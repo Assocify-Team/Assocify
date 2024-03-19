@@ -34,3 +34,25 @@ Assocify is an application to centralize all of your student organization needs 
 
 [Figma](https://www.figma.com/files/project/213391728/Assocify?fuid=1213058493509425919)
 [Project Proposal](https://docs.google.com/document/d/1_9hGwoGBIqygBJgahw5CbMNxU-d_K-2d-qFGFdvNsdA/edit)
+
+## Setup Dev environment
+
+This repository uses client hooks to ensure the quality of the commits. You need to install the `pre-commit` python package to set up those:
+
+```sh
+# Using apt
+apt-get update
+apt-get install pip
+pip install pre-commit
+
+# Using pacman
+pacman -S python-pre-commit
+```
+
+Then run:
+
+```sh
+pre-commit install --hook-type commit-msg
+```
+
+All the commits must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. It is checked both locally by the hook and by the CI on pull requests.
