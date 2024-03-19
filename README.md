@@ -30,7 +30,7 @@ Assocify is an application to centralize all of your student organization needs 
 | François Théron     | [ZiZouet](https://github.com/ZiZouet)                |
 | Sidonie Bouthors    | [SidonieBouthors](https://github.com/SidonieBouthors)|
 
-# Quick Links
+## Quick Links
 
 [Figma](https://www.figma.com/files/project/213391728/Assocify?fuid=1213058493509425919)
 [Project Proposal](https://docs.google.com/document/d/1_9hGwoGBIqygBJgahw5CbMNxU-d_K-2d-qFGFdvNsdA/edit)
