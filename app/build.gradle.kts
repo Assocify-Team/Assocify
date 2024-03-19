@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("org.sonarqube") version "2.6.2"
+    id ("org.sonarqube") version "3.3"
 }
 
 android {
