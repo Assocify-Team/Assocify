@@ -1,4 +1,4 @@
-name: "Lint PR for conventional commits"
+name: "Conventional commits"
 
 on:
   pull_request:

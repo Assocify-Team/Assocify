@@ -28,6 +28,7 @@ Assocify is an application to centralize all of your student organization needs 
 | Maï-Linh Cordonnier | [Mai-LinhC](https://github.com/Mai-LinhC)            |
 | Rayan Boucheny      | [Polymeth](https://github.com/polymeth)              |
 | François Théron     | [ZiZouet](https://github.com/ZiZouet)                |
+| Sebastien Kobler    | [SekoiaTree](https://github.com/SekoiaTree)          |
 | Sidonie Bouthors    | [SidonieBouthors](https://github.com/SidonieBouthors)|
 
 ## Quick Links
