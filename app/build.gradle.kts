@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
