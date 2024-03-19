@@ -3,7 +3,7 @@
   Assocify
   <br>
 </h1>
-
+ 
 Assocify is an application to centralize all of your student organization needs in one place: accounting, chat, event management, todo list, annoucements, minutes of meeting...
 
 ## Key Features
