@@ -4,11 +4,11 @@
   <br>
 </h1>
 
-Assocify is an application to centralize all of your student organization needs in one place: accounting, chat, event management, todo list, annoucements, minutes of meeting...
+Assocify is an application to centralize all of your student organization needs in one place: accounting, chat, event management, todo list, announcements, minutes of meeting...
 
 ## Key Features
 
-- Chat & Annoucements
+- Chat & Announcements
 - Budgets & Transactions
 - Receipt Management
 - Security & Authentication
@@ -38,7 +38,7 @@ Assocify is an application to centralize all of your student organization needs 
 
 ## Setup Dev environment
 
-This repository uses client hooks to ensure the quality of the commits. You need to install the `pre-commit` python package to set up those:
+This repository uses client hooks to ensure the quality of the commits. You need to install the `pre-commit` python package to set it up :
 
 ```sh
 # Using apt
@@ -56,4 +56,4 @@ Then run:
 pre-commit install --hook-type commit-msg
 ```
 
-All the commits must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. It is checked both locally by the hook and by the CI on pull requests.
+All the commits must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This is checked both locally by the hook and by the CI on pull requests.
