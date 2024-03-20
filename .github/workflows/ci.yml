@@ -70,12 +70,14 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
 
       - name: Create google-services.json file
-  	run: cat /home/runner/work/Assocify/Assocify/app/google-services.json | base64
+        run: |
+          cat /home/runner/work/Assocify/Assocify/app/google-services.json | base64
 
       - name: Load google-services.json contents
-  	env:
-    	  DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-  	run: echo $DATA > /home/runner/work/Assocify/Assocify/app/google-services.json
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo $DATA > /home/runner/work/Assocify/Assocify/app/google-services.json
 
       - name: Grant execute permission for gradlew
         run: |
