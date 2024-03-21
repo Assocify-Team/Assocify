@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("org.sonarqube") version "3.3"
+    id("org.sonarqube") version "4.4.1.3373"
     id("com.google.gms.google-services")
 }
 
@@ -147,5 +147,13 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
 tasks.withType<Test> {
     onlyIf {
         !name.toLowerCaseAsciiOnly().contains("release")
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Assocify-Team_Assocify")
+        property("sonar.organization", "assocify-team")
+        property("sonar.host.url", "https://sonarcloud.io")
     }
 }
