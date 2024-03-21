@@ -104,6 +104,9 @@ dependencies {
     // Jetpack Compose support
     androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
 
+    // Support for intents in instrumented tests
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+
     implementation("androidx.fragment:fragment:1.5.5")
 
     implementation("com.squareup.okhttp3:okhttp:3.10.0")
