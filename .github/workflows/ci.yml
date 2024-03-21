@@ -113,7 +113,7 @@ jobs:
         run: |
           ./gradlew jacocoTestReport
 
-      # Upload the various reports to sonar
+      # Upload the various reports to sonarcloud
       - name: Upload report to SonarCloud
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
