@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Assocify</string>
+    <string name="home_tab_label">Home</string>
+    <string name="treasury_tab_label">Treasury</string>
+    <string name="event_tab_label">Event</string>
+    <string name="chat_tab_label">Chat</string>
+    <string name="profile_tab_label">Profile</string>
 </resources>
