@@ -1,7 +1,9 @@
 package com.github.se.assocify
 
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -30,13 +32,15 @@ class FirebaseTest{
         )
         myCollection.document("test_document").set(testData)
 
-        // Read data from Firebase Firestore and verify it
-        myCollection.document("test_document").get().addOnSuccessListener { documentSnapshot ->
+        try {
+            // Read data from Firebase Firestore and verify it
+            val documentSnapshot = Tasks.await(myCollection.document("test_document").get())
             val name = documentSnapshot.getString("name")
             val age = documentSnapshot.getLong("age")
-            assert(name == "John Doe" && age?.toInt() == 30)
-        }.addOnFailureListener { exception ->
-            assert(false) // The test should fail if there's an error
+            Assert.assertEquals("John Doe", name)
+            Assert.assertEquals(30, age?.toInt())
+        } catch (e: Exception) {
+            Assert.fail("The test should fail if there's an error") // The test should fail if there's an error
         }
     }
 }
