@@ -1,6 +1,9 @@
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.sonarqube") version "4.4.1.3373"
     id("com.google.gms.google-services")
 }
 
@@ -28,6 +31,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
     compileOptions {
@@ -102,4 +109,51 @@ dependencies {
     testImplementation("org.mockito:mockito-core:3.11.2")
     testImplementation("org.mockito:mockito-inline:2.13.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+
+    // Roboelectric
+    testImplementation("org.robolectric:robolectric:4.11.1")
+}
+
+tasks.register("jacocoTestReport", JacocoReport::class) {
+    mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
+
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+    )
+    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(project.buildDir) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
+    })
+}
+
+// Avoid redundant tests, debug is sufficient
+tasks.withType<Test> {
+    onlyIf {
+        !name.toLowerCaseAsciiOnly().contains("release")
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Assocify-Team_Assocify")
+        property("sonar.organization", "assocify-team")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
