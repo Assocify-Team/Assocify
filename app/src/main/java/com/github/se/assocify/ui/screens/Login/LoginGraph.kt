@@ -1,0 +1,15 @@
+package com.github.se.assocify.ui.screens.Login
+
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.profile.ProfileScreen
+
+fun NavGraphBuilder.loginGraph(navigationActions: NavigationActions) {
+    composable(
+        route = Destination.Login.route,
+    ) {
+        LoginScreen(navigationActions)
+    }
+}

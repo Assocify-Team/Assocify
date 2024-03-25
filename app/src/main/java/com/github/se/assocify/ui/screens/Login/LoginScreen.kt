@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui
+package com.github.se.assocify.ui.screens.Login
 
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -12,12 +12,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,17 +30,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
-import com.github.se.assocify.ui.theme.AssocifyTheme
+import com.github.se.assocify.navigation.NavigationActions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
@@ -72,11 +67,12 @@ fun rememberFirebaseAuthLauncher(
 }
 
 @Composable
-fun LoginPage(onLogin: (FirebaseUser?) -> Unit, onAuthError: () -> Unit) {
+fun LoginScreen(navActions: NavigationActions) {
+
     val launcher =
         rememberFirebaseAuthLauncher(
-            onAuthComplete = { result -> onLogin(result.user) },
-            onAuthError = { onAuthError() })
+            onAuthComplete = { result -> navActions.onLogin(result.user) },
+            onAuthError = { navActions.onAuthError() })
     val token = stringResource(R.string.web_client_id)
     val context = LocalContext.current
 

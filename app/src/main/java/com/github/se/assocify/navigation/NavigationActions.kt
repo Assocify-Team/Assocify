@@ -1,10 +1,8 @@
 package com.github.se.assocify.navigation
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.github.se.assocify.R
+import com.google.firebase.auth.FirebaseUser
 
 class NavigationActions(private val navController: NavHostController) {
     fun navigateToMainTab(destination: Destination) {
@@ -17,6 +15,14 @@ class NavigationActions(private val navController: NavHostController) {
         } else {
             throw IllegalArgumentException("Destination $destination is not a main tab")
         }
+    }
+
+    fun onLogin(user: FirebaseUser?) {
+        /* Handle login */
+    }
+
+    fun onAuthError() {
+        /* Handle auth error */
     }
 }
 
