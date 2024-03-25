@@ -2,20 +2,17 @@ package com.github.se.assocify.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,12 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 
+/**
+ * Screen to select an association
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAssociation(){
     //TODO: fetch lists from DB
-    //lists of organizations
-    val allOrganization = listOf("Organization 1", "Organization 2", "Organization 3") //all organization in db
     val registeredOrganization = listOf("CLIC", "GAME*") // organizations that the user is registered to
     val filteredOrganization = emptyList<String>() // organizations that matches the search query
 
@@ -50,13 +48,14 @@ fun SelectAssociation(){
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp), // Add 16dp padding to all sides
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp) // Space items vertically by 8.dp
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 /*TODO: replace user by user's actual name*/
                 Text(text = "Hello User", style = MaterialTheme.typography.headlineSmall)
                 SearchBar(
+                    modifier = Modifier.testTag("SearchOrganization"),
                     query = "",
                     onQueryChange = {},
                     onSearch = {},
@@ -100,7 +99,7 @@ fun SelectAssociation(){
                 onClick = { /*TODO: navigate to go to newAssociation screen*/ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp), // Add 16dp padding to all sides
+                    .padding(16.dp),
                 content = { Text(text = "Create new organization") },
                 colors = ButtonDefaults.buttonColors(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -109,13 +108,13 @@ fun SelectAssociation(){
             )
         }
     ){
-        //Display registered organizations
         innerPadding ->
         LazyColumn(
             contentPadding = innerPadding,
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.fillMaxSize().fillMaxWidth().padding(16.dp)
+            modifier = Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")
         ){
+            //Display only registered organization
             if(registeredOrganization.isEmpty()){
                 item {
                     Text(text = "You are not registered to any organization.")
@@ -135,16 +134,19 @@ fun SelectAssociation(){
     }
 }
 
+/**
+ * Display an organization on the select association screen
+ */
+
 //TODO: change the parameter to organization object (should have name, logo, etc)
 @Composable
 fun DisplayOrganization(organization: String){
-    //display organization
     Row (
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp), // Space items horizontally by 8.dp
-        verticalAlignment = Alignment.CenterVertically // Align items vertically in the center
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Organization Icon")
         Text(text = organization, style = MaterialTheme.typography.bodyLarge)
