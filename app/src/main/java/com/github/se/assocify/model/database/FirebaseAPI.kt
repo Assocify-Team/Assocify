@@ -1,22 +1,22 @@
-package model.database
+package com.github.se.assocify.model.database
 
-import androidx.lifecycle.LiveData
 import com.google.firebase.firestore.FirebaseFirestore
+import com.github.se.assocify.model.entities.Association
 
 abstract class FirebaseApi(val db: FirebaseFirestore) {
 
     // Define common properties
     abstract val collectionName: String
 
-    // Define common methods
-    fun get(id: String) = db.collection(collectionName).document(id)
 
-    fun getAll() = db.collection(collectionName).get()
-
-    fun add(data: Map<String, Any>) = db.collection(collectionName).add(data)
+    fun getNewId() = db.collection(collectionName).document().id
 
     fun update(id: String, data: Map<String, Any>) =
         db.collection(collectionName).document(id).update(data)
 
     fun delete(id: String) = db.collection(collectionName).document(id).delete()
+
+    abstract fun deserialize(data: String): Association
+
+
 }

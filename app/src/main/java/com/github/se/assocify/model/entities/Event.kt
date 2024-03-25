@@ -1,4 +1,4 @@
-package entities
+package com.github.se.assocify.model.entities
 
 import java.time.LocalDate
 

@@ -1,4 +1,4 @@
-package model.database
+package com.github.se.assocify.model.database
 
 import com.google.firebase.firestore.FirebaseFirestore
 

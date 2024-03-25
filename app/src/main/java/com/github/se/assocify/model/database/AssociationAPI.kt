@@ -1,10 +1,10 @@
-package model.database
+package com.github.se.assocify.model.database
 
 import com.google.firebase.firestore.FirebaseFirestore
 
 class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
-    override val collectionName: String
-        get() = "associations"
+    override val collectionName: String = "associations"
+
     fun getAssociation(id:String) = get(id)
     fun getAssociations() = getAll()
 
