@@ -13,6 +13,10 @@ sealed class Screen(val route: String, @StringRes val labelId: Int, @DrawableRes
     data object Event : Screen("event", R.string.event_tab_label, R.drawable.event_tab_icon)
     data object Chat : Screen("chat", R.string.chat_tab_label, R.drawable.chat_tab_icon)
     data object Profile : Screen("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
+
+    data object Login : Screen("login", R.string.login_page_label, null)
+    data object ChooseAssoc : Screen("chooseAssoc", R.string.choose_assoc_page_label, null)
+    data object CreateAssoc : Screen("createAssoc", R.string.create_assoc_page_label, null)
 }
 
 val MAIN_TABS_LIST = listOf(
