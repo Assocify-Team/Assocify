@@ -12,3 +12,4 @@ abstract class FirebaseApi(val db: FirebaseFirestore) {
     fun delete(id: String) = db.collection(collectionName).document(id).delete()
 
 }
+
