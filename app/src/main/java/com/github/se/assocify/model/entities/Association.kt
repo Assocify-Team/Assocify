@@ -1,12 +1,16 @@
 package com.github.se.assocify.model.entities
 
-import java.time.LocalDate
 
 data class Association(
+    var uid: String,
     val name: String,
     val description: String,
-    val creationDate: LocalDate,
+    val creationDate: String,
     val status: String,
-    val members: Map<User, Role>,
-    val events:  List<User>,
-)
+    val members: List<User>,
+    val events: List<Event>
+) {
+    constructor(): this("", "", "", "", "", listOf(), listOf())
+
+}
+
