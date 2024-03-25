@@ -9,12 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.github.se.assocify.Screen
+import com.github.se.assocify.navigation.Destination
 
 @Composable
 fun MainNavigationBar(
-    tabList: List<Screen>,
-    selectedTab: Screen,
+    onTabSelect: (Destination) -> Unit,
+    tabList: List<Destination>,
+    selectedTab: Destination,
 ) {
     NavigationBar(
         modifier = Modifier.testTag("mainNavBar")
@@ -23,9 +24,11 @@ fun MainNavigationBar(
             NavigationBarItem(
                 modifier = Modifier.testTag("mainNavBarItem"),
                 selected = tab == selectedTab,
-                onClick = { /*TODO*/ },
-                label = { Text(stringResource(id = tab.labelId)) },
-                icon = { if (tab.iconId != null) { Icon(painterResource(tab.iconId), contentDescription = null) } },
+                onClick = { onTabSelect(tab) },
+                label = { Text(if(tab.labelId != null) {
+                    stringResource(id =  tab.labelId) } else { "" } ) },
+                icon = { if (tab.iconId != null) {
+                    Icon(painterResource(tab.iconId), contentDescription = null) } },
             )
         }
     }
