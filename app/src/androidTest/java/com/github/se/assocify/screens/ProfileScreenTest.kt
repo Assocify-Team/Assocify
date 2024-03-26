@@ -36,7 +36,7 @@ class ProfileScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
     }
 
     @Test
-    fun iconsDisplayed() {
+    fun display() {
         with (composeTestRule) {
             onNodeWithTag("profileScreen").assertIsDisplayed()
         }

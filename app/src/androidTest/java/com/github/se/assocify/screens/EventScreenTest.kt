@@ -36,7 +36,7 @@ class EventScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
     }
 
     @Test
-    fun iconsDisplayed() {
+    fun display() {
         with (composeTestRule) {
             onNodeWithTag("eventScreen").assertIsDisplayed()
         }

@@ -36,7 +36,7 @@ class HomeScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeS
     }
 
     @Test
-    fun iconsDisplayed() {
+    fun display() {
         with (composeTestRule) {
             onNodeWithTag("homeScreen").assertIsDisplayed()
         }

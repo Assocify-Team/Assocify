@@ -35,7 +35,7 @@ class TreasuryScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
 
     @Test
-    fun iconsDisplayed() {
+    fun display() {
         with (composeTestRule) {
             onNodeWithTag("treasuryScreen").assertIsDisplayed()
         }

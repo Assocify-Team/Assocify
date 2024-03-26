@@ -36,7 +36,7 @@ class ChatScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeS
     }
 
     @Test
-    fun iconsDisplayed() {
+    fun display() {
         with (composeTestRule) {
             onNodeWithTag("chatScreen").assertIsDisplayed()
         }
