@@ -9,8 +9,16 @@ class SelectAssociationScreen(semanticsProvider: SemanticsNodeInteractionsProvid
     ComposeScreen<SelectAssociationScreen>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("SelectAssociationScreen") }) {
-        // Search Bar Tag
         val searchOrganization: KNode = child { hasTestTag("SearchOrganization") }
         val registeredList: KNode = child { hasTestTag("RegisteredList") }
+        val createOrgaButton: KNode = child { hasTestTag("CreateNewOrganizationButton") }
 
+    }
+
+class DisplayOrganizationScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<DisplayOrganizationScreen>(
+        semanticsProvider = semanticsProvider,
+        viewBuilderAction = { hasTestTag("DisplayOrganizationScreen") }) {
+    val organizationName: KNode = child { hasTestTag("OrganizationName") }
+    val organizationIcon: KNode = child { hasTestTag("OrganizationIcon") }
     }
