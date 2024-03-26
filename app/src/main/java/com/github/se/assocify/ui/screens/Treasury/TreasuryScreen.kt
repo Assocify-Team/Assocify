@@ -24,9 +24,12 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -95,9 +98,19 @@ fun TreasuryMainScreen() {
                     }
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier.testTag("AddReceipt"),
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
+                onClick = { },
+            ) {
+                Icon(Icons.Outlined.Add, "Create")
+            }
         }
     ) { innerPadding ->
         Column(
@@ -294,9 +307,7 @@ private fun ReceiptItem(receiptName: String) {
                 contentDescription = "Arrow icon",
             )
         }
-
     }
-
 }
 
 @Preview
