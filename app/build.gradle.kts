@@ -4,7 +4,9 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.sonarqube") version "4.4.1.3373"
+    id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+
 }
 
 android {
