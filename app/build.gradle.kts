@@ -53,6 +53,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
         }
     }
 }
@@ -112,6 +114,13 @@ dependencies {
 
     // Roboelectric
     testImplementation("org.robolectric:robolectric:4.11.1")
+
+    // Mockk
+    testImplementation("io.mockk:mockk:1.13.7")
+    testImplementation("io.mockk:mockk-android:1.13.7")
+    testImplementation("io.mockk:mockk-agent:1.13.7")
+    androidTestImplementation("io.mockk:mockk-android:1.13.7")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
