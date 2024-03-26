@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+<<<<<<< HEAD
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -93,3 +94,69 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
         }
     }
 }
+=======
+  @get:Rule val composeTestRule = createComposeRule()
+
+  // The IntentsTestRule simply calls Intents.init() before the @Test block
+  // and Intents.release() after the @Test block is completed. IntentsTestRule
+  // is deprecated, but it was MUCH faster than using IntentsRule in our tests
+  @get:Rule val intentsTestRule = IntentsRule()
+
+  class LoginScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+      ComposeScreen<LoginScreen>(
+          semanticsProvider = semanticsProvider,
+          viewBuilderAction = { hasTestTag("LoginScreen") }) {
+
+    // Structural elements of the UI
+    val loginTitle: KNode = child { hasTestTag("LoginTitle") }
+    val loginButton: KNode = child { hasTestTag("LoginButton") }
+  }
+
+  private var authError = false
+  private var authSuccess = false
+
+  @Before
+  fun setupLogin() {
+
+    composeTestRule.setContent { LoginPage({ authSuccess = true }, { authError = true }) }
+  }
+
+  @Test
+  fun titleAndButtonAreCorrectlyDisplayed() {
+    ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
+      // Test the UI elements
+      loginTitle {
+        assertIsDisplayed()
+        assertTextEquals("Welcome")
+      }
+      loginButton {
+        assertIsDisplayed()
+        assertHasClickAction()
+      }
+    }
+  }
+
+  @Test
+  fun googleSignInReturnsValidActivityResult() {
+    ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
+      val intent = Intent()
+      val activity = Instrumentation.ActivityResult(Activity.RESULT_OK, intent)
+
+      intending(toPackage("com.google.android.gms")).respondWith(activity)
+
+      loginButton {
+        assertIsDisplayed()
+        performClick()
+      }
+
+      // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
+      intended(toPackage("com.google.android.gms"))
+
+      assert(authError)
+      authError = false
+
+      assert(!authSuccess)
+    }
+  }
+}
+>>>>>>> 4e6cde9d7cdce77d0e2f93e603fe6982136fdf42
