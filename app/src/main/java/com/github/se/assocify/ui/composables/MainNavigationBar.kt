@@ -22,7 +22,7 @@ fun MainNavigationBar(
     ) {
         tabList.forEach { tab ->
             NavigationBarItem(
-                modifier = Modifier.testTag("mainNavBarItem"),
+                modifier = Modifier.testTag("mainNavBarItem/${tab.route}"),
                 selected = tab == selectedTab,
                 onClick = { onTabSelect(tab) },
                 label = { Text(if(tab.labelId != null) {
