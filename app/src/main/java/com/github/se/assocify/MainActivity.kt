@@ -16,6 +16,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.navigation.mainNavGraph
 import com.github.se.assocify.ui.composables.MainNavigationBar
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +30,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AssocifyApp()
+                    val navController = rememberNavController()
+                    val navActions = NavigationActions(navController)
+                    NavHost(navController = navController, startDestination = Destination.Home.route) {
+                        mainNavGraph(navActions = navActions)
+                    }
                 }
             }
         }
