@@ -1,7 +1,9 @@
 package com.github.se.assocify
 
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
