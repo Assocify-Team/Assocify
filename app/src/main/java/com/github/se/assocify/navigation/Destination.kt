@@ -15,8 +15,6 @@ sealed class Destination(val route: String, @StringRes val labelId: Int? = null,
     data object Profile : Destination("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
 
     data object Login : Destination("login", R.string.login_page_label)
-    data object ChooseAssoc : Destination("chooseAssoc", R.string.choose_assoc_page_label)
-    data object CreateAssoc : Destination("createAssoc", R.string.create_assoc_page_label)
 }
 
 val MAIN_TABS_LIST = listOf(
