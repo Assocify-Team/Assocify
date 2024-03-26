@@ -8,16 +8,12 @@ import org.junit.Test
 
 class UserAPITest {
 
-    private val db = FirebaseFirestore.getInstance()
-    private val userAPI = UserAPI(db)
-    @Before
-    fun setUp() {
-    }
-    @After
-    fun tearDown() {
-    }
+  private val db = FirebaseFirestore.getInstance()
+  private val userAPI = UserAPI(db)
 
-    @Test
-    fun test() {
-    }
+  @Before fun setUp() {}
+
+  @After fun tearDown() {}
+
+  @Test fun test() {}
 }
