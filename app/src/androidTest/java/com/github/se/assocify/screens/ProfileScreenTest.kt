@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
@@ -17,6 +18,7 @@ import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
@@ -29,9 +31,15 @@ class ProfileScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
     val composeTestRule = createComposeRule()
 
     private val navActions = mockk<NavigationActions>()
+    private var tabSelected = false
 
     @Before
     fun testSetup() {
+        every {
+            navActions.navigateToMainTab(any())
+        } answers {
+            tabSelected = true
+        }
         composeTestRule.setContent { ProfileScreen(navActions = navActions) }
     }
 
@@ -39,6 +47,14 @@ class ProfileScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withCompo
     fun display() {
         with (composeTestRule) {
             onNodeWithTag("profileScreen").assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun navigate() {
+        with (composeTestRule) {
+            onNodeWithTag("mainNavBarItem/treasury").performClick()
+            assert(tabSelected)
         }
     }
 }
