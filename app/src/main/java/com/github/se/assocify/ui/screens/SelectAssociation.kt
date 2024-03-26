@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui
+package com.github.se.assocify.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SelectAssociation(){
     //TODO: fetch lists from DB
-    val registeredOrganization = listOf("CLIC", "GAME*") // organizations that the user is registered to
-    val filteredOrganization = emptyList<String>() // organizations that matches the search query
+    val registeredAssociation = listOf("CLIC", "GAME*") // organizations that the user is registered to
+    val filteredAssociation= emptyList<String>() // organizations that matches the search query
 
     //search bar var: TODO: implement search
     val isSearching = false
@@ -99,7 +99,8 @@ fun SelectAssociation(){
                 onClick = { /*TODO: navigate to go to newAssociation screen*/ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .testTag("CreateNewOrganizationButton"),
                 content = { Text(text = "Create new organization") },
                 colors = ButtonDefaults.buttonColors(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -112,18 +113,19 @@ fun SelectAssociation(){
         LazyColumn(
             contentPadding = innerPadding,
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")
+            modifier = Modifier.fillMaxSize()
+                .fillMaxWidth().padding(16.dp).testTag("RegisteredList")
         ){
             //Display only registered organization
-            if(registeredOrganization.isEmpty()){
+            if(registeredAssociation.isEmpty()){
                 item {
                     Text(text = "You are not registered to any organization.")
                 }
             } else {
-                itemsIndexed(registeredOrganization) { index, organization ->
+                itemsIndexed(registeredAssociation) { index, organization ->
                     DisplayOrganization(organization)
                     // Add a Divider for each organization except the last one
-                    if (index < registeredOrganization.size - 1) {
+                    if (index < registeredAssociation.size - 1) {
                         Divider(
                             Modifier.fillMaxWidth().padding(8.dp)
                         )
@@ -136,6 +138,7 @@ fun SelectAssociation(){
 
 /**
  * Display an organization on the select association screen
+ * @param organization the name of the organization
  */
 
 //TODO: change the parameter to organization object (should have name, logo, etc)
@@ -144,11 +147,14 @@ fun DisplayOrganization(organization: String){
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .testTag("DisplayOrganizationScreen"),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Organization Icon")
-        Text(text = organization, style = MaterialTheme.typography.bodyLarge)
+        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Organization Icon",
+            modifier = Modifier.testTag("OrganizationIcon"))
+        Text(text = organization, style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.testTag("OrganizationName"))
     }
 }
