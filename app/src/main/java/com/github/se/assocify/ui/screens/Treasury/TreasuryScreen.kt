@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -96,6 +97,7 @@ fun TreasuryMainScreen() {
 
             // Tabs
             TabRow(
+                modifier = Modifier.height(48.dp),
                 selectedTabIndex = pagerState.currentPage,
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.primary,
@@ -116,7 +118,16 @@ fun TreasuryMainScreen() {
                     onClick = { coroutineRoute.launch {
                         pagerState.animateScrollToPage(PAGE_RECEIPT_INDEX)
                     } },
-                    text = { Text("My receipts") }
+                    text = {
+                        Text(
+                            text = "My receipts",
+                            color = if (pagerState.currentPage == PAGE_RECEIPT_INDEX) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            }
+                        )
+                    }
                 )
                 // Budget
                 Tab(
@@ -124,7 +135,16 @@ fun TreasuryMainScreen() {
                     onClick = { coroutineRoute.launch {
                         pagerState.animateScrollToPage(PAGE_BUDGET_INDEX)
                     } },
-                    text = { Text("Budget") }
+                    text = {
+                        Text(
+                            text = "Budget",
+                            color = if (pagerState.currentPage == PAGE_BUDGET_INDEX) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                            }
+                        )
+                    }
                 )
                 // Balance
                 Tab(
@@ -132,7 +152,16 @@ fun TreasuryMainScreen() {
                     onClick = { coroutineRoute.launch {
                         pagerState.animateScrollToPage(PAGE_BALANCE_INDEX)
                     } },
-                    text = { Text("Balance") }
+                    text = {
+                        Text(
+                            text = "Balance",
+                            color = if (pagerState.currentPage == PAGE_BALANCE_INDEX) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                            }
+                        )
+                    }
                 )
             }
 
