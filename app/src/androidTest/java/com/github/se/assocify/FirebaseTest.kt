@@ -6,6 +6,7 @@ import org.junit.Before
 import org.junit.Test
 
 class FirebaseTest {
+
   private val db = FirebaseFirestore.getInstance()
   private val myCollection = db.collection("test_collection")
 
