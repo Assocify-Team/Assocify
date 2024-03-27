@@ -59,3 +59,14 @@ class LoginAppTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
     with(composeTestRule) { onRoot().assertIsDisplayed() }
   }
 }
+
+@RunWith(AndroidJUnit4::class)
+class ActivityAppTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
+
+  @Test
+  fun loginStart() {
+    composeTestRule.setContent { MainActivity() }
+    with(composeTestRule) { onRoot().assertExists() }
+  }
+}
