@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
@@ -80,5 +81,27 @@ class MainNavigationBarTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       onNodeWithTag("mainNavBarItem/home").performClick()
       assert(tabPressed == Destination.Home)
     }
+  }
+}
+
+@RunWith(AndroidJUnit4::class)
+class MainNavigationBarTest2 : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
+
+  private var tabPressed: Destination? = null
+
+  @Before
+  fun testSetup() {
+    composeTestRule.setContent {
+      MainNavigationBar(
+          onTabSelect = { tabPressed = it },
+          tabList = listOf(Destination.Login),
+          selectedTab = Destination.Login)
+    }
+  }
+
+  @Test
+  fun nullIconLabelTab() {
+    with(composeTestRule) { onAllNodesWithTag("mainNavBarItem/login").assertCountEquals(0) }
   }
 }
