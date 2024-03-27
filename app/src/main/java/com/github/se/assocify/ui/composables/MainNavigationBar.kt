@@ -19,27 +19,20 @@ fun MainNavigationBar(
 ) {
   NavigationBar(modifier = Modifier.testTag("mainNavBar")) {
     tabList.forEach { tab ->
-      NavigationBarItem(
-          modifier = Modifier.testTag("mainNavBarItem/${tab.route}"),
-          selected = tab == selectedTab,
-          onClick = { onTabSelect(tab) },
-          label = {
-            Text(
-                if (tab.labelId != null) {
-                  stringResource(id = tab.labelId)
-                } else {
-                  ""
-                })
-          },
-          icon = {
-            if (tab.iconId != null) {
+      if (tab.labelId != null && tab.iconId != null) {
+        NavigationBarItem(
+            modifier = Modifier.testTag("mainNavBarItem/${tab.route}"),
+            selected = tab == selectedTab,
+            onClick = { onTabSelect(tab) },
+            label = { Text(stringResource(id = tab.labelId)) },
+            icon = {
               Icon(
                   painterResource(tab.iconId),
                   contentDescription = null,
                   modifier = Modifier.testTag("${tab.route}Icon"))
-            }
-          },
-      )
+            },
+        )
+      }
     }
   }
 }
