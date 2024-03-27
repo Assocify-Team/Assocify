@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.sonarqube") version "4.4.1.3373"
+    id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
 }
 
@@ -53,6 +54,18 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE*.md"
+        }
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+
+        packaging {
+            jniLibs {
+                useLegacyPackaging = true
+            }
         }
     }
 }
@@ -115,6 +128,13 @@ dependencies {
 
     // Roboelectric
     testImplementation("org.robolectric:robolectric:4.11.1")
+
+    // Mockk
+    testImplementation("io.mockk:mockk:1.13.7")
+    testImplementation("io.mockk:mockk-android:1.13.7")
+    testImplementation("io.mockk:mockk-agent:1.13.7")
+    androidTestImplementation("io.mockk:mockk-android:1.13.7")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
