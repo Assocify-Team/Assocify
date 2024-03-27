@@ -1,6 +1,5 @@
 package com.github.se.assocify.navigation
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.github.se.assocify.ui.screens.chat.chatGraph
 import com.github.se.assocify.ui.screens.event.eventGraph
