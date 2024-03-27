@@ -20,54 +20,45 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.se.assocify.R
 import kotlinx.coroutines.launch
-import com.github.se.assocify.ui.theme.AssocifyTheme
 
+// Number of tabs at the top
 const val NUMBER_OF_PAGES: Int = 3
+
+// Index of each tag for navigation
 const val PAGE_RECEIPT_INDEX: Int = 0
 const val PAGE_BUDGET_INDEX: Int = 1
 const val PAGE_BALANCE_INDEX: Int = 2
 
+/**
+ * Main treasury screen UI
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -110,23 +101,44 @@ fun TreasuryMainScreen() {
                             .fillMaxSize()
                             .tabIndicatorOffset(tabPositions[pagerState.currentPage])
                             .size(width = 10.dp, height = 3.dp)
-                            .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(8.dp)
+                            )
                     )
                 }
             ) {
                 TreasuryTab(
                     selected = pagerState.currentPage == PAGE_RECEIPT_INDEX,
-                    onClick = { coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_RECEIPT_INDEX) } },
+                    onClick = {
+                        coroutineRoute.launch {
+                            pagerState.animateScrollToPage(
+                                PAGE_RECEIPT_INDEX
+                            )
+                        }
+                    },
                     text = "My receipts"
                 )
                 TreasuryTab(
                     selected = pagerState.currentPage == PAGE_BUDGET_INDEX,
-                    onClick = { coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_BUDGET_INDEX) } },
+                    onClick = {
+                        coroutineRoute.launch {
+                            pagerState.animateScrollToPage(
+                                PAGE_BUDGET_INDEX
+                            )
+                        }
+                    },
                     text = "Budget"
                 )
                 TreasuryTab(
                     selected = pagerState.currentPage == PAGE_BALANCE_INDEX,
-                    onClick = { coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_BALANCE_INDEX) } },
+                    onClick = {
+                        coroutineRoute.launch {
+                            pagerState.animateScrollToPage(
+                                PAGE_BALANCE_INDEX
+                            )
+                        }
+                    },
                     text = "Balance"
                 )
             }
@@ -150,8 +162,13 @@ fun TreasuryMainScreen() {
     }
 }
 
-// ------------- PAGES ------------- //
+/** ------------------------------------------------- **
+ *  PAGES                                              *
+ ** ------------------------------------------------- **/
 
+/**
+ * My receipts UI page
+ */
 @Composable
 private fun MyReceiptPage() {
     //val receiptNames = listOf("Grocery Shopping", "Restaurant", "Gas Station", "Coffee Shop")
@@ -170,18 +187,29 @@ private fun MyReceiptPage() {
     }
 }
 
+/**
+ * Budget UI page
+ */
 @Composable
 private fun BudgetPage() {
 
 }
 
+/**
+ * Balance UI page
+ */
 @Composable
 private fun BalancePage() {
 
 }
 
-// ------------- ELEMENTS ------------- //
+/** ------------------------------------------------- **
+ *  Elements                                           *
+ ** ------------------------------------------------- **/
 
+/**
+ * Top tabs component
+ */
 @Composable
 fun TreasuryTab(
     selected: Boolean,
@@ -204,6 +232,9 @@ fun TreasuryTab(
     )
 }
 
+/**
+ * Main top bar with search and account icon
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TreasuryTopBar(
@@ -239,6 +270,9 @@ fun TreasuryTopBar(
     )
 }
 
+/**
+ * Receipt item from the list in My Receipts page
+ */
 @Composable
 private fun ReceiptItem(receiptName: String) {
     Box(
@@ -305,6 +339,9 @@ private fun ReceiptItem(receiptName: String) {
     }
 }
 
+/**
+ * Android Studio preview
+ */
 @Preview
 @Composable
 private fun PreviewCardsScreen() {
