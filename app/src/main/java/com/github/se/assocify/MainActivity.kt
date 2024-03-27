@@ -7,11 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
-import com.github.se.assocify.navigation.Destination
-import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.navigation.mainNavGraph
 import com.github.se.assocify.ui.theme.AssocifyTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,11 +19,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    val navActions = NavigationActions(navController)
-                    NavHost(navController = navController, startDestination = Destination.Home.route) {
-                        mainNavGraph(navActions = navActions)
-                    }
+                    AssocifyApp()
                 }
             }
         }

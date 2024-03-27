@@ -1,6 +1,10 @@
 package com.github.se.assocify
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -17,13 +21,14 @@ class AppTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport(
 
     @Before
     fun testSetup() {
-        composeTestRule.setContent { MainActivity() }
+        composeTestRule.setContent { AssocifyApp() }
     }
 
     @Test
     fun display() {
         with (composeTestRule) {
-
+            onRoot().assertIsDisplayed()
+            onNodeWithTag("mainNavBarItem/treasury").assertIsDisplayed().performClick()
         }
     }
 }
