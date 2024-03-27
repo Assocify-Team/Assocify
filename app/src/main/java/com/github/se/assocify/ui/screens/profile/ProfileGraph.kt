@@ -6,9 +6,9 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.profileGraph(navigationActions: NavigationActions) {
-    composable(
-        route = Destination.Profile.route,
-    ) {
-        ProfileScreen(navigationActions)
-    }
+  composable(
+      route = Destination.Profile.route,
+  ) {
+    ProfileScreen(navigationActions)
+  }
 }

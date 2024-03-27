@@ -6,9 +6,9 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.chatGraph(navigationActions: NavigationActions) {
-    composable(
-        route = Destination.Chat.route,
-    ) {
-        ChatScreen(navigationActions)
-    }
+  composable(
+      route = Destination.Chat.route,
+  ) {
+    ChatScreen(navigationActions)
+  }
 }

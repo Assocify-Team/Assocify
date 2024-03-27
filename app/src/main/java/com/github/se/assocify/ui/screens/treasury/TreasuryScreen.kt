@@ -13,18 +13,14 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 
 @Composable
 fun TreasuryScreen(navActions: NavigationActions) {
-    Scaffold (
-        modifier = Modifier.testTag("treasuryScreen"),
-        bottomBar = {
-            MainNavigationBar(
-                onTabSelect = { navActions.navigateToMainTab(it) },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Treasury
-            )
-        }
-    ) {
-        Text(
-            modifier = Modifier.padding(it),
-            text = "Treasury Screen")
-    }
+  Scaffold(
+      modifier = Modifier.testTag("treasuryScreen"),
+      bottomBar = {
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Treasury)
+      }) {
+        Text(modifier = Modifier.padding(it), text = "Treasury Screen")
+      }
 }

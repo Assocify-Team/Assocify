@@ -13,18 +13,14 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 
 @Composable
 fun ChatScreen(navActions: NavigationActions) {
-    Scaffold (
-        modifier = Modifier.testTag("chatScreen"),
-        bottomBar = {
-            MainNavigationBar(
-                onTabSelect = { navActions.navigateToMainTab(it) },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Chat
-            )
-        }
-    ) {
-        Text(
-            modifier = Modifier.padding(it),
-            text = "Chat Screen")
-    }
+  Scaffold(
+      modifier = Modifier.testTag("chatScreen"),
+      bottomBar = {
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Chat)
+      }) {
+        Text(modifier = Modifier.padding(it), text = "Chat Screen")
+      }
 }

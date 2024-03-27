@@ -17,21 +17,29 @@ fun MainNavigationBar(
     tabList: List<Destination>,
     selectedTab: Destination,
 ) {
-    NavigationBar(
-        modifier = Modifier.testTag("mainNavBar")
-    ) {
-        tabList.forEach { tab ->
-            NavigationBarItem(
-                modifier = Modifier.testTag("mainNavBarItem/${tab.route}"),
-                selected = tab == selectedTab,
-                onClick = { onTabSelect(tab) },
-                label = { Text(if(tab.labelId != null) {
-                    stringResource(id =  tab.labelId) } else { "" } ) },
-                icon = { if (tab.iconId != null) {
-                    Icon(painterResource(tab.iconId), contentDescription = null,
-                        modifier = Modifier.testTag("${tab.route}Icon")) } },
-            )
-        }
+  NavigationBar(modifier = Modifier.testTag("mainNavBar")) {
+    tabList.forEach { tab ->
+      NavigationBarItem(
+          modifier = Modifier.testTag("mainNavBarItem/${tab.route}"),
+          selected = tab == selectedTab,
+          onClick = { onTabSelect(tab) },
+          label = {
+            Text(
+                if (tab.labelId != null) {
+                  stringResource(id = tab.labelId)
+                } else {
+                  ""
+                })
+          },
+          icon = {
+            if (tab.iconId != null) {
+              Icon(
+                  painterResource(tab.iconId),
+                  contentDescription = null,
+                  modifier = Modifier.testTag("${tab.route}Icon"))
+            }
+          },
+      )
     }
+  }
 }
-

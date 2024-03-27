@@ -18,36 +18,31 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ChatScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+class ChatScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
 
-    private val navActions = mockk<NavigationActions>()
-    private var tabSelected = false
+  private val navActions = mockk<NavigationActions>()
+  private var tabSelected = false
 
-    @Before
-    fun testSetup() {
-        every {
-            navActions.navigateToMainTab(any())
-        } answers {
-            tabSelected = true
-        }
-        composeTestRule.setContent { ChatScreen(navActions = navActions) }
+  @Before
+  fun testSetup() {
+    every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
+    composeTestRule.setContent { ChatScreen(navActions = navActions) }
+  }
+
+  @Test
+  fun display() {
+    with(composeTestRule) {
+      onNodeWithTag("chatScreen").assertIsDisplayed()
+      onNodeWithTag("mainNavBar").assertIsDisplayed()
     }
+  }
 
-    @Test
-    fun display() {
-        with (composeTestRule) {
-            onNodeWithTag("chatScreen").assertIsDisplayed()
-            onNodeWithTag("mainNavBar").assertIsDisplayed()
-        }
+  @Test
+  fun navigate() {
+    with(composeTestRule) {
+      onNodeWithTag("mainNavBarItem/treasury").performClick()
+      assert(tabSelected)
     }
-
-    @Test
-    fun navigate() {
-        with (composeTestRule) {
-            onNodeWithTag("mainNavBarItem/treasury").performClick()
-            assert(tabSelected)
-        }
-    }
+  }
 }

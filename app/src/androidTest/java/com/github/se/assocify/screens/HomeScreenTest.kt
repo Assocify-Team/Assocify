@@ -18,35 +18,28 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class HomeScreenTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+class HomeScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
 
-    private val navActions = mockk<NavigationActions>()
-    private var tabSelected = false
+  private val navActions = mockk<NavigationActions>()
+  private var tabSelected = false
 
-    @Before
-    fun testSetup() {
-        every {
-            navActions.navigateToMainTab(any())
-        } answers {
-            tabSelected = true
-        }
-        composeTestRule.setContent { HomeScreen(navActions = navActions) }
+  @Before
+  fun testSetup() {
+    every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
+    composeTestRule.setContent { HomeScreen(navActions = navActions) }
+  }
+
+  @Test
+  fun display() {
+    with(composeTestRule) { onNodeWithTag("homeScreen").assertIsDisplayed() }
+  }
+
+  @Test
+  fun navigate() {
+    with(composeTestRule) {
+      onNodeWithTag("mainNavBarItem/treasury").performClick()
+      assert(tabSelected)
     }
-
-    @Test
-    fun display() {
-        with (composeTestRule) {
-            onNodeWithTag("homeScreen").assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun navigate() {
-        with (composeTestRule) {
-            onNodeWithTag("mainNavBarItem/treasury").performClick()
-            assert(tabSelected)
-        }
-    }
+  }
 }

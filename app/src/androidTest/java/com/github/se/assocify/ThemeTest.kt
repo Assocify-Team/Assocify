@@ -21,27 +21,28 @@ import org.junit.runner.RunWith
 
 @Composable
 fun TestScreen() {
-    Text("Test")
-    Text((MaterialTheme.colorScheme.primary).toString())
+  Text("Test")
+  Text((MaterialTheme.colorScheme.primary).toString())
 }
 
 @RunWith(AndroidJUnit4::class)
-class ThemeTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+class ThemeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Before
-    fun testSetup() {
-        composeTestRule.setContent { AssocifyTheme (darkTheme = true, dynamicColor = false) {
-            TestScreen()
-        } }
+  @Before
+  fun testSetup() {
+    composeTestRule.setContent {
+      AssocifyTheme(darkTheme = true, dynamicColor = false) { TestScreen() }
     }
+  }
 
-    @Test
-    fun theme() {
-        with (composeTestRule) {
-            onNodeWithText("Test").assertIsDisplayed()
-                .onSibling().assertTextContains(md_theme_dark_primary.toString())
-        }
+  @Test
+  fun theme() {
+    with(composeTestRule) {
+      onNodeWithText("Test")
+          .assertIsDisplayed()
+          .onSibling()
+          .assertTextContains(md_theme_dark_primary.toString())
     }
+  }
 }

@@ -28,82 +28,69 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    // The IntentsTestRule simply calls Intents.init() before the @Test block
-    // and Intents.release() after the @Test block is completed. IntentsTestRule
-    // is deprecated, but it was MUCH faster than using IntentsRule in our tests
-    @get:Rule val intentsTestRule = IntentsRule()
+  // The IntentsTestRule simply calls Intents.init() before the @Test block
+  // and Intents.release() after the @Test block is completed. IntentsTestRule
+  // is deprecated, but it was MUCH faster than using IntentsRule in our tests
+  @get:Rule val intentsTestRule = IntentsRule()
 
-    class LoginTestScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-        ComposeScreen<LoginTestScreen>(
-            semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("LoginScreen") }) {
+  class LoginTestScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+      ComposeScreen<LoginTestScreen>(
+          semanticsProvider = semanticsProvider,
+          viewBuilderAction = { hasTestTag("LoginScreen") }) {
 
-        // Structural elements of the UI
-        val loginTitle: KNode = child { hasTestTag("LoginTitle") }
-        val loginButton: KNode = child { hasTestTag("LoginButton") }
+    // Structural elements of the UI
+    val loginTitle: KNode = child { hasTestTag("LoginTitle") }
+    val loginButton: KNode = child { hasTestTag("LoginButton") }
+  }
+
+  private val navActions = mockk<NavigationActions>()
+
+  private var authSuccess = false
+  private var authError = false
+
+  @Before
+  fun setupLogin() {
+    every { navActions.onLogin(any()) } answers { authSuccess = true }
+    every { navActions.onAuthError() } answers { authError = true }
+    composeTestRule.setContent { LoginScreen(navActions) }
+  }
+
+  @Test
+  fun titleAndButtonAreCorrectlyDisplayed() {
+    ComposeScreen.onComposeScreen<LoginTestScreen>(composeTestRule) {
+      // Test the UI elements
+      loginTitle {
+        assertIsDisplayed()
+        assertTextEquals("Welcome")
+      }
+      loginButton {
+        assertIsDisplayed()
+        assertHasClickAction()
+      }
     }
+  }
 
-    private val navActions = mockk<NavigationActions>()
+  @Test
+  fun googleSignInReturnsValidActivityResult() {
+    ComposeScreen.onComposeScreen<LoginTestScreen>(composeTestRule) {
+      val intent = Intent()
+      val activity = Instrumentation.ActivityResult(Activity.RESULT_OK, intent)
 
-    private var authSuccess = false
-    private var authError = false
+      intending(toPackage("com.google.android.gms")).respondWith(activity)
 
-    @Before
-    fun setupLogin() {
-        every {
-            navActions.onLogin(any())
-        } answers {
-            authSuccess = true
-        }
-        every {
-            navActions.onAuthError()
-        } answers {
-            authError = true
-        }
-        composeTestRule.setContent {
-            LoginScreen(navActions)
-        }
+      loginButton {
+        assertIsDisplayed()
+        performClick()
+      }
+
+      // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
+      intended(toPackage("com.google.android.gms"))
+
+      verify { navActions.onAuthError() }
+      confirmVerified(navActions)
+      assert(authError)
     }
-
-    @Test
-    fun titleAndButtonAreCorrectlyDisplayed() {
-        ComposeScreen.onComposeScreen<LoginTestScreen>(composeTestRule) {
-            // Test the UI elements
-            loginTitle {
-                assertIsDisplayed()
-                assertTextEquals("Welcome")
-            }
-            loginButton {
-                assertIsDisplayed()
-                assertHasClickAction()
-            }
-        }
-    }
-
-    @Test
-    fun googleSignInReturnsValidActivityResult() {
-        ComposeScreen.onComposeScreen<LoginTestScreen>(composeTestRule) {
-            val intent = Intent()
-            val activity = Instrumentation.ActivityResult(Activity.RESULT_OK, intent)
-
-            intending(toPackage("com.google.android.gms"))
-                .respondWith(activity)
-
-            loginButton {
-                assertIsDisplayed()
-                performClick()
-            }
-
-            // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
-            intended(toPackage("com.google.android.gms"))
-
-            verify {
-                navActions.onAuthError()
-            }
-            confirmVerified(navActions)
-            assert(authError)
-        }
-    }
+  }
 }

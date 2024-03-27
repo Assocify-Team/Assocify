@@ -49,90 +49,81 @@ fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,
     onAuthError: (ApiException) -> Unit
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
-    val scope = rememberCoroutineScope()
-    return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)!!
-            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-            scope.launch {
-                val authResult = Firebase.auth.signInWithCredential(credential).await()
-                onAuthComplete(authResult)
-            }
-        } catch (e: ApiException) {
-            onAuthError(e)
-        }
+  val scope = rememberCoroutineScope()
+  return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+      result ->
+    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+    try {
+      val account = task.getResult(ApiException::class.java)!!
+      val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+      scope.launch {
+        val authResult = Firebase.auth.signInWithCredential(credential).await()
+        onAuthComplete(authResult)
+      }
+    } catch (e: ApiException) {
+      onAuthError(e)
     }
+  }
 }
 
 @Composable
 fun LoginScreen(navActions: NavigationActions) {
 
-    val launcher =
-        rememberFirebaseAuthLauncher(
-            onAuthComplete = { result -> navActions.onLogin(result.user) },
-            onAuthError = { navActions.onAuthError() })
-    val token = stringResource(R.string.web_client_id)
-    val context = LocalContext.current
+  val launcher =
+      rememberFirebaseAuthLauncher(
+          onAuthComplete = { result -> navActions.onLogin(result.user) },
+          onAuthError = { navActions.onAuthError() })
+  val token = stringResource(R.string.web_client_id)
+  val context = LocalContext.current
 
-    Column(
-        modifier =
-        Modifier
-            .background(color = Color(0xFFFFFFFF))
-            .testTag("LoginScreen"),
-        verticalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            modifier = Modifier
-                .width(189.dp)
-                .height(189.dp),
-            painter = painterResource(id = R.drawable.app_logo),
-            contentDescription = "App logo",
-            contentScale = ContentScale.FillBounds)
-        Text(
-            modifier = Modifier.testTag("LoginTitle"),
-            text = "Welcome",
-            style =
+  Column(
+      modifier = Modifier.background(color = Color(0xFFFFFFFF)).testTag("LoginScreen"),
+      verticalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterVertically),
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Image(
+        modifier = Modifier.width(189.dp).height(189.dp),
+        painter = painterResource(id = R.drawable.app_logo),
+        contentDescription = "App logo",
+        contentScale = ContentScale.FillBounds)
+    Text(
+        modifier = Modifier.testTag("LoginTitle"),
+        text = "Welcome",
+        style =
             TextStyle(
                 fontSize = 48.sp,
                 fontWeight = FontWeight(700),
                 color = Color(0xFF000000),
                 textAlign = TextAlign.Center,
-            )
-        )
-        Spacer(modifier = Modifier.height(136.dp))
-        TextButton(
-            onClick = {
-                val gso =
-                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(token)
-                        .requestEmail()
-                        .build()
-                val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                launcher.launch(googleSignInClient.signInIntent)
-            },
-            modifier =
-            Modifier
-                .border(
+            ))
+    Spacer(modifier = Modifier.height(136.dp))
+    TextButton(
+        onClick = {
+          val gso =
+              GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                  .requestIdToken(token)
+                  .requestEmail()
+                  .build()
+          val googleSignInClient = GoogleSignIn.getClient(context, gso)
+          launcher.launch(googleSignInClient.signInIntent)
+        },
+        modifier =
+            Modifier.border(
                     width = 1.dp,
                     color = Color(0xFFDADCE0),
-                    shape = RoundedCornerShape(size = 20.dp)
-                )
-                .testTag("LoginButton")
-        ){
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(32.dp),
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.google_logo),
-                    contentDescription = "image description",
-                    contentScale = ContentScale.None)
-                Text(
-                    text = "Sign in with Google",
-                    style =
+                    shape = RoundedCornerShape(size = 20.dp))
+                .testTag("LoginButton")) {
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(32.dp),
+          ) {
+            Image(
+                painter = painterResource(id = R.drawable.google_logo),
+                contentDescription = "image description",
+                contentScale = ContentScale.None)
+            Text(
+                text = "Sign in with Google",
+                style =
                     TextStyle(
                         fontSize = 14.sp,
                         lineHeight = 17.sp,
@@ -141,7 +132,7 @@ fun LoginScreen(navActions: NavigationActions) {
                         textAlign = TextAlign.Center,
                         letterSpacing = 0.25.sp,
                     ))
-            }
+          }
         }
-    }
+  }
 }

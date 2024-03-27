@@ -6,9 +6,9 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.loginGraph(navigationActions: NavigationActions) {
-    composable(
-        route = Destination.Login.route,
-    ) {
-        LoginScreen(navigationActions)
-    }
+  composable(
+      route = Destination.Login.route,
+  ) {
+    LoginScreen(navigationActions)
+  }
 }

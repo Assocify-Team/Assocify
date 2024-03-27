@@ -13,18 +13,14 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 
 @Composable
 fun EventScreen(navActions: NavigationActions) {
-    Scaffold (
-        modifier = Modifier.testTag("eventScreen"),
-        bottomBar = {
-            MainNavigationBar(
-                onTabSelect = { navActions.navigateToMainTab(it) },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Event
-            )
-        }
-    ) {
-        Text(
-            modifier = Modifier.padding(it),
-            text = "Event Screen")
-    }
+  Scaffold(
+      modifier = Modifier.testTag("eventScreen"),
+      bottomBar = {
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Event)
+      }) {
+        Text(modifier = Modifier.padding(it), text = "Event Screen")
+      }
 }

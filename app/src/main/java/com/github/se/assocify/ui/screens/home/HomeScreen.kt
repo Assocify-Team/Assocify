@@ -13,18 +13,14 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 
 @Composable
 fun HomeScreen(navActions: NavigationActions) {
-    Scaffold (
-        modifier = Modifier.testTag("homeScreen"),
-        bottomBar = {
-            MainNavigationBar(
-                onTabSelect = { navActions.navigateToMainTab(it) },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Home
-            )
-        }
-    ) {
-        Text(
-            modifier = Modifier.padding(it),
-            text = "Home Screen")
-    }
+  Scaffold(
+      modifier = Modifier.testTag("homeScreen"),
+      bottomBar = {
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Home)
+      }) {
+        Text(modifier = Modifier.padding(it), text = "Home Screen")
+      }
 }

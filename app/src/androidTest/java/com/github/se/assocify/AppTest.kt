@@ -21,46 +21,41 @@ import org.junit.runner.RunWith
 
 @Composable
 fun LoginApp() {
-    val navController = rememberNavController()
-    val navActions = NavigationActions(navController)
-    NavHost(navController = navController, startDestination = Destination.Login.route) {
-        loginGraph(navigationActions = navActions)
-    }
+  val navController = rememberNavController()
+  val navActions = NavigationActions(navController)
+  NavHost(navController = navController, startDestination = Destination.Login.route) {
+    loginGraph(navigationActions = navActions)
+  }
 }
 
 @RunWith(AndroidJUnit4::class)
-class AppTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+class AppTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Test
-    fun display() {
-        composeTestRule.setContent { AssocifyApp() }
-        with (composeTestRule) {
-            onRoot().assertIsDisplayed()
-            onNodeWithTag("mainNavBarItem/treasury").assertIsDisplayed().performClick()
-            onRoot().assertIsDisplayed()
-            onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
-            onRoot().assertIsDisplayed()
-            onNodeWithTag("mainNavBarItem/chat").assertIsDisplayed().performClick()
-            onRoot().assertIsDisplayed()
-            onNodeWithTag("mainNavBarItem/event").assertIsDisplayed().performClick()
-            onRoot().assertIsDisplayed()
-
-        }
+  @Test
+  fun display() {
+    composeTestRule.setContent { AssocifyApp() }
+    with(composeTestRule) {
+      onRoot().assertIsDisplayed()
+      onNodeWithTag("mainNavBarItem/treasury").assertIsDisplayed().performClick()
+      onRoot().assertIsDisplayed()
+      onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
+      onRoot().assertIsDisplayed()
+      onNodeWithTag("mainNavBarItem/chat").assertIsDisplayed().performClick()
+      onRoot().assertIsDisplayed()
+      onNodeWithTag("mainNavBarItem/event").assertIsDisplayed().performClick()
+      onRoot().assertIsDisplayed()
     }
+  }
 }
 
 @RunWith(AndroidJUnit4::class)
-class LoginAppTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+class LoginAppTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Test
-    fun loginStart() {
-        composeTestRule.setContent { LoginApp() }
-        with (composeTestRule) {
-            onRoot().assertIsDisplayed()
-        }
-    }
+  @Test
+  fun loginStart() {
+    composeTestRule.setContent { LoginApp() }
+    with(composeTestRule) { onRoot().assertIsDisplayed() }
+  }
 }

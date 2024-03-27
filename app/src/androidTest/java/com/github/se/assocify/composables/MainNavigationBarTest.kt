@@ -22,66 +22,63 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MainNavigationBarTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    private var tabPressed: Destination? = null
+  private var tabPressed: Destination? = null
 
-    @Before
-    fun testSetup() {
-        composeTestRule.setContent {
-            MainNavigationBar(
-                onTabSelect = { tabPressed = it },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Home
-            )
-        }
+  @Before
+  fun testSetup() {
+    composeTestRule.setContent {
+      MainNavigationBar(
+          onTabSelect = { tabPressed = it },
+          tabList = MAIN_TABS_LIST,
+          selectedTab = Destination.Home)
     }
+  }
 
-    @Test
-    fun tabsDisplayed() {
-        with(composeTestRule) {
-            onNodeWithTag("mainNavBar").assertIsDisplayed()
-            onNodeWithTag("mainNavBar").onChild().onChildren().assertCountEquals(5)
-        }
+  @Test
+  fun tabsDisplayed() {
+    with(composeTestRule) {
+      onNodeWithTag("mainNavBar").assertIsDisplayed()
+      onNodeWithTag("mainNavBar").onChild().onChildren().assertCountEquals(5)
     }
+  }
 
-    @Test
-    fun labelsDisplayed() {
-        with(composeTestRule) {
-            onNodeWithTag("mainNavBarItem/event").assertTextContains("Event")
-            onNodeWithTag("mainNavBarItem/profile").assertTextContains("Profile")
-            onNodeWithTag("mainNavBarItem/chat").assertTextContains("Chat")
-            onNodeWithTag("mainNavBarItem/treasury").assertTextContains("Treasury")
-            onNodeWithTag("mainNavBarItem/home").assertTextContains("Home")
-        }
+  @Test
+  fun labelsDisplayed() {
+    with(composeTestRule) {
+      onNodeWithTag("mainNavBarItem/event").assertTextContains("Event")
+      onNodeWithTag("mainNavBarItem/profile").assertTextContains("Profile")
+      onNodeWithTag("mainNavBarItem/chat").assertTextContains("Chat")
+      onNodeWithTag("mainNavBarItem/treasury").assertTextContains("Treasury")
+      onNodeWithTag("mainNavBarItem/home").assertTextContains("Home")
     }
+  }
 
-    @Test
-    fun iconsDisplayed() {
-        with(composeTestRule) {
-            onNodeWithTag("eventIcon", useUnmergedTree = true).assertIsDisplayed()
-            onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
-            onNodeWithTag("chatIcon", useUnmergedTree = true).assertIsDisplayed()
-            onNodeWithTag("treasuryIcon", useUnmergedTree = true).assertIsDisplayed()
-            onNodeWithTag("homeIcon", useUnmergedTree = true).assertIsDisplayed()
-        }
+  @Test
+  fun iconsDisplayed() {
+    with(composeTestRule) {
+      onNodeWithTag("eventIcon", useUnmergedTree = true).assertIsDisplayed()
+      onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
+      onNodeWithTag("chatIcon", useUnmergedTree = true).assertIsDisplayed()
+      onNodeWithTag("treasuryIcon", useUnmergedTree = true).assertIsDisplayed()
+      onNodeWithTag("homeIcon", useUnmergedTree = true).assertIsDisplayed()
     }
+  }
 
-
-    @Test
-    fun tabSelect() {
-        with(composeTestRule) {
-            onNodeWithTag("mainNavBarItem/event").performClick()
-            assert(tabPressed == Destination.Event)
-            onNodeWithTag("mainNavBarItem/profile").performClick()
-            assert(tabPressed == Destination.Profile)
-            onNodeWithTag("mainNavBarItem/chat").performClick()
-            assert(tabPressed == Destination.Chat)
-            onNodeWithTag("mainNavBarItem/treasury").performClick()
-            assert(tabPressed == Destination.Treasury)
-            onNodeWithTag("mainNavBarItem/home").performClick()
-            assert(tabPressed == Destination.Home)
-        }
+  @Test
+  fun tabSelect() {
+    with(composeTestRule) {
+      onNodeWithTag("mainNavBarItem/event").performClick()
+      assert(tabPressed == Destination.Event)
+      onNodeWithTag("mainNavBarItem/profile").performClick()
+      assert(tabPressed == Destination.Profile)
+      onNodeWithTag("mainNavBarItem/chat").performClick()
+      assert(tabPressed == Destination.Chat)
+      onNodeWithTag("mainNavBarItem/treasury").performClick()
+      assert(tabPressed == Destination.Treasury)
+      onNodeWithTag("mainNavBarItem/home").performClick()
+      assert(tabPressed == Destination.Home)
     }
+  }
 }

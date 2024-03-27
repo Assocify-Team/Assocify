@@ -6,9 +6,9 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions) {
-    composable(
-        route = Destination.Treasury.route,
-    ) {
-        TreasuryScreen(navigationActions)
-    }
+  composable(
+      route = Destination.Treasury.route,
+  ) {
+    TreasuryScreen(navigationActions)
+  }
 }
