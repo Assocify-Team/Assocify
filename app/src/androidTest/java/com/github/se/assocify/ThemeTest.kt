@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onSibling
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.ui.theme.AssocifyTheme
 import com.github.se.assocify.ui.theme.md_theme_dark_primary
+import com.github.se.assocify.ui.theme.md_theme_light_primary
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -29,20 +30,31 @@ fun TestScreen() {
 class ThemeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  @Before
-  fun testSetup() {
+  @Before fun testSetup() {}
+
+  @Test
+  fun darkTheme() {
     composeTestRule.setContent {
       AssocifyTheme(darkTheme = true, dynamicColor = false) { TestScreen() }
     }
-  }
-
-  @Test
-  fun theme() {
     with(composeTestRule) {
       onNodeWithText("Test")
           .assertIsDisplayed()
           .onSibling()
           .assertTextContains(md_theme_dark_primary.toString())
+    }
+  }
+
+  @Test
+  fun lightTheme() {
+    composeTestRule.setContent {
+      AssocifyTheme(darkTheme = false, dynamicColor = false) { TestScreen() }
+    }
+    with(composeTestRule) {
+      onNodeWithText("Test")
+          .assertIsDisplayed()
+          .onSibling()
+          .assertTextContains(md_theme_light_primary.toString())
     }
   }
 }
