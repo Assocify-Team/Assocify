@@ -74,33 +74,7 @@ const val PAGE_BALANCE_INDEX: Int = 2
 fun TreasuryMainScreen() {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Treasury",
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
+            TreasuryTopBar({}, {})
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -140,56 +114,20 @@ fun TreasuryMainScreen() {
                     )
                 }
             ) {
-                // My receipts
-                Tab(
+                TreasuryTab(
                     selected = pagerState.currentPage == PAGE_RECEIPT_INDEX,
-                    onClick = { coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PAGE_RECEIPT_INDEX)
-                    } },
-                    text = {
-                        Text(
-                            text = "My receipts",
-                            color = if (pagerState.currentPage == PAGE_RECEIPT_INDEX) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                            }
-                        )
-                    }
+                    onClick = { coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_RECEIPT_INDEX) } },
+                    text = "My receipts"
                 )
-                // Budget
-                Tab(
+                TreasuryTab(
                     selected = pagerState.currentPage == PAGE_BUDGET_INDEX,
-                    onClick = { coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PAGE_BUDGET_INDEX)
-                    } },
-                    text = {
-                        Text(
-                            text = "Budget",
-                            color = if (pagerState.currentPage == PAGE_BUDGET_INDEX) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                            }
-                        )
-                    }
+                    onClick = { coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_BUDGET_INDEX) } },
+                    text = "Budget"
                 )
-                // Balance
-                Tab(
+                TreasuryTab(
                     selected = pagerState.currentPage == PAGE_BALANCE_INDEX,
-                    onClick = { coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PAGE_BALANCE_INDEX)
-                    } },
-                    text = {
-                        Text(
-                            text = "Balance",
-                            color = if (pagerState.currentPage == PAGE_BALANCE_INDEX) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                            }
-                        )
-                    }
+                    onClick = { coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_BALANCE_INDEX) } },
+                    text = "Balance"
                 )
             }
 
@@ -243,6 +181,63 @@ private fun BalancePage() {
 }
 
 // ------------- ELEMENTS ------------- //
+
+@Composable
+fun TreasuryTab(
+    selected: Boolean,
+    onClick: () -> Unit,
+    text: String
+) {
+    Tab(
+        selected = selected,
+        onClick = onClick,
+        text = {
+            Text(
+                text = text,
+                color = if (selected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                }
+            )
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TreasuryTopBar(
+    onAccountClick: () -> Unit,
+    onSearchClick: () -> Unit,
+) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = "Treasury",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onAccountClick) {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "Localized description"
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onSearchClick) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Localized description"
+                )
+            }
+        },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    )
+}
 
 @Composable
 private fun ReceiptItem(receiptName: String) {
