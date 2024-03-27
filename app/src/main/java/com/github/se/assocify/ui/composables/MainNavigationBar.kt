@@ -28,7 +28,8 @@ fun MainNavigationBar(
                 label = { Text(if(tab.labelId != null) {
                     stringResource(id =  tab.labelId) } else { "" } ) },
                 icon = { if (tab.iconId != null) {
-                    Icon(painterResource(tab.iconId), contentDescription = null) } },
+                    Icon(painterResource(tab.iconId), contentDescription = null,
+                        modifier = Modifier.testTag("${tab.route}Icon")) } },
             )
         }
     }

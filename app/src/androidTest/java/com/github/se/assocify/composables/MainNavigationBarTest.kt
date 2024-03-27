@@ -1,8 +1,14 @@
 package com.github.se.assocify.composables
 
 import android.util.Log
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChild
@@ -37,12 +43,35 @@ class MainNavigationBarTest: TestCase(kaspressoBuilder = Kaspresso.Builder.withC
         ) }
     }
     @Test
-    fun iconsDisplayed() {
-        with (composeTestRule) {
+    fun tabsDisplayed() {
+        with(composeTestRule) {
             onNodeWithTag("mainNavBar").assertIsDisplayed()
             onNodeWithTag("mainNavBar").onChild().onChildren().assertCountEquals(5)
         }
     }
+
+    @Test
+    fun labelsDisplayed() {
+        with (composeTestRule) {
+            onNodeWithTag("mainNavBarItem/event").assertTextContains("Event")
+            onNodeWithTag("mainNavBarItem/profile").assertTextContains("Profile")
+            onNodeWithTag("mainNavBarItem/chat").assertTextContains("Chat")
+            onNodeWithTag("mainNavBarItem/treasury").assertTextContains("Treasury")
+            onNodeWithTag("mainNavBarItem/home").assertTextContains("Home")
+        }
+    }
+
+    @Test
+    fun iconsDisplayed() {
+        with (composeTestRule) {
+            onNodeWithTag("eventIcon", useUnmergedTree = true).assertIsDisplayed()
+            onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
+            onNodeWithTag("chatIcon", useUnmergedTree = true).assertIsDisplayed()
+            onNodeWithTag("treasuryIcon", useUnmergedTree = true).assertIsDisplayed()
+            onNodeWithTag("homeIcon", useUnmergedTree = true).assertIsDisplayed()
+        }
+    }
+
 
     @Test
     fun tabSelect() {
