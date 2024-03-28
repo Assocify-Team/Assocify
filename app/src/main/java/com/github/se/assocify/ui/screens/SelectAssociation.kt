@@ -31,13 +31,13 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Screen to select an association
+ * @param registeredAssociation list of organizations that the user is registered to
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(){
+fun SelectAssociation(registeredAssociation: List<String>){
     //TODO: fetch lists from DB
-    val registeredAssociation = listOf("CLIC", "GAME*") // organizations that the user is registered to
-    val filteredAssociation= emptyList<String>() // organizations that matches the search query
+    //val registeredAssociation = listOf("CLIC", "GAME*") // organizations that the user is registered to
 
     //search bar var: TODO: implement search
     val isSearching = false
@@ -63,17 +63,15 @@ fun SelectAssociation(){
                     active = isSearching,
                     placeholder = { Text(text = "Search an organization") },
                     trailingIcon = {
-                        if (isSearching) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = null,
                                 modifier =
                                 Modifier.clickable(
                                     onClick = { /*TODO: clear the search*/ }))
-                        }
                     },
                     leadingIcon = {
-                        if (isSearching) {
+                       /* if (isSearching) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = null,
@@ -81,13 +79,13 @@ fun SelectAssociation(){
                                 Modifier.clickable(
                                     onClick = {/*TODO: go back to selectOrganization screen*/ })
                             )
-                        }  else {
+                        }  else {*/
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = null,
                                 modifier =
                                 Modifier.clickable(onClick = {/*TODO: search*/}))
-                        }
+                        /*}*/
                     }
                 ) {
                     // TODO: Display search results (filtered organizations)
