@@ -24,4 +24,9 @@ class NavigationActions(private val navController: NavHostController) {
   fun onAuthError() {
     /* Handle auth error */
   }
+
+  fun onCreateReceipt() {
+    /*TODO create new uid*/
+    navController.navigate(Destination.Receipt("new").route)
+  }
 }

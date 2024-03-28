@@ -1,6 +1,10 @@
 package com.github.se.assocify.ui.screens.treasury
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +24,11 @@ fun TreasuryScreen(navActions: NavigationActions) {
             onTabSelect = { navActions.navigateToMainTab(it) },
             tabList = MAIN_TABS_LIST,
             selectedTab = Destination.Treasury)
+      },
+      floatingActionButton = {
+        FloatingActionButton(onClick = { /*TODO*/}) {
+          Icon(Icons.Filled.Add, contentDescription = "Add")
+        }
       }) {
         Text(modifier = Modifier.padding(it), text = "Treasury Screen")
       }
