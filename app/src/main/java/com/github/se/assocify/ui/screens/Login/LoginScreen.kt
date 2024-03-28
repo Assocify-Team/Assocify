@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui
+package com.github.se.assocify.ui.screens.login
 
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -33,12 +33,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
+import com.github.se.assocify.navigation.NavigationActions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
@@ -67,10 +67,12 @@ fun rememberFirebaseAuthLauncher(
 }
 
 @Composable
-fun LoginPage(onLogin: (FirebaseUser?) -> Unit, onAuthError: () -> Unit) {
+fun LoginScreen(navActions: NavigationActions) {
+
   val launcher =
       rememberFirebaseAuthLauncher(
-          onAuthComplete = { result -> onLogin(result.user) }, onAuthError = { onAuthError() })
+          onAuthComplete = { result -> navActions.onLogin(result.user) },
+          onAuthError = { navActions.onAuthError() })
   val token = stringResource(R.string.web_client_id)
   val context = LocalContext.current
 
