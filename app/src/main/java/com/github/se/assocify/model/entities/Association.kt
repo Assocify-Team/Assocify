@@ -8,6 +8,4 @@ data class Association(
     val status: String,
     val members: List<User>,
     val events: List<Event>
-) {
-    constructor() : this("", "", "", "", "", listOf(), listOf())
-}
+)

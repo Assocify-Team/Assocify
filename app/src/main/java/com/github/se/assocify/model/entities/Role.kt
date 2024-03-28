@@ -1,5 +1,10 @@
 package com.github.se.assocify.model.entities
 
-data class Role(val name: String) {
-    constructor() : this("")
+enum class Role{
+    PRESIDENT,
+    CO_PRESIDENT,
+    TREASURER,
+    COMITEE,
+    MEMBER,
+    PENDING_MEMBER
 }
