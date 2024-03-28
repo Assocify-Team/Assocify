@@ -1,15 +1,27 @@
 package com.github.se.assocify.ui.screens.Treasury
 
+import android.app.Activity
+import android.app.Instrumentation
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,6 +38,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,17 +48,35 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.github.se.assocify.R
 
 @Composable
 fun EditReceiptScreen() {
     var receiptTitle by remember { mutableStateOf("Courses ICeLan") }
     var receiptDesc by remember { mutableStateOf("Courses pour la bouffe IceLan ") }
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            selectedImageUri.value = result.data!!.data!!
+        }
+    }
+
+    fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+        launcher.launch(intent)
+    }
 
     Scaffold(
         topBar = {
@@ -94,11 +125,65 @@ fun EditReceiptScreen() {
                         Text(text = "Receipt desc cannot be empty", color = MaterialTheme.colorScheme.error)
                     }
                 },
-                minLines = 2
+                minLines = 3
             )
 
-            // Image
-            //ImageWithUploadButton()
+            // Image box
+            Text(
+                text = "Receipt",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp)
+                    .height(300.dp)
+                    .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                selectedImageUri.value?.let { uri ->
+                    AsyncImage(
+                        model = uri,
+                        contentDescription = "Selected Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } ?: run {
+                    Text("No image selected")
+                }
+            }
+
+            // Upload button
+            Button(
+                onClick = { openImagePicker() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp)
+            ) {
+                Text("Upload file")
+            }
+
+            // Upload button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextButton(
+                    onClick = { /* Cancel button action */ },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cancel")
+                }
+
+                Button(
+                    onClick = { /* Save button action */ },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Save")
+                }
+            }
         }
     }
 }
@@ -131,26 +216,21 @@ fun EditReceiptTopBar(
 }
 
 @Composable
-fun ImageWithUploadButton() {
-    var imageResourceId by remember { mutableStateOf(R.drawable.ic_launcher_background) }
-
-    Box(
-        modifier = Modifier
-            .border(BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary), shape = RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp))
-    ) {
-        Image(
-            painter = painterResource(id = imageResourceId),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
+fun OpenImagePicker(onImageSelected: (Uri) -> Unit) {
+    val intent = Intent(Intent.ACTION_PICK).apply {
+        type = "image/*"
     }
-
-    Button(onClick = { /*TODO: Add upload logic here and update imageResourceId*/ }) {
-        Text("Upload new file")
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            onImageSelected(result.data!!.data!!)
+        }
     }
+    launcher.launch(intent)
 }
+
+
 
 @Preview
 @Composable
