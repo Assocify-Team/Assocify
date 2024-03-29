@@ -19,7 +19,7 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param id the id of the association to get
    * @return the association with the given id
    */
-  fun getAssociation(id: String): Association {
+  fun getAssociation(id: String): Association? {
     return Tasks.await(
         db.collection(collectionName).document(id).get().continueWith { task ->
           if (task.isSuccessful) {
@@ -66,38 +66,13 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         db.collection(collectionName)
             .document(association.uid)
             .set(association)
-            .addOnSuccessListener {
-              Log.d("FirebaseConnection", "DocumentSnapshot successfully written! Asso added")
-            }
-            .addOnFailureListener { e ->
-              Log.w("FirebaseConnection", "Error writing document Asso", e)
-            })
+    )
   }
 
-  /**
-   * Adds/edit a list of associations to the database
-   *
-   * @param associations the list of associations to add/edit
-   */
-  fun addAllAssociations(associations: List<Association>) {
-    for (association in associations) {
-      addAssociation(association)
-    }
-  }
-
-  /** Deletes an association from the database */
-  fun deleteAllAssociations() {
-    Tasks.await(
-        db.collection(collectionName).get().addOnSuccessListener { querySnapshot ->
-          for (document in querySnapshot) {
-            document.reference.delete()
-          }
-        })
-  }
   /**
    * Deletes an association from the database
    *
    * @param id the id of the association to delete
    */
-  fun deleteAssociation(id: String) = delete(id)
+  fun deleteAssociation(id: String) = Tasks.await(delete(id))
 }

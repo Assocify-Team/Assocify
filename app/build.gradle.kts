@@ -122,8 +122,7 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:3.14.9")
 
-    testImplementation("org.mockito:mockito-core:3.11.2")
-    testImplementation("org.mockito:mockito-inline:2.13.0")
+    androidTestImplementation("org.mockito:mockito-android:5.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     // Roboelectric

@@ -1,16 +1,23 @@
 package com.github.se.assocify.model.database
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
+
 
 abstract class FirebaseApi(val db: FirebaseFirestore) {
 
-  // Define common properties
+
+  /**
+   * The name of the collection in the database
+   */
   abstract val collectionName: String
 
+  /**
+   * Gets a new id for a document in the collection
+   *
+   * @return the new id
+   */
   fun getNewId() = db.collection(collectionName).document().id
-
-  fun update(id: String, data: Map<String, Any>) =
-      db.collection(collectionName).document(id).update(data)
 
   fun delete(id: String) = db.collection(collectionName).document(id).delete()
 }

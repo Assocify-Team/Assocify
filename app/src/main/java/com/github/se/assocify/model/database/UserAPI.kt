@@ -1,6 +1,7 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.User
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -19,9 +20,8 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param id the id of the user to get
    * @return the user with the given id
    */
-  fun getUser(id: String): User {
-    return Tasks.await(
-        db.collection(collectionName).document(id).get().continueWith { task ->
+    fun getUser(id: String): Task<User?> {
+    return db.collection(collectionName).document(id).get().continueWith { task ->
           if (task.isSuccessful) {
             val document = task.result
             if (document != null && document.exists()) {
@@ -32,7 +32,7 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
           } else {
             throw task.exception ?: Exception("Unknown error occurred")
           }
-        })
+        }
   }
   /**
    * Gets all users from the database
@@ -68,33 +68,6 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    *
    * @param id the id of the user to delete
    */
-  fun deleteUser(id: String) {
-    Tasks.await(
-        db.collection(collectionName)
-            .document(id)
-            .delete()
-            .addOnSuccessListener { println("DocumentSnapshot successfully deleted! User deleted") }
-            .addOnFailureListener { e -> println("Error deleting document User: $e") })
-  }
+  fun deleteUser(id: String) = Tasks.await(delete(id))
 
-  /** Deletes all users from the database */
-  fun deleteAllUsers() {
-    Tasks.await(
-        db.collection(collectionName).get().addOnSuccessListener { querySnapshot ->
-          for (document in querySnapshot) {
-            document.reference.delete()
-          }
-        })
-  }
-
-  /**
-   * Adds multiple users to the database
-   *
-   * @param users the list of users to add
-   */
-  fun addAllUsers(users: List<User>) {
-    for (user in users) {
-      addUser(user)
-    }
-  }
 }
