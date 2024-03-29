@@ -2,13 +2,10 @@ package com.github.se.assocify
 
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.FirebaseApi
-import com.github.se.assocify.model.entities.Association
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -17,14 +14,12 @@ import org.mockito.Mockito
 
 class FirebaseTest {
 
+  @Mock private lateinit var db: FirebaseFirestore
+  private val documentReference = Mockito.mock(DocumentReference::class.java)
+  private lateinit var assoAPI: FirebaseApi
+  private val collectionReference = Mockito.mock(CollectionReference::class.java)
 
-    @Mock
-    private lateinit var db: FirebaseFirestore
-    private val documentReference = Mockito.mock(DocumentReference::class.java)
-    private lateinit var assoAPI: FirebaseApi
-    private val collectionReference = Mockito.mock(CollectionReference::class.java)
-
-    val uid = "testId"
+  val uid = "testId"
 
   @Before
   fun setup() {
@@ -43,17 +38,17 @@ class FirebaseTest {
     Assert.assertEquals(uid, result)
   }
 
-    @Test
-    fun testDelete() {
-      Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
-      Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any())).thenReturn(documentReference)
-      Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()).delete()).thenReturn(Tasks.forResult(null))
-      val result = Tasks.await(assoAPI.delete(uid))
+  @Test
+  fun testDelete() {
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()).delete())
+        .thenReturn(Tasks.forResult(null))
+    val result = Tasks.await(assoAPI.delete(uid))
 
-      Mockito.verify(db).collection(assoAPI.collectionName)
-      Mockito.verify(db.collection(assoAPI.collectionName)).document(uid)
-      Mockito.verify(db.collection(assoAPI.collectionName).document(uid)).delete()
-    }
-
-
+    Mockito.verify(db).collection(assoAPI.collectionName)
+    Mockito.verify(db.collection(assoAPI.collectionName)).document(uid)
+    Mockito.verify(db.collection(assoAPI.collectionName).document(uid)).delete()
+  }
 }

@@ -13,13 +13,10 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
-
 
 class UserAPITest {
 
-  @Mock
-  private lateinit var db: FirebaseFirestore
+  @Mock private lateinit var db: FirebaseFirestore
 
   private lateinit var userAPI: UserAPI
   private val documentSnapshot = Mockito.mock(DocumentSnapshot::class.java)
@@ -42,7 +39,8 @@ class UserAPITest {
 
     Tasks.forResult(documentSnapshot)
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
-    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any())).thenReturn(documentReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
     val result = userAPI.getUser(user.uid)
     Tasks.await(result)
     Mockito.verify(db).collection(userAPI.collectionName)
@@ -51,46 +49,42 @@ class UserAPITest {
     assert(result.result == user)
   }
 
-    @Test
-    fun testGetAllUsers() {
-      Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
-      Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
-      val query = Tasks.forResult(Mockito.mock(QuerySnapshot::class.java))
-      Mockito.`when`(db.collection(Mockito.any()).get()).thenReturn(query)
-      Mockito.`when`(query.result!!.documents).thenReturn(listOf(documentSnapshot))
-      Mockito.`when`(documentSnapshot.toObject(User::class.java)).thenReturn(user)
-      val result = userAPI.getAllUsers()
-      Mockito.verify(db).collection(userAPI.collectionName)
-      Mockito.verify(db.collection(userAPI.collectionName)).get()
-      assert(result.size == 1)
-      assert(result[0] == user)
+  @Test
+  fun testGetAllUsers() {
+    Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    val query = Tasks.forResult(Mockito.mock(QuerySnapshot::class.java))
+    Mockito.`when`(db.collection(Mockito.any()).get()).thenReturn(query)
+    Mockito.`when`(query.result!!.documents).thenReturn(listOf(documentSnapshot))
+    Mockito.`when`(documentSnapshot.toObject(User::class.java)).thenReturn(user)
+    val result = userAPI.getAllUsers()
+    Mockito.verify(db).collection(userAPI.collectionName)
+    Mockito.verify(db.collection(userAPI.collectionName)).get()
+    assert(result.size == 1)
+    assert(result[0] == user)
+  }
 
-    }
+  @Test
+  fun testAddUser() {
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(documentReference.set(user)).thenReturn(Tasks.forResult(null))
+    userAPI.addUser(user)
+    Mockito.verify(db).collection(userAPI.collectionName)
+    Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
+    Mockito.verify(db.collection(userAPI.collectionName).document(user.uid)).set(user)
+  }
 
-    @Test
-    fun testAddUser() {
-      Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
-      Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any())).thenReturn(documentReference)
-      Mockito.`when`(documentReference.set(user)).thenReturn(Tasks.forResult(null))
-      userAPI.addUser(user)
-      Mockito.verify(db).collection(userAPI.collectionName)
-      Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
-      Mockito.verify(db.collection(userAPI.collectionName).document(user.uid)).set(user)
-    }
-
-    @Test
-    fun testDeleteUser() {
-      Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
-      Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any())).thenReturn(documentReference)
-      Mockito.`when`(documentReference.delete()).thenReturn(Tasks.forResult(null))
-      userAPI.deleteUser(user.uid)
-      Mockito.verify(db).collection(userAPI.collectionName)
-      Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
-      Mockito.verify(db.collection(userAPI.collectionName).document(user.uid)).delete()
-    }
-
-
-
+  @Test
+  fun testDeleteUser() {
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(documentReference.delete()).thenReturn(Tasks.forResult(null))
+    userAPI.deleteUser(user.uid)
+    Mockito.verify(db).collection(userAPI.collectionName)
+    Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
+    Mockito.verify(db.collection(userAPI.collectionName).document(user.uid)).delete()
+  }
 }
-
-

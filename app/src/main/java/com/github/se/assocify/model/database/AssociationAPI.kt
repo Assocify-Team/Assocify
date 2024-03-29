@@ -1,6 +1,5 @@
 package com.github.se.assocify.model.database
 
-import android.util.Log
 import com.github.se.assocify.model.entities.Association
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
@@ -62,11 +61,7 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param association the association to add/edit
    */
   fun addAssociation(association: Association) {
-    Tasks.await(
-        db.collection(collectionName)
-            .document(association.uid)
-            .set(association)
-    )
+    Tasks.await(db.collection(collectionName).document(association.uid).set(association))
   }
 
   /**

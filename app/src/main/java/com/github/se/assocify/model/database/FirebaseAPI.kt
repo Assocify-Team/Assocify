@@ -1,15 +1,10 @@
 package com.github.se.assocify.model.database
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
-
 
 abstract class FirebaseApi(val db: FirebaseFirestore) {
 
-
-  /**
-   * The name of the collection in the database
-   */
+  /** The name of the collection in the database */
   abstract val collectionName: String
 
   /**

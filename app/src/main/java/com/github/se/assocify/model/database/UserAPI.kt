@@ -20,19 +20,19 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param id the id of the user to get
    * @return the user with the given id
    */
-    fun getUser(id: String): Task<User?> {
+  fun getUser(id: String): Task<User?> {
     return db.collection(collectionName).document(id).get().continueWith { task ->
-          if (task.isSuccessful) {
-            val document = task.result
-            if (document != null && document.exists()) {
-              document.toObject(User::class.java)
-            } else {
-              throw Exception("No User found with ID: $id")
-            }
-          } else {
-            throw task.exception ?: Exception("Unknown error occurred")
-          }
+      if (task.isSuccessful) {
+        val document = task.result
+        if (document != null && document.exists()) {
+          document.toObject(User::class.java)
+        } else {
+          throw Exception("No User found with ID: $id")
         }
+      } else {
+        throw task.exception ?: Exception("Unknown error occurred")
+      }
+    }
   }
   /**
    * Gets all users from the database
@@ -69,5 +69,4 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param id the id of the user to delete
    */
   fun deleteUser(id: String) = Tasks.await(delete(id))
-
 }
