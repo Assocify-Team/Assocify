@@ -5,7 +5,6 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
@@ -47,12 +46,11 @@ class AssociationAPITest {
             assoAPI.getNewId(), "caaaa", "description", "", "status", emptyList(), emptyList())
 
     // When
-    assoAPI.addAssociation(association1)
-    assoAPI.addAssociation(association2)
-    assoAPI.addAssociation(association3)
+    assoAPI.addAllAssociations(listOf(association1, association2, association3))
+
 
     // Then
-    val associations = Tasks.await(assoAPI.getAssociations())
+    val associations = assoAPI.getAssociations()
 
     assertEquals(3, associations.size)
   }
@@ -156,7 +154,7 @@ class AssociationAPITest {
     assoAPI.deleteAssociation(association1.uid)
 
     // Get the list of associations from the database
-    val associations = Tasks.await(assoAPI.getAssociations())
+    val associations = assoAPI.getAssociations()
 
     // Verify that the deleted association is no longer present
     assertEquals(1, associations.size)
