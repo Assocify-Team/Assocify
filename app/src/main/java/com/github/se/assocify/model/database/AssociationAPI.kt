@@ -5,7 +5,6 @@ import com.github.se.assocify.model.entities.Association
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 /**
  * API for interacting with the associations in the database
  *
@@ -14,12 +13,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
   override val collectionName: String = "associations"
 
-    /**
-     * Gets an association from the database
-     *
-     * @param id the id of the association to get
-     * @return the association with the given id
-     */
+  /**
+   * Gets an association from the database
+   *
+   * @param id the id of the association to get
+   * @return the association with the given id
+   */
   fun getAssociation(id: String): Association {
     return Tasks.await(
         db.collection(collectionName).document(id).get().continueWith { task ->
@@ -36,11 +35,11 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         })
   }
 
-    /**
-     * Gets all associations from the database
-     *
-     * @return a list of all associations
-     */
+  /**
+   * Gets all associations from the database
+   *
+   * @return a list of all associations
+   */
   fun getAssociations(): List<Association> {
     return Tasks.await(
         db.collection(collectionName).get().continueWith { task ->
@@ -57,12 +56,12 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         })
   }
 
-    /**
-     * Adds/edit an association to the database
-     *
-     * @param association the association to add/edit
-     */
-    fun addAssociation(association: Association) {
+  /**
+   * Adds/edit an association to the database
+   *
+   * @param association the association to add/edit
+   */
+  fun addAssociation(association: Association) {
     Tasks.await(
         db.collection(collectionName)
             .document(association.uid)
@@ -75,20 +74,18 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
             })
   }
 
-    /**
-     * Adds/edit a list of associations to the database
-     *
-     * @param associations the list of associations to add/edit
-     */
+  /**
+   * Adds/edit a list of associations to the database
+   *
+   * @param associations the list of associations to add/edit
+   */
   fun addAllAssociations(associations: List<Association>) {
     for (association in associations) {
       addAssociation(association)
     }
   }
 
-    /**
-     * Deletes an association from the database
-     */
+  /** Deletes an association from the database */
   fun deleteAllAssociations() {
     Tasks.await(
         db.collection(collectionName).get().addOnSuccessListener { querySnapshot ->
@@ -97,10 +94,10 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
           }
         })
   }
-    /**
-     * Deletes an association from the database
-     *
-     * @param id the id of the association to delete
-     */
+  /**
+   * Deletes an association from the database
+   *
+   * @param id the id of the association to delete
+   */
   fun deleteAssociation(id: String) = delete(id)
 }

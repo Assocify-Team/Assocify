@@ -48,7 +48,6 @@ class AssociationAPITest {
     // When
     assoAPI.addAllAssociations(listOf(association1, association2, association3))
 
-
     // Then
     val associations = assoAPI.getAssociations()
 

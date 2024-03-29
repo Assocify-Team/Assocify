@@ -3,6 +3,7 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.User
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
+
 /**
  * API for interacting with the users in the database
  *
