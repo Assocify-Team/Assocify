@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.entities
 
-enum class Role(
-  private var permissions: Set<Permission>) {
+enum class Role(private var permissions: Set<Permission>) {
 
   // The ADMIN role has all permissions
   ADMIN(Permission.entries.toSet()),
@@ -39,9 +38,9 @@ enum class Role(
    *
    * @param role the role to grant
    */
-  fun canGrantRoleTo(user : User, role: Role): Boolean {
-    return this.hasPermission(Permission.ASSIGN_ROLE)
-            && this.hasPermissions(role.getPermissions())
-            && user.role != this
+  fun canGrantRoleTo(user: User, role: Role): Boolean {
+    return this.hasPermission(Permission.ASSIGN_ROLE) &&
+        this.hasPermissions(role.getPermissions()) &&
+        user.role != this
   }
 }
