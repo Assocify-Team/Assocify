@@ -1,11 +1,9 @@
 package com.github.se.assocify.model.database
 
-import android.net.Uri
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import java.time.LocalDate
 
@@ -15,39 +13,47 @@ class ReceiptsAPI(userId: String, basePath: String, storage: FirebaseStorage, db
     private val storageReference = storage.getReference(userCollection)
     private val dbReference = db.collection(userCollection)
 
-    // TODO: Progress callbacks; when the photo is uploaded, and when the receipt itself is uploaded.
-    // More generally, don't return a Unit.
-    fun uploadReceipt(receipt: Receipt): Task<Unit> {
-        val photoUpload = when (receipt.photo) {
+    fun uploadReceipt(receipt: Receipt, onPhotoUploadSuccess: (Boolean) -> Unit, onReceiptUploadSuccess: () -> Unit, onFailure: (Boolean, Exception) -> Unit) {
+        when (receipt.photo) {
             is MaybeRemotePhoto.LocalFile -> {
-                storageReference.child(receipt.uid).putFile(receipt.photo.filePath).continueWith {}
+                storageReference
+                    .child(receipt.uid)
+                    .putFile(receipt.photo.filePath)
+                    .addOnSuccessListener { onPhotoUploadSuccess(true) }
+                    .addOnFailureListener { onFailure(false, it) }
             }
 
             is MaybeRemotePhoto.Remote -> {
-                Tasks.forResult(Unit)
+                onPhotoUploadSuccess(false)
             }
         }
 
-        val receiptUpload = dbReference.document(receipt.uid).set(receipt)
-
-        return receiptUpload.continueWithTask {
-            photoUpload
-        }
+        dbReference
+            .document(receipt.uid)
+            .set(receipt)
+            .addOnSuccessListener { onReceiptUploadSuccess() }
+            .addOnFailureListener { onFailure(true, it) }
     }
 
-    fun getUserReceipts(): Task<List<Receipt>> =
-        dbReference.get().continueWith { query ->
-            query.result.documents.map {
-                it.toObject(FirestoreReceipt::class.java)!!.toReceipt(it.id)
-            }
+    private fun parseReceiptList(snapshot: QuerySnapshot): List<Receipt> =
+        snapshot.documents.map {
+            it.toObject(FirestoreReceipt::class.java)!!.toReceipt(it.id)
         }
 
-    fun getAllUserIds(): Task<List<String>> =
-        db.collection(collectionName).get().continueWith { query ->
-            query.result.documents.map {
-                it.id
+    fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) =
+        dbReference.get()
+            .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
+            .addOnFailureListener { onError(it) }
+
+    fun getAllReceipts(onReceiptsFetched: (List<Receipt>) -> Unit, onError: (String?, Exception) -> Unit) =
+        db.collection(collectionName).get().addOnSuccessListener { query ->
+            query.documents.forEach { snapshot ->
+                snapshot.reference.collection("list")
+                    .get()
+                    .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
+                    .addOnFailureListener { onError(snapshot.id, it) }
             }
-        }
+        }.addOnFailureListener { onError(null, it) }
 
     private data class FirestoreReceipt(
         val date: String,
