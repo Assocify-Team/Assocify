@@ -36,6 +36,13 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
     return _associationState.value!!.members.filter { x -> x.role != Role.PENDING_MEMBER }
   }
 
+  fun getAllUsers(): List<User>{
+    if (_associationState.value == null) {
+      return emptyList()
+    }
+    return _associationState.value!!.members
+  }
+
   fun getAssociationName(): String {
     if (_associationState.value == null) return ""
     return _associationState.value!!.name
@@ -56,7 +63,7 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
     return _associationState.value!!.events
   }
 
-  fun acceptUser(uid: String) {
+  fun acceptNewUser(uid: String) {
     if (_associationState.value != null &&
         (user.role == Role.CO_PRESIDENT || user.role == Role.PRESIDENT)) {
       val userList = getPendingUsers().filter { u -> u.uid == uid }
@@ -75,5 +82,19 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
               ass.events)
       associationDatabase.addAssociation(updatedAssoc)
     }
+  }
+
+  fun requestAssociationAccess(){
+    val ass = _associationState.value!!
+    val updatedAssoc =
+      Association(
+        ass.uid,
+        ass.name,
+        ass.description,
+        ass.creationDate,
+        ass.status,
+        ass.members + user,
+        ass.events)
+    associationDatabase.addAssociation(updatedAssoc)
   }
 }
