@@ -57,21 +57,22 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
   }
 
   fun acceptUser(uid: String) {
-    if (_associationState.value != null && (user.role == Role.CO_PRESIDENT
-      || user.role == Role.PRESIDENT)
-    ) {
+    if (_associationState.value != null &&
+        (user.role == Role.CO_PRESIDENT || user.role == Role.PRESIDENT)) {
       val userList = getPendingUsers().filter { u -> u.uid == uid }
       if (userList.isEmpty()) return
       val user = userList[0]
       val updatedUser = User(uid, user.name, Role.MEMBER)
       val ass = _associationState.value!!
-      val updatedAssoc = Association(ass.uid,
-        ass.name,
-        ass.description,
-        ass.creationDate,
-        ass.status,
-        ass.members.filter { us -> us.uid != uid } + updatedUser,
-        ass.events)
+      val updatedAssoc =
+          Association(
+              ass.uid,
+              ass.name,
+              ass.description,
+              ass.creationDate,
+              ass.status,
+              ass.members.filter { us -> us.uid != uid } + updatedUser,
+              ass.events)
       associationDatabase.addAssociation(updatedAssoc)
     }
   }
