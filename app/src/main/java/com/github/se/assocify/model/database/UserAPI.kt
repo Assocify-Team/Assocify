@@ -43,12 +43,9 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
     return Tasks.await(
         db.collection(collectionName).get().continueWith { task ->
           if (task.isSuccessful) {
-            val users = mutableListOf<User>()
-            for (document in task.result!!.documents) {
-              val user = document.toObject(User::class.java)
-              users.add(user!!)
+            task.result!!.map { document ->
+              document.toObject(User::class.java)
             }
-            users
           } else {
             throw task.exception ?: Exception("Unknown error occurred")
           }

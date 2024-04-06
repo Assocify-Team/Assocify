@@ -43,12 +43,9 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
     return Tasks.await(
         db.collection(collectionName).get().continueWith { task ->
           if (task.isSuccessful) {
-            val associations = mutableListOf<Association>()
-            for (document in task.result!!.documents) {
-              val association = document.toObject(Association::class.java)
-              associations.add(association!!)
+            task.result!!.map { document ->
+              document.toObject(Association::class.java)
             }
-            associations
           } else {
             throw task.exception ?: Exception("Unknown error occurred")
           }
