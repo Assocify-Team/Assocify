@@ -25,10 +25,10 @@ import java.time.ZoneId
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerWithDialog(
+    value: String,
+    onDateSelect: (LocalDate?) -> Unit,
     modifier: Modifier = Modifier,
-    label: @Composable () -> Unit,
-    dateValue: String,
-    onDateSelected: (LocalDate?) -> Unit
+    label: @Composable (() -> Unit)? = null
 ) {
   var showDialog by remember { mutableStateOf(false) }
   val datePickerState =
@@ -52,10 +52,10 @@ fun DatePickerWithDialog(
   Box {
     OutlinedTextField(
         modifier = modifier,
-        value = dateValue,
+        value = value,
         onValueChange = {},
         readOnly = true,
-        label = { label() },
+        label = label,
         placeholder = { Text("--/--/--") })
     Box(modifier = Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
   }
@@ -68,7 +68,7 @@ fun DatePickerWithDialog(
           Button(
               onClick = {
                 showDialog = false
-                onDateSelected(selectedDate)
+                onDateSelect(selectedDate)
               }) {
                 Text(text = "OK")
               }
