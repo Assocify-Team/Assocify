@@ -23,7 +23,7 @@ sealed class Destination(
 
   data object Login : Destination("login")
 
-  data class Receipt(val id: String) : Destination("receipt/$id")
+  // data class Receipt(val id: String) : Destination("receipt/$id")
 }
 
 val MAIN_TABS_LIST =

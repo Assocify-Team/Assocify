@@ -25,11 +25,6 @@ class NavigationActions(private val navController: NavHostController) {
     /* Handle auth error */
   }
 
-  fun onCreateReceipt() {
-    /*TODO create new uid*/
-    navController.navigate(Destination.Receipt("new").route)
-  }
-
   fun back() {
     /*TODO handle back navigation*/
   }

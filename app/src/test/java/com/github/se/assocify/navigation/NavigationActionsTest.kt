@@ -35,5 +35,7 @@ class NavigationActionsTest {
 
     navActions.onAuthError()
     navActions.onLogin(user)
+
+    navActions.back()
   }
 }
