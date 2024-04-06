@@ -58,10 +58,9 @@ class AssociationAPITest {
     val query = Tasks.forResult(Mockito.mock(QuerySnapshot::class.java))
     Mockito.`when`(db.collection(Mockito.any()).get()).thenReturn(query)
 
-
-
     Mockito.`when`(query.result!!.documents).thenReturn(listOf(documentSnapshot))
-    Mockito.`when`(listOf(documentSnapshot).map { document -> document.toObject(Association::class.java) })
+    Mockito.`when`(
+            listOf(documentSnapshot).map { document -> document.toObject(Association::class.java) })
         .thenReturn(listOf(asso))
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(asso)
 

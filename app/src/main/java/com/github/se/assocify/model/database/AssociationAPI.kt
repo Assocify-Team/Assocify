@@ -43,8 +43,7 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
     return Tasks.await(
         db.collection(collectionName).get().continueWith { task ->
           if (task.isSuccessful) {
-            task.result!!.documents.map { document ->
-              document.toObject(Association::class.java)!!}
+            task.result!!.documents.map { document -> document.toObject(Association::class.java)!! }
           } else {
             throw task.exception ?: Exception("Unknown error occurred")
           }
