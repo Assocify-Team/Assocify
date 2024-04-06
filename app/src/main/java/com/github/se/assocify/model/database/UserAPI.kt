@@ -43,9 +43,7 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
     return Tasks.await(
         db.collection(collectionName).get().continueWith { task ->
           if (task.isSuccessful) {
-            task.result!!.map { document ->
-              document.toObject(User::class.java)
-            }
+            task.result!!.map { document -> document.toObject(User::class.java) }
           } else {
             throw task.exception ?: Exception("Unknown error occurred")
           }
