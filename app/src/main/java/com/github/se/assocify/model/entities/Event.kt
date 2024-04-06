@@ -6,5 +6,5 @@ data class Event(
     val organizers: List<User>,
     val staffers: List<User>
 ) {
-    constructor() : this("", "", listOf(), listOf())
+  constructor() : this("", "", listOf(), listOf())
 }
