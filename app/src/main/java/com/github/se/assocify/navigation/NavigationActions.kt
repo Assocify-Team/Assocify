@@ -29,4 +29,8 @@ class NavigationActions(private val navController: NavHostController) {
     /*TODO create new uid*/
     navController.navigate(Destination.Receipt("new").route)
   }
+
+  fun back() {
+    /*TODO handle back navigation*/
+  }
 }

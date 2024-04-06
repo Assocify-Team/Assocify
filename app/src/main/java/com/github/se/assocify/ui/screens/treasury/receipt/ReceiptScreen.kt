@@ -1,6 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.receipt
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -12,31 +12,43 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReceiptScreen() {
+fun ReceiptScreen(navActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("receiptScreen"),
       topBar = {
         MediumTopAppBar(
             title = { Text("New Receipt") },
             navigationIcon = {
-              IconButton(onClick = { /*TODO*/}) {
+              IconButton(
+                  modifier = Modifier.testTag("backButton"),
+                  onClick = { navActions.back() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
               }
             })
       },
   ) {
-    LazyColumn(modifier = Modifier.padding(it)) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = it,
+        horizontalAlignment = Alignment.CenterHorizontally){
       item {
-        OutlinedTextField(value = "", onValueChange = { /*TODO*/}, label = { Text("Title") })
         OutlinedTextField(
+            modifier = Modifier.testTag("titleField"),
+            value = "", onValueChange = { /*TODO*/}, label = { Text("Title") })
+        OutlinedTextField(
+            modifier = Modifier.testTag("descriptionField"),
             value = "", onValueChange = { /*TODO*/}, label = { Text("Description") }, minLines = 3)
-        DatePickerWithDialog(dateText = "", onDateSelected = { /*TODO*/})
+        DatePickerWithDialog(
+            modifier = Modifier.testTag("dateField"),
+            label = {Text("Date")}, dateValue = "", onDateSelected = { /*TODO*/})
       }
     }
   }
