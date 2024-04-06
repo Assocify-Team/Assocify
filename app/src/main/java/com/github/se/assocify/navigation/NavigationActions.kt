@@ -24,4 +24,8 @@ class NavigationActions(private val navController: NavHostController) {
   fun onAuthError() {
     /* Handle auth error */
   }
+
+  fun back() {
+    /*TODO handle back navigation*/
+  }
 }
