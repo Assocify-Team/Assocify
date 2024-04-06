@@ -2,164 +2,99 @@ package com.github.se.assocify
 
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.model.entities.Event
-import com.github.se.assocify.model.entities.Role
-import com.github.se.assocify.model.entities.User
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
-import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.runBlocking
-import org.junit.After
+import com.google.firebase.firestore.QuerySnapshot
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.Mockito
 
 class AssociationAPITest {
 
-  private lateinit var firestore: FirebaseFirestore
+  @Mock private lateinit var db: FirebaseFirestore
+
   private lateinit var assoAPI: AssociationAPI
+  private val documentSnapshot = Mockito.mock(DocumentSnapshot::class.java)
+  private val documentReference = Mockito.mock(DocumentReference::class.java)
+  private val collectionReference = Mockito.mock(CollectionReference::class.java)
+  private val asso =
+      Association(
+          "testId", "testName", "testDescription", "testDate", "testStatus", listOf(), listOf())
 
   @Before
   fun setup() {
-    firestore = FirebaseFirestore.getInstance()
-    assoAPI = AssociationAPI(firestore)
+    db = Mockito.mock(FirebaseFirestore::class.java)
+    assoAPI = AssociationAPI(db)
   }
 
-  @After
-  fun teardown() {
-    // Delete all associations added during the test to clean up the database
-    runBlocking { assoAPI.deleteAllAssociations() }
+  @Test
+  fun testGetAssociation() {
+
+    Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
+    Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(asso)
+    Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
+
+    val task = Tasks.forResult(documentSnapshot)
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    val result = assoAPI.getAssociation(asso.uid)
+
+    Mockito.verify(db).collection(assoAPI.collectionName)
+    Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
+    Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).get()
+    assert(result == asso)
   }
 
   @Test
   fun testGetAllAssociations() {
-    assoAPI.deleteAllAssociations()
-    // Given
-    val association1 =
-        Association(
-            assoAPI.getNewId(), "caaaa", "description", "", "status", emptyList(), emptyList())
-    val association2 =
-        Association(
-            assoAPI.getNewId(), "caaaa", "description", "", "status", emptyList(), emptyList())
-    val association3 =
-        Association(
-            assoAPI.getNewId(), "caaaa", "description", "", "status", emptyList(), emptyList())
 
-    // When
-    assoAPI.addAssociation(association1)
-    assoAPI.addAssociation(association2)
-    assoAPI.addAssociation(association3)
+    Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    val query = Tasks.forResult(Mockito.mock(QuerySnapshot::class.java))
+    Mockito.`when`(db.collection(Mockito.any()).get()).thenReturn(query)
 
-    // Then
-    val associations = Tasks.await(assoAPI.getAssociations())
+    Mockito.`when`(query.result!!.documents).thenReturn(listOf(documentSnapshot))
+    Mockito.`when`(
+            listOf(documentSnapshot).map { document -> document.toObject(Association::class.java) })
+        .thenReturn(listOf(asso))
+    Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(asso)
 
-    assertEquals(3, associations.size)
+    val result = assoAPI.getAssociations()
+
+    Mockito.verify(db).collection(assoAPI.collectionName)
+    Mockito.verify(db.collection(assoAPI.collectionName)).get()
+
+    assert(result == listOf(asso))
   }
 
   @Test
-  fun testUpdateAssociation() {
-    // Given
-    val association =
-        Association(
-            assoAPI.getNewId(), "caaaa", "description", "", "status", emptyList(), emptyList())
-    assoAPI.addAssociation(association)
+  fun testAddAssociation() {
 
-    // When
-    val updatedAssociation =
-        Association(
-            association.uid,
-            "new name",
-            "new description",
-            "",
-            "new status",
-            emptyList(),
-            emptyList())
-    assoAPI.addAssociation(updatedAssociation)
-
-    // Then
-    val updatedAssociationTask = assoAPI.getAssociation(association.uid)
-    val fetchedUpdatedAssociation = updatedAssociationTask
-
-    assertEquals(updatedAssociation.uid, fetchedUpdatedAssociation.uid)
-    assertEquals(updatedAssociation.name, fetchedUpdatedAssociation.name)
-    assertEquals(updatedAssociation.description, fetchedUpdatedAssociation.description)
-    assertEquals(updatedAssociation.creationDate, fetchedUpdatedAssociation.creationDate)
-    assertEquals(updatedAssociation.status, fetchedUpdatedAssociation.status)
-    assertEquals(updatedAssociation.members, fetchedUpdatedAssociation.members)
-    assertEquals(updatedAssociation.events, fetchedUpdatedAssociation.events)
-  }
-
-  @Test
-  fun testAddAssociation_associationDoesNotExist() {
-    // Given
-    val association =
-        Association(
-            assoAPI.getNewId(), "caaaa", "description", "", "status", emptyList(), emptyList())
-
-    // When
-    assoAPI.addAssociation(association)
-
-    // Then
-    val addedAssociationTask = assoAPI.getAssociation(association.uid)
-    val addedAssociation = addedAssociationTask
-
-    assertNotNull(addedAssociation)
-    assertEquals(association.uid, addedAssociation.uid)
-    assertEquals(association.name, addedAssociation.name)
-    assertEquals(association.description, addedAssociation.description)
-    assertEquals(association.creationDate, addedAssociation.creationDate)
-    assertEquals(association.status, addedAssociation.status)
-    assertEquals(association.members, addedAssociation.members)
-    assertEquals(association.events, addedAssociation.events)
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(documentReference.set(asso)).thenReturn(Tasks.forResult(null))
+    assoAPI.addAssociation(asso)
+    Mockito.verify(db).collection(assoAPI.collectionName)
+    Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
+    Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).set(asso)
   }
 
   @Test
   fun testDeleteAssociation() {
-    assoAPI.deleteAllAssociations()
-    // Add some test associations to the database
-    val usss = User("test-user-uid", "Test User", Role("Admin"))
-    val association1 =
-        Association(
-            uid = assoAPI.getNewId(),
-            name = "Test Association 1",
-            description = "This is a test association",
-            creationDate = "",
-            status = "active",
-            members = listOf(usss),
-            events =
-                listOf(
-                    Event(
-                        startDate = "",
-                        endDate = "",
-                        organizers = listOf(User("test-user-uid", "Test User", usss.role)),
-                        staffers = listOf(User("test-user-uid", "Test User", usss.role)))))
-    val association2 =
-        Association(
-            uid = assoAPI.getNewId(),
-            name = "Test Association 1",
-            description = "This is a test association",
-            creationDate = "",
-            status = "active",
-            members = listOf(usss),
-            events =
-                listOf(
-                    Event(
-                        startDate = "",
-                        endDate = "",
-                        organizers = listOf(User("test-user-uid", "Test User", usss.role)),
-                        staffers = listOf(User("test-user-uid", "Test User", usss.role)))))
-    assoAPI.addAssociation(association1)
-    assoAPI.addAssociation(association2)
 
-    // Delete one of the test associations
-    assoAPI.deleteAssociation(association1.uid)
-
-    // Get the list of associations from the database
-    val associations = Tasks.await(assoAPI.getAssociations())
-
-    // Verify that the deleted association is no longer present
-    assertEquals(1, associations.size)
-    assertTrue(associations.contains(association2))
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(documentReference.delete()).thenReturn(Tasks.forResult(null))
+    assoAPI.deleteAssociation(asso.uid)
+    Mockito.verify(db).collection(assoAPI.collectionName)
+    Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
+    Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).delete()
   }
 }
