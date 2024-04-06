@@ -9,6 +9,5 @@ data class Receipt(
     val date: String,
     val incoming: Boolean
 ) {
-    constructor() : this("", "", "", 0.0, User("", "", Role("")), "", false)
-
+  constructor() : this("", "", "", 0.0, User("", "", Role("")), "", false)
 }
