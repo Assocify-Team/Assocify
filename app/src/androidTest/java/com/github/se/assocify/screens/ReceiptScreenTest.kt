@@ -48,4 +48,13 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       assert(tabSelected)
     }
   }
+
+  @Test
+  fun datePicker() {
+    with(composeTestRule) {
+      onNodeWithTag("dateField").performClick()
+      onNodeWithTag("datePickerDialog").assertIsDisplayed()
+      onNodeWithTag("datePickerDialogDismiss").performClick()
+    }
+  }
 }

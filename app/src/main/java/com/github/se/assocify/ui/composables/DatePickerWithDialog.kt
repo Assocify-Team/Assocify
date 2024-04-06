@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.testTag
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -61,7 +62,7 @@ fun DatePickerWithDialog(
 
   if (showDialog) {
     DatePickerDialog(
-        modifier = Modifier,
+        modifier = Modifier.testTag("datePickerDialog"),
         onDismissRequest = { showDialog = false },
         confirmButton = {
           Button(
@@ -73,7 +74,11 @@ fun DatePickerWithDialog(
               }
         },
         dismissButton = {
-          Button(modifier = Modifier, onClick = { showDialog = false }) { Text(text = "Cancel") }
+          Button(
+              modifier = Modifier.testTag("datePickerDialogDismiss"),
+              onClick = { showDialog = false }) {
+                Text(text = "Cancel")
+              }
         }) {
           DatePicker(state = datePickerState, showModeToggle = true)
         }
