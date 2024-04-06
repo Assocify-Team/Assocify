@@ -1,6 +1,7 @@
 package com.github.se.assocify
 
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.google.android.gms.tasks.Tasks
@@ -55,8 +56,13 @@ class UserAPITest {
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
     val query = Tasks.forResult(Mockito.mock(QuerySnapshot::class.java))
     Mockito.`when`(db.collection(Mockito.any()).get()).thenReturn(query)
+
+
     Mockito.`when`(query.result!!.documents).thenReturn(listOf(documentSnapshot))
+    Mockito.`when`(listOf(documentSnapshot).map { document -> document.toObject(User::class.java) })
+      .thenReturn(listOf(user))
     Mockito.`when`(documentSnapshot.toObject(User::class.java)).thenReturn(user)
+
     val result = userAPI.getAllUsers()
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).get()
