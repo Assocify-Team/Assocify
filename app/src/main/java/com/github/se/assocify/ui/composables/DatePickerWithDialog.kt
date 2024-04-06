@@ -27,7 +27,8 @@ fun DatePickerWithDialog(
     modifier: Modifier = Modifier,
     label: @Composable () -> Unit,
     dateValue: String,
-    onDateSelected: (LocalDate?) -> Unit) {
+    onDateSelected: (LocalDate?) -> Unit
+) {
   var showDialog by remember { mutableStateOf(false) }
   val datePickerState =
       rememberDatePickerState(

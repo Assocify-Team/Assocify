@@ -28,28 +28,34 @@ fun ReceiptScreen(navActions: NavigationActions) {
             title = { Text("New Receipt") },
             navigationIcon = {
               IconButton(
-                  modifier = Modifier.testTag("backButton"),
-                  onClick = { navActions.back() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-              }
+                  modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                  }
             })
       },
   ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = it,
-        horizontalAlignment = Alignment.CenterHorizontally){
-      item {
-        OutlinedTextField(
-            modifier = Modifier.testTag("titleField"),
-            value = "", onValueChange = { /*TODO*/}, label = { Text("Title") })
-        OutlinedTextField(
-            modifier = Modifier.testTag("descriptionField"),
-            value = "", onValueChange = { /*TODO*/}, label = { Text("Description") }, minLines = 3)
-        DatePickerWithDialog(
-            modifier = Modifier.testTag("dateField"),
-            label = {Text("Date")}, dateValue = "", onDateSelected = { /*TODO*/})
-      }
-    }
+        horizontalAlignment = Alignment.CenterHorizontally) {
+          item {
+            OutlinedTextField(
+                modifier = Modifier.testTag("titleField"),
+                value = "",
+                onValueChange = { /*TODO*/},
+                label = { Text("Title") })
+            OutlinedTextField(
+                modifier = Modifier.testTag("descriptionField"),
+                value = "",
+                onValueChange = { /*TODO*/},
+                label = { Text("Description") },
+                minLines = 3)
+            DatePickerWithDialog(
+                modifier = Modifier.testTag("dateField"),
+                label = { Text("Date") },
+                dateValue = "",
+                onDateSelected = { /*TODO*/})
+          }
+        }
   }
 }

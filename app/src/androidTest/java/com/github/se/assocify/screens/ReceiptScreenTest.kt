@@ -19,33 +19,33 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    private val navActions = mockk<NavigationActions>()
-    private var tabSelected = false
-    @Before
-    fun testSetup() {
-        every { navActions.back() } answers { tabSelected = true }
-        composeTestRule.setContent { ReceiptScreen(navActions = navActions) }
-    }
+  private val navActions = mockk<NavigationActions>()
+  private var tabSelected = false
 
-    @Test
-    fun display() {
-        with(composeTestRule) {
-            onNodeWithTag("receiptScreen").assertIsDisplayed()
-            onNodeWithTag("titleField").assertIsDisplayed()
-            onNodeWithTag("descriptionField").assertIsDisplayed()
-            onNodeWithTag("dateField").assertIsDisplayed()
-            onNodeWithTag("backButton").assertIsDisplayed()
-        }
-    }
+  @Before
+  fun testSetup() {
+    every { navActions.back() } answers { tabSelected = true }
+    composeTestRule.setContent { ReceiptScreen(navActions = navActions) }
+  }
 
-    @Test
-    fun back() {
-        with(composeTestRule) {
-            onNodeWithTag("backButton").performClick()
-            assert(tabSelected)
-        }
+  @Test
+  fun display() {
+    with(composeTestRule) {
+      onNodeWithTag("receiptScreen").assertIsDisplayed()
+      onNodeWithTag("titleField").assertIsDisplayed()
+      onNodeWithTag("descriptionField").assertIsDisplayed()
+      onNodeWithTag("dateField").assertIsDisplayed()
+      onNodeWithTag("backButton").assertIsDisplayed()
     }
+  }
+
+  @Test
+  fun back() {
+    with(composeTestRule) {
+      onNodeWithTag("backButton").performClick()
+      assert(tabSelected)
+    }
+  }
 }
