@@ -1,4 +1,3 @@
 package com.github.se.assocify
 
-class AssociationViewModelTest {
-}
+class AssociationViewModelTest {}

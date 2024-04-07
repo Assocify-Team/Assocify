@@ -65,6 +65,4 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param id the id of the association to delete
    */
   fun deleteAssociation(id: String) = Tasks.await(delete(id))
-
-
 }

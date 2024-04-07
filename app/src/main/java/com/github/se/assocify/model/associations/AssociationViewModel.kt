@@ -36,7 +36,7 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
     return _associationState.value!!.members.filter { x -> x.role != Role("pending") }
   }
 
-  fun getAllUsers(): List<User>{
+  fun getAllUsers(): List<User> {
     if (_associationState.value == null) {
       return emptyList()
     }
@@ -84,32 +84,30 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
     }
   }
 
-  fun requestAssociationAccess(){
+  fun requestAssociationAccess() {
     val ass = _associationState.value!!
     val updatedAssoc =
-      Association(
-        ass.uid,
-        ass.name,
-        ass.description,
-        ass.creationDate,
-        ass.status,
-        ass.members + User(user.uid, user.name, Role("pending")),
-        ass.events)
+        Association(
+            ass.uid,
+            ass.name,
+            ass.description,
+            ass.creationDate,
+            ass.status,
+            ass.members + User(user.uid, user.name, Role("pending")),
+            ass.events)
     associationDatabase.addAssociation(updatedAssoc)
   }
 
-
-  fun createNewAssoc(name: String, description: String, creationDate: String, status: String, members: List<User>, events: List<Event>){
+  fun createNewAssoc(
+      name: String,
+      description: String,
+      creationDate: String,
+      status: String,
+      members: List<User>,
+      events: List<Event>
+  ) {
     val uid = associationDatabase.getNewId()
-    val assoc = Association(
-      uid,
-      name,
-      description,
-      creationDate,
-      status,
-      members,
-      events
-    )
+    val assoc = Association(uid, name, description, creationDate, status, members, events)
     associationDatabase.addAssociation(assoc)
   }
 }
