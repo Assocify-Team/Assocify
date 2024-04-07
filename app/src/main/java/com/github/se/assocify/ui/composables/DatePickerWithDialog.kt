@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
+import com.github.se.assocify.ui.util.DateUtil
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -56,7 +57,7 @@ fun DatePickerWithDialog(
         onValueChange = {},
         readOnly = true,
         label = label,
-        placeholder = { Text("--/--/--") })
+        placeholder = { Text(DateUtil.NULL_DATE_STRING) })
     Box(modifier = Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
   }
 
