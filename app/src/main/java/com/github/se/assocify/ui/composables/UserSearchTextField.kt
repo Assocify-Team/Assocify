@@ -3,12 +3,11 @@ package com.github.se.assocify.ui.composables
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.github.se.assocify.model.entities.User
 
 @Composable
 fun UserSearchTextField(
     value: String,
-    onUserSelect: (User?) -> Unit,
+    onUserSelect: (String?) -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null
 ) {
