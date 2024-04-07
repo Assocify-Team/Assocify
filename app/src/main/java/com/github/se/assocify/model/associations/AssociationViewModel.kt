@@ -26,14 +26,14 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
     if (_associationState.value == null) {
       return emptyList()
     }
-    return _associationState.value!!.members.filter { x -> x.role == Role.PENDING_MEMBER }
+    return _associationState.value!!.members.filter { x -> x.role == Role("pending") }
   }
 
   fun getRecordedUsers(): List<User> {
     if (_associationState.value == null) {
       return emptyList()
     }
-    return _associationState.value!!.members.filter { x -> x.role != Role.PENDING_MEMBER }
+    return _associationState.value!!.members.filter { x -> x.role != Role("pending") }
   }
 
   fun getAllUsers(): List<User>{
@@ -63,13 +63,13 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
     return _associationState.value!!.events
   }
 
-  fun acceptNewUser(uid: String) {
+  fun acceptNewUser(uid: String, role: String) {
     if (_associationState.value != null &&
-        (user.role == Role.CO_PRESIDENT || user.role == Role.PRESIDENT)) {
+        (user.role == Role("president") || user.role == Role("co-president"))) {
       val userList = getPendingUsers().filter { u -> u.uid == uid }
       if (userList.isEmpty()) return
       val user = userList[0]
-      val updatedUser = User(uid, user.name, Role.MEMBER)
+      val updatedUser = User(uid, user.name, Role(role))
       val ass = _associationState.value!!
       val updatedAssoc =
           Association(
@@ -93,7 +93,7 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
         ass.description,
         ass.creationDate,
         ass.status,
-        ass.members + user,
+        ass.members + User(user.uid, user.name, Role("pending")),
         ass.events)
     associationDatabase.addAssociation(updatedAssoc)
   }
