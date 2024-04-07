@@ -7,63 +7,52 @@ import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
-import io.mockk.Called
-import io.mockk.confirmVerified
-import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import io.mockk.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.github.se.assocify.ui.screens.TreasuryScreen
 
 @RunWith(AndroidJUnit4::class)
 class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
-    @get:Rule
-    val mockkRule = MockKRule(this)
+  // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
+  @get:Rule val mockkRule = MockKRule(this)
 
-    @Before
-    fun testSetup() {
-        composeTestRule.setContent { TreasuryMainScreen() }
+  @Before
+  fun testSetup() {
+    composeTestRule.setContent { TreasuryMainScreen() }
+  }
+
+  @Test
+  fun testTabSwitching() {
+    onComposeScreen<TreasuryScreen>(composeTestRule) {
+      budgetTab.assertIsDisplayed()
+      budgetTab.performClick()
+      budgetTab.assertIsSelected()
+
+      balanceTab.assertIsDisplayed()
+      balanceTab.performClick()
+      balanceTab.assertIsSelected()
+
+      myReceiptsTab.assertIsDisplayed()
+      myReceiptsTab.performClick()
+      myReceiptsTab.assertIsSelected()
     }
+  }
 
-    @Test
-    fun testTabSwitching() {
-        onComposeScreen<TreasuryScreen>(composeTestRule) {
-            budgetTab.assertIsDisplayed()
-            budgetTab.performClick()
-            budgetTab.assertIsSelected()
+  @Test
+  fun testTodoListItem() = run {
+    onComposeScreen<TreasuryScreen>(composeTestRule) { receiptItemBox.assertIsDisplayed() }
+  }
 
-            balanceTab.assertIsDisplayed()
-            balanceTab.performClick()
-            balanceTab.assertIsSelected()
-
-            myReceiptsTab.assertIsDisplayed()
-            myReceiptsTab.performClick()
-            myReceiptsTab.assertIsSelected()
-        }
+  @Test
+  fun createTodo() = run {
+    onComposeScreen<TreasuryScreen>(composeTestRule) {
+      createReceiptFab.assertIsDisplayed()
+      createReceiptFab.performClick()
     }
-
-    @Test
-    fun testTodoListItem() = run {
-        onComposeScreen<TreasuryScreen>(composeTestRule) {
-            receiptItemBox.assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun createTodo() = run {
-        onComposeScreen<TreasuryScreen>(composeTestRule) {
-            createReceiptFab.assertIsDisplayed()
-            createReceiptFab.performClick()
-        }
-    }
-
-
+  }
 }
