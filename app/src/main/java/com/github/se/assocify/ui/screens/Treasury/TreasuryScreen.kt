@@ -64,12 +64,13 @@ const val PAGE_BALANCE_INDEX: Int = 2
 @Composable
 fun TreasuryMainScreen() {
     Scaffold(
+        modifier = Modifier.testTag("treasuryScreen"),
         topBar = {
             TreasuryTopBar({}, {})
         },
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier.testTag("AddReceipt"),
+                modifier = Modifier.testTag("createReceipt"),
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.primary,
                 onClick = { },
@@ -90,7 +91,8 @@ fun TreasuryMainScreen() {
 
             // Tabs
             TabRow(
-                modifier = Modifier.height(48.dp),
+                modifier = Modifier.height(48.dp)
+                    .testTag("tabRows"),
                 selectedTabIndex = pagerState.currentPage,
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.primary,
@@ -117,7 +119,8 @@ fun TreasuryMainScreen() {
                             )
                         }
                     },
-                    text = "My receipts"
+                    text = "My receipts",
+                    modifier = Modifier.testTag("myReceiptsTab")
                 )
                 TreasuryTab(
                     selected = pagerState.currentPage == PAGE_BUDGET_INDEX,
@@ -128,7 +131,8 @@ fun TreasuryMainScreen() {
                             )
                         }
                     },
-                    text = "Budget"
+                    text = "Budget",
+                    modifier = Modifier.testTag("budgetTab")
                 )
                 TreasuryTab(
                     selected = pagerState.currentPage == PAGE_BALANCE_INDEX,
@@ -139,7 +143,8 @@ fun TreasuryMainScreen() {
                             )
                         }
                     },
-                    text = "Balance"
+                    text = "Balance",
+                    modifier = Modifier.testTag("balanceTab")
                 )
             }
 
@@ -214,7 +219,8 @@ private fun BalancePage() {
 fun TreasuryTab(
     selected: Boolean,
     onClick: () -> Unit,
-    text: String
+    text: String,
+    modifier: Modifier = Modifier
 ) {
     Tab(
         selected = selected,
@@ -228,7 +234,8 @@ fun TreasuryTab(
                     MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
                 }
             )
-        }
+        },
+        modifier = modifier
     )
 }
 
@@ -249,7 +256,10 @@ fun TreasuryTopBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = onAccountClick) {
+            IconButton(
+                modifier = Modifier.testTag("accountIconButton"),
+                onClick = onAccountClick
+            ) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
                     contentDescription = "Localized description"
@@ -257,7 +267,10 @@ fun TreasuryTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onSearchClick) {
+            IconButton(
+                modifier = Modifier.testTag("searchIconButton"),
+                onClick = onSearchClick
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Search,
                     contentDescription = "Localized description"
@@ -280,13 +293,16 @@ private fun ReceiptItem(receiptName: String) {
             .fillMaxWidth()
             .padding(6.dp)
             .height(70.dp)
+            .testTag("receiptItemBox")
     ) {
         Column(
             modifier = Modifier.padding(start = 20.dp)
         ) {
             Text(
                 text = "17/04/2002",
-                modifier = Modifier.padding(top = 6.dp),
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .testTag("receiptDateText"),
                 style = TextStyle(
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
@@ -296,6 +312,7 @@ private fun ReceiptItem(receiptName: String) {
             )
             Text(
                 text = receiptName,
+                modifier = Modifier.testTag("receiptNameText"),
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 24.sp,
@@ -305,6 +322,7 @@ private fun ReceiptItem(receiptName: String) {
             )
             Text(
                 text = "Super description mdr",
+                modifier = Modifier.testTag("receiptDescriptionText"),
                 style = TextStyle(
                     fontSize = 14.sp,
                     lineHeight = 24.sp,
@@ -317,11 +335,13 @@ private fun ReceiptItem(receiptName: String) {
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(end = 16.dp, top = 8.dp),
+                .padding(end = 16.dp, top = 8.dp)
+                .testTag("receiptPriceAndIconRow"),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "80.-",
+                modifier = Modifier.testTag("receiptPriceText"),
                 style = TextStyle(
                     fontSize = 14.sp,
                     lineHeight = 24.sp,
@@ -331,7 +351,9 @@ private fun ReceiptItem(receiptName: String) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier
+                    .size(20.dp)
+                    .testTag("shoppingCartIcon"),
                 imageVector = Icons.Filled.ShoppingCart,
                 contentDescription = "Arrow icon",
             )
@@ -347,4 +369,3 @@ private fun ReceiptItem(receiptName: String) {
 private fun PreviewCardsScreen() {
     TreasuryMainScreen()
 }
-
