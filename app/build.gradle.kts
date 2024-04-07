@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.sonarqube") version "4.4.1.3373"
+    id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
 }
 
@@ -53,6 +54,18 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE*.md"
+        }
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+
+        packaging {
+            jniLibs {
+                useLegacyPackaging = true
+            }
         }
     }
 }
@@ -60,42 +73,45 @@ android {
 dependencies {
 
     // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation ("com.google.firebase:firebase-firestore:24.10.3")
     // When using the BoM, you don't specify versions in Firebase library dependencies
     //Add the dependency for the Firebase SDK for Google Analytics
     implementation("com.google.firebase:firebase-analytics")
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.compose.ui:ui:1.4.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.4.0")
-    implementation("androidx.compose.material:material:1.1.1")
-    implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("io.coil-kt:coil-compose:2.0.0")
+
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
+    implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation("androidx.compose.ui:ui:1.6.4")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.4")
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     implementation("com.google.maps.android:maps-compose:4.3.0")
     implementation("com.google.maps.android:maps-compose-utils:4.3.0")
 
-    implementation("com.google.android.gms:play-services-maps:18.1.0")
-    implementation("com.google.android.material:material:1.10.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation(platform("androidx.compose:compose-bom:2024.03.00"))
     implementation("androidx.compose.ui:ui-graphics")
-    implementation("com.google.android.gms:play-services-auth:20.6.0")
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
-    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    debugImplementation("androidx.compose.ui:ui-tooling:1.4.0")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.4")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.03.00"))
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.4")
 
     androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
     // Allure support
@@ -103,16 +119,25 @@ dependencies {
     // Jetpack Compose support
     androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
 
-    implementation("androidx.fragment:fragment:1.5.5")
+    // Support for intents in instrumented tests
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
 
-    implementation("com.squareup.okhttp3:okhttp:3.10.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
 
-    testImplementation("org.mockito:mockito-core:3.11.2")
-    testImplementation("org.mockito:mockito-inline:2.13.0")
+    implementation("com.squareup.okhttp3:okhttp:3.14.9")
+
+    androidTestImplementation("org.mockito:mockito-android:5.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     // Roboelectric
     testImplementation("org.robolectric:robolectric:4.11.1")
+
+    // Mockk
+    testImplementation("io.mockk:mockk:1.13.7")
+    testImplementation("io.mockk:mockk-android:1.13.7")
+    testImplementation("io.mockk:mockk-agent:1.13.7")
+    androidTestImplementation("io.mockk:mockk-android:1.13.7")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
