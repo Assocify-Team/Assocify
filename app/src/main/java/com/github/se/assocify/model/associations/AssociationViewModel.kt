@@ -15,10 +15,10 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
   private val associationDatabase = AssociationAPI(Firebase.firestore)
 
   init {
-    updateAssoc()
+    update()
   }
 
-  private fun updateAssoc() {
+  fun update() {
     _associationState.value = associationDatabase.getAssociation(assocId)
   }
 
@@ -96,5 +96,20 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
         ass.members + user,
         ass.events)
     associationDatabase.addAssociation(updatedAssoc)
+  }
+
+
+  fun createNewAssoc(name: String, description: String, creationDate: String, status: String, members: List<User>, events: List<Event>){
+    val uid = associationDatabase.getNewId()
+    val assoc = Association(
+      uid,
+      name,
+      description,
+      creationDate,
+      status,
+      members,
+      events
+    )
+    associationDatabase.addAssociation(assoc)
   }
 }
