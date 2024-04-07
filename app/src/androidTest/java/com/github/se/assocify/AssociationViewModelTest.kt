@@ -93,7 +93,7 @@ class AssociationViewModelTest {
   }
 
   @Test
-  fun checkThatFiltersWork(){
+  fun checkThatFiltersWork() {
     val db = AssociationAPI(Firebase.firestore)
     val user = User(db.getNewId(), "Carlo", Role("president"))
     val assocViewModel = AssociationViewModel(user)
@@ -107,11 +107,11 @@ class AssociationViewModelTest {
     assocViewModel.createNewAssoc("b", description, creationDate, status, users, events)
     assocViewModel.createNewAssoc("c", description, creationDate, status, users, events)
     assocViewModel.createNewAssoc("d", description, creationDate, status, users, events)
-    assocViewModel.createNewAssoc("testTheAssoc", "a sample testing description", creationDate, status, users, events)
+    assocViewModel.createNewAssoc(
+        "testTheAssoc", "a sample testing description", creationDate, status, users, events)
     assert(assocViewModel.getAllAssociations().size == 5)
-    assert(assocViewModel.getFilteredAssociations("testTheAssoc")[0].description == "a sample testing description")
-
-
+    assert(
+        assocViewModel.getFilteredAssociations("testTheAssoc")[0].description ==
+            "a sample testing description")
   }
-
 }
