@@ -10,7 +10,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class AssociationViewModel(private var user: User, private var assocId: String) : ViewModel() {
+class AssociationViewModel(private var user: User, private var assocId: String = "") : ViewModel() {
   private val _associationState: MutableStateFlow<Association?> = MutableStateFlow(null)
   private val associationDatabase = AssociationAPI(Firebase.firestore)
 
@@ -19,7 +19,7 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
   }
 
   fun update() {
-    _associationState.value = associationDatabase.getAssociation(assocId)
+    if (assocId != "") _associationState.value = associationDatabase.getAssociation(assocId)
   }
 
   fun getPendingUsers(): List<User> {
@@ -85,17 +85,19 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
   }
 
   fun requestAssociationAccess() {
-    val ass = _associationState.value!!
-    val updatedAssoc =
-        Association(
-            ass.uid,
-            ass.name,
-            ass.description,
-            ass.creationDate,
-            ass.status,
-            ass.members + User(user.uid, user.name, Role("pending")),
-            ass.events)
-    associationDatabase.addAssociation(updatedAssoc)
+    if (_associationState.value != null) {
+      val ass = _associationState.value!!
+      val updatedAssoc =
+          Association(
+              ass.uid,
+              ass.name,
+              ass.description,
+              ass.creationDate,
+              ass.status,
+              ass.members + User(user.uid, user.name, Role("pending")),
+              ass.events)
+      associationDatabase.addAssociation(updatedAssoc)
+    }
   }
 
   fun createNewAssoc(
@@ -109,5 +111,7 @@ class AssociationViewModel(private var user: User, private var assocId: String) 
     val uid = associationDatabase.getNewId()
     val assoc = Association(uid, name, description, creationDate, status, members, events)
     associationDatabase.addAssociation(assoc)
+    assocId = uid
+    _associationState.value = assoc
   }
 }
