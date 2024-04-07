@@ -2,7 +2,7 @@ package com.github.se.assocify.ui.screens
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.assocify.ui.screens.Treasury.TreasuryMainScreen
+import com.github.se.assocify.ui.screens.treasury.TreasuryMainScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
