@@ -34,6 +34,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -47,8 +49,11 @@ import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReceiptScreen(navActions: NavigationActions) {
-  Scaffold(
+fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = ReceiptViewModel()) {
+
+    val receiptState by viewModel.uiState.collectAsState()
+
+    Scaffold(
       modifier = Modifier.testTag("receiptScreen"),
       topBar = {
         TopAppBar(
@@ -60,38 +65,41 @@ fun ReceiptScreen(navActions: NavigationActions) {
                   }
             })
       },
-      contentWindowInsets = WindowInsets(60.dp, 20.dp, 60.dp, 0.dp)) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(it).verticalScroll(ScrollState(0)),
+      contentWindowInsets = WindowInsets(60.dp, 20.dp, 60.dp, 0.dp))
+  { paddingValues ->
+      Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(ScrollState(0)),
             verticalArrangement = Arrangement.spacedBy(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
                   modifier = Modifier.testTag("titleField"),
-                  value = "",
-                  onValueChange = { /*TODO*/},
+                  value = receiptState.title,
+                  onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") })
               OutlinedTextField(
                   modifier = Modifier.testTag("descriptionField"),
-                  value = "",
-                  onValueChange = { /*TODO*/},
+                  value = receiptState.description,
+                  onValueChange = { viewModel.setDescription(it) },
                   label = { Text("Description") },
                   minLines = 3)
               OutlinedTextField(
                   modifier = Modifier.testTag("amountField"),
-                  value = "",
-                  onValueChange = { /*TODO*/},
+                  value = receiptState.amount,
+                  onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal))
               UserSearchTextField(
                   modifier = Modifier.testTag("payerField"),
-                  value = "",
-                  onUserSelect = { /*TODO*/},
+                  value = receiptState.payer,
+                  onUserSelect = { viewModel.setPayer(it) },
                   label = { Text("Payer") })
               DatePickerWithDialog(
                   modifier = Modifier.testTag("dateField"),
-                  value = "",
-                  onDateSelect = { /*TODO*/},
+                  value = receiptState.date,
+                  onDateSelect = { viewModel.setDate(it) },
                   label = { Text("Date") })
               Card(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -101,27 +109,27 @@ fun ReceiptScreen(navActions: NavigationActions) {
                       contentDescription = "Receipt")
                   FilledIconButton(
                       modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
-                      onClick = { /*TODO*/}) {
+                      onClick = { /*TODO Edit receipt image */ },) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
                       }
                 }
               }
               Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 FilterChip(
-                    selected = true,
-                    onClick = { /*TODO*/},
+                    selected = !receiptState.incoming,
+                    onClick = { viewModel.setIncoming(false) },
                     label = { Text("Expense") },
                     leadingIcon = {
-                      if (true) {
+                      if (!receiptState.incoming) {
                         Icon(Icons.Filled.Check, contentDescription = "Selected")
                       }
                     })
                 FilterChip(
-                    selected = false,
-                    onClick = { /*TODO*/},
+                    selected = receiptState.incoming,
+                    onClick = { viewModel.setIncoming(true) },
                     label = { Text("Earning") },
                     leadingIcon = {
-                      if (false) {
+                      if (receiptState.incoming) {
                         Icon(Icons.Filled.Check, contentDescription = "Selected")
                       }
                     })
@@ -129,11 +137,11 @@ fun ReceiptScreen(navActions: NavigationActions) {
               Spacer(modifier = Modifier.weight(1.0f))
               Button(
                   modifier = Modifier.fillMaxWidth().testTag("saveButton"),
-                  onClick = { /*TODO*/},
+                  onClick = { viewModel.saveReceipt() },
                   content = { Text("Save") })
               OutlinedButton(
                   modifier = Modifier.fillMaxWidth().testTag("deleteButton"),
-                  onClick = { /*TODO*/},
+                  onClick = { viewModel.deleteReceipt() },
                   content = { Text("Delete") },
                   colors =
                       ButtonDefaults.outlinedButtonColors(
