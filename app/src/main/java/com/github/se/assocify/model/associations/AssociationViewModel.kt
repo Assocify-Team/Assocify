@@ -11,7 +11,7 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class AssociationViewModel(private var user: User, private var assocId: String) : ViewModel() {
-  val _associationState: MutableStateFlow<Association?> = MutableStateFlow(null)
+  private val _associationState: MutableStateFlow<Association?> = MutableStateFlow(null)
   private val associationDatabase = AssociationAPI(Firebase.firestore)
 
   init {
