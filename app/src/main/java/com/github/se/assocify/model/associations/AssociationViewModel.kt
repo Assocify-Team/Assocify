@@ -22,6 +22,10 @@ class AssociationViewModel(private var user: User, private var assocId: String =
     if (assocId != "") _associationState.value = associationDatabase.getAssociation(assocId)
   }
 
+  fun getAssocId(): String {
+    return assocId
+  }
+
   fun getPendingUsers(): List<User> {
     update()
     if (_associationState.value == null) {
@@ -119,8 +123,18 @@ class AssociationViewModel(private var user: User, private var assocId: String =
   }
 
   fun deleteAssoc() {
+      if(user.role != Role("president")) return
     associationDatabase.deleteAssociation(assocId)
     assocId = ""
     _associationState.value = null
   }
+
+    fun getAllAssociations(): List<Association>{
+        if (_associationState.value == null) return emptyList()
+        return associationDatabase.getAssociations()
+    }
+
+    fun getFilteredAssociations(searchQuery: String): List<Association>{
+        return getAllAssociations().filter { ass -> ass.name == searchQuery || ass.description == searchQuery}
+    }
 }
