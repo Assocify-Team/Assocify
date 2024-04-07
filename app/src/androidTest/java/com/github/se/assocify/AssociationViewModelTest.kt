@@ -44,5 +44,31 @@ class AssociationViewModelTest {
     assert(assocViewModel.getEvents() == events)
     assert(assocViewModel.getCreationDate() == creationDate)
     assert(assocViewModel.getAssociationName() == name)
+
+    assocViewModel.deleteAssoc()
+    assert(assocViewModel.getAllUsers() == emptyList<User>())
+  }
+
+  @Test
+  fun checkThatAcceptationWorks() {
+    val db = AssociationAPI(Firebase.firestore)
+    val user = User(db.getNewId(), "Carlo", Role("president"))
+    val user2 = User(db.getNewId(), "Jonathan", Role("co-president"))
+    val user3 = User(db.getNewId(), "Bigio", Role("pending"))
+    val assocViewModel = AssociationViewModel(user)
+    val name = "critify"
+    val description = "A cool association to have fun with friends!!"
+    val creationDate = "today"
+    val status = "new"
+    val users = listOf(user, user2, user3)
+    val events = listOf(Event("a", "b", emptyList(), emptyList()))
+    assocViewModel.createNewAssoc(name, description, creationDate, status, users, events)
+    assert(assocViewModel.getPendingUsers() == listOf(user3))
+    assocViewModel.acceptNewUser(user3.uid, "captain")
+    assert(assocViewModel.getPendingUsers() == emptyList<User>())
+    val x = assocViewModel.getRecordedUsers()
+    val newUser3 = User(user3.uid, user3.name, Role("captain"))
+    assert(assocViewModel.getRecordedUsers() == listOf(user, user2, newUser3))
+    assocViewModel.deleteAssoc()
   }
 }

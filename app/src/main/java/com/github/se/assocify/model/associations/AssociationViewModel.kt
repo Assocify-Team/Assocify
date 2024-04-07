@@ -23,6 +23,7 @@ class AssociationViewModel(private var user: User, private var assocId: String =
   }
 
   fun getPendingUsers(): List<User> {
+    update()
     if (_associationState.value == null) {
       return emptyList()
     }
@@ -30,6 +31,7 @@ class AssociationViewModel(private var user: User, private var assocId: String =
   }
 
   fun getRecordedUsers(): List<User> {
+    update()
     if (_associationState.value == null) {
       return emptyList()
     }
@@ -37,6 +39,7 @@ class AssociationViewModel(private var user: User, private var assocId: String =
   }
 
   fun getAllUsers(): List<User> {
+    update()
     if (_associationState.value == null) {
       return emptyList()
     }
@@ -113,5 +116,11 @@ class AssociationViewModel(private var user: User, private var assocId: String =
     associationDatabase.addAssociation(assoc)
     assocId = uid
     _associationState.value = assoc
+  }
+
+  fun deleteAssoc() {
+    associationDatabase.deleteAssociation(assocId)
+    assocId = ""
+    _associationState.value = null
   }
 }
