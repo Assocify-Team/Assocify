@@ -45,7 +45,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.MainNavigationBar
 import kotlinx.coroutines.launch
 
 // Number of tabs at the top
@@ -60,10 +63,17 @@ const val PAGE_BALANCE_INDEX: Int = 2
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun TreasuryScreen(navigationActions: NavigationActions) {
+fun TreasuryScreen(navActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}) },
+      bottomBar = {
+          MainNavigationBar(
+              onTabSelect = { navActions.navigateToMainTab(it) },
+              tabList = MAIN_TABS_LIST,
+              selectedTab = Destination.Profile
+          )
+      },
       floatingActionButton = {
         FloatingActionButton(
             modifier = Modifier.testTag("createReceipt"),
