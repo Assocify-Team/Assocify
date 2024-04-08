@@ -5,7 +5,6 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -34,15 +33,17 @@ class AssociationUtilsTest {
           listOf(president),
           emptyList())
   private val newUser = User()
+  private lateinit var assoApi: AssociationAPI
 
-    /*
   @Before
   fun setup() {
-
+    db = Mockito.mock(FirebaseFirestore::class.java)
+    assoApi = AssociationAPI(db)
   }
 
   @Test
   fun checkThatEmptyAssocWorksWell() {
+    assoUtilsNewUser = AssociationUtils(newUser, associationDatabase = assoApi)
     assert(assoUtilsNewUser.getPendingUsers() == emptyList<User>())
     assert(assoUtilsNewUser.getRecordedUsers() == emptyList<User>())
     assert(assoUtilsNewUser.getEvents() == emptyList<User>())
@@ -50,26 +51,29 @@ class AssociationUtilsTest {
     assert(assoUtilsNewUser.getAssociationName() == "")
   }
 
+  /*
   @Test
   fun checkThatCreateAssocWorksWell() {
-      assoUtilsPresident =
-          AssociationUtils(
-              user = president, assocId = oldAsso.uid, associationDatabase = AssociationAPI(db))
-      assoUtilsNewUser = AssociationUtils(user = newUser, associationDatabase = AssociationAPI(db))
-    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
-    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
-        .thenReturn(documentReference)
-    Mockito.`when`(documentReference.set(oldAsso)).thenReturn(Tasks.forResult(null))
+    assoUtilsNewUser = AssociationUtils(user = newUser, associationDatabase = assoApi)
+    val assoTest = Association("fakeId",
+        "b", "desc", "date", "status", listOf(newUser), emptyList())
+      Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+      Mockito.`when`(db.collection(Mockito.any()).document()).thenReturn(documentReference)
+      Mockito.`when`(documentReference.id).thenReturn("fakeId")
+      Mockito.`when`(documentReference.set(assoTest)).thenReturn(Tasks.forResult(null))
 
     val newAsso =
         assoUtilsNewUser.createNewAssoc("b", "desc", "date", "status", listOf(newUser), emptyList())
-    val api = AssociationAPI(db)
-    assert(assoUtilsNewUser.getAllUsers().isNotEmpty())
-    Mockito.verify(db).collection(api.collectionName)
-    Mockito.verify(db.collection(api.collectionName)).document(newAsso.uid)
-    Mockito.verify(db.collection(api.collectionName).document(newAsso.uid)).set(newAsso)
+
+    Mockito.verify(db).collection(assoApi.collectionName)
+    Mockito.verify(db.collection(assoApi.collectionName)).document(newAsso.uid)
+    Mockito.verify(db.collection(assoApi.collectionName).document(newAsso.uid)).set(newAsso)
+      assert(assoUtilsNewUser.getAllUsers().isNotEmpty())
   }
 
+     */
+
+  /*
   @Test
   fun checkThatAcceptationWorks() {
     val db = AssociationAPI(Firebase.firestore)
