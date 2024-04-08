@@ -31,14 +31,11 @@ import androidx.compose.ui.unit.dp
 /**
  * Screen to select an association
  *
- * @param registeredAssociation list of organizations that the user is registered to
+ * @param registeredAssociation list of organizations in the database
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAssociation(registeredAssociation: List<String>) {
-  // TODO: fetch lists from DB
-  // val registeredAssociation = listOf("CLIC", "GAME*") // organizations that the user is
-  // registered to
 
   // search bar var: TODO: implement search
   val isSearching = false
@@ -104,7 +101,7 @@ fun SelectAssociation(registeredAssociation: List<String>) {
                 Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")) {
               // Display only registered organization
               if (registeredAssociation.isEmpty()) {
-                item { Text(text = "You are not registered to any organization.") }
+                item { Text(text = "There is no organization to display.") }
               } else {
                 itemsIndexed(registeredAssociation) { index, organization ->
                   DisplayOrganization(organization)

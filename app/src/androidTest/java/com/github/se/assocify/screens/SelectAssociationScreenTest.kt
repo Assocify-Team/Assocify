@@ -22,8 +22,8 @@ import org.junit.runner.RunWith
  *
  * @param semanticsProvider the semantics provider
  */
-class SelectAssociationScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<SelectAssociationScreen>(
+class SelectAssociationScreenTest(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<SelectAssociationScreenTest>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("SelectAssociationScreen") }) {
   val searchOrganization: KNode = child { hasTestTag("SearchOrganization") }
@@ -36,8 +36,8 @@ class SelectAssociationScreen(semanticsProvider: SemanticsNodeInteractionsProvid
  *
  * @param semanticsProvider the semantics provider
  */
-class DisplayOrganizationScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<DisplayOrganizationScreen>(
+class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<DisplayOrganizationScreenTest>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("DisplayOrganizationScreen") }) {
   val organizationName: KNode = child { hasTestTag("OrganizationName") }
@@ -58,7 +58,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @Test
   fun testCreateNewOrganizationButton() {
     composeTestRule.setContent { SelectAssociation(registeredAssociation) }
-    ComposeScreen.onComposeScreen<SelectAssociationScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       createOrgaButton {
         assertIsDisplayed()
         hasClickAction()
@@ -70,7 +70,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @Test
   fun testSearchOrganization() {
     composeTestRule.setContent { SelectAssociation(registeredAssociation) }
-    ComposeScreen.onComposeScreen<SelectAssociationScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       searchOrganization { assertIsDisplayed() }
     }
   }
@@ -79,7 +79,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @Test
   fun testRegisteredOrganizationList() {
     composeTestRule.setContent { SelectAssociation(registeredAssociation) }
-    ComposeScreen.onComposeScreen<SelectAssociationScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       registeredList {
         assertIsDisplayed()
         hasScrollAction()
@@ -97,16 +97,14 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun testNoRegisteredOrganization() {
     composeTestRule.setContent { SelectAssociation(emptyList()) }
     // Find the text node with the expected message and assert it is displayed
-    composeTestRule
-        .onNodeWithText("You are not registered to any organization.")
-        .assertIsDisplayed()
+    composeTestRule.onNodeWithText("There is no organization to display.").assertIsDisplayed()
   }
 
   /** This test checks if the organization name and icon are displayed */
   @Test
   fun testDisplayOrganization() {
     composeTestRule.setContent { SelectAssociation(registeredAssociation) }
-    ComposeScreen.onComposeScreen<DisplayOrganizationScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
       organizationName { assertIsDisplayed() }
       organizationIcon { assertIsDisplayed() }
     }
