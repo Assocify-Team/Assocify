@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,14 +14,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -30,9 +27,9 @@ import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,17 +43,18 @@ import com.github.se.assocify.model.entities.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun createAssoScreen() {
-  // should maybe be in viewmodel or something
-    val bigList = listOf(User("1", "jean", Role("com")), User("2", "roger", Role("tres")), User("1", "jean", Role("com")), User("1", "jean", Role("com")), User("1", "jean", Role("com")), User("1", "jean", Role("com")), User("1", "jean", Role("com")), User("1", "jean", Role("com")), User("2", "roger", Role("tres")),User("2", "roger", Role("tres")),User("2", "roger", Role("tres")), User("2", "roger", Role("tres")),User("2", "roger", Role("tres")),User("2", "roger", Role("tres")))
-  val smallList = listOf(User("1", "jean", Role("com")), User("2", "roger", Role("tres")))
-    var memberList by remember { mutableStateOf(bigList) }
-  var name by remember { mutableStateOf("") }
+fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf())) {
+
+    val state by viewmodel.uiState.collectAsState()
+
+    // should also be in viewmodel probably
+    var name by remember { mutableStateOf("") }
 
   Scaffold(
+        modifier = Modifier.testTag("createAssoScreen"),
       topBar = {
           TopAppBar(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
               navigationIcon = {
                   IconButton(onClick = { /*TODO : go back to previous screen*/ }) {
                       Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -82,7 +80,7 @@ fun createAssoScreen() {
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedIconButton(
-                modifier = Modifier.padding(top = 8.dp)/*.background(MaterialTheme.colorScheme.primary)*/,
+                modifier = Modifier.padding(top = 8.dp).testTag("logo")/*.background(MaterialTheme.colorScheme.primary)*/,
                 onClick = {
                     /* TODO : can add association logo */
                 }) {
@@ -92,7 +90,7 @@ fun createAssoScreen() {
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth()/*.background(MaterialTheme.colorScheme.secondary)*/
+                modifier = Modifier.fillMaxWidth().testTag("name")
             )
         }
 
@@ -104,7 +102,7 @@ fun createAssoScreen() {
                 .testTag("MemberList"),
             verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            memberList.forEach { member ->
+            state.forEach { member ->
                 item {
                     ListItem(
                         modifier =
@@ -131,11 +129,12 @@ fun createAssoScreen() {
 //        Spacer(Modifier.weight(0.5f))
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             OutlinedButton(
-                onClick = { /*TODO : add members to list*/}, modifier = Modifier.fillMaxWidth()) {
+                onClick = { /*TODO : add members to list*/},
+                modifier = Modifier.fillMaxWidth().testTag("addMember")) {
                 Icon(Icons.Default.Add, contentDescription = "Add members")
                 Text("Add members")
             }
-            Button(onClick = { /*TODO : add asso to DB */}, modifier = Modifier.fillMaxWidth()) { Text("Create") }
+            Button(onClick = { /*TODO : add asso to DB */}, modifier = Modifier.fillMaxWidth().testTag("create")) { Text("Create") }
         }
 //        Spacer(Modifier.weight(0.1f))
     }
