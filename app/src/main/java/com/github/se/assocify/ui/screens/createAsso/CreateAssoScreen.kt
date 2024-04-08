@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -55,7 +55,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
             modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
               IconButton(onClick = { /*TODO : go back to previous screen*/}) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
               }
             },
             title = { Text(text = "Create your association") })
