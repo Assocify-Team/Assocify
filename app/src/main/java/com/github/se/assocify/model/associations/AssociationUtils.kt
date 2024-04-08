@@ -6,12 +6,13 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class AssociationUtils(private var user: User, private var assocId: String = "", private val associationDatabase: AssociationAPI) : ViewModel() {
+class AssociationUtils(
+    private var user: User,
+    private var assocId: String = "",
+    private val associationDatabase: AssociationAPI
+) : ViewModel() {
   private val _associationState: MutableStateFlow<Association?> = MutableStateFlow(null)
 
   init {
@@ -114,12 +115,13 @@ class AssociationUtils(private var user: User, private var assocId: String = "",
       status: String,
       members: List<User>,
       events: List<Event>
-  ) {
+  ): Association {
     val uid = associationDatabase.getNewId()
     val assoc = Association(uid, name, description, creationDate, status, members, events)
     associationDatabase.addAssociation(assoc)
     assocId = uid
     _associationState.value = assoc
+    return assoc
   }
 
   fun deleteAssoc() {
