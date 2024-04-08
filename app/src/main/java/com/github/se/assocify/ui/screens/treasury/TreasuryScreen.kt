@@ -68,11 +68,10 @@ fun TreasuryScreen(navActions: NavigationActions) {
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}) },
       bottomBar = {
-          MainNavigationBar(
-              onTabSelect = { navActions.navigateToMainTab(it) },
-              tabList = MAIN_TABS_LIST,
-              selectedTab = Destination.Profile
-          )
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Profile)
       },
       floatingActionButton = {
         FloatingActionButton(

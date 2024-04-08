@@ -64,7 +64,9 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
 
   @Test
   fun testTodoListItem() = run {
-    ComposeScreen.onComposeScreen<TreasuryScreen>(composeTestRule) { receiptItemBox.assertIsDisplayed() }
+    ComposeScreen.onComposeScreen<TreasuryScreen>(composeTestRule) {
+      receiptItemBox.assertIsDisplayed()
+    }
   }
 
   @Test
