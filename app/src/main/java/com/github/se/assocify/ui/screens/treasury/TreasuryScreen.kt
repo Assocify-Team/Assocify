@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.launch
 
 // Number of tabs at the top
@@ -59,7 +60,7 @@ const val PAGE_BALANCE_INDEX: Int = 2
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun TreasuryMainScreen() {
+fun TreasuryScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}) },
