@@ -132,6 +132,8 @@ class AssociationUtilsTest {
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.set(Mockito.any())).thenReturn(Tasks.forResult(null))
     newAssoUtils.createNewAssoc(name, description, creationDate, status, emptyList(), emptyList())
+    assert(newAssoUtils.getAssocId() == "testId")
+    assert(newAssoUtils.getAssociationDescription() == "a small association to have fun")
     Mockito.verify(db.collection(assoApi.collectionName).document(newAsso.uid)).set(newAsso)
   }
 }
