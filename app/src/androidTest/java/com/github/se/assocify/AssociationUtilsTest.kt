@@ -10,7 +10,6 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -48,8 +47,7 @@ class AssociationUtilsTest {
 
   @Before
   fun setup() {
-    db = Mockito.mock(FirebaseFirestore::class.java)
-    assoApi = AssociationAPI(db)
+    assoApi = Mockito.mock(AssociationAPI::class.java)
   }
 
   @Test
@@ -64,26 +62,26 @@ class AssociationUtilsTest {
 
   @Test
   fun checkRequestWorks() {
+    // adding the value to the db
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.set(oldAsso)).thenReturn(Tasks.forResult(null))
-
     assoApi.addAssociation(oldAsso)
 
+    // adding the utils inside
     Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
-    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
-    val query = Tasks.forResult(Mockito.mock(QuerySnapshot::class.java))
-    Mockito.`when`(db.collection(Mockito.any()).get()).thenReturn(query)
-
-    Mockito.`when`(query.result!!.documents).thenReturn(listOf(documentSnapshot))
-    Mockito.`when`(
-            listOf(documentSnapshot).map { document -> document.toObject(Association::class.java) })
-        .thenReturn(listOf(oldAsso))
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(oldAsso)
+    Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
+    val task = Tasks.forResult(documentSnapshot)
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
     assoUtilsPresident = AssociationUtils(president, oldAsso.uid, assoApi)
     assoUtilsNewUser = AssociationUtils(newUser, oldAsso.uid, assoApi)
+
+    // adding the
     assoUtilsNewUser.requestAssociationAccess()
 
     Mockito.verify(db).collection(assoApi.collectionName)
