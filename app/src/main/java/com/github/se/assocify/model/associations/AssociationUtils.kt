@@ -7,12 +7,12 @@ import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class AssociationViewModel(private var user: User, private var assocId: String = "") : ViewModel() {
+class AssociationUtils(private var user: User, private var assocId: String = "", private val associationDatabase: AssociationAPI) : ViewModel() {
   private val _associationState: MutableStateFlow<Association?> = MutableStateFlow(null)
-  private val associationDatabase = AssociationAPI(Firebase.firestore)
 
   init {
     update()

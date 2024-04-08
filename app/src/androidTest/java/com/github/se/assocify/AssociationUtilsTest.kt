@@ -2,14 +2,22 @@ package com.github.se.assocify
 
 import com.github.se.assocify.model.associations.AssociationViewModel
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.Mockito
 
-class AssociationViewModelTest {
+class AssociationUtilsTest {
+  @Mock
 
   @Test
   fun checkThatEmptyAssocWorksWell() {
@@ -104,14 +112,20 @@ class AssociationViewModelTest {
     val users = listOf(user)
     val events = listOf(Event("a", "b", emptyList(), emptyList()))
     assocViewModel.createNewAssoc("a", description, creationDate, status, users, events)
+    val i1 = assocViewModel.getAssocId()
     assocViewModel.createNewAssoc("b", description, creationDate, status, users, events)
+    val i2 = assocViewModel.getAssocId()
     assocViewModel.createNewAssoc("c", description, creationDate, status, users, events)
+    val i3 = assocViewModel.getAssocId()
     assocViewModel.createNewAssoc("d", description, creationDate, status, users, events)
+    val i4 = assocViewModel.getAssocId()
     assocViewModel.createNewAssoc(
         "testTheAssoc", "a sample testing description", creationDate, status, users, events)
+    val i = assocViewModel.getAllAssociations().size
     assert(assocViewModel.getAllAssociations().size == 5)
     assert(
         assocViewModel.getFilteredAssociations("testTheAssoc")[0].description ==
             "a sample testing description")
+    assocViewModel.deleteAssoc()
   }
 }
