@@ -2,7 +2,6 @@ package com.github.se.assocify
 
 import com.github.se.assocify.model.associations.AssociationUtils
 import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.database.FirebaseApi
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
@@ -13,42 +12,49 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockMakers
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 
 class AssociationUtilsTest {
-    private lateinit var db: FirebaseFirestore
+  private lateinit var db: FirebaseFirestore
   private lateinit var assoApi: AssociationAPI
-    private val documentSnapshot = Mockito.mock(DocumentSnapshot::class.java)
-    private val documentReference = Mockito.mock(DocumentReference::class.java)
-    private val collectionReference = Mockito.mock(CollectionReference::class.java)
-    private val president = User("testId", "Carlo", Role("president"))
-    private val newUser = User()
-    val oldAsso =
-        Association(
-            "aId",
-            "cassify",
-            "a cool association",
-            "31/09/2005",
-            "active",
-            listOf(president),
-            emptyList())
-    val oldAssoUpdated =
-        Association(
-            "aId",
-            "cassify",
-            "a cool association",
-            "31/09/2005",
-            "active",
-            listOf(president, newUser),
-            emptyList())
+  private val documentSnapshot = Mockito.mock(DocumentSnapshot::class.java)
+  private val documentReference = Mockito.mock(DocumentReference::class.java)
+  private val collectionReference = Mockito.mock(CollectionReference::class.java)
+  private val president = User("testId", "Carlo", Role("president"))
+  private val newUser = User()
+  val oldAsso =
+      Association(
+          "aId",
+          "cassify",
+          "a cool association",
+          "31/09/2005",
+          "active",
+          listOf(president),
+          emptyList())
+  val oldAssoUpdated =
+      Association(
+          "aId",
+          "cassify",
+          "a cool association",
+          "31/09/2005",
+          "active",
+          listOf(president, newUser),
+          emptyList())
+  val oldAssoReviewed =
+      Association(
+          "aId",
+          "cassify",
+          "a cool association",
+          "31/09/2005",
+          "active",
+          listOf(president, User("", "", Role("newRole"))),
+          emptyList())
 
   @Before
   fun setup() {
     db = Mockito.mock(FirebaseFirestore::class.java)
-      assoApi = AssociationAPI(db)
+    assoApi = AssociationAPI(db)
   }
 
   @Test
@@ -62,7 +68,26 @@ class AssociationUtilsTest {
   }
 
   @Test
-  fun checkCreateWorks() {
+  fun checkAcceptNewUser() {
+    Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
+    Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(oldAssoUpdated)
+    Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
+    val task = Tasks.forResult(documentSnapshot)
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    val assocUtilsUpdated = AssociationUtils(president, oldAssoUpdated.uid, assoApi)
+    val pendingUsers = assocUtilsUpdated.getPendingUsers()
+    assert(pendingUsers == listOf(newUser))
+
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(documentReference.set(Mockito.any())).thenReturn(Tasks.forResult(null))
+
+    assocUtilsUpdated.acceptNewUser(newUser.uid, "newRole")
+    Mockito.verify(db.collection(assoApi.collectionName).document(oldAssoUpdated.uid))
+        .set(oldAssoReviewed)
   }
 }
