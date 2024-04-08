@@ -90,4 +90,25 @@ class AssociationUtilsTest {
     Mockito.verify(db.collection(assoApi.collectionName).document(oldAssoUpdated.uid))
         .set(oldAssoReviewed)
   }
+
+  @Test
+  fun checkRequestAssocEntry() {
+    Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
+    Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(oldAsso)
+    Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
+
+    val task = Tasks.forResult(documentSnapshot)
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    val newUserUtils = AssociationUtils(newUser, oldAsso.uid, assoApi)
+
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(documentReference.set(Mockito.any())).thenReturn(Tasks.forResult(null))
+    newUserUtils.requestAssociationAccess()
+    Mockito.verify(db.collection(assoApi.collectionName).document(oldAssoUpdated.uid))
+        .set(oldAssoUpdated)
+  }
 }
