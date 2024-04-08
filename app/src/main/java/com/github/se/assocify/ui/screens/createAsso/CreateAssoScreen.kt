@@ -38,105 +38,104 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.entities.Role
-import com.github.se.assocify.model.entities.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf())) {
 
-    val state by viewmodel.uiState.collectAsState()
+  val state by viewmodel.uiState.collectAsState()
 
-    // should also be in viewmodel probably
-    var name by remember { mutableStateOf("") }
+  // should also be in viewmodel probably
+  var name by remember { mutableStateOf("") }
 
   Scaffold(
-        modifier = Modifier.testTag("createAssoScreen"),
+      modifier = Modifier.testTag("createAssoScreen"),
       topBar = {
-          TopAppBar(
-              modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
-              navigationIcon = {
-                  IconButton(onClick = { /*TODO : go back to previous screen*/ }) {
-                      Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                  }
-              },
-              title = {
-                  Text(text = "Create your association")
+        TopAppBar(
+            modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
+            navigationIcon = {
+              IconButton(onClick = { /*TODO : go back to previous screen*/}) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
               }
-          )
+            },
+            title = { Text(text = "Create your association") })
       },
-      contentWindowInsets = WindowInsets(50.dp, 10.dp, 50.dp, 20.dp)
-  ) { innerPadding ->
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(15.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+      contentWindowInsets = WindowInsets(50.dp, 10.dp, 50.dp, 20.dp)) { innerPadding ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            OutlinedIconButton(
-                modifier = Modifier.padding(top = 8.dp).testTag("logo")/*.background(MaterialTheme.colorScheme.primary)*/,
-                onClick = {
-                    /* TODO : can add association logo */
-                }) {
-                Icon(Icons.Default.Person, contentDescription = "Logo")
-            }
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth().testTag("name")
-            )
-        }
+          Row(
+              horizontalArrangement = Arrangement.spacedBy(15.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.fillMaxWidth()) {
+                OutlinedIconButton(
+                    modifier =
+                        Modifier.padding(top = 8.dp)
+                            .testTag("logo") /*.background(MaterialTheme.colorScheme.primary)*/,
+                    onClick = {
+                      /* TODO : can add association logo */
+                    }) {
+                      Icon(Icons.Default.Person, contentDescription = "Logo")
+                    }
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth().testTag("name"))
+              }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .testTag("MemberList"),
-            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            state.forEach { member ->
-                item {
+          LazyColumn(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .weight(1f)
+                      .background(MaterialTheme.colorScheme.primaryContainer)
+                      .testTag("MemberList"),
+              verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
+              horizontalAlignment = Alignment.CenterHorizontally) {
+                state.forEach { member ->
+                  item {
                     ListItem(
-                        modifier =
-                        Modifier
-                            .testTag("MemberListItem")
-                        ,
-                        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        modifier = Modifier.testTag("MemberListItem"),
+                        colors =
+                            ListItemDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer),
                         headlineContent = { Text(member.name) },
                         overlineContent = { Text(member.role.name) },
-                        leadingContent = { Icon(Icons.Default.Person, contentDescription = "Person") },
+                        leadingContent = {
+                          Icon(Icons.Default.Person, contentDescription = "Person")
+                        },
                         trailingContent = {
-                            IconButton(
-                                onClick = {
-                                    /*TODO : edit member from list */
-                                }) {
+                          IconButton(
+                              onClick = {
+                                /*TODO : edit member from list */
+                              }) {
                                 Icon(Icons.Default.Edit, contentDescription = "Edit")
-                            }
+                              }
                         },
                     )
                     HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+                  }
                 }
-            }
+              }
+          //        Spacer(Modifier.weight(0.5f))
+          Column(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = { /*TODO : add members to list*/},
+                    modifier = Modifier.fillMaxWidth().testTag("addMember")) {
+                      Icon(Icons.Default.Add, contentDescription = "Add members")
+                      Text("Add members")
+                    }
+                Button(
+                    onClick = { /*TODO : add asso to DB */},
+                    modifier = Modifier.fillMaxWidth().testTag("create")) {
+                      Text("Create")
+                    }
+              }
+          //        Spacer(Modifier.weight(0.1f))
         }
-//        Spacer(Modifier.weight(0.5f))
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            OutlinedButton(
-                onClick = { /*TODO : add members to list*/},
-                modifier = Modifier.fillMaxWidth().testTag("addMember")) {
-                Icon(Icons.Default.Add, contentDescription = "Add members")
-                Text("Add members")
-            }
-            Button(onClick = { /*TODO : add asso to DB */}, modifier = Modifier.fillMaxWidth().testTag("create")) { Text("Create") }
-        }
-//        Spacer(Modifier.weight(0.1f))
-    }
-  }
+      }
 }
