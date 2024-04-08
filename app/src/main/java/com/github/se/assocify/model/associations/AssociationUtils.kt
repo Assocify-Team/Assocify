@@ -108,22 +108,6 @@ class AssociationUtils(
     }
   }
 
-  fun createNewAssoc(
-      name: String,
-      description: String,
-      creationDate: String,
-      status: String,
-      members: List<User>,
-      events: List<Event>
-  ): Association {
-    val uid = associationDatabase.getNewId()
-    val assoc = Association(uid, name, description, creationDate, status, members, events)
-    associationDatabase.addAssociation(assoc)
-    assocId = uid
-    _associationState.value = assoc
-    return assoc
-  }
-
   fun deleteAssoc() {
     if (user.role != Role("president")) return
     associationDatabase.deleteAssociation(assocId)
