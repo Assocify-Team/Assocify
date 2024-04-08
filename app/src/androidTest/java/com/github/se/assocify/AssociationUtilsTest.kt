@@ -107,8 +107,31 @@ class AssociationUtilsTest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.set(Mockito.any())).thenReturn(Tasks.forResult(null))
+
     newUserUtils.requestAssociationAccess()
     Mockito.verify(db.collection(assoApi.collectionName).document(oldAssoUpdated.uid))
         .set(oldAssoUpdated)
+  }
+
+  @Test
+  fun checkCreateNewAssociation() {
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
+    Mockito.`when`(db.collection(Mockito.any()).document()).thenReturn(documentReference)
+    Mockito.`when`(documentReference.id).thenReturn("testId")
+    Mockito.`when`(documentReference.set(Mockito.any())).thenReturn(Tasks.forResult(null))
+
+    val newAssoUtils = AssociationUtils(president, associationDatabase = assoApi)
+    val name = "pollify"
+    val description = "a small association to have fun"
+    val creationDate = "12/06/1987"
+    val status = "open"
+    val newAsso =
+        Association("testId", name, description, creationDate, status, emptyList(), emptyList())
+
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+    Mockito.`when`(documentReference.set(Mockito.any())).thenReturn(Tasks.forResult(null))
+    newAssoUtils.createNewAssoc(name, description, creationDate, status, emptyList(), emptyList())
+    Mockito.verify(db.collection(assoApi.collectionName).document(newAsso.uid)).set(newAsso)
   }
 }
