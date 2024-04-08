@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.createAsso
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -20,8 +20,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,8 +34,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +61,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
             },
             title = { Text(text = "Create your association") })
       },
-      contentWindowInsets = WindowInsets(50.dp, 10.dp, 50.dp, 20.dp)) { innerPadding ->
+      contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -77,30 +78,26 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
                     onClick = {
                       /* TODO : can add association logo */
                     }) {
-                      Icon(Icons.Default.Person, contentDescription = "Logo")
+                      Icon(
+                          painter = painterResource(id = R.drawable.landscape),
+                          contentDescription = "Logo")
                     }
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") },
+                    label = { Text("Association Name") },
                     modifier = Modifier.fillMaxWidth().testTag("name"))
               }
 
           LazyColumn(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .weight(1f)
-                      .background(MaterialTheme.colorScheme.primaryContainer)
-                      .testTag("MemberList"),
+              modifier = Modifier.fillMaxWidth().weight(1f).testTag("MemberList"),
               verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 state.forEach { member ->
                   item {
                     ListItem(
-                        modifier = Modifier.testTag("MemberListItem"),
-                        colors =
-                            ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        modifier =
+                            Modifier.clip(RoundedCornerShape(10.dp)).testTag("MemberListItem"),
                         headlineContent = { Text(member.name) },
                         overlineContent = { Text(member.role.name) },
                         leadingContent = {
@@ -115,11 +112,10 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
                               }
                         },
                     )
-                    HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+                    HorizontalDivider()
                   }
                 }
               }
-          //        Spacer(Modifier.weight(0.5f))
           Column(
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier = Modifier.fillMaxWidth()) {
@@ -135,7 +131,6 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
                       Text("Create")
                     }
               }
-          //        Spacer(Modifier.weight(0.1f))
         }
       }
 }
