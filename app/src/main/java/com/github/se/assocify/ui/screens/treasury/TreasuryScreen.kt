@@ -140,13 +140,11 @@ enum class PageIndex(val index: Int) {
 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
-            Column(modifier = Modifier.fillMaxSize()) {
               when (page) {
                   PageIndex.RECEIPT.index -> MyReceiptPage()
                   PageIndex.BUDGET.index -> BudgetPage()
                   PageIndex.BALANCE.index -> BalancePage()
               }
-            }
           }
         }
       }
@@ -225,12 +223,12 @@ fun TreasuryTopBar(
         IconButton(modifier = Modifier.testTag("accountIconButton"), onClick = onAccountClick) {
           Icon(
               imageVector = Icons.Filled.AccountCircle,
-              contentDescription = "Localized description")
+              contentDescription = "Account logo")
         }
       },
       actions = {
         IconButton(modifier = Modifier.testTag("searchIconButton"), onClick = onSearchClick) {
-          Icon(imageVector = Icons.Filled.Search, contentDescription = "Localized description")
+          Icon(imageVector = Icons.Filled.Search, contentDescription = "Search receipt")
         }
       },
       colors =
@@ -264,7 +262,7 @@ private fun ReceiptItem(receiptName: String) {
                   letterSpacing = 0.sp,
               ))
       Text(
-          text = "Super description mdr",
+          text = "Super description",
           modifier = Modifier.testTag("receiptDescriptionText"),
           style =
               TextStyle(
