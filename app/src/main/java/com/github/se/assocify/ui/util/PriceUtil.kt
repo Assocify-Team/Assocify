@@ -13,4 +13,8 @@ object PriceUtil {
     /*TODO: Remove - and add appropriate checks*/
     return price.toDouble()
   }
+
+  fun isValid(price: String): Boolean {
+    return price.toDoubleOrNull() != null && price.toDouble() >= 0
+  }
 }
