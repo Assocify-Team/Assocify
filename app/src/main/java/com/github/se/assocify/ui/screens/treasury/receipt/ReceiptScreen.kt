@@ -51,13 +51,15 @@ import com.github.se.assocify.ui.composables.UserSearchTextField
 @Composable
 fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = ReceiptViewModel()) {
 
-    val receiptState by viewModel.uiState.collectAsState()
+  val receiptState by viewModel.uiState.collectAsState()
 
-    Scaffold(
+  Scaffold(
       modifier = Modifier.testTag("receiptScreen"),
       topBar = {
         TopAppBar(
-            title = { Text("New Receipt") },
+            title = {
+              Text(modifier = Modifier.testTag("receiptScreenTitle"), text = "New Receipt")
+            },
             navigationIcon = {
               IconButton(
                   modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
@@ -65,12 +67,9 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   }
             })
       },
-      contentWindowInsets = WindowInsets(60.dp, 20.dp, 60.dp, 0.dp))
-  { paddingValues ->
-      Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(ScrollState(0)),
+      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp)) { paddingValues ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(ScrollState(0)),
             verticalArrangement = Arrangement.spacedBy(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
@@ -101,21 +100,28 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   value = receiptState.date,
                   onDateSelect = { viewModel.setDate(it) },
                   label = { Text("Date") })
-              Card(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
+              Card(modifier = Modifier.testTag("imageCard").fillMaxWidth().aspectRatio(1f)) {
                 Box(modifier = Modifier.fillMaxSize()) {
                   Image(
                       modifier = Modifier.align(Alignment.Center),
-                      painter = painterResource(id = R.drawable.fake_receipt),
+                      painter =
+                          painterResource(
+                              id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
                       contentDescription = "Receipt")
                   FilledIconButton(
-                      modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
-                      onClick = { /*TODO Edit receipt image */ },) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
-                      }
+                      modifier =
+                          Modifier.testTag("editImageButton")
+                              .align(Alignment.BottomEnd)
+                              .padding(10.dp),
+                      onClick = { viewModel.setImage() },
+                  ) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                  }
                 }
               }
               Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 FilterChip(
+                    modifier = Modifier.testTag("expenseChip"),
                     selected = !receiptState.incoming,
                     onClick = { viewModel.setIncoming(false) },
                     label = { Text("Expense") },
@@ -125,6 +131,7 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                       }
                     })
                 FilterChip(
+                    modifier = Modifier.testTag("earningChip"),
                     selected = receiptState.incoming,
                     onClick = { viewModel.setIncoming(true) },
                     label = { Text("Earning") },
@@ -134,19 +141,22 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                       }
                     })
               }
-              Spacer(modifier = Modifier.weight(1.0f))
-              Button(
-                  modifier = Modifier.fillMaxWidth().testTag("saveButton"),
-                  onClick = { viewModel.saveReceipt() },
-                  content = { Text("Save") })
-              OutlinedButton(
-                  modifier = Modifier.fillMaxWidth().testTag("deleteButton"),
-                  onClick = { viewModel.deleteReceipt() },
-                  content = { Text("Delete") },
-                  colors =
-                      ButtonDefaults.outlinedButtonColors(
-                          contentColor = MaterialTheme.colorScheme.error),
-                  border = BorderStroke(1.dp, MaterialTheme.colorScheme.error))
+
+              Column {
+                Button(
+                    modifier = Modifier.testTag("saveButton").fillMaxWidth(),
+                    onClick = { viewModel.saveReceipt() },
+                    content = { Text("Save") })
+                OutlinedButton(
+                    modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
+                    onClick = { viewModel.deleteReceipt() },
+                    content = { Text("Delete") },
+                    colors =
+                        ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error))
+              }
+
               Spacer(modifier = Modifier.weight(1.0f))
             }
       }
