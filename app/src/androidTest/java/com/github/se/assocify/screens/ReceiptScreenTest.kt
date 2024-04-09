@@ -83,7 +83,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun amount() {
     with(composeTestRule) {
-      onNodeWithTag("amountField").performClick()
+      onNodeWithTag("amountField").performScrollTo().performClick()
       onNodeWithTag("amountField").performTextInput("100")
       assert(viewModel.uiState.value.amount == "100")
       onNodeWithTag("amountField").assertTextContains("100")
@@ -93,7 +93,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun payer() {
     with(composeTestRule) {
-      onNodeWithTag("payerField").performClick()
+      onNodeWithTag("payerField").performScrollTo().performClick()
       onNodeWithTag("payerField").performTextInput("Test User")
       assert(viewModel.uiState.value.payer == "Test User")
       onNodeWithTag("payerField").assertTextContains("Test User")
@@ -103,7 +103,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun save() {
     with(composeTestRule) {
-      onNodeWithTag("saveButton").performClick()
+      onNodeWithTag("saveButton").performScrollTo().performClick()
       assert(saved)
     }
   }

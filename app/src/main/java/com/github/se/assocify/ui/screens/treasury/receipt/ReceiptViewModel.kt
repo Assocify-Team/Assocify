@@ -3,9 +3,9 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
 
 class ReceiptViewModel {
 
@@ -32,12 +32,8 @@ class ReceiptViewModel {
     _uiState.value = _uiState.value.copy(description = description)
   }
 
-  fun setAmount(amount: String): Boolean {
-    val numAmount = amount.toDoubleOrNull() ?: return false
-    if (numAmount < 0) return false
-    /*TODO: Implement currency formatting and add appropriate checks*/
+  fun setAmount(amount: String) {
     _uiState.value = _uiState.value.copy(amount = amount)
-    return true
   }
 
   fun setPayer(payer: String?) {
