@@ -71,7 +71,7 @@ class AssociationUtilsTest {
 
   @Before
   fun setup() {
-    db = Mockito.mock(FirebaseFirestore::class.java)
+    db = mock(FirebaseFirestore::class.java)
     assoApi = AssociationAPI(db)
   }
 
@@ -91,7 +91,6 @@ class AssociationUtilsTest {
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(oldAssoUpdated)
     Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
-    val task = Tasks.forResult(documentSnapshot)
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
