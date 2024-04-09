@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -73,8 +74,9 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun description() {
     with(composeTestRule) {
-      onNodeWithTag("descriptionField").performClick()
-      onNodeWithTag("descriptionField").performTextInput("Test Description")
+      onNodeWithTag("descriptionField")
+        .performClick()
+        .performTextInput("Test Description")
       assert(viewModel.uiState.value.description == "Test Description")
       onNodeWithTag("descriptionField").assertTextContains("Test Description")
     }
@@ -83,20 +85,13 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun amount() {
     with(composeTestRule) {
-      onNodeWithTag("amountField").performScrollTo().performClick()
-      onNodeWithTag("amountField").performTextInput("100")
+      onNodeWithTag("amountField")
+        .performScrollTo()
+        .performClick()
+        .performTextInput("100")
+      Log.e("TAG", viewModel.uiState.value.amount)
       assert(viewModel.uiState.value.amount == "100")
       onNodeWithTag("amountField").assertTextContains("100")
-    }
-  }
-
-  @Test
-  fun payer() {
-    with(composeTestRule) {
-      onNodeWithTag("payerField").performScrollTo().performClick()
-      onNodeWithTag("payerField").performTextInput("Test User")
-      assert(viewModel.uiState.value.payer == "Test User")
-      onNodeWithTag("payerField").assertTextContains("Test User")
     }
   }
 

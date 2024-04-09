@@ -72,7 +72,7 @@ class ReceiptViewModel {
 data class ReceiptState(
     val title: String = "",
     val description: String = "",
-    val amount: String = PriceUtil.ZERO_PRICE_STRING,
+    val amount: String = "",
     val payer: String = "",
     val date: String = DateUtil.NULL_DATE_STRING,
     val incoming: Boolean = false
