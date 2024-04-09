@@ -3,9 +3,9 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
+import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
 
 class ReceiptViewModel {
 

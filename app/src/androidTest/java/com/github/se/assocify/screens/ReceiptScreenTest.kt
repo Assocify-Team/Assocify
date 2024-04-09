@@ -74,9 +74,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun description() {
     with(composeTestRule) {
-      onNodeWithTag("descriptionField")
-        .performClick()
-        .performTextInput("Test Description")
+      onNodeWithTag("descriptionField").performClick().performTextInput("Test Description")
       assert(viewModel.uiState.value.description == "Test Description")
       onNodeWithTag("descriptionField").assertTextContains("Test Description")
     }
@@ -85,10 +83,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun amount() {
     with(composeTestRule) {
-      onNodeWithTag("amountField")
-        .performScrollTo()
-        .performClick()
-        .performTextInput("100")
+      onNodeWithTag("amountField").performScrollTo().performClick().performTextInput("100")
       Log.e("TAG", viewModel.uiState.value.amount)
       assert(viewModel.uiState.value.amount == "100")
       onNodeWithTag("amountField").assertTextContains("100")
