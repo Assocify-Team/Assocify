@@ -51,14 +51,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import kotlinx.coroutines.launch
 
-// Number of tabs at the top
-// const val NUMBER_OF_PAGES: Int = 3
-
 // Index of each tag for navigation
-const val PAGE_RECEIPT_INDEX: Int = 0
-const val PAGE_BUDGET_INDEX: Int = 1
-const val PAGE_BALANCE_INDEX: Int = 2
-
 enum class PageIndex(val index: Int) {
   RECEIPT(0),
   BUDGET(1),
