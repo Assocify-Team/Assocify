@@ -62,7 +62,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   }
 
   @Test
-  fun createTodo() = run {
+  fun createReceipt() = run {
     with(composeTestRule) {
       onNodeWithTag("createReceipt").assertIsDisplayed()
       onNodeWithTag("createReceipt").performClick()
