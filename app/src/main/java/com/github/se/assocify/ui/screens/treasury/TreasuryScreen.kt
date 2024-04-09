@@ -52,18 +52,29 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import kotlinx.coroutines.launch
 
 // Number of tabs at the top
-const val NUMBER_OF_PAGES: Int = 3
+//const val NUMBER_OF_PAGES: Int = 3
 
 // Index of each tag for navigation
 const val PAGE_RECEIPT_INDEX: Int = 0
 const val PAGE_BUDGET_INDEX: Int = 1
 const val PAGE_BALANCE_INDEX: Int = 2
 
-/** Main treasury screen UI */
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Composable
-fun TreasuryScreen(navActions: NavigationActions) {
+enum class PageIndex(val index: Int) {
+    RECEIPT(0),
+    BUDGET(1),
+    BALANCE(2);
+
+    companion object {
+        val NUMBER_OF_PAGES: Int = entries.size
+    }
+}
+
+
+    /** Main treasury screen UI */
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+    @Composable
+    fun TreasuryScreen(navActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}) },
@@ -84,7 +95,7 @@ fun TreasuryScreen(navActions: NavigationActions) {
         }
       }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-          val pagerState = rememberPagerState(pageCount = { NUMBER_OF_PAGES })
+          val pagerState = rememberPagerState(pageCount = { PageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
           // Tabs
@@ -105,23 +116,23 @@ fun TreasuryScreen(navActions: NavigationActions) {
                                 shape = RoundedCornerShape(8.dp)))
               }) {
                 TreasuryTab(
-                    selected = pagerState.currentPage == PAGE_RECEIPT_INDEX,
+                    selected = pagerState.currentPage == PageIndex.RECEIPT.index,
                     onClick = {
-                      coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_RECEIPT_INDEX) }
+                      coroutineRoute.launch { pagerState.animateScrollToPage(PageIndex.RECEIPT.index) }
                     },
                     text = "My receipts",
                     modifier = Modifier.testTag("myReceiptsTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == PAGE_BUDGET_INDEX,
+                    selected = pagerState.currentPage == PageIndex.BUDGET.index,
                     onClick = {
-                      coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_BUDGET_INDEX) }
+                      coroutineRoute.launch { pagerState.animateScrollToPage(PageIndex.BUDGET.index) }
                     },
                     text = "Budget",
                     modifier = Modifier.testTag("budgetTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == PAGE_BALANCE_INDEX,
+                    selected = pagerState.currentPage == PageIndex.BALANCE.index,
                     onClick = {
-                      coroutineRoute.launch { pagerState.animateScrollToPage(PAGE_BALANCE_INDEX) }
+                      coroutineRoute.launch { pagerState.animateScrollToPage(PageIndex.BALANCE.index) }
                     },
                     text = "Balance",
                     modifier = Modifier.testTag("balanceTab"))
@@ -131,9 +142,9 @@ fun TreasuryScreen(navActions: NavigationActions) {
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             Column(modifier = Modifier.fillMaxSize()) {
               when (page) {
-                PAGE_RECEIPT_INDEX -> MyReceiptPage()
-                PAGE_BUDGET_INDEX -> BudgetPage()
-                PAGE_BALANCE_INDEX -> BalancePage()
+                  PageIndex.RECEIPT.index -> MyReceiptPage()
+                  PageIndex.BUDGET.index -> BudgetPage()
+                  PageIndex.BALANCE.index -> BalancePage()
               }
             }
           }
@@ -142,8 +153,9 @@ fun TreasuryScreen(navActions: NavigationActions) {
 }
 
 /**
- * ------------------------------------------------- ** PAGES *
- * * ------------------------------------------------- *
+ * ------------------------------------------------- *
+ * PAGES *
+ * ------------------------------------------------- *
  */
 
 /** My receipts UI page */
@@ -171,8 +183,9 @@ private fun MyReceiptPage() {
 @Composable private fun BalancePage() {}
 
 /**
- * ------------------------------------------------- ** Elements *
- * * ------------------------------------------------- *
+ * ------------------------------------------------- *
+ * Elements *
+ * ------------------------------------------------- *
  */
 
 /** Top tabs component */
