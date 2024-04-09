@@ -19,9 +19,9 @@ import org.mockito.Mockito.mock
 class AssociationUtilsTest {
   private lateinit var db: FirebaseFirestore
   private lateinit var assoApi: AssociationAPI
-  private val documentSnapshot = Mockito.mock(DocumentSnapshot::class.java)
-  private val documentReference = Mockito.mock(DocumentReference::class.java)
-  private val collectionReference = Mockito.mock(CollectionReference::class.java)
+  private val documentSnapshot = mock(DocumentSnapshot::class.java)
+  private val documentReference = mock(DocumentReference::class.java)
+  private val collectionReference = mock(CollectionReference::class.java)
   private val president = User("testId", "Carlo", Role("president"))
   private val newUser = User()
   val oldAsso =

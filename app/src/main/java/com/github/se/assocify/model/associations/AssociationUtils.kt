@@ -12,15 +12,15 @@ class AssociationUtils(
     private var user: User,
     private var assocId: String = "",
     private val associationDatabase: AssociationAPI
-) : ViewModel() {
-  private val _associationState: MutableStateFlow<Association?> = MutableStateFlow(null)
+){
+  private var _associationState: Association? = null
 
   init {
     update()
   }
 
   fun update() {
-    if (assocId != "") _associationState.value = associationDatabase.getAssociation(assocId)
+    if (assocId != "") _associationState = associationDatabase.getAssociation(assocId)
   }
 
   fun getAssocId(): String {
@@ -29,56 +29,56 @@ class AssociationUtils(
 
   fun getPendingUsers(): List<User> {
     update()
-    if (_associationState.value == null) {
+    if (_associationState == null) {
       return emptyList()
     }
-    return _associationState.value!!.members.filter { x -> x.role == Role("pending") }
+    return _associationState!!.members.filter { x -> x.role == Role("pending") }
   }
 
   fun getRecordedUsers(): List<User> {
     update()
-    if (_associationState.value == null) {
+    if (_associationState == null) {
       return emptyList()
     }
-    return _associationState.value!!.members.filter { x -> x.role != Role("pending") }
+    return _associationState!!.members.filter { x -> x.role != Role("pending") }
   }
 
   fun getAllUsers(): List<User> {
     update()
-    if (_associationState.value == null) {
+    if (_associationState == null) {
       return emptyList()
     }
-    return _associationState.value!!.members
+    return _associationState!!.members
   }
 
   fun getAssociationName(): String {
-    if (_associationState.value == null) return ""
-    return _associationState.value!!.name
+    if (_associationState == null) return ""
+    return _associationState!!.name
   }
 
   fun getAssociationDescription(): String {
-    if (_associationState.value == null) return ""
-    return _associationState.value!!.description
+    if (_associationState == null) return ""
+    return _associationState!!.description
   }
 
   fun getCreationDate(): String {
-    if (_associationState.value == null) return ""
-    return _associationState.value!!.creationDate
+    if (_associationState == null) return ""
+    return _associationState!!.creationDate
   }
 
   fun getEvents(): List<Event> {
-    if (_associationState.value == null) return emptyList()
-    return _associationState.value!!.events
+    if (_associationState == null) return emptyList()
+    return _associationState!!.events
   }
 
   fun acceptNewUser(uid: String, role: String) {
-    if (_associationState.value != null &&
+    if (_associationState != null &&
         (user.role == Role("president") || user.role == Role("co-president"))) {
       val userList = getPendingUsers().filter { u -> u.uid == uid }
       if (userList.isEmpty()) return
       val user = userList[0]
       val updatedUser = User(uid, user.name, Role(role))
-      val ass = _associationState.value!!
+      val ass = _associationState!!
       val updatedAssoc =
           Association(
               ass.uid,
@@ -93,8 +93,8 @@ class AssociationUtils(
   }
 
   fun requestAssociationAccess() {
-    if (_associationState.value != null) {
-      val ass = _associationState.value!!
+    if (_associationState != null) {
+      val ass = _associationState!!
       val updatedAssoc =
           Association(
               ass.uid,
@@ -120,7 +120,7 @@ class AssociationUtils(
     val assoc = Association(uid, name, description, creationDate, status, members, events)
     associationDatabase.addAssociation(assoc)
     assocId = uid
-    _associationState.value = assoc
+    _associationState = assoc
     return assoc
   }
 
@@ -128,11 +128,11 @@ class AssociationUtils(
     if (user.role != Role("president")) return
     associationDatabase.deleteAssociation(assocId)
     assocId = ""
-    _associationState.value = null
+    _associationState = null
   }
 
   fun getAllAssociations(): List<Association> {
-    if (_associationState.value == null) return emptyList()
+    if (_associationState == null) return emptyList()
     return associationDatabase.getAssociations()
   }
 
