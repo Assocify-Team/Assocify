@@ -72,9 +72,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedIconButton(
-                    modifier =
-                        Modifier.padding(top = 8.dp)
-                            .testTag("logo") /*.background(MaterialTheme.colorScheme.primary)*/,
+                    modifier = Modifier.padding(top = 8.dp).testTag("logo"),
                     onClick = {
                       /* TODO : can add association logo */
                     }) {
