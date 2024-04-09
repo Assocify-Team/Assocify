@@ -3,6 +3,7 @@ package com.github.se.assocify
 import com.github.se.assocify.model.associations.AssociationUtils
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.google.android.gms.tasks.Tasks
@@ -50,6 +51,23 @@ class AssociationUtilsTest {
           "active",
           listOf(president, User("", "", Role("newRole"))),
           emptyList())
+  val u1 = User("a", "1", Role("president"))
+  val u2 = User("b", "2", Role("user"))
+  val u3 = User("c", "3", Role("user"))
+  val u4 = User("d", "4", Role("pending"))
+  val u5 = User("e", "5", Role("pending"))
+  val e1 = Event("s1", "e1", emptyList(), emptyList())
+  val e2 = Event("s2", "e2", emptyList(), emptyList())
+  val e3 = Event("s3", "e3", emptyList(), emptyList())
+  val getterAsso =
+      Association(
+          "getId",
+          "gettify",
+          "association to test the getters",
+          "31/09/2005",
+          "active",
+          listOf(u1, u2, u3, u4, u5),
+          listOf(e1, e2, e3))
 
   @Before
   fun setup() {
@@ -97,7 +115,6 @@ class AssociationUtilsTest {
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(oldAsso)
     Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
-    val task = Tasks.forResult(documentSnapshot)
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
@@ -135,5 +152,26 @@ class AssociationUtilsTest {
     assert(newAssoUtils.getAssocId() == "testId")
     assert(newAssoUtils.getAssociationDescription() == "a small association to have fun")
     Mockito.verify(db.collection(assoApi.collectionName).document(newAsso.uid)).set(newAsso)
+  }
+
+  @Test
+  fun checkGetters() {
+    Mockito.`when`(documentSnapshot.exists()).thenReturn(true)
+    Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(getterAsso)
+    Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
+
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
+        .thenReturn(documentReference)
+
+    val getterUtil = AssociationUtils(newUser, "getId", assoApi)
+    assert(getterUtil.getAllUsers() == listOf(u1, u2, u3, u4, u5))
+    assert(getterUtil.getAssociationDescription() == "association to test the getters")
+    assert(getterUtil.getAssocId() == "getId")
+    assert(getterUtil.getPendingUsers() == listOf(u4, u5))
+    assert(getterUtil.getRecordedUsers() == listOf(u1, u2, u3))
+    assert(getterUtil.getEvents() == listOf(e1, e2, e3))
+    assert(getterUtil.getCreationDate() == "31/09/2005")
+    assert(getterUtil.getAssociationName() == "gettify")
   }
 }
