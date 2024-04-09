@@ -74,7 +74,6 @@ class AssociationAPITest {
 
   @Test
   fun testAddAssociation() {
-
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
@@ -87,7 +86,6 @@ class AssociationAPITest {
 
   @Test
   fun testDeleteAssociation() {
-
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
