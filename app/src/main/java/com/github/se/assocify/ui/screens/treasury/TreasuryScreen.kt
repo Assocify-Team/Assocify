@@ -82,7 +82,7 @@ enum class PageIndex(val index: Int) {
         MainNavigationBar(
             onTabSelect = { navActions.navigateToMainTab(it) },
             tabList = MAIN_TABS_LIST,
-            selectedTab = Destination.Profile)
+            selectedTab = Destination.Treasury)
       },
       floatingActionButton = {
         FloatingActionButton(
@@ -120,7 +120,7 @@ enum class PageIndex(val index: Int) {
                     onClick = {
                       coroutineRoute.launch { pagerState.animateScrollToPage(PageIndex.RECEIPT.index) }
                     },
-                    text = "My receipts",
+                    text = "Receipts",
                     modifier = Modifier.testTag("myReceiptsTab"))
                 TreasuryTab(
                     selected = pagerState.currentPage == PageIndex.BUDGET.index,
