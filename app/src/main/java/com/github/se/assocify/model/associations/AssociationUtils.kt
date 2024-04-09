@@ -1,18 +1,16 @@
 package com.github.se.assocify.model.associations
 
-import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class AssociationUtils(
     private var user: User,
     private var assocId: String = "",
     private val associationDatabase: AssociationAPI
-){
+) {
   private var _associationState: Association? = null
 
   init {
