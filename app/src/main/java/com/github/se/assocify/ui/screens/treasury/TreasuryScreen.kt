@@ -52,7 +52,7 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import kotlinx.coroutines.launch
 
 // Number of tabs at the top
-//const val NUMBER_OF_PAGES: Int = 3
+// const val NUMBER_OF_PAGES: Int = 3
 
 // Index of each tag for navigation
 const val PAGE_RECEIPT_INDEX: Int = 0
@@ -60,21 +60,20 @@ const val PAGE_BUDGET_INDEX: Int = 1
 const val PAGE_BALANCE_INDEX: Int = 2
 
 enum class PageIndex(val index: Int) {
-    RECEIPT(0),
-    BUDGET(1),
-    BALANCE(2);
+  RECEIPT(0),
+  BUDGET(1),
+  BALANCE(2);
 
-    companion object {
-        val NUMBER_OF_PAGES: Int = entries.size
-    }
+  companion object {
+    val NUMBER_OF_PAGES: Int = entries.size
+  }
 }
 
-
-    /** Main treasury screen UI */
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-    @Composable
-    fun TreasuryScreen(navActions: NavigationActions) {
+/** Main treasury screen UI */
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun TreasuryScreen(navActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}) },
@@ -118,21 +117,27 @@ enum class PageIndex(val index: Int) {
                 TreasuryTab(
                     selected = pagerState.currentPage == PageIndex.RECEIPT.index,
                     onClick = {
-                      coroutineRoute.launch { pagerState.animateScrollToPage(PageIndex.RECEIPT.index) }
+                      coroutineRoute.launch {
+                        pagerState.animateScrollToPage(PageIndex.RECEIPT.index)
+                      }
                     },
                     text = "Receipts",
                     modifier = Modifier.testTag("myReceiptsTab"))
                 TreasuryTab(
                     selected = pagerState.currentPage == PageIndex.BUDGET.index,
                     onClick = {
-                      coroutineRoute.launch { pagerState.animateScrollToPage(PageIndex.BUDGET.index) }
+                      coroutineRoute.launch {
+                        pagerState.animateScrollToPage(PageIndex.BUDGET.index)
+                      }
                     },
                     text = "Budget",
                     modifier = Modifier.testTag("budgetTab"))
                 TreasuryTab(
                     selected = pagerState.currentPage == PageIndex.BALANCE.index,
                     onClick = {
-                      coroutineRoute.launch { pagerState.animateScrollToPage(PageIndex.BALANCE.index) }
+                      coroutineRoute.launch {
+                        pagerState.animateScrollToPage(PageIndex.BALANCE.index)
+                      }
                     },
                     text = "Balance",
                     modifier = Modifier.testTag("balanceTab"))
@@ -140,19 +145,18 @@ enum class PageIndex(val index: Int) {
 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
-              when (page) {
-                  PageIndex.RECEIPT.index -> MyReceiptPage()
-                  PageIndex.BUDGET.index -> BudgetPage()
-                  PageIndex.BALANCE.index -> BalancePage()
-              }
+            when (page) {
+              PageIndex.RECEIPT.index -> MyReceiptPage()
+              PageIndex.BUDGET.index -> BudgetPage()
+              PageIndex.BALANCE.index -> BalancePage()
+            }
           }
         }
       }
 }
 
 /**
- * ------------------------------------------------- *
- * PAGES *
+ * ------------------------------------------------- * PAGES *
  * ------------------------------------------------- *
  */
 
@@ -181,8 +185,7 @@ private fun MyReceiptPage() {
 @Composable private fun BalancePage() {}
 
 /**
- * ------------------------------------------------- *
- * Elements *
+ * ------------------------------------------------- * Elements *
  * ------------------------------------------------- *
  */
 
@@ -221,9 +224,7 @@ fun TreasuryTopBar(
       title = { Text(text = "Treasury", style = MaterialTheme.typography.headlineSmall) },
       navigationIcon = {
         IconButton(modifier = Modifier.testTag("accountIconButton"), onClick = onAccountClick) {
-          Icon(
-              imageVector = Icons.Filled.AccountCircle,
-              contentDescription = "Account logo")
+          Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account logo")
         }
       },
       actions = {
