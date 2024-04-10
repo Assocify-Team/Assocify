@@ -41,12 +41,13 @@ class UserAPITest {
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
-    val result = userAPI.getUser(user.uid)
-    Tasks.await(result)
+    var result: User? = null
+    userAPI.getUser(user.uid){user: User -> result = user}
+
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
     Mockito.verify(db.collection(userAPI.collectionName).document(user.uid)).get()
-    assert(result.result == user)
+    assert(result == user)
   }
 
   @Test
@@ -60,8 +61,8 @@ class UserAPITest {
     Mockito.`when`(listOf(documentSnapshot).map { document -> document.toObject(User::class.java) })
         .thenReturn(listOf(user))
     Mockito.`when`(documentSnapshot.toObject(User::class.java)).thenReturn(user)
-
-    val result = userAPI.getAllUsers()
+    var result: List<User> = emptyList()
+    userAPI.getAllUsers(){users -> result = users}
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).get()
     assert(result.size == 1)
