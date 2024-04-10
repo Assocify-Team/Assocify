@@ -1,6 +1,8 @@
 package com.github.se.assocify.model.database
 
+import android.net.Uri
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
+import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -12,11 +14,10 @@ class ReceiptsAPI(
     basePath: String,
     storage: FirebaseStorage,
     db: FirebaseFirestore
-) : FirebaseApi(userId, db) {
+) : FirebaseApi(db) {
   override val collectionName: String = "$basePath/receipts"
-  private val userCollection = "$collectionName/$userId/list"
-  private val storageReference = storage.getReference(userCollection)
-  private val dbReference = db.collection(userCollection)
+  private val storageReference = storage.getReference("$userId/receipts")
+  private val dbReference = db.collection("$collectionName/$userId/list")
 
   /**
    * Uploads a receipt to the database, as well as the image (if needed). Can create or update a
@@ -40,7 +41,7 @@ class ReceiptsAPI(
       is MaybeRemotePhoto.LocalFile -> {
         storageReference
             .child(receipt.uid)
-            .putFile(receipt.photo.filePath)
+            .putFile(Uri.parse(receipt.photo.filePath))
             .addOnSuccessListener { onPhotoUploadSuccess(true) }
             .addOnFailureListener { onFailure(false, it) }
       }
@@ -51,7 +52,7 @@ class ReceiptsAPI(
 
     dbReference
         .document(receipt.uid)
-        .set(receipt)
+        .set(FirestoreReceipt(receipt))
         .addOnSuccessListener { onReceiptUploadSuccess() }
         .addOnFailureListener { onFailure(true, it) }
   }
@@ -93,16 +94,22 @@ class ReceiptsAPI(
 
   private data class FirestoreReceipt(
       val date: String,
+      val cents: Int,
+      val phase: Int,
       val title: String,
       val notes: String,
       val photo: String,
   ) {
-    constructor(from: Receipt) : this(from.date.toString(), from.title, from.notes, from.uid)
+    constructor(
+        from: Receipt
+    ) : this(from.date.toString(), from.cents, from.phase.ordinal, from.title, from.notes, from.uid)
 
     fun toReceipt(uid: String) =
         Receipt(
             uid,
             LocalDate.parse(this.date),
+            this.cents,
+            Phase.entries[this.phase],
             this.title,
             this.notes,
             MaybeRemotePhoto.Remote(photo),

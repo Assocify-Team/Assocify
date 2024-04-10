@@ -2,7 +2,7 @@ package com.github.se.assocify.model.database
 
 import com.google.firebase.firestore.FirebaseFirestore
 
-abstract class FirebaseApi(val userId: String, val db: FirebaseFirestore) {
+abstract class FirebaseApi(val db: FirebaseFirestore) {
   /** The name of the collection in the database */
   abstract val collectionName: String
 
