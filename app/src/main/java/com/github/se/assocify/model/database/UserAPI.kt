@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import android.util.Log
 import com.github.se.assocify.model.entities.User
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -46,6 +47,7 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
       if (task.isSuccessful) {
         val users =
             task.result!!.documents.map { document -> document.toObject(User::class.java)!! }
+        Log.d("UserAPI", "Users: $users")
         callback(users)
       } else {
         throw task.exception ?: Exception("Unknown error occurred")
