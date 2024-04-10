@@ -2,6 +2,7 @@ package com.github.se.assocify.navigation
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 
 class NavigationActions(private val navController: NavHostController) {
