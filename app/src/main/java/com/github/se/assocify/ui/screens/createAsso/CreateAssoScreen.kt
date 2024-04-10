@@ -133,7 +133,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
                     onClick = { /* TODO : add members to list : need to open listDialog... call other function?? */
-                              editMember = User("uid", "name", Role("role"))},
+                              editMember.copy(uid = "uid", name ="name", role = Role("role"))},
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("addMember")) {
