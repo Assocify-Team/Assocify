@@ -21,7 +21,7 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param callback the callback to call with the user
    * @return the user with the given id
    */
-  fun getUser(id: String, callback: (User) -> Unit) : Task<Unit> {
+  fun getUser(id: String, callback: (User) -> Unit): Task<Unit> {
     return db.collection(collectionName).document(id).get().continueWith { task ->
       if (task.isSuccessful) {
         val document = task.result
@@ -69,7 +69,7 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    *
    * @param id the id of the user to delete
    */
-  fun deleteUser(id: String): Task<Void>{
+  fun deleteUser(id: String): Task<Void> {
     return db.collection(collectionName).document(id).delete()
   }
 }
