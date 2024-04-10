@@ -97,6 +97,7 @@ fun DatePickerWithDialog(
         onDismissRequest = { showDialog = false },
         confirmButton = {
           Button(
+              modifier = Modifier.testTag("datePickerDialogOk"),
               onClick = {
                 showDialog = false
                 onDateSelect(selectedDate)
@@ -106,7 +107,7 @@ fun DatePickerWithDialog(
         },
         dismissButton = {
           Button(
-              modifier = Modifier.testTag("datePickerDialogDismiss"),
+              modifier = Modifier.testTag("datePickerDialogCancel"),
               onClick = {
                 showDialog = false
                 onDateSelect(null)

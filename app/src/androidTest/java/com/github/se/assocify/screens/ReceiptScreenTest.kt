@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.navigation.NavigationActions
@@ -63,11 +64,13 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun title() {
     with(composeTestRule) {
-      onNodeWithTag("titleField").performClick()
-      onNodeWithTag("titleField").performTextInput("Test Title")
+      onNodeWithTag("titleField").performClick().performTextInput("Test Title")
       assert(viewModel.uiState.value.title == "Test Title")
-
       onNodeWithTag("titleField").assertTextContains("Test Title")
+
+      onNodeWithTag("titleField").performClick().performTextClearance()
+      assert(viewModel.uiState.value.title == "")
+      onNodeWithTag("titleField").assertTextContains("Title cannot be empty")
     }
   }
 
@@ -84,9 +87,30 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   fun amount() {
     with(composeTestRule) {
       onNodeWithTag("amountField").performScrollTo().performClick().performTextInput("100")
-      Log.e("TAG", viewModel.uiState.value.amount)
       assert(viewModel.uiState.value.amount == "100")
       onNodeWithTag("amountField").assertTextContains("100")
+
+      onNodeWithTag("amountField").performClick().performTextClearance()
+      assert(viewModel.uiState.value.amount == "")
+      onNodeWithTag("amountField").assertTextContains("Price cannot be empty")
+
+      onNodeWithTag("amountField").performClick().performTextInput("0")
+      assert(viewModel.uiState.value.amount == "0")
+      onNodeWithTag("amountField").assertTextContains("Price cannot be zero")
+
+      onNodeWithTag("amountField").performClick().performTextClearance()
+      onNodeWithTag("amountField").performTextInput(".")
+      assert(viewModel.uiState.value.amount == ".")
+      onNodeWithTag("amountField").assertTextContains("Price cannot be zero")
+      onNodeWithTag("amountField").performTextInput(".") // try to add a second .
+      assert(viewModel.uiState.value.amount == ".")
+
+      onNodeWithTag("amountField").performClick().performTextClearance()
+      onNodeWithTag("amountField").performTextInput("1000000.00")
+      onNodeWithTag("amountField").performTextInput("1") // try to add another 1 at end
+      Log.e("amount", viewModel.uiState.value.amount)
+      assert(viewModel.uiState.value.amount == "1000000.00")
+      onNodeWithTag("amountField").assertTextContains("Price is too large")
     }
   }
 
@@ -111,7 +135,9 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     with(composeTestRule) {
       onNodeWithTag("dateField").performClick()
       onNodeWithTag("datePickerDialog").assertIsDisplayed()
-      onNodeWithTag("datePickerDialogDismiss").performClick()
+      onNodeWithTag("datePickerDialogCancel").performClick()
+      onNodeWithTag("datePickerDialog").assertDoesNotExist()
+      onNodeWithTag("dateField").assertTextContains("Date cannot be empty")
     }
   }
 }
