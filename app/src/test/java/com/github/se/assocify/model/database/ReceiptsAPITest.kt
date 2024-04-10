@@ -44,7 +44,9 @@ class ReceiptsAPITest {
   private val successfulReceipt =
       Receipt(
           "successful_rid",
+          "payer",
           LocalDate.EPOCH,
+          false,
           100,
           Phase.Approved,
           "title",
@@ -54,7 +56,9 @@ class ReceiptsAPITest {
   private val failingReceipt =
       Receipt(
           "failing_rid",
+          "payer",
           LocalDate.EPOCH,
+          false,
           100,
           Phase.Approved,
           "title",

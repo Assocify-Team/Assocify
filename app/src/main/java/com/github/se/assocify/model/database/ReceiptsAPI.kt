@@ -93,25 +93,29 @@ class ReceiptsAPI(
           .addOnFailureListener { onError(null, it) }
 
   private data class FirestoreReceipt(
+      val payer: String,
       val date: String,
+      val incoming: Boolean,
       val cents: Int,
       val phase: Int,
       val title: String,
-      val notes: String,
+      val description: String,
       val photo: String,
   ) {
     constructor(
         from: Receipt
-    ) : this(from.date.toString(), from.cents, from.phase.ordinal, from.title, from.notes, from.uid)
+    ) : this(from.payer, from.date.toString(), from.incoming, from.cents, from.phase.ordinal, from.title, from.description, from.uid)
 
     fun toReceipt(uid: String) =
         Receipt(
             uid,
+            this.payer,
             LocalDate.parse(this.date),
+            this.incoming,
             this.cents,
             Phase.entries[this.phase],
             this.title,
-            this.notes,
+            this.description,
             MaybeRemotePhoto.Remote(photo),
         )
   }
