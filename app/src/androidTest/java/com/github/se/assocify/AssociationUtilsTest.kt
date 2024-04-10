@@ -10,18 +10,16 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
-
 class AssociationUtilsTest {
   private lateinit var assoApi: AssociationAPI
   private val documentSnapshot = mockk<DocumentSnapshot>()
-  private val documentReference =  mockk<DocumentReference>()
+  private val documentReference = mockk<DocumentReference>()
   private val collectionReference = mockk<CollectionReference>()
   private val president = User("testId", "Carlo", Role("president"))
   private val newUser = User()
@@ -72,7 +70,7 @@ class AssociationUtilsTest {
 
   @Before
   fun setup() {
-      assoApi = mockk<AssociationAPI>()
+    assoApi = mockk<AssociationAPI>()
   }
 
   @Test
@@ -87,30 +85,25 @@ class AssociationUtilsTest {
 
   @Test
   fun checkAcceptNewUser() {
-    var result : Association? = null
-    every { assoApi.getAssociation(any<String>(), any<(Association) -> Unit>())  } answers {
-        val callback = arg<(Association) -> Unit>(1)
-        callback.invoke(oldAssoUpdated)
-        result = oldAssoUpdated
-        Tasks.forResult(null)
-    }
+    var result: Association? = null
+    every { assoApi.getAssociation(any<String>(), any<(Association) -> Unit>()) } answers
+        {
+          val callback = arg<(Association) -> Unit>(1)
+          callback.invoke(oldAssoUpdated)
+          result = oldAssoUpdated
+          Tasks.forResult(null)
+        }
 
-      // Assert asso is upadted and newUser is in the list of members
+    // Assert asso is upadted and newUser is in the list of members
     val assocUtilsUpdated = AssociationUtils(president, oldAssoUpdated.uid, assoApi)
     val pendingUsers = assocUtilsUpdated.getPendingUsers()
     assert(pendingUsers == listOf(newUser))
 
-    every { assoApi.addAssociation(any<Association>()) } answers {
-        Tasks.forResult(null)
-    }
+    every { assoApi.addAssociation(any<Association>()) } answers { Tasks.forResult(null) }
     assocUtilsUpdated.acceptNewUser(newUser.uid, "newRole")
     verify { assoApi.addAssociation(oldAssoReviewed) }
-
-
-
-
   }
-    /*
+  /*
 
   @Test
   fun checkRequestAssocEntry() {
