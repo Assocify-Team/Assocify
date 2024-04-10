@@ -1,8 +1,6 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.User
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -21,7 +19,7 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param callback the callback to call with the user
    * @return the user with the given id
    */
-  fun getUser(id: String, callback : (User) -> Unit ){
+  fun getUser(id: String, callback: (User) -> Unit) {
     db.collection(collectionName).document(id).get().continueWith { task ->
       if (task.isSuccessful) {
         val document = task.result
@@ -42,16 +40,17 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param callback the callback to call with the list of users
    * @return a list of all users
    */
-  fun getAllUsers(callback : (List<User>)->Unit) {
+  fun getAllUsers(callback: (List<User>) -> Unit) {
 
-        db.collection(collectionName).get().continueWith { task ->
-          if (task.isSuccessful) {
-            val users = task.result!!.documents.map { document -> document.toObject(User::class.java)!! }
-            callback(users)
-          } else {
-            throw task.exception ?: Exception("Unknown error occurred")
-          }
-        }
+    db.collection(collectionName).get().continueWith { task ->
+      if (task.isSuccessful) {
+        val users =
+            task.result!!.documents.map { document -> document.toObject(User::class.java)!! }
+        callback(users)
+      } else {
+        throw task.exception ?: Exception("Unknown error occurred")
+      }
+    }
   }
 
   /**

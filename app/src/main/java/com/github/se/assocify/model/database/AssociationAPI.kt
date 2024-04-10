@@ -18,21 +18,21 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param callback the callback to call with the association
    * @return the association with the given id
    */
-  fun getAssociation(id: String, callback : (Association) -> Unit ) {
+  fun getAssociation(id: String, callback: (Association) -> Unit) {
 
-      db.collection(collectionName).document(id).get().continueWith { task ->
-        if (task.isSuccessful) {
-          val document = task.result
-          if (document != null && document.exists()) {
-            val doc = document.toObject(Association::class.java)
-            callback(doc!!)
-          } else {
-            throw Exception("No Asso found with ID: $id")
-          }
+    db.collection(collectionName).document(id).get().continueWith { task ->
+      if (task.isSuccessful) {
+        val document = task.result
+        if (document != null && document.exists()) {
+          val doc = document.toObject(Association::class.java)
+          callback(doc!!)
         } else {
-          throw task.exception ?: Exception("Unknown error occurred")
+          throw Exception("No Asso found with ID: $id")
         }
+      } else {
+        throw task.exception ?: Exception("Unknown error occurred")
       }
+    }
   }
 
   /**
@@ -41,15 +41,16 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param callback the callback to call with the list of associations
    * @return a list of all associations
    */
-  fun getAssociations(callback : (List<Association>) -> Unit) {
-      db.collection(collectionName).get().continueWith { task ->
-        if (task.isSuccessful) {
-          val associations = task.result!!.documents.map { document -> document.toObject(Association::class.java)!! }
-            callback(associations)
-        } else {
-          throw task.exception ?: Exception("Unknown error occurred")
-        }
+  fun getAssociations(callback: (List<Association>) -> Unit) {
+    db.collection(collectionName).get().continueWith { task ->
+      if (task.isSuccessful) {
+        val associations =
+            task.result!!.documents.map { document -> document.toObject(Association::class.java)!! }
+        callback(associations)
+      } else {
+        throw task.exception ?: Exception("Unknown error occurred")
       }
+    }
   }
 
   /**

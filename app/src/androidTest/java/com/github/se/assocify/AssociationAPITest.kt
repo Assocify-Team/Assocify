@@ -65,7 +65,7 @@ class AssociationAPITest {
         .thenReturn(listOf(asso))
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(asso)
     var result: List<Association>? = null
-    assoAPI.getAssociations(){associations -> result = associations}
+    assoAPI.getAssociations() { associations -> result = associations }
 
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).get()

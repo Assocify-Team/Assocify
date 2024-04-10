@@ -42,7 +42,7 @@ class UserAPITest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     var result: User? = null
-    userAPI.getUser(user.uid){user: User -> result = user}
+    userAPI.getUser(user.uid) { user: User -> result = user }
 
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
@@ -62,7 +62,7 @@ class UserAPITest {
         .thenReturn(listOf(user))
     Mockito.`when`(documentSnapshot.toObject(User::class.java)).thenReturn(user)
     var result: List<User> = emptyList()
-    userAPI.getAllUsers(){users -> result = users}
+    userAPI.getAllUsers() { users -> result = users }
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).get()
     assert(result.size == 1)
