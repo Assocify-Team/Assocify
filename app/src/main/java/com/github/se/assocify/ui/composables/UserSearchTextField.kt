@@ -1,5 +1,7 @@
 package com.github.se.assocify.ui.composables
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
@@ -17,6 +19,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.User
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,7 +30,7 @@ fun UserSearchTextField(
     modifier: Modifier = Modifier,
     searchValue: String,
     userList: List<User>,
-    user: User? = null,
+    user: User?,
     onUserSearch: (String) -> Unit,
     onUserSelect: (User) -> Unit,
     onUserDismiss: () -> Unit,
@@ -35,34 +40,53 @@ fun UserSearchTextField(
 ) {
   var expanded by remember { mutableStateOf(false) }
   val value = user?.name ?: searchValue
+  var textfieldSize by remember { mutableStateOf(0) }
+  var scrollToPosition by remember { mutableStateOf(0f) }
 
-  OutlinedTextField(
-      value = value,
-      onValueChange = onUserSearch,
-      modifier = modifier,
-      readOnly = user != null,
-      isError = isError,
-      label = label,
-      supportingText = supportingText,
-      trailingIcon = {
-        if (user != null) {
-          IconButton(onClick = onUserDismiss) {
-            Icon(Icons.Default.Clear, contentDescription = "Clear")
+  Column {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+          onUserSearch(it)
+          if (value == "" && it != "") {
+            expanded = true
+          } else if (value != "" && it == "") {
+            expanded = false
           }
-        } else {
-          IconButton(onClick = { expanded = !expanded }) {
-            if (expanded) {
-              Icon(Icons.Default.ArrowDropUp, contentDescription = "Collapse")
-            } else {
-              Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
+        },
+        modifier = modifier then Modifier.onSizeChanged { textfieldSize = it.width },
+        readOnly = user != null,
+        isError = isError,
+        label = label,
+        supportingText = supportingText,
+        trailingIcon = {
+          if (user != null) {
+            IconButton(onClick = onUserDismiss) {
+              Icon(Icons.Default.Clear, contentDescription = "Clear")
+            }
+          } else {
+            IconButton(onClick = { expanded = !expanded }) {
+              if (expanded) {
+                Icon(Icons.Default.ArrowDropUp, contentDescription = "Collapse")
+              } else {
+                Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
+              }
             }
           }
+        })
+    DropdownMenu(
+        modifier = Modifier.width(with(LocalDensity.current) { textfieldSize.toDp() }),
+        expanded = expanded,
+        onDismissRequest = { expanded = !expanded },
+        properties = PopupProperties(focusable = false)) {
+          userList.forEach { user ->
+            DropdownMenuItem(
+                text = { Text(user.name) },
+                onClick = {
+                  onUserSelect(user)
+                  expanded = false
+                })
+          }
         }
-      })
-  DropdownMenu(
-      expanded = user == null && value.isNotEmpty(), onDismissRequest = { expanded = !expanded }) {
-        userList.forEach { user ->
-          DropdownMenuItem(text = { Text(user.name) }, onClick = { onUserSelect(user) })
-        }
-      }
+  }
 }
