@@ -21,8 +21,8 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param callback the callback to call with the user
    * @return the user with the given id
    */
-  fun getUser(id: String, callback: (User) -> Unit) {
-    db.collection(collectionName).document(id).get().continueWith { task ->
+  fun getUser(id: String, callback: (User) -> Unit) : Task<Unit> {
+    return db.collection(collectionName).document(id).get().continueWith { task ->
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {
@@ -61,13 +61,15 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    *
    * @param user the user to add/edit
    */
-  fun addUser(user: User) {
-    db.collection(collectionName).document(user.uid).set(user)
+  fun addUser(user: User): Task<Void> {
+    return db.collection(collectionName).document(user.uid).set(user)
   }
   /**
    * Deletes a user from the database
    *
    * @param id the id of the user to delete
    */
-  fun deleteUser(id: String) = delete(id)
+  fun deleteUser(id: String): Task<Void>{
+    return db.collection(collectionName).document(id).delete()
+  }
 }

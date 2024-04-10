@@ -42,7 +42,7 @@ class UserAPITest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     var result: User? = null
-    userAPI.getUser(user.uid) { user: User -> result = user }
+    Tasks.await(userAPI.getUser(user.uid) { user: User -> result = user })
 
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
@@ -62,7 +62,6 @@ class UserAPITest {
         .thenReturn(listOf(user))
     Mockito.`when`(documentSnapshot.toObject(User::class.java)).thenReturn(user)
     var result: List<User>? = null
-
     Tasks.await(userAPI.getAllUsers { users: List<User> -> result = users })
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).get()
@@ -76,7 +75,7 @@ class UserAPITest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.set(user)).thenReturn(Tasks.forResult(null))
-    userAPI.addUser(user)
+    Tasks.await(userAPI.addUser(user))
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
     Mockito.verify(db.collection(userAPI.collectionName).document(user.uid)).set(user)
@@ -88,7 +87,7 @@ class UserAPITest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.delete()).thenReturn(Tasks.forResult(null))
-    userAPI.deleteUser(user.uid)
+    Tasks.await(userAPI.deleteUser(user.uid))
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).document(user.uid)
     Mockito.verify(db.collection(userAPI.collectionName).document(user.uid)).delete()
