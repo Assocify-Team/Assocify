@@ -43,7 +43,7 @@ class AssociationAPITest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     var assoc: Association? = null
-    assoAPI.getAssociation(asso.uid) { asso -> assoc = asso }
+    Tasks.await(assoAPI.getAssociation(asso.uid) { asso -> assoc = asso })
 
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
@@ -65,7 +65,7 @@ class AssociationAPITest {
         .thenReturn(listOf(asso))
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(asso)
     var result: List<Association>? = null
-    assoAPI.getAssociations() { associations -> result = associations }
+    Tasks.await(assoAPI.getAssociations() { associations -> result = associations })
 
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).get()
@@ -79,7 +79,7 @@ class AssociationAPITest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.set(asso)).thenReturn(Tasks.forResult(null))
-    assoAPI.addAssociation(asso)
+    Tasks.await(assoAPI.addAssociation(asso))
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
     Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).set(asso)
@@ -91,7 +91,7 @@ class AssociationAPITest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.delete()).thenReturn(Tasks.forResult(null))
-    assoAPI.deleteAssociation(asso.uid)
+    Tasks.await(assoAPI.deleteAssociation(asso.uid))
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
     Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).delete()

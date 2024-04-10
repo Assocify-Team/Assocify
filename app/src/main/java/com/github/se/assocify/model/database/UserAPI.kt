@@ -2,6 +2,7 @@ package com.github.se.assocify.model.database
 
 import android.util.Log
 import com.github.se.assocify.model.entities.User
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -41,9 +42,9 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param callback the callback to call with the list of users
    * @return a list of all users
    */
-  fun getAllUsers(callback: (List<User>) -> Unit) {
+  fun getAllUsers(callback: (List<User>) -> Unit): Task<Unit> {
 
-    db.collection(collectionName).get().continueWith { task ->
+    return db.collection(collectionName).get().continueWith { task ->
       if (task.isSuccessful) {
         val users =
             task.result!!.documents.map { document -> document.toObject(User::class.java)!! }

@@ -63,7 +63,7 @@ class UserAPITest {
     Mockito.`when`(documentSnapshot.toObject(User::class.java)).thenReturn(user)
     var result: List<User>? = null
 
-    userAPI.getAllUsers { users: List<User> -> result = users }
+    Tasks.await(userAPI.getAllUsers { users: List<User> -> result = users })
     Mockito.verify(db).collection(userAPI.collectionName)
     Mockito.verify(db.collection(userAPI.collectionName)).get()
     assert(result?.size == 1)
