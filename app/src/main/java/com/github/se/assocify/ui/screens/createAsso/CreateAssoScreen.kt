@@ -29,9 +29,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,7 +39,7 @@ import com.github.se.assocify.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf())) {
+fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
 
   val state by viewmodel.uiState.collectAsState()
 
@@ -52,7 +49,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
         TopAppBar(
             modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
-              IconButton(onClick = { /*TODO : go back to previous screen*/}) {
+              IconButton(onClick = { /* TODO : go back to previous screen */}) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
               }
             },
@@ -71,15 +68,15 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
                 OutlinedIconButton(
                     modifier = Modifier.padding(top = 8.dp).testTag("logo"),
                     onClick = {
-                      /* TODO : can add association logo */
+                      /* TODO : can add association logo // note : nowhere to put it yet because picture not handled in DB */
                     }) {
                       Icon(
                           painter = painterResource(id = R.drawable.landscape),
                           contentDescription = "Logo")
                     }
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
+                    value = state.name,
+                    onValueChange = { viewmodel.setName(it) },
                     label = { Text("Association Name") },
                     modifier = Modifier.fillMaxWidth().testTag("name"))
               }
@@ -88,7 +85,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
               modifier = Modifier.fillMaxWidth().weight(1f).testTag("MemberList"),
               verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
               horizontalAlignment = Alignment.CenterHorizontally) {
-                state.forEach { member ->
+                state.members.forEach { member ->
                   item {
                     ListItem(
                         modifier =
@@ -115,13 +112,13 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
-                    onClick = { /*TODO : add members to list*/},
+                    onClick = { /* TODO : add members to list : need to open listDialog... call other function?? */},
                     modifier = Modifier.fillMaxWidth().testTag("addMember")) {
                       Icon(Icons.Default.Add, contentDescription = "Add members")
                       Text("Add members")
                     }
-                Button(
-                    onClick = { /*TODO : add asso to DB */},
+                Button( // TODO : should be disabled if no member/name empty ?
+                    onClick = { viewmodel.saveAsso() },
                     modifier = Modifier.fillMaxWidth().testTag("create")) {
                       Text("Create")
                     }
