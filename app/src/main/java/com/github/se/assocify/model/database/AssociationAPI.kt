@@ -71,5 +71,4 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
   fun deleteAssociation(id: String): Task<Void> {
     return db.collection(collectionName).document(id).delete()
   }
-
 }
