@@ -3,29 +3,35 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
 
 class ReceiptViewModel {
+
+    private val NEW_RECEIPT_TITLE = "New Receipt"
+    private val EDIT_RECEIPT_TITLE = "Edit Receipt"
 
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
 
   constructor() {
-    _uiState = MutableStateFlow(ReceiptState())
+    _uiState = MutableStateFlow(ReceiptState(pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
   }
 
   constructor(todoUID: String) {
-    _uiState = MutableStateFlow(ReceiptState())
+    _uiState = MutableStateFlow(ReceiptState(pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
 
     /*TODO: Implement fetching of receipt from database*/
   }
 
   fun setTitle(title: String) {
-    _uiState.value = _uiState.value.copy(title = title)
+      _uiState.value = _uiState.value.copy(title = title)
+      if (title.isEmpty()) {
+          _uiState.value = _uiState.value.copy(titleError = "Title cannot be empty")
+      }
   }
 
   fun setDescription(description: String) {
@@ -33,7 +39,14 @@ class ReceiptViewModel {
   }
 
   fun setAmount(amount: String) {
-    _uiState.value = _uiState.value.copy(amount = amount)
+      _uiState.value = _uiState.value.copy(amount = amount)
+      if (amount.toDoubleOrNull() == null) {
+          _uiState.value = _uiState.value.copy(amountError = "Invalid price")
+      } else if (amount.toDouble() < 0) {
+          _uiState.value = _uiState.value.copy(amountError = "Price cannot be negative")
+      } else if (amount.toDouble() == 0.0) {
+          _uiState.value = _uiState.value.copy(amountError = "Price cannot be zero")
+      }
   }
 
   fun setPayer(payer: String?) {
@@ -43,6 +56,9 @@ class ReceiptViewModel {
 
   fun setDate(date: LocalDate?) {
     _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
+      if (date == null) {
+          _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
+      }
   }
 
   fun setIncoming(incoming: Boolean) {
@@ -70,10 +86,14 @@ class ReceiptViewModel {
 }
 
 data class ReceiptState(
+    val pageTitle: String,
     val title: String = "",
     val description: String = "",
     val amount: String = "",
     val payer: String = "",
-    val date: String = DateUtil.NULL_DATE_STRING,
-    val incoming: Boolean = false
+    val date: String = "",
+    val incoming: Boolean = false,
+    val titleError: String? = null,
+    val amountError: String? = null,
+    val dateError: String? = null,
 )

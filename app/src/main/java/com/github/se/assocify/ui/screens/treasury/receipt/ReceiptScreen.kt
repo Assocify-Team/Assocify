@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
@@ -58,16 +58,17 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
       topBar = {
         TopAppBar(
             title = {
-              Text(modifier = Modifier.testTag("receiptScreenTitle"), text = "New Receipt")
+              Text(modifier = Modifier.testTag("receiptScreenTitle"), text = receiptState.pageTitle)
             },
             navigationIcon = {
               IconButton(
                   modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                   }
             })
       },
-      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp)) { paddingValues ->
+      contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp))
+  { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(ScrollState(0)),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -76,7 +77,10 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   modifier = Modifier.testTag("titleField"),
                   value = receiptState.title,
                   onValueChange = { viewModel.setTitle(it) },
-                  label = { Text("Title") })
+                  label = { Text("Title") },
+                  isError = receiptState.titleError != null,
+                  supportingText = { receiptState.titleError?.let { Text(it) } }
+              )
               OutlinedTextField(
                   modifier = Modifier.testTag("descriptionField"),
                   value = receiptState.description,
@@ -89,7 +93,10 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
                   keyboardOptions =
-                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal))
+                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+                    isError = receiptState.amountError != null,
+                    supportingText = { receiptState.amountError?.let { Text(it) } }
+              )
               UserSearchTextField(
                   modifier = Modifier.testTag("payerField"),
                   value = receiptState.payer,
@@ -99,7 +106,8 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   modifier = Modifier.testTag("dateField"),
                   value = receiptState.date,
                   onDateSelect = { viewModel.setDate(it) },
-                  label = { Text("Date") })
+                  label = { Text("Date") },
+                  errorMessage = receiptState.dateError)
               Card(modifier = Modifier.testTag("imageCard").fillMaxWidth().aspectRatio(1f)) {
                 Box(modifier = Modifier.fillMaxSize()) {
                   Image(
