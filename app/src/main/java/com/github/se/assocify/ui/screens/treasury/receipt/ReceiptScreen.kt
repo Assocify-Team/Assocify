@@ -67,14 +67,15 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   }
             })
       },
-      contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp))
+      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp))
   { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(ScrollState(0)),
-            verticalArrangement = Arrangement.spacedBy(15.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
-                  modifier = Modifier.testTag("titleField"),
+                  modifier = Modifier.testTag("titleField")
+                      .fillMaxWidth(),
                   value = receiptState.title,
                   onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") },
@@ -82,13 +83,17 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   supportingText = { receiptState.titleError?.let { Text(it) } }
               )
               OutlinedTextField(
-                  modifier = Modifier.testTag("descriptionField"),
+                  modifier = Modifier.testTag("descriptionField")
+                      .fillMaxWidth(),
                   value = receiptState.description,
                   onValueChange = { viewModel.setDescription(it) },
                   label = { Text("Description") },
-                  minLines = 3)
+                  minLines = 3,
+                  supportingText = { }
+              )
               OutlinedTextField(
-                  modifier = Modifier.testTag("amountField"),
+                  modifier = Modifier.testTag("amountField")
+                      .fillMaxWidth(),
                   value = receiptState.amount,
                   onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
@@ -98,17 +103,24 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                     supportingText = { receiptState.amountError?.let { Text(it) } }
               )
               UserSearchTextField(
-                  modifier = Modifier.testTag("payerField"),
+                  modifier = Modifier.testTag("payerField")
+                      .fillMaxWidth(),
                   value = receiptState.payer,
                   onUserSelect = { viewModel.setPayer(it) },
-                  label = { Text("Payer") })
+                  label = { Text("Payer") },
+                  supportingText = { })
               DatePickerWithDialog(
-                  modifier = Modifier.testTag("dateField"),
+                  modifier = Modifier.testTag("dateField")
+                      .fillMaxWidth(),
                   value = receiptState.date,
                   onDateSelect = { viewModel.setDate(it) },
                   label = { Text("Date") },
-                  errorMessage = receiptState.dateError)
-              Card(modifier = Modifier.testTag("imageCard").fillMaxWidth().aspectRatio(1f)) {
+                  isError = receiptState.dateError != null,
+                  supportingText = { receiptState.dateError?.let { Text(it) } })
+              Card(modifier = Modifier.testTag("imageCard")
+                  .fillMaxWidth()
+                  .aspectRatio(1f)
+                  .padding(top=5.dp, bottom=5.dp)) {
                 Box(modifier = Modifier.fillMaxSize()) {
                   Image(
                       modifier = Modifier.align(Alignment.Center),

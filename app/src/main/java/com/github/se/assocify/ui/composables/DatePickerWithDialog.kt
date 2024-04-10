@@ -39,8 +39,9 @@ fun DatePickerWithDialog(
     onDateSelect: (LocalDate?) -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
-    errorMessage : String? = null,
-    isSelectableDate: DateRestriction = DateRestriction.ANY
+    isSelectableDate: DateRestriction = DateRestriction.ANY,
+    isError: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null
 ) {
   var showDialog by remember { mutableStateOf(false) }
   val datePickerState =
@@ -89,8 +90,8 @@ fun DatePickerWithDialog(
         readOnly = true,
         label = label,
         placeholder = { Text(DateUtil.NULL_DATE_STRING) },
-        isError = errorMessage != null,
-        supportingText = { errorMessage?.let { Text(it) } })
+        isError = isError,
+        supportingText = supportingText)
     Box(modifier = Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
   }
 

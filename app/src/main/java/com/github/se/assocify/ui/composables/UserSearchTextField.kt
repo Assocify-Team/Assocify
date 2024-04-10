@@ -9,7 +9,13 @@ fun UserSearchTextField(
     value: String,
     onUserSelect: (String?) -> Unit,
     modifier: Modifier = Modifier,
-    label: @Composable (() -> Unit)? = null
+    label: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null
 ) {
-  OutlinedTextField(value = value, onValueChange = {}, modifier = modifier, label = label)
+  OutlinedTextField(
+      value = value,
+      onValueChange = {},
+      modifier = modifier,
+      label = label,
+      supportingText = supportingText)
 }
