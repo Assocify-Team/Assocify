@@ -1,6 +1,21 @@
 package com.github.se.assocify
 
-/*
+import com.github.se.assocify.model.associations.AssociationUtils
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.Event
+import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.model.entities.User
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import org.junit.Before
+import org.junit.Test
+import org.mockito.Mockito
+import org.mockito.Mockito.mock
+
 class AssociationUtilsTest {
   private lateinit var db: FirebaseFirestore
   private lateinit var assoApi: AssociationAPI
@@ -159,4 +174,3 @@ class AssociationUtilsTest {
     assert(getterUtil.getAssociationName() == "gettify")
   }
 }
-*/
