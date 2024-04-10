@@ -2,7 +2,6 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -69,7 +69,8 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
       },
       contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp)) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(ScrollState(0)),
+            modifier =
+                Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
@@ -95,16 +96,6 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
                   isError = receiptState.amountError != null,
                   supportingText = { receiptState.amountError?.let { Text(it) } })
-              UserSearchTextField(
-                  modifier = Modifier.testTag("payerField").fillMaxWidth(),
-                  searchValue = receiptState.payerSearch,
-                  userList = receiptState.payerList,
-                  onUserSearch = { viewModel.searchPayer(it) },
-                  onUserSelect = { viewModel.setPayer(it) },
-                  onUserDismiss = { viewModel.unsetPayer() },
-                  label = { Text("Payer") },
-                  isError = receiptState.payerError != null,
-                  supportingText = { receiptState.payerError?.let { Text(it) } })
               DatePickerWithDialog(
                   modifier = Modifier.testTag("dateField").fillMaxWidth(),
                   value = receiptState.date,
@@ -112,12 +103,23 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   label = { Text("Date") },
                   isError = receiptState.dateError != null,
                   supportingText = { receiptState.dateError?.let { Text(it) } })
+              UserSearchTextField(
+                  modifier = Modifier.testTag("payerField").fillMaxWidth(),
+                  searchValue = receiptState.payerSearch,
+                  userList = receiptState.payerList,
+                  user = receiptState.payer,
+                  onUserSearch = { viewModel.searchPayer(it) },
+                  onUserSelect = { viewModel.setPayer(it) },
+                  onUserDismiss = { viewModel.unsetPayer() },
+                  label = { Text("Payer") },
+                  isError = receiptState.payerError != null,
+                  supportingText = receiptState.payerError?.let { { Text(it) } })
               Card(
                   modifier =
                       Modifier.testTag("imageCard")
                           .fillMaxWidth()
                           .aspectRatio(1f)
-                          .padding(top = 5.dp, bottom = 5.dp)) {
+                          .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
                       Image(
                           modifier = Modifier.align(Alignment.Center),

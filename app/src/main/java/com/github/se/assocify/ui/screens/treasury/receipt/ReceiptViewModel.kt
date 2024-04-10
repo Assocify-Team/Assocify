@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
@@ -69,9 +70,15 @@ class ReceiptViewModel {
     _uiState.value = _uiState.value.copy(payerSearch = payerSearch)
     _uiState.value =
         _uiState.value.copy(
-            payerList = userAPI.getAllUsers().filter { it.name.contains(payerSearch) })
+            payerList =
+                listOf(User("", "Maï", Role()), User("", "Sido", Role())).filter {
+                  it.name.lowercase().contains(payerSearch.lowercase())
+                })
+
     if (_uiState.value.payerList.isEmpty()) {
       _uiState.value = _uiState.value.copy(payerError = "No users found")
+    } else {
+      _uiState.value = _uiState.value.copy(payerError = null)
     }
   }
 
