@@ -50,7 +50,10 @@ class ReceiptViewModel {
       } else if (PriceUtil.isZero(amount)) {
           _uiState.value = _uiState.value.copy(amount = amount)
           _uiState.value = _uiState.value.copy(amountError = "Price cannot be zero")
-      } else if (!PriceUtil.isTooPrecise(amount) && !PriceUtil.isTooLarge(amount)) {
+      } else if (!PriceUtil.isTooPrecise(amount) && PriceUtil.isTooLarge(amount)) {
+            _uiState.value = _uiState.value.copy(amount = amount)
+            _uiState.value = _uiState.value.copy(amountError = "Price is too large")
+      }else if (!PriceUtil.isTooPrecise(amount) && !PriceUtil.isTooLarge(amount)) {
           _uiState.value = _uiState.value.copy(amount = amount)
           _uiState.value = _uiState.value.copy(amountError = null)
       }
