@@ -104,7 +104,15 @@ class ReceiptsAPI(
   ) {
     constructor(
         from: Receipt
-    ) : this(from.payer, from.date.toString(), from.incoming, from.cents, from.phase.ordinal, from.title, from.description, from.uid)
+    ) : this(
+        from.payer,
+        from.date.toString(),
+        from.incoming,
+        from.cents,
+        from.phase.ordinal,
+        from.title,
+        from.description,
+        from.uid)
 
     fun toReceipt(uid: String) =
         Receipt(
