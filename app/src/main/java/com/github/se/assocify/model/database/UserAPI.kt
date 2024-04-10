@@ -63,5 +63,5 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    *
    * @param id the id of the user to delete
    */
-  fun deleteUser(id: String) = Tasks.await(db.collection(collectionName).document(id).delete())
+  fun deleteUser(id: String) = Tasks.await(delete(id))
 }

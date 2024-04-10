@@ -12,4 +12,6 @@ abstract class FirebaseApi(val db: FirebaseFirestore) {
    * @return the new id
    */
   fun getNewId() = db.collection(collectionName).document().id
+
+  fun delete(id: String) = db.collection(collectionName).document(id).delete()
 }
