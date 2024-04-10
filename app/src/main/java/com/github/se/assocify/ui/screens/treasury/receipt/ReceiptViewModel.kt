@@ -31,6 +31,8 @@ class ReceiptViewModel {
       _uiState.value = _uiState.value.copy(title = title)
       if (title.isEmpty()) {
           _uiState.value = _uiState.value.copy(titleError = "Title cannot be empty")
+      } else {
+          _uiState.value = _uiState.value.copy(titleError = null)
       }
   }
 
@@ -39,13 +41,18 @@ class ReceiptViewModel {
   }
 
   fun setAmount(amount: String) {
-      _uiState.value = _uiState.value.copy(amount = amount)
-      if (amount.toDoubleOrNull() == null) {
-          _uiState.value = _uiState.value.copy(amountError = "Invalid price")
-      } else if (amount.toDouble() < 0) {
-          _uiState.value = _uiState.value.copy(amountError = "Price cannot be negative")
-      } else if (amount.toDouble() == 0.0) {
+      if (PriceUtil.hasInvalidCharacters(amount)) {
+        return
+      }
+      if (amount.isEmpty()) {
+          _uiState.value = _uiState.value.copy(amount = amount)
+          _uiState.value = _uiState.value.copy(amountError = "Price cannot be empty")
+      } else if (PriceUtil.isZero(amount)) {
+          _uiState.value = _uiState.value.copy(amount = amount)
           _uiState.value = _uiState.value.copy(amountError = "Price cannot be zero")
+      } else if (!PriceUtil.isTooPrecise(amount) && !PriceUtil.isTooLarge(amount)) {
+          _uiState.value = _uiState.value.copy(amount = amount)
+          _uiState.value = _uiState.value.copy(amountError = null)
       }
   }
 
@@ -58,6 +65,8 @@ class ReceiptViewModel {
     _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
       if (date == null) {
           _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
+      } else {
+          _uiState.value = _uiState.value.copy(dateError = null)
       }
   }
 
