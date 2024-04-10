@@ -18,14 +18,16 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * Gets a user from the database
    *
    * @param id the id of the user to get
+   * @param callback the callback to call with the user
    * @return the user with the given id
    */
-  fun getUser(id: String): Task<User?> {
-    return db.collection(collectionName).document(id).get().continueWith { task ->
+  fun getUser(id: String, callback : (User) -> Unit ){
+    db.collection(collectionName).document(id).get().continueWith { task ->
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {
-          document.toObject(User::class.java)
+          val user = document.toObject(User::class.java)
+          callback(user!!)
         } else {
           throw Exception("No User found with ID: $id")
         }
@@ -37,17 +39,19 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
   /**
    * Gets all users from the database
    *
+   * @param callback the callback to call with the list of users
    * @return a list of all users
    */
-  fun getAllUsers(): List<User> {
-    return Tasks.await(
+  fun getAllUsers(callback : (List<User>)->Unit) {
+
         db.collection(collectionName).get().continueWith { task ->
           if (task.isSuccessful) {
-            task.result!!.documents.map { document -> document.toObject(User::class.java)!! }
+            val users = task.result!!.documents.map { document -> document.toObject(User::class.java)!! }
+            callback(users)
           } else {
             throw task.exception ?: Exception("Unknown error occurred")
           }
-        })
+        }
   }
 
   /**
@@ -56,12 +60,12 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param user the user to add/edit
    */
   fun addUser(user: User) {
-    Tasks.await(db.collection(collectionName).document(user.uid).set(user))
+    db.collection(collectionName).document(user.uid).set(user)
   }
   /**
    * Deletes a user from the database
    *
    * @param id the id of the user to delete
    */
-  fun deleteUser(id: String) = Tasks.await(delete(id))
+  fun deleteUser(id: String) = delete(id)
 }
