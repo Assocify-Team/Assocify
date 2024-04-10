@@ -1,15 +1,24 @@
 package com.github.se.assocify.model.database
 
-import android.util.Log
 import com.github.se.assocify.model.entities.Association
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * API for interacting with the associations in the database
+ *
+ * @property db the Firestore database
+ */
 class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
   override val collectionName: String = "associations"
 
-  fun getAssociation(id: String): Association {
+  /**
+   * Gets an association from the database
+   *
+   * @param id the id of the association to get
+   * @return the association with the given id
+   */
+  fun getAssociation(id: String): Association? {
     return Tasks.await(
         db.collection(collectionName).document(id).get().continueWith { task ->
           if (task.isSuccessful) {
@@ -25,42 +34,35 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         })
   }
 
-  fun getAssociations(): Task<List<Association>> {
-    return db.collection(collectionName).get().continueWithTask { task ->
-      if (!task.isSuccessful) {
-        throw task.exception!!
-      }
-      val associations = mutableListOf<Association>()
-      for (document in task.result!!.documents) {
-        val asso = document.toObject(Association::class.java)
-        associations.add(asso!!)
-      }
-
-      return@continueWithTask Tasks.forResult(associations)
-    }
-  }
-
-  fun addAssociation(association: Association) {
-    Tasks.await(
-        db.collection(collectionName)
-            .document(association.uid)
-            .set(association)
-            .addOnSuccessListener {
-              Log.d("FirebaseConnection", "DocumentSnapshot successfully written! Asso added")
-            }
-            .addOnFailureListener { e ->
-              Log.w("FirebaseConnection", "Error writing document Asso", e)
-            })
-  }
-
-  fun deleteAllAssociations() {
-    Tasks.await(
-        db.collection(collectionName).get().addOnSuccessListener { querySnapshot ->
-          for (document in querySnapshot) {
-            document.reference.delete()
+  /**
+   * Gets all associations from the database
+   *
+   * @return a list of all associations
+   */
+  fun getAssociations(): List<Association> {
+    return Tasks.await(
+        db.collection(collectionName).get().continueWith { task ->
+          if (task.isSuccessful) {
+            task.result!!.documents.map { document -> document.toObject(Association::class.java)!! }
+          } else {
+            throw task.exception ?: Exception("Unknown error occurred")
           }
         })
   }
 
-  fun deleteAssociation(id: String) = delete(id)
+  /**
+   * Adds/edit an association to the database
+   *
+   * @param association the association to add/edit
+   */
+  fun addAssociation(association: Association) {
+    Tasks.await(db.collection(collectionName).document(association.uid).set(association))
+  }
+
+  /**
+   * Deletes an association from the database
+   *
+   * @param id the id of the association to delete
+   */
+  fun deleteAssociation(id: String) = Tasks.await(delete(id))
 }

@@ -1,6 +1,7 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -40,6 +41,31 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     with(composeTestRule) {
       onNodeWithTag("mainNavBarItem/home").performClick()
       assert(tabSelected)
+    }
+  }
+
+  @Test
+  fun testTabSwitching() {
+    with(composeTestRule) {
+      onNodeWithTag("budgetTab").assertIsDisplayed()
+      onNodeWithTag("budgetTab").performClick()
+      onNodeWithTag("budgetTab").assertIsSelected()
+
+      onNodeWithTag("balanceTab").assertIsDisplayed()
+      onNodeWithTag("balanceTab").performClick()
+      onNodeWithTag("balanceTab").assertIsSelected()
+
+      onNodeWithTag("myReceiptsTab").assertIsDisplayed()
+      onNodeWithTag("myReceiptsTab").performClick()
+      onNodeWithTag("myReceiptsTab").assertIsSelected()
+    }
+  }
+
+  @Test
+  fun createReceipt() = run {
+    with(composeTestRule) {
+      onNodeWithTag("createReceipt").assertIsDisplayed()
+      onNodeWithTag("createReceipt").performClick()
     }
   }
 }
