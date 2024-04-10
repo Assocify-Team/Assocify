@@ -3,14 +3,14 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
+import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
 
 class ReceiptViewModel {
 
-    private val NEW_RECEIPT_TITLE = "New Receipt"
-    private val EDIT_RECEIPT_TITLE = "Edit Receipt"
+  private val NEW_RECEIPT_TITLE = "New Receipt"
+  private val EDIT_RECEIPT_TITLE = "Edit Receipt"
 
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
@@ -28,12 +28,12 @@ class ReceiptViewModel {
   }
 
   fun setTitle(title: String) {
-      _uiState.value = _uiState.value.copy(title = title)
-      if (title.isEmpty()) {
-          _uiState.value = _uiState.value.copy(titleError = "Title cannot be empty")
-      } else {
-          _uiState.value = _uiState.value.copy(titleError = null)
-      }
+    _uiState.value = _uiState.value.copy(title = title)
+    if (title.isEmpty()) {
+      _uiState.value = _uiState.value.copy(titleError = "Title cannot be empty")
+    } else {
+      _uiState.value = _uiState.value.copy(titleError = null)
+    }
   }
 
   fun setDescription(description: String) {
@@ -41,22 +41,22 @@ class ReceiptViewModel {
   }
 
   fun setAmount(amount: String) {
-      if (PriceUtil.hasInvalidCharacters(amount)) {
-        return
-      }
-      if (amount.isEmpty()) {
-          _uiState.value = _uiState.value.copy(amount = amount)
-          _uiState.value = _uiState.value.copy(amountError = "Price cannot be empty")
-      } else if (PriceUtil.isZero(amount)) {
-          _uiState.value = _uiState.value.copy(amount = amount)
-          _uiState.value = _uiState.value.copy(amountError = "Price cannot be zero")
-      } else if (!PriceUtil.isTooPrecise(amount) && PriceUtil.isTooLarge(amount)) {
-            _uiState.value = _uiState.value.copy(amount = amount)
-            _uiState.value = _uiState.value.copy(amountError = "Price is too large")
-      }else if (!PriceUtil.isTooPrecise(amount) && !PriceUtil.isTooLarge(amount)) {
-          _uiState.value = _uiState.value.copy(amount = amount)
-          _uiState.value = _uiState.value.copy(amountError = null)
-      }
+    if (PriceUtil.hasInvalidCharacters(amount)) {
+      return
+    }
+    if (amount.isEmpty()) {
+      _uiState.value = _uiState.value.copy(amount = amount)
+      _uiState.value = _uiState.value.copy(amountError = "Price cannot be empty")
+    } else if (PriceUtil.isZero(amount)) {
+      _uiState.value = _uiState.value.copy(amount = amount)
+      _uiState.value = _uiState.value.copy(amountError = "Price cannot be zero")
+    } else if (!PriceUtil.isTooPrecise(amount) && PriceUtil.isTooLarge(amount)) {
+      _uiState.value = _uiState.value.copy(amount = amount)
+      _uiState.value = _uiState.value.copy(amountError = "Price is too large")
+    } else if (!PriceUtil.isTooPrecise(amount) && !PriceUtil.isTooLarge(amount)) {
+      _uiState.value = _uiState.value.copy(amount = amount)
+      _uiState.value = _uiState.value.copy(amountError = null)
+    }
   }
 
   fun setPayer(payer: String?) {
@@ -66,11 +66,11 @@ class ReceiptViewModel {
 
   fun setDate(date: LocalDate?) {
     _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
-      if (date == null) {
-          _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
-      } else {
-          _uiState.value = _uiState.value.copy(dateError = null)
-      }
+    if (date == null) {
+      _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
+    } else {
+      _uiState.value = _uiState.value.copy(dateError = null)
+    }
   }
 
   fun setIncoming(incoming: Boolean) {

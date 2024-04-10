@@ -16,9 +16,7 @@ object PriceUtil {
   }
 
   fun hasInvalidCharacters(price: String): Boolean {
-    return price.isNotEmpty() &&
-            (!price.matches(Regex(CHARS))
-            || price.count { it == '.' } > 1)
+    return price.isNotEmpty() && (!price.matches(Regex(CHARS)) || price.count { it == '.' } > 1)
   }
 
   fun isZero(price: String): Boolean {
@@ -37,5 +35,4 @@ object PriceUtil {
   fun isValid(price: String): Boolean {
     return price.toDoubleOrNull() != null && price.toDouble() >= 0
   }
-
 }

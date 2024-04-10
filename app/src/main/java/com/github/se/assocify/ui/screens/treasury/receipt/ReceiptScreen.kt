@@ -67,78 +67,71 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   }
             })
       },
-      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp))
-  { paddingValues ->
+      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp)) { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(ScrollState(0)),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
-                  modifier = Modifier.testTag("titleField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = receiptState.title,
                   onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") },
                   isError = receiptState.titleError != null,
-                  supportingText = { receiptState.titleError?.let { Text(it) } }
-              )
+                  supportingText = { receiptState.titleError?.let { Text(it) } })
               OutlinedTextField(
-                  modifier = Modifier.testTag("descriptionField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("descriptionField").fillMaxWidth(),
                   value = receiptState.description,
                   onValueChange = { viewModel.setDescription(it) },
                   label = { Text("Description") },
                   minLines = 3,
-                  supportingText = { }
-              )
+                  supportingText = {})
               OutlinedTextField(
-                  modifier = Modifier.testTag("amountField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("amountField").fillMaxWidth(),
                   value = receiptState.amount,
                   onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                    isError = receiptState.amountError != null,
-                    supportingText = { receiptState.amountError?.let { Text(it) } }
-              )
+                  isError = receiptState.amountError != null,
+                  supportingText = { receiptState.amountError?.let { Text(it) } })
               UserSearchTextField(
-                  modifier = Modifier.testTag("payerField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("payerField").fillMaxWidth(),
                   value = receiptState.payer,
                   onUserSelect = { viewModel.setPayer(it) },
                   label = { Text("Payer") },
-                  supportingText = { })
+                  supportingText = {})
               DatePickerWithDialog(
-                  modifier = Modifier.testTag("dateField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("dateField").fillMaxWidth(),
                   value = receiptState.date,
                   onDateSelect = { viewModel.setDate(it) },
                   label = { Text("Date") },
                   isError = receiptState.dateError != null,
                   supportingText = { receiptState.dateError?.let { Text(it) } })
-              Card(modifier = Modifier.testTag("imageCard")
-                  .fillMaxWidth()
-                  .aspectRatio(1f)
-                  .padding(top=5.dp, bottom=5.dp)) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                  Image(
-                      modifier = Modifier.align(Alignment.Center),
-                      painter =
-                          painterResource(
-                              id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
-                      contentDescription = "Receipt")
-                  FilledIconButton(
-                      modifier =
-                          Modifier.testTag("editImageButton")
-                              .align(Alignment.BottomEnd)
-                              .padding(10.dp),
-                      onClick = { viewModel.setImage() },
-                  ) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+              Card(
+                  modifier =
+                      Modifier.testTag("imageCard")
+                          .fillMaxWidth()
+                          .aspectRatio(1f)
+                          .padding(top = 5.dp, bottom = 5.dp)) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                      Image(
+                          modifier = Modifier.align(Alignment.Center),
+                          painter =
+                              painterResource(
+                                  id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
+                          contentDescription = "Receipt")
+                      FilledIconButton(
+                          modifier =
+                              Modifier.testTag("editImageButton")
+                                  .align(Alignment.BottomEnd)
+                                  .padding(10.dp),
+                          onClick = { viewModel.setImage() },
+                      ) {
+                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                      }
+                    }
                   }
-                }
-              }
               Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 FilterChip(
                     modifier = Modifier.testTag("expenseChip"),

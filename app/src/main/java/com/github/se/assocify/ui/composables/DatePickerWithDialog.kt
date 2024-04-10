@@ -24,14 +24,15 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 enum class DateRestriction {
-    ANY,
-    NONE,
-    FUTURE,
-    FUTURE_OR_NOW,
-    PAST,
-    PAST_OR_NOW,
-    NOW
+  ANY,
+  NONE,
+  FUTURE,
+  FUTURE_OR_NOW,
+  PAST,
+  PAST_OR_NOW,
+  NOW
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerWithDialog(
@@ -49,32 +50,27 @@ fun DatePickerWithDialog(
           selectableDates =
               object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    val nowStart = LocalDate.now()
-                        .atStartOfDay()
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()
-                    val nowEnd = LocalDate.now()
-                        .atTime(23, 59, 59)
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()
-                    return when (isSelectableDate) {
-                        DateRestriction.ANY ->
-                            true
-                        DateRestriction.NONE ->
-                            false
-                        DateRestriction.PAST_OR_NOW ->
-                            utcTimeMillis <= nowEnd
-                        DateRestriction.PAST ->
-                            utcTimeMillis < nowStart
-                        DateRestriction.NOW ->
-                            utcTimeMillis in nowStart..nowEnd
-                        DateRestriction.FUTURE_OR_NOW ->
-                            utcTimeMillis >= nowStart
-                        DateRestriction.FUTURE ->
-                            utcTimeMillis > nowEnd
-                    }
+                  val nowStart =
+                      LocalDate.now()
+                          .atStartOfDay()
+                          .atZone(ZoneId.systemDefault())
+                          .toInstant()
+                          .toEpochMilli()
+                  val nowEnd =
+                      LocalDate.now()
+                          .atTime(23, 59, 59)
+                          .atZone(ZoneId.systemDefault())
+                          .toInstant()
+                          .toEpochMilli()
+                  return when (isSelectableDate) {
+                    DateRestriction.ANY -> true
+                    DateRestriction.NONE -> false
+                    DateRestriction.PAST_OR_NOW -> utcTimeMillis <= nowEnd
+                    DateRestriction.PAST -> utcTimeMillis < nowStart
+                    DateRestriction.NOW -> utcTimeMillis in nowStart..nowEnd
+                    DateRestriction.FUTURE_OR_NOW -> utcTimeMillis >= nowStart
+                    DateRestriction.FUTURE -> utcTimeMillis > nowEnd
+                  }
                 }
               })
   val selectedDate =
@@ -112,8 +108,8 @@ fun DatePickerWithDialog(
           Button(
               modifier = Modifier.testTag("datePickerDialogDismiss"),
               onClick = {
-                  showDialog = false
-                  onDateSelect(null)
+                showDialog = false
+                onDateSelect(null)
               }) {
                 Text(text = "Cancel")
               }
