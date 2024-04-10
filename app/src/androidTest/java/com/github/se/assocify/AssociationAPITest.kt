@@ -42,12 +42,13 @@ class AssociationAPITest {
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
-    val result = assoAPI.getAssociation(asso.uid)
+    var assoc: Association? = null
+    Tasks.await(assoAPI.getAssociation(asso.uid) { asso -> assoc = asso })
 
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
     Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).get()
-    assert(result == asso)
+    assert(assoc == asso)
   }
 
   @Test
@@ -63,8 +64,8 @@ class AssociationAPITest {
             listOf(documentSnapshot).map { document -> document.toObject(Association::class.java) })
         .thenReturn(listOf(asso))
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(asso)
-
-    val result = assoAPI.getAssociations()
+    var result: List<Association>? = null
+    Tasks.await(assoAPI.getAssociations() { associations -> result = associations })
 
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).get()
@@ -74,12 +75,11 @@ class AssociationAPITest {
 
   @Test
   fun testAddAssociation() {
-
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.set(asso)).thenReturn(Tasks.forResult(null))
-    assoAPI.addAssociation(asso)
+    Tasks.await(assoAPI.addAssociation(asso))
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
     Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).set(asso)
@@ -87,12 +87,11 @@ class AssociationAPITest {
 
   @Test
   fun testDeleteAssociation() {
-
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(collectionReference)
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     Mockito.`when`(documentReference.delete()).thenReturn(Tasks.forResult(null))
-    assoAPI.deleteAssociation(asso.uid)
+    Tasks.await(assoAPI.deleteAssociation(asso.uid))
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(asso.uid)
     Mockito.verify(db.collection(assoAPI.collectionName).document(asso.uid)).delete()
