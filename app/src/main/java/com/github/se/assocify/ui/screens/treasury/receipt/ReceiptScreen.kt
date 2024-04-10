@@ -97,10 +97,14 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   supportingText = { receiptState.amountError?.let { Text(it) } })
               UserSearchTextField(
                   modifier = Modifier.testTag("payerField").fillMaxWidth(),
-                  value = receiptState.payer,
+                  searchValue = receiptState.payerSearch,
+                  userList = receiptState.payerList,
+                  onUserSearch = { viewModel.searchPayer(it) },
                   onUserSelect = { viewModel.setPayer(it) },
+                  onUserDismiss = { viewModel.unsetPayer() },
                   label = { Text("Payer") },
-                  supportingText = {})
+                  isError = receiptState.payerError != null,
+                  supportingText = { receiptState.payerError?.let { Text(it) } })
               DatePickerWithDialog(
                   modifier = Modifier.testTag("dateField").fillMaxWidth(),
                   value = receiptState.date,
