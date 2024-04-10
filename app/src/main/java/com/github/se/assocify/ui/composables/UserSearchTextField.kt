@@ -33,8 +33,8 @@ fun UserSearchTextField(
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val value = user?.name ?: searchValue
+  var expanded by remember { mutableStateOf(false) }
+  val value = user?.name ?: searchValue
 
   OutlinedTextField(
       value = value,
@@ -46,26 +46,23 @@ fun UserSearchTextField(
       supportingText = supportingText,
       trailingIcon = {
         if (user != null) {
-            IconButton(onClick = onUserDismiss) {
-                Icon(Icons.Default.Clear, contentDescription = "Clear")
-            }
+          IconButton(onClick = onUserDismiss) {
+            Icon(Icons.Default.Clear, contentDescription = "Clear")
+          }
         } else {
-            IconButton(onClick = { expanded = !expanded }) {
-                if (expanded) {
-                    Icon(Icons.Default.ArrowDropUp, contentDescription = "Collapse")
-                } else {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
-                }
+          IconButton(onClick = { expanded = !expanded }) {
+            if (expanded) {
+              Icon(Icons.Default.ArrowDropUp, contentDescription = "Collapse")
+            } else {
+              Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
             }
+          }
         }
       })
-    DropdownMenu(expanded = user == null && value.isNotEmpty(), onDismissRequest = { expanded = !expanded} ) {
-        userList.forEach {user ->
-            DropdownMenuItem(text = { Text(user.name) },
-                onClick = {
-                    onUserSelect(user)
-                })
+  DropdownMenu(
+      expanded = user == null && value.isNotEmpty(), onDismissRequest = { expanded = !expanded }) {
+        userList.forEach { user ->
+          DropdownMenuItem(text = { Text(user.name) }, onClick = { onUserSelect(user) })
         }
-
-    }
+      }
 }
