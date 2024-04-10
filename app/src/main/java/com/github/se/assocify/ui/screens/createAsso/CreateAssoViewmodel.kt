@@ -11,8 +11,7 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class CreateAssoViewmodel(
-/*association : Association // idk if there should be an argument, maybe db ?*/ ) : ViewModel() {
+class CreateAssoViewmodel() : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
@@ -23,6 +22,21 @@ class CreateAssoViewmodel(
     // need input sanitization TODO
     _uiState.value = _uiState.value.copy(name = name)
   }
+
+    fun addMember(member: User) {
+        // need input sanitization TODO
+        _uiState.value = _uiState.value.copy(members = _uiState.value.members + member)
+    }
+
+    fun removeMember(member: User) {
+        // need input sanitization TODO
+        _uiState.value = _uiState.value.copy(members = _uiState.value.members - member)
+    }
+
+    // unsure if this is needed yet
+    fun modifyMember(member: User) {
+        // need input sanitization TODO
+    }
 
   fun saveAsso() {
     // TODO check that all is valid : at least one member (current user), name not empty
@@ -38,6 +52,6 @@ class CreateAssoViewmodel(
 
 data class CreateAssoUIState(
     val name: String = "",
-    val date: String = "",
-    val members: List<User> = listOf()
+    val members: List<User> = listOf(),
+    // there should be a logo val but not implemented yet
 )
