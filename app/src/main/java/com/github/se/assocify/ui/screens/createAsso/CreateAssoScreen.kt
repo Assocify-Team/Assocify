@@ -46,9 +46,6 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
 
   val state by viewmodel.uiState.collectAsState()
 
-  // should also be in viewmodel probably
-  var name by remember { mutableStateOf("") }
-
   Scaffold(
       modifier = Modifier.testTag("createAssoScreen"),
       topBar = {
