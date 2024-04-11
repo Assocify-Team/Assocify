@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +49,7 @@ import com.github.se.assocify.model.entities.User
 fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
 
   val state by viewmodel.uiState.collectAsState()
-    val editMember by remember { mutableStateOf(User("", "", Role(""))) }
+    var editMember by remember { mutableStateOf(User()) }
 
   Scaffold(
       modifier = Modifier.testTag("createAssoScreen"),
@@ -133,7 +134,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
                     onClick = { /* TODO : add members to list : need to open listDialog... call other function?? */
-                              editMember.copy(uid = "uid", name ="name", role = Role("role"))},
+                              editMember = User("uid", "", Role())},
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("addMember")) {
@@ -152,7 +153,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
 
       // open dialog to edit member
       if (editMember.uid != "") {
-          Dialog(onDismissRequest = { /*TODO : should close dialog... idk how to exploit a var here with the function */ }) {
+          Dialog(onDismissRequest = { editMember = User() }) {
               ElevatedCard {
                   // temporary UI to see if dialog opens
                   Column(
