@@ -39,4 +39,8 @@ object PriceUtil {
   fun isValid(price: String): Boolean {
     return price.toDoubleOrNull() != null && price.toDouble() >= 0
   }
+
+  fun fromCents(cents: Int): String {
+    return (cents.toDouble() / 100).toString()
+  }
 }

@@ -45,11 +45,13 @@ import androidx.compose.ui.unit.dp
 import com.github.se.assocify.R
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
-import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = ReceiptViewModel()) {
+fun ReceiptScreen(
+    navActions: NavigationActions,
+    viewModel: ReceiptViewModel = ReceiptViewModel(navActions)
+) {
 
   val receiptState by viewModel.uiState.collectAsState()
 
@@ -103,17 +105,17 @@ fun ReceiptScreen(navActions: NavigationActions, viewModel: ReceiptViewModel = R
                   label = { Text("Date") },
                   isError = receiptState.dateError != null,
                   supportingText = { receiptState.dateError?.let { Text(it) } })
-              UserSearchTextField(
-                  modifier = Modifier.testTag("payerField").fillMaxWidth(),
-                  searchValue = receiptState.payerSearch,
-                  userList = receiptState.payerList,
-                  user = receiptState.payer,
-                  onUserSearch = { viewModel.searchPayer(it) },
-                  onUserSelect = { viewModel.setPayer(it) },
-                  onUserDismiss = { viewModel.unsetPayer() },
-                  label = { Text("Payer") },
-                  isError = receiptState.payerError != null,
-                  supportingText = receiptState.payerError?.let { { Text(it) } })
+              /*UserSearchTextField(
+              modifier = Modifier.testTag("payerField").fillMaxWidth(),
+              searchValue = receiptState.payerSearch,
+              userList = receiptState.payerList,
+              user = receiptState.payer,
+              onUserSearch = { viewModel.searchPayer(it) },
+              onUserSelect = { viewModel.setPayer(it) },
+              onUserDismiss = { viewModel.unsetPayer() },
+              label = { Text("Payer") },
+              isError = receiptState.payerError != null,
+              supportingText = receiptState.payerError?.let { { Text(it) } })*/
               Card(
                   modifier =
                       Modifier.testTag("imageCard")

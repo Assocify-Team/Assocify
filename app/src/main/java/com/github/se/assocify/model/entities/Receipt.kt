@@ -13,7 +13,6 @@ data class Receipt(
     val title: String,
     val description: String,
     val date: LocalDate,
-    val payer: String, // User uid
     val cents: Int,
     val incoming: Boolean,
     val phase: Phase,

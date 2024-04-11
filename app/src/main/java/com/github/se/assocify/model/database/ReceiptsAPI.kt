@@ -61,11 +61,12 @@ class ReceiptsAPI(
       snapshot.documents.map { it.toObject(FirestoreReceipt::class.java)!!.toReceipt(it.id) }
 
   /** Gets all receipts created by the current user. */
-  fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) =
-      dbReference
-          .get()
-          .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
-          .addOnFailureListener { onError(it) }
+  fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
+    dbReference
+        .get()
+        .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
+        .addOnFailureListener { onError(it) }
+  }
 
   /**
    * Gets *all* receipts created by *all* users, if the current user has permissions to do so.
@@ -78,22 +79,22 @@ class ReceiptsAPI(
   fun getAllReceipts(
       onReceiptsFetched: (List<Receipt>) -> Unit,
       onError: (String?, Exception) -> Unit
-  ) =
-      db.collection(collectionName)
-          .get()
-          .addOnSuccessListener { query ->
-            query.documents.forEach { snapshot ->
-              snapshot.reference
-                  .collection("list")
-                  .get()
-                  .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
-                  .addOnFailureListener { onError(snapshot.id, it) }
-            }
+  ) {
+    db.collection(collectionName)
+        .get()
+        .addOnSuccessListener { query ->
+          query.documents.forEach { snapshot ->
+            snapshot.reference
+                .collection("list")
+                .get()
+                .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
+                .addOnFailureListener { onError(snapshot.id, it) }
           }
-          .addOnFailureListener { onError(null, it) }
+        }
+        .addOnFailureListener { onError(null, it) }
+  }
 
   private data class FirestoreReceipt(
-      val payer: String,
       val date: String,
       val incoming: Boolean,
       val cents: Int,
@@ -105,7 +106,6 @@ class ReceiptsAPI(
     constructor(
         from: Receipt
     ) : this(
-        from.payer,
         from.date.toString(),
         from.incoming,
         from.cents,
@@ -117,7 +117,6 @@ class ReceiptsAPI(
     fun toReceipt(uid: String) =
         Receipt(
             uid = uid,
-            payer = this.payer,
             date = LocalDate.parse(this.date),
             incoming = this.incoming,
             cents = this.cents,
