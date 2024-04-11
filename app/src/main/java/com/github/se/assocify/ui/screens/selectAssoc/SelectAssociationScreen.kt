@@ -62,7 +62,7 @@ fun SelectAssociation(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
-                  text = "Hello " + state.value.user.name + " !!",
+                  text = "Hello " + state.value.user.getName() + " !!",
                   style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
@@ -106,8 +106,8 @@ fun SelectAssociation(
                     if (state.value.searchState) {
                       val filteredAssos =
                           state.value.associations.filter { ass ->
-                            val min = min(ass.name.length, state.value.searchQuery.length)
-                            ass.name.take(min).lowercase() ==
+                            val min = min(ass.getName().length, state.value.searchQuery.length)
+                            ass.getName().take(min).lowercase() ==
                                 state.value.searchQuery.take(min).lowercase()
                           }
                       filteredAssos.map { ass -> DisplayOrganization(ass) }
@@ -166,7 +166,7 @@ fun DisplayOrganization(organization: Association) {
             contentDescription = "Organization Icon",
             modifier = Modifier.testTag("OrganizationIcon"))
         Text(
-            text = organization.name,
+            text = organization.getName(),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.testTag("OrganizationName"))
       }
