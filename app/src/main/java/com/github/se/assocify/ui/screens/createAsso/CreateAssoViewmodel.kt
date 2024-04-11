@@ -54,6 +54,8 @@ class CreateAssoViewmodel() : ViewModel() {
     }
 
     fun modifyMemberName(name: String) {
+        // will need to change the uid depending on members in DB -> waiting for memberSearch merge
+        _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember.copy(uid = name))
         _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember.copy(name = name))
     }
 
