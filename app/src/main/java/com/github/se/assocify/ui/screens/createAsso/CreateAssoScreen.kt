@@ -46,13 +46,13 @@ import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
 
   val state by viewmodel.uiState.collectAsState()
-    var editMember by remember { mutableStateOf(User()) }
 
   Scaffold(
       modifier = Modifier.testTag("createAssoScreen"),
@@ -122,7 +122,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                         trailingContent = {
                           IconButton(
                               onClick = {
-                                /*TODO : edit member from list */
+                                viewmodel.modifyMember(member)
                               }) {
                                 Icon(Icons.Default.Edit, contentDescription = "Edit")
                               }
@@ -136,8 +136,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
-                    onClick = { /* TODO : add members to list : need to open listDialog... call other function?? */
-                              editMember = User("uid", "", Role())},
+                    onClick = { viewmodel.addMember() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("addMember")) {
@@ -155,8 +154,8 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
         }
 
       // open dialog to edit member
-      if (editMember.uid != "") {
-          Dialog(onDismissRequest = { editMember = User() }) {
+      if (state.editMember.uid != "") {
+          Dialog(onDismissRequest = { viewmodel.cancelModifyMember() }) {
               ElevatedCard {
                   // temporary UI to see if dialog opens
                   Column(
@@ -165,35 +164,26 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                           .fillMaxWidth(),
                       horizontalAlignment = Alignment.CenterHorizontally) {
                       OutlinedTextField(
-                          value = editMember.name,
-                          onValueChange = { editMember = editMember.copy(name = it) },
+                          value = state.editMember.name,
+                          onValueChange = { viewmodel.modifyMemberName(it) },
                           label = { Text("Name") },
                           modifier = Modifier.fillMaxWidth())
-                      ListItem(
-                          headlineContent = { Text("Presidence") },
-                          trailingContent = {
-                              Checkbox(checked = editMember.hasRole("Presidence"), onCheckedChange = { editMember = editMember.toggleRole("Presidence") })
-                          })
-                      ListItem(
-                          headlineContent = { Text("Treasury") },
-                          trailingContent = {
-                              Checkbox(checked = editMember.hasRole("Treasury"), onCheckedChange = { editMember = editMember.toggleRole("Treasury") })
-                          })
-                      ListItem(
-                          headlineContent = { Text("Committee") },
-                          trailingContent = {
-                              Checkbox(checked = editMember.hasRole("Committee"), onCheckedChange = { editMember = editMember.toggleRole("Committee") })
-                          })
-                      ListItem(
-                          headlineContent = { Text("Member") },
-                          trailingContent = {
-                              Checkbox(checked = editMember.hasRole("Member"), onCheckedChange = { editMember = editMember.toggleRole("Member") })
-                          })
-                      ListItem(
-                          headlineContent = { Text("Staff") },
-                          trailingContent = {
-                              Checkbox(checked = editMember.hasRole("Staff"), onCheckedChange = { editMember = editMember.toggleRole("Staff") })
-                          })
+                      Role.RoleType.entries.filter { role -> role != Role.RoleType.PENDING }.forEach { role ->
+                            ListItem(
+                                headlineContent = { Text(role.name.uppercase()) },
+                                trailingContent = {
+                                    Checkbox(
+                                        checked = state.editMember.hasRole(role.name),
+                                        onCheckedChange = { viewmodel.modifyMemberRole(role.name) })
+                                })
+                      }
+                        Button(
+                            onClick = {
+                                viewmodel.addMemberToDB()
+                            },
+                            modifier = Modifier.fillMaxWidth()) {
+                            Text("Validate member")
+                        }
                   }
               }
           }
