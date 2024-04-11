@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,7 +46,11 @@ import kotlin.math.min
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(navActions: NavigationActions, associationAPI: AssociationAPI, userAPI: UserAPI) {
+fun SelectAssociation(
+    navActions: NavigationActions,
+    associationAPI: AssociationAPI,
+    userAPI: UserAPI
+) {
   val model = SelectAssociationViewModel(associationAPI, userAPI)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
@@ -55,16 +58,16 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
       modifier = Modifier.testTag("SelectAssociationScreen"),
       topBar = {
         Column(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-              Text(text = "Hello " + state.value.user.name+ " !!", style = MaterialTheme.typography.headlineSmall)
+              Text(
+                  text = "Hello " + state.value.user.name + " !!",
+                  style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
                   query = query,
-                  onQueryChange = { it -> query = it},
+                  onQueryChange = { it -> query = it },
                   onSearch = { model.updateSearchQuery(query, true) },
                   onActiveChange = {},
                   active = state.value.searchState,
@@ -74,34 +77,40 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
                         imageVector = Icons.Default.Clear,
                         contentDescription = null,
                         modifier =
-                            Modifier.clickable(onClick = { model.updateSearchQuery("", false)
-                            query = ""}))
+                            Modifier.clickable(
+                                onClick = {
+                                  model.updateSearchQuery("", false)
+                                  query = ""
+                                }))
                   },
                   leadingIcon = {
                     if (state.value.searchState) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            modifier =
-                            Modifier.clickable(
-                                onClick = {model.updateSearchQuery("", false)
-                                query = ""})
-                        )
-                    }  else {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        modifier = Modifier.clickable(onClick = { model.updateSearchQuery(query, true)}))
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                          contentDescription = null,
+                          modifier =
+                              Modifier.clickable(
+                                  onClick = {
+                                    model.updateSearchQuery("", false)
+                                    query = ""
+                                  }))
+                    } else {
+                      Icon(
+                          imageVector = Icons.Default.Search,
+                          contentDescription = null,
+                          modifier =
+                              Modifier.clickable(
+                                  onClick = { model.updateSearchQuery(query, true) }))
                     }
                   }) {
-                    if(state.value.searchState){
-                      val filteredAssos =state.value.associations.filter { ass ->
-                        val min = min(ass.name.length, state.value.searchQuery.length)
-                        ass.name.take(min).lowercase() == state.value.searchQuery.take(min).lowercase()
-                      }
-                      filteredAssos.map{ass ->
-                        DisplayOrganization(ass)
-                      }
+                    if (state.value.searchState) {
+                      val filteredAssos =
+                          state.value.associations.filter { ass ->
+                            val min = min(ass.name.length, state.value.searchQuery.length)
+                            ass.name.take(min).lowercase() ==
+                                state.value.searchQuery.take(min).lowercase()
+                          }
+                      filteredAssos.map { ass -> DisplayOrganization(ass) }
                     } else {
                       state.value.associations
                     }
@@ -110,13 +119,9 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
       },
       bottomBar = {
         Button(
-            onClick = { /*TODO: navigate to go to newAssociation screen*/
-            },
+            onClick = { /*TODO: navigate to go to newAssociation screen*/},
             modifier =
-            Modifier
-              .fillMaxWidth()
-              .padding(16.dp)
-              .testTag("CreateNewOrganizationButton"),
+                Modifier.fillMaxWidth().padding(16.dp).testTag("CreateNewOrganizationButton"),
             content = { Text(text = "Create new organization") },
             colors =
                 ButtonDefaults.buttonColors(
@@ -127,11 +132,7 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
             contentPadding = innerPadding,
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier =
-            Modifier
-              .fillMaxSize()
-              .fillMaxWidth()
-              .padding(16.dp)
-              .testTag("RegisteredList")) {
+                Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")) {
               // Display only registered organization
               val registeredAssociation = state.value.associations
               if (registeredAssociation.isEmpty()) {
@@ -141,10 +142,7 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
                   DisplayOrganization(organization)
                   // Add a Divider for each organization except the last one
                   if (index < registeredAssociation.size - 1) {
-                    HorizontalDivider(
-                      Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp))
+                    HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))
                   }
                 }
               }
@@ -160,10 +158,7 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
 @Composable
 fun DisplayOrganization(organization: Association) {
   Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)
-        .testTag("DisplayOrganizationScreen"),
+      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("DisplayOrganizationScreen"),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically) {
         Icon(
@@ -176,5 +171,3 @@ fun DisplayOrganization(organization: Association) {
             modifier = Modifier.testTag("OrganizationName"))
       }
 }
-
-

@@ -16,8 +16,12 @@ import kotlinx.coroutines.flow.StateFlow
  * @param associationAPI the database used to fetch the association data
  * @param userAPI the database used to fetch the user data
  */
-class SelectAssociationViewModel(private var associationAPI: AssociationAPI, private var userAPI: UserAPI) : ViewModel() {
-  private val _uiState: MutableStateFlow<SelectAssociationState> = MutableStateFlow(SelectAssociationState())
+class SelectAssociationViewModel(
+    private var associationAPI: AssociationAPI,
+    private var userAPI: UserAPI
+) : ViewModel() {
+  private val _uiState: MutableStateFlow<SelectAssociationState> =
+      MutableStateFlow(SelectAssociationState())
   val uiState: StateFlow<SelectAssociationState>
 
   init {
@@ -27,30 +31,40 @@ class SelectAssociationViewModel(private var associationAPI: AssociationAPI, pri
 
   private fun update() {
     associationAPI.getAssociations { assocList ->
-      _uiState.value = SelectAssociationState(assocList, _uiState.value.searchQuery, _uiState.value.user, _uiState.value.searchState)
+      _uiState.value =
+          SelectAssociationState(
+              assocList,
+              _uiState.value.searchQuery,
+              _uiState.value.user,
+              _uiState.value.searchState)
     }
     getUserId()
-    if(getUserId() != ""){
-      userAPI.getUser(getUserId()) {user ->
-        _uiState.value = SelectAssociationState(_uiState.value.associations, _uiState.value.searchQuery, user, _uiState.value.searchState)
+    if (getUserId() != "") {
+      userAPI.getUser(getUserId()) { user ->
+        _uiState.value =
+            SelectAssociationState(
+                _uiState.value.associations,
+                _uiState.value.searchQuery,
+                user,
+                _uiState.value.searchState)
       }
     }
   }
 
   fun updateSearchQuery(query: String, searchState: Boolean) {
-    _uiState.value = SelectAssociationState(_uiState.value.associations, query, _uiState.value.user, searchState)
+    _uiState.value =
+        SelectAssociationState(_uiState.value.associations, query, _uiState.value.user, searchState)
   }
 
-  private fun getUserId(): String{
+  private fun getUserId(): String {
     val user = Firebase.auth.currentUser
     return user?.uid ?: ""
   }
-
 }
 
 data class SelectAssociationState(
-  val associations: List<Association> = emptyList(),
-  val searchQuery: String = "",
-  val user: User = User(),
-  val searchState: Boolean = false
+    val associations: List<Association> = emptyList(),
+    val searchQuery: String = "",
+    val user: User = User(),
+    val searchState: Boolean = false
 )

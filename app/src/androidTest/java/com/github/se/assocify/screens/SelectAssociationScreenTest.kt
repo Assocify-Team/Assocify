@@ -60,13 +60,10 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK
-  lateinit var mockAssocAPI: AssociationAPI
+  @RelaxedMockK lateinit var mockAssocAPI: AssociationAPI
 
   // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK
-  lateinit var mockUserAPI: UserAPI
-
+  @RelaxedMockK lateinit var mockUserAPI: UserAPI
 
   /** This test checks if the "Create new organization" button is displayed */
   @Test
