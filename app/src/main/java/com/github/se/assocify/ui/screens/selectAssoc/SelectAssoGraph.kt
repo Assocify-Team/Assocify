@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.Login.selectAssoc
+package com.github.se.assocify.ui.screens.selectAssoc
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

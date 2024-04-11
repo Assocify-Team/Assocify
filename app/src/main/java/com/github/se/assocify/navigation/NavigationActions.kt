@@ -33,6 +33,6 @@ class NavigationActions(private val navController: NavHostController) {
   }
 
   fun back() {
-    /*TODO handle back navigation*/
+    navController.popBackStack()
   }
 }

@@ -3,8 +3,8 @@ package com.github.se.assocify.navigation
 import androidx.navigation.NavGraphBuilder
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.ui.screens.Login.createAssoc.createAssoGraph
-import com.github.se.assocify.ui.screens.Login.selectAssoc.selectAssoGraph
+import com.github.se.assocify.ui.screens.chat.createAssoc.createAssoGraph
+import com.github.se.assocify.ui.screens.selectAssoc.selectAssoGraph
 import com.github.se.assocify.ui.screens.chat.chatGraph
 import com.github.se.assocify.ui.screens.event.eventGraph
 import com.github.se.assocify.ui.screens.home.homeGraph

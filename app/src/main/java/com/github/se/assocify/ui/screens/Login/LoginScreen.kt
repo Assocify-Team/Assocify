@@ -79,11 +79,11 @@ fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
 
   val launcher =
       rememberFirebaseAuthLauncher(
-          onAuthComplete = {
-            user = it.user
-            navActions.onLogin(viewModel.existUserId())
-          },
-          onAuthError = { navActions.onAuthError() })
+          onAuthComplete = { navActions.onLogin(viewModel.existUserId()) },
+          onAuthError = {
+            println("Error: $it")
+            navActions.onAuthError()
+          })
   val token = stringResource(R.string.web_client_id)
   val context = LocalContext.current
 

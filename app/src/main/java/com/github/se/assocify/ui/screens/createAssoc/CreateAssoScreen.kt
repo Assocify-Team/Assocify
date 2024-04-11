@@ -39,10 +39,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.R
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf())) {
+fun CreateAssoScreen(
+    navigationActions: NavigationActions,
+    viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf())
+) {
 
   val state by viewmodel.uiState.collectAsState()
 
@@ -55,8 +60,9 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
         TopAppBar(
             modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
-              IconButton(onClick = { /*TODO : go back to previous screen*/}) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+              IconButton(onClick = { navigationActions.back() }, modifier = Modifier.testTag("Back")){
+                Icon(Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back")
               }
             },
             title = { Text(text = "Create your association") })
@@ -124,7 +130,9 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(listOf
                       Text("Add members")
                     }
                 Button(
-                    onClick = { /*TODO : add asso to DB */},
+                    onClick = { /*TODO : add asso to DB */
+                      navigationActions.navigateTo(Destination.Home)
+                    },
                     modifier = Modifier.fillMaxWidth().testTag("create")) {
                       Text("Create")
                     }

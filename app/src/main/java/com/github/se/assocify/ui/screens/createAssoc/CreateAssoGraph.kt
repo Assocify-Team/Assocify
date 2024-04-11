@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.Login.createAssoc
+package com.github.se.assocify.ui.screens.createAssoc
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -13,5 +13,5 @@ fun NavGraphBuilder.createAssoGraph(
     userAPI: UserAPI,
     associationAPI: AssociationAPI
 ) {
-  composable(route = Destination.CreateAsso.route) { CreateAssoScreen() }
+  composable(route = Destination.CreateAsso.route) { CreateAssoScreen(navigationActions) }
 }
