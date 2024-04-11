@@ -21,8 +21,6 @@ fun HomeScreen(navActions: NavigationActions) {
             tabList = MAIN_TABS_LIST,
             selectedTab = Destination.Home)
       }) {
-        // val a = AssociationAPI(Firebase.firestore).getAssociations()
-
         Text(modifier = Modifier.padding(it), text = "Home Screen")
       }
 }
