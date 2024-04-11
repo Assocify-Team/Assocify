@@ -45,7 +45,7 @@ class FirebaseTest {
         .thenReturn(documentReference)
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()).delete())
         .thenReturn(Tasks.forResult(null))
-    val result = Tasks.await(assoAPI.delete(uid))
+    assoAPI.delete(uid)
 
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(uid)
