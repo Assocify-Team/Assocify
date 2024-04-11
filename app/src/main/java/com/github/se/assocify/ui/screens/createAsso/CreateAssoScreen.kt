@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -26,6 +27,7 @@ import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
@@ -161,8 +164,36 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                           .padding(16.dp)
                           .fillMaxWidth(),
                       horizontalAlignment = Alignment.CenterHorizontally) {
-                      Text("Edit member")
-                      // TODO : add fields to edit member
+                      OutlinedTextField(
+                          value = editMember.name,
+                          onValueChange = { editMember = editMember.copy(name = it) },
+                          label = { Text("Name") },
+                          modifier = Modifier.fillMaxWidth())
+                      ListItem(
+                          headlineContent = { Text("Presidence") },
+                          trailingContent = {
+                              Checkbox(checked = editMember.hasRole("Presidence"), onCheckedChange = { editMember = editMember.toggleRole("Presidence") })
+                          })
+                      ListItem(
+                          headlineContent = { Text("Treasury") },
+                          trailingContent = {
+                              Checkbox(checked = editMember.hasRole("Treasury"), onCheckedChange = { editMember = editMember.toggleRole("Treasury") })
+                          })
+                      ListItem(
+                          headlineContent = { Text("Committee") },
+                          trailingContent = {
+                              Checkbox(checked = editMember.hasRole("Committee"), onCheckedChange = { editMember = editMember.toggleRole("Committee") })
+                          })
+                      ListItem(
+                          headlineContent = { Text("Member") },
+                          trailingContent = {
+                              Checkbox(checked = editMember.hasRole("Member"), onCheckedChange = { editMember = editMember.toggleRole("Member") })
+                          })
+                      ListItem(
+                          headlineContent = { Text("Staff") },
+                          trailingContent = {
+                              Checkbox(checked = editMember.hasRole("Staff"), onCheckedChange = { editMember = editMember.toggleRole("Staff") })
+                          })
                   }
               }
           }
