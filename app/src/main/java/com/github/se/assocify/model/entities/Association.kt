@@ -25,7 +25,6 @@ data class Association(
     return "Association(uid='$uid', name='$name', description='$description', creationDate='$creationDate', status='$status', members=$members, events=$events)"
   }
 
-
   fun getName(): String {
     return name
   }
