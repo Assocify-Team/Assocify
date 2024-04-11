@@ -1,5 +1,6 @@
 package com.github.se.assocify
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.associations.AssociationUtils
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.Association
@@ -13,9 +14,11 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 
+@RunWith(AndroidJUnit4::class)
 class AssociationUtilsTest {
   private lateinit var db: FirebaseFirestore
   private lateinit var assoApi: AssociationAPI
@@ -24,7 +27,7 @@ class AssociationUtilsTest {
   private val collectionReference = mock(CollectionReference::class.java)
   private val president = User("testId", "Carlo", Role("president"))
   private val newUser = User()
-  val oldAsso =
+  private val oldAsso =
       Association(
           "aId",
           "cassify",
@@ -33,7 +36,7 @@ class AssociationUtilsTest {
           "active",
           listOf(president),
           emptyList())
-  val oldAssoUpdated =
+  private val oldAssoUpdated =
       Association(
           "aId",
           "cassify",
@@ -42,7 +45,7 @@ class AssociationUtilsTest {
           "active",
           listOf(president, newUser),
           emptyList())
-  val oldAssoReviewed =
+  private val oldAssoReviewed =
       Association(
           "aId",
           "cassify",
@@ -51,15 +54,15 @@ class AssociationUtilsTest {
           "active",
           listOf(president, User("", "", Role("newRole"))),
           emptyList())
-  val u1 = User("a", "1", Role("president"))
-  val u2 = User("b", "2", Role("user"))
-  val u3 = User("c", "3", Role("user"))
-  val u4 = User("d", "4", Role("pending"))
-  val u5 = User("e", "5", Role("pending"))
-  val e1 = Event("s1", "e1", emptyList(), emptyList())
-  val e2 = Event("s2", "e2", emptyList(), emptyList())
-  val e3 = Event("s3", "e3", emptyList(), emptyList())
-  val getterAsso =
+  private val u1 = User("a", "1", Role("president"))
+  private val u2 = User("b", "2", Role("user"))
+  private val u3 = User("c", "3", Role("user"))
+  private val u4 = User("d", "4", Role("pending"))
+  private val u5 = User("e", "5", Role("pending"))
+  private val e1 = Event("s1", "e1", "", "", "", emptyList(), emptyList())
+  private val e2 = Event("s2", "e2", "", "", "", emptyList(), emptyList())
+  private val e3 = Event("s3", "e3", "", "", "", emptyList(), emptyList())
+  private val getterAsso =
       Association(
           "getId",
           "gettify",
@@ -91,7 +94,7 @@ class AssociationUtilsTest {
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(oldAssoUpdated)
     Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
-    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     val assocUtilsUpdated = AssociationUtils(president, oldAssoUpdated.uid, assoApi)
@@ -114,7 +117,7 @@ class AssociationUtilsTest {
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(oldAsso)
     Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
-    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
     val newUserUtils = AssociationUtils(newUser, oldAsso.uid, assoApi)
@@ -159,7 +162,7 @@ class AssociationUtilsTest {
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(getterAsso)
     Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
-    Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
+    Mockito.`when`(db.collection(Mockito.any())).thenReturn(mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)
 

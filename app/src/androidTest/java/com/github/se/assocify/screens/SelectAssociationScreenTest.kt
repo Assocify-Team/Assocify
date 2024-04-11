@@ -52,7 +52,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
 @RunWith(AndroidJUnit4::class)
 class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-  val registeredAssociation = listOf("CLIC", "GAME*")
+  private val registeredAssociation = listOf("CLIC", "GAME*")
 
   /** This test checks if the "Create new organization" button is displayed */
   @Test

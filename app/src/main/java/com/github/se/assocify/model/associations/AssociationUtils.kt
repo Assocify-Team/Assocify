@@ -17,7 +17,7 @@ class AssociationUtils(
     update()
   }
 
-  fun update() {
+  private fun update() {
     if (assocId != "") _associationState = associationDatabase.getAssociation(assocId)
   }
 
@@ -129,7 +129,7 @@ class AssociationUtils(
     _associationState = null
   }
 
-  fun getAllAssociations(): List<Association> {
+  private fun getAllAssociations(): List<Association> {
     if (_associationState == null) return emptyList()
     return associationDatabase.getAssociations()
   }

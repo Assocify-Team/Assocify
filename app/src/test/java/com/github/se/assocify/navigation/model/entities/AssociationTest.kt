@@ -5,7 +5,10 @@ import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.User
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
+@RunWith(JUnit4::class)
 class AssociationTest {
   @Test
   fun testEquals() {

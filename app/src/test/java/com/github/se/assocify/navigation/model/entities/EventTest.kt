@@ -3,20 +3,23 @@ package com.github.se.assocify.navigation.model.entities
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.User
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
+@RunWith(JUnit4::class)
 class EventTest {
   @Test
   fun testEquals() {
     val event1 = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
     val event2 = Event("uid1", "name2", " ", " ", "", listOf(), listOf())
-    assert(event1.equals(event2))
+    assert(event1 == event2)
   }
 
   @Test
   fun notEquals() {
     val event1 = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
     val event2 = Event("uid2", "name2", " ", " ", "", listOf(), listOf())
-    assert(!event1.equals(event2))
+    assert(event1 != event2)
   }
 
   @Test
@@ -47,12 +50,12 @@ class EventTest {
   @Test
   fun testGetOrganizers() {
     val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    assert(event.getOrganizers().equals(listOf<User>()))
+    assert(event.getOrganizers() == listOf<User>())
   }
 
   @Test
   fun testGetStaffers() {
     val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    assert(event.getStaffers().equals(listOf<User>()))
+    assert(event.getStaffers() == listOf<User>())
   }
 }
