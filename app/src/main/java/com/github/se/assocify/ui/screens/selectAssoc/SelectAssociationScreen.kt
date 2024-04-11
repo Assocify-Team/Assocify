@@ -23,10 +23,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 
 /**
  * Screen to select an association
@@ -35,11 +44,10 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(registeredAssociation: List<String>) {
-
-  // search bar var: TODO: implement search
-  val isSearching = false
-
+fun SelectAssociation(navActions: NavigationActions, associationAPI: AssociationAPI) {
+  val model = SelectAssociationViewModel(associationAPI)
+  val state = model.uiState.collectAsState()
+  var query by remember { mutableStateOf("") }
   Scaffold(
       modifier = Modifier.testTag("SelectAssociationScreen"),
       topBar = {
@@ -51,17 +59,18 @@ fun SelectAssociation(registeredAssociation: List<String>) {
               Text(text = "Hello User", style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
-                  query = "",
-                  onQueryChange = {},
-                  onSearch = {},
+                  query = query,
+                  onQueryChange = { it -> query = it },
+                  onSearch = { model.updateSearchQuery(query, true) },
                   onActiveChange = {},
-                  active = isSearching,
+                  active = state.value.searchState,
                   placeholder = { Text(text = "Search an organization") },
                   trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = null,
-                        modifier = Modifier.clickable(onClick = { /*TODO: clear the search*/}))
+                        modifier =
+                            Modifier.clickable(onClick = { model.updateSearchQuery("", false) }))
                   },
                   leadingIcon = {
                     /* if (isSearching) {
@@ -85,7 +94,9 @@ fun SelectAssociation(registeredAssociation: List<String>) {
       },
       bottomBar = {
         Button(
-            onClick = { /*TODO: navigate to go to newAssociation screen*/},
+            onClick = { /*TODO: navigate to go to newAssociation screen*/
+              navActions.navigateTo(Destination.Profile)
+            },
             modifier =
                 Modifier.fillMaxWidth().padding(16.dp).testTag("CreateNewOrganizationButton"),
             content = { Text(text = "Create new organization") },
@@ -100,6 +111,7 @@ fun SelectAssociation(registeredAssociation: List<String>) {
             modifier =
                 Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")) {
               // Display only registered organization
+              val registeredAssociation = state.value.associations
               if (registeredAssociation.isEmpty()) {
                 item { Text(text = "There is no organization to display.") }
               } else {
@@ -120,10 +132,8 @@ fun SelectAssociation(registeredAssociation: List<String>) {
  *
  * @param organization the name of the organization
  */
-
-// TODO: change the parameter to organization object (should have name, logo, etc)
 @Composable
-fun DisplayOrganization(organization: String) {
+fun DisplayOrganization(organization: Association) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("DisplayOrganizationScreen"),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -133,7 +143,7 @@ fun DisplayOrganization(organization: String) {
             contentDescription = "Organization Icon",
             modifier = Modifier.testTag("OrganizationIcon"))
         Text(
-            text = organization,
+            text = organization.name,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.testTag("OrganizationName"))
       }

@@ -23,6 +23,10 @@ sealed class Destination(
 
   data object Login : Destination("login")
 
+  data object SelectAssociation : Destination("selectAssociation")
+
+  data object CreateAssociation : Destination("createAssociation")
+
   // data class Receipt(val id: String) : Destination("receipt/$id")
 }
 
