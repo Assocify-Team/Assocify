@@ -12,6 +12,9 @@ data class Event(
   constructor() : this("", "", "", "", "", listOf(), listOf())
 
   override fun equals(other: Any?): Boolean {
+      if (other?.javaClass != this.javaClass) {
+          return false
+      }
     if (this === other) return true
     other as Event
     return uid == other.uid

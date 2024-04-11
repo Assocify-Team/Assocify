@@ -10,6 +10,9 @@ data class Role(private val name: String) {
    * @return true if the name of the role is the same as the name of the other role
    */
   override fun equals(other: Any?): Boolean {
+    if (other?.javaClass != this.javaClass) {
+      return false
+    }
     if (this === other) return true
     other as Role
     return name == other.name

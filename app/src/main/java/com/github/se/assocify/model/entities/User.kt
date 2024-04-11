@@ -4,6 +4,9 @@ data class User(val uid: String, private val name: String, private val role: Rol
   constructor() : this("", "", Role("pending"))
 
   override fun equals(other: Any?): Boolean {
+    if (other?.javaClass != this.javaClass) {
+      return false
+    }
     if (this === other) return true
     other as User
     return uid == other.uid

@@ -12,6 +12,9 @@ data class Association(
   constructor() : this("", "", "", "", "", listOf(), listOf())
 
   override fun equals(other: Any?): Boolean {
+    if (other?.javaClass != this.javaClass) {
+      return false
+    }
     if (this === other) return true
     other as Association
     return uid == other.uid
