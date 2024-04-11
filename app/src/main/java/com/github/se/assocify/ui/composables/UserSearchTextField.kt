@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,7 +26,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.User
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun UserSearchTextField(
     modifier: Modifier = Modifier,
@@ -40,9 +41,8 @@ fun UserSearchTextField(
     supportingText: @Composable (() -> Unit)? = null
 ) {
   var expanded by remember { mutableStateOf(false) }
-  val value = user?.name ?: searchValue
-  var textfieldSize by remember { mutableStateOf(0) }
-  var scrollToPosition by remember { mutableStateOf(0f) }
+  val value = if (user != null) user.name else searchValue
+  var textfieldSize by remember { mutableIntStateOf(0) }
 
   Column {
     OutlinedTextField(
