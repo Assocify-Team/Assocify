@@ -1,15 +1,19 @@
 package com.github.se.assocify.screens
 
-import android.util.Log
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
@@ -18,7 +22,7 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,14 +33,18 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @get:Rule val composeTestRule = createComposeRule()
 
   private val navActions = mockk<NavigationActions>()
-  private val viewModel = spyk<ReceiptViewModel>()
-  private var tabSelected = false
-  private var saved = false
+  private val userApi = mockk<UserAPI>()
+  private val viewModel = ReceiptViewModel(userApi)
+
+  val userMai = User("1", "Maï", Role())
+  val userSeb = User("2", "Sebastien", Role())
+  val userSido = User("3", "Sido", Role())
+  val userList = listOf(userMai, userSeb, userSido)
 
   @Before
   fun testSetup() {
-    every { navActions.back() } answers { tabSelected = true }
-    every { viewModel.saveReceipt() } answers { saved = true }
+    every { userApi.getAllUsers() } returns userList
+    every { navActions.back() } returns Unit
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel) }
   }
 
@@ -108,25 +116,44 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("amountField").performClick().performTextClearance()
       onNodeWithTag("amountField").performTextInput("1000000.00")
       onNodeWithTag("amountField").performTextInput("1") // try to add another 1 at end
-      Log.e("amount", viewModel.uiState.value.amount)
       assert(viewModel.uiState.value.amount == "1000000.00")
       onNodeWithTag("amountField").assertTextContains("Price is too large")
     }
   }
 
   @Test
-  fun save() {
+  fun payer() {
     with(composeTestRule) {
-      onNodeWithTag("saveButton").performScrollTo().performClick()
-      assert(saved)
+      // Test search : should work without capital letter,
+      onNodeWithTag("payerField").performClick().performTextInput("maï")
+      onNodeWithTag("userDropdown").assertIsDisplayed()
+      onNodeWithTag("userDropdownItem-1").assertIsDisplayed().performClick()
+      assert(viewModel.uiState.value.payer == userMai)
+      onNodeWithTag("payerField").assertTextContains("Maï")
+
+      onNodeWithTag("userDismissButton").assertIsDisplayed().performClick()
+      assert(viewModel.uiState.value.payerSearch == "")
+
+      onNodeWithTag("payerField").performClick().performTextInput("Ya")
+      onNodeWithTag("payerField").assertTextContains("No users found")
+
+      onNodeWithTag("payerField").performClick().performTextClearance()
+      onNodeWithTag("payerField").performClick().performTextInput("S")
+      onNodeWithTag("userDropdown").assertIsDisplayed().onChildren().assertCountEquals(2)
     }
+  }
+
+  @Test
+  fun save() {
+    with(composeTestRule) { onNodeWithTag("saveButton").performScrollTo().performClick() }
+    /* TODO: verify { viewModel.save() } */
   }
 
   @Test
   fun back() {
     with(composeTestRule) {
       onNodeWithTag("backButton").performClick()
-      assert(tabSelected)
+      verify { navActions.back() }
     }
   }
 

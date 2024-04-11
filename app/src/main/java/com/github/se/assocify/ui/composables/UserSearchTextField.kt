@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.User
 
@@ -61,26 +62,30 @@ fun UserSearchTextField(
         supportingText = supportingText,
         trailingIcon = {
           if (user != null) {
-            IconButton(onClick = onUserDismiss) {
+            IconButton(modifier = Modifier.testTag("userDismissButton"), onClick = onUserDismiss) {
               Icon(Icons.Default.Clear, contentDescription = "Clear")
             }
           } else {
-            IconButton(onClick = { expanded = !expanded }) {
-              if (expanded) {
-                Icon(Icons.Default.ArrowDropUp, contentDescription = "Collapse")
-              } else {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
-              }
-            }
+            IconButton(
+                modifier = Modifier.testTag("userDropButton"), onClick = { expanded = !expanded }) {
+                  if (expanded) {
+                    Icon(Icons.Default.ArrowDropUp, contentDescription = "Collapse")
+                  } else {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
+                  }
+                }
           }
         })
     DropdownMenu(
-        modifier = Modifier.width(with(LocalDensity.current) { textfieldSize.toDp() }),
+        modifier =
+            Modifier.testTag("userDropdown")
+                .width(with(LocalDensity.current) { textfieldSize.toDp() }),
         expanded = expanded,
         onDismissRequest = { expanded = !expanded },
         properties = PopupProperties(focusable = false)) {
           userList.forEach { user ->
             DropdownMenuItem(
+                modifier = Modifier.testTag("userDropdownItem-${user.uid}"),
                 text = { Text(user.name) },
                 onClick = {
                   onUserSelect(user)
