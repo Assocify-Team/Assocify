@@ -10,6 +10,20 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class AssociationTest {
+
+  @Test
+  fun testNotSameClassEquals() {
+    val event = Association()
+    assertEquals(false, event.equals("string"))
+  }
+
+  @Test
+  fun testSameObjectEquals() {
+    val association =
+        Association("uid1", "name1", "description1", "creationDate1", "status1", listOf(), listOf())
+    assert(association.equals(association))
+  }
+
   @Test
   fun testEquals() {
     val association1 =
