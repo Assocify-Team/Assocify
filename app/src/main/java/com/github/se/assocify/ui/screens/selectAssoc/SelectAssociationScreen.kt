@@ -10,13 +10,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -44,8 +48,8 @@ import com.github.se.assocify.navigation.NavigationActions
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(navActions: NavigationActions, associationAPI: AssociationAPI) {
-  val model = SelectAssociationViewModel(associationAPI)
+fun SelectAssociation(navActions: NavigationActions, associationAPI: AssociationAPI, userAPI: UserAPI) {
+  val model = SelectAssociationViewModel(associationAPI, userAPI)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
   Scaffold(
@@ -55,8 +59,7 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-              /*TODO: replace user by user's actual name*/
-              Text(text = "Hello User", style = MaterialTheme.typography.headlineSmall)
+              Text(text = "Hello " + state.value.user.name, style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
                   query = query,
@@ -73,20 +76,20 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
                             Modifier.clickable(onClick = { model.updateSearchQuery("", false) }))
                   },
                   leadingIcon = {
-                    /* if (isSearching) {
+                    if (state.value.searchState) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
                             modifier =
                             Modifier.clickable(
-                                onClick = {/*TODO: go back to selectOrganization screen*/ })
+                                onClick = {model.updateSearchQuery("", false) })
                         )
-                    }  else {*/
+                    }  else {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
                         modifier = Modifier.clickable(onClick = { /*TODO: search*/}))
-                    /*}*/
+                    }
                   }) {
                     // TODO: Display search results (filtered organizations)
                   }
@@ -119,7 +122,7 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
                   DisplayOrganization(organization)
                   // Add a Divider for each organization except the last one
                   if (index < registeredAssociation.size - 1) {
-                    Divider(Modifier.fillMaxWidth().padding(8.dp))
+                    HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))
                   }
                 }
               }
