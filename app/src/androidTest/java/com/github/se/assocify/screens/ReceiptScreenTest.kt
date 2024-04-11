@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -9,9 +10,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.entities.Role
-import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.model.database.ReceiptsAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
@@ -30,23 +29,24 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @get:Rule val composeTestRule = createComposeRule()
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val userApi = mockk<UserAPI>()
-  private val viewModel = ReceiptViewModel(userApi)
+  private val receiptsAPI = mockk<ReceiptsAPI>(relaxUnitFun = true)
+  private val viewModel = ReceiptViewModel(navActions, receiptsAPI)
 
-  val userMai = User("1", "Maï", Role())
+  /*val userMai = User("1", "Maï", Role())
   val userSeb = User("2", "Sebastien", Role())
   val userSido = User("3", "Sido", Role())
-  val userList = listOf(userMai, userSeb, userSido)
+  val userList = listOf(userMai, userSeb, userSido)*/
 
   @Before
   fun testSetup() {
-
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel) }
   }
 
   @Test
   fun display() {
     with(composeTestRule) {
+      Log.e("LMAO", "Huluberlu")
+
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("receiptScreenTitle").assertIsDisplayed()
       onNodeWithTag("backButton").assertIsDisplayed()
@@ -54,7 +54,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("titleField").assertIsDisplayed()
       onNodeWithTag("descriptionField").assertIsDisplayed()
       onNodeWithTag("amountField").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("payerField").performScrollTo().assertIsDisplayed()
+      // onNodeWithTag("payerField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("imageCard").performScrollTo().assertIsDisplayed()
       onNodeWithTag("editImageButton").performScrollTo().assertIsDisplayed()
