@@ -114,6 +114,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.4")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.4")
 
+    // Kaspresso
     androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
     // Allure support
     androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:1.4.3")
@@ -127,18 +128,21 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:3.14.9")
 
+    // Mockito
+    testImplementation("org.mockito:mockito-core:5.11.0")
     androidTestImplementation("org.mockito:mockito-android:5.11.0")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     // Roboelectric
     testImplementation("org.robolectric:robolectric:4.11.1")
 
     // Mockk
-    testImplementation("io.mockk:mockk:1.13.7")
-    testImplementation("io.mockk:mockk-android:1.13.7")
-    testImplementation("io.mockk:mockk-agent:1.13.7")
-    androidTestImplementation("io.mockk:mockk-android:1.13.7")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
+    testImplementation("io.mockk:mockk:1.13.3")
+    testImplementation("io.mockk:mockk-android:1.13.3")
+    testImplementation("io.mockk:mockk-agent:1.13.3")
+    androidTestImplementation("io.mockk:mockk-android:1.13.3")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.3")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
