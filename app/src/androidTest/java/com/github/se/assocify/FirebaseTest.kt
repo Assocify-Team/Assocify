@@ -21,7 +21,6 @@ class FirebaseTest {
   private val documentReference = Mockito.mock(DocumentReference::class.java)
   private lateinit var assoAPI: FirebaseApi
   private val collectionReference = Mockito.mock(CollectionReference::class.java)
-
   private val uid = "testId"
 
   @Before
@@ -49,7 +48,6 @@ class FirebaseTest {
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()).delete())
         .thenReturn(Tasks.forResult(null))
     Tasks.await(assoAPI.delete(uid))
-
     Mockito.verify(db).collection(assoAPI.collectionName)
     Mockito.verify(db.collection(assoAPI.collectionName)).document(uid)
     Mockito.verify(db.collection(assoAPI.collectionName).document(uid)).delete()
