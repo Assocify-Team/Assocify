@@ -20,12 +20,14 @@ sealed class Destination(
 
   data object Profile :
       Destination("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
-    data object Login: Destination("login"){
-        data object Authentication : Destination("login/authentication")
-        data object SelectAsso: Destination("login/selectAsso")
-        data object CreateAsso: Destination("login/createAsso")
-    }
 
+  // data object Login : Destination("login") {
+  data object Authentication : Destination("login/authentication")
+
+  data object SelectAsso : Destination("login/selectAsso")
+
+  data object CreateAsso : Destination("login/createAsso")
+  // }
 
   // data class Receipt(val id: String) : Destination("receipt/$id")
 }

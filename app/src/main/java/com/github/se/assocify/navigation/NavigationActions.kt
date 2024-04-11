@@ -2,8 +2,6 @@ package com.github.se.assocify.navigation
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseUser
 
 class NavigationActions(private val navController: NavHostController) {
   fun navigateToMainTab(destination: Destination) {
@@ -18,12 +16,20 @@ class NavigationActions(private val navController: NavHostController) {
     }
   }
 
-  fun onLogin(user: FirebaseUser?) {
-    /* Handle login */
+  fun navigateTo(destination: Destination) {
+    navController.navigate(destination.route)
+  }
+
+  fun onLogin(userExists: Boolean) {
+    if (userExists) {
+      navigateTo(Destination.Home)
+    } else {
+      navigateTo(Destination.SelectAsso)
+    }
   }
 
   fun onAuthError() {
-    /* Handle auth error */
+    // throw Exception("Authentication error")
   }
 
   fun back() {
