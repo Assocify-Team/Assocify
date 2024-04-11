@@ -102,7 +102,6 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
       bottomBar = {
         Button(
             onClick = { /*TODO: navigate to go to newAssociation screen*/
-              navActions.navigateTo(Destination.Profile)
             },
             modifier =
             Modifier
