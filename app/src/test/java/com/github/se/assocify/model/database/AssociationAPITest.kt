@@ -37,13 +37,14 @@ class AssociationAPITest {
 
   @Before
   fun setup() {
-    assoAPI = AssociationAPI(db)
     every { documentSnapshot.exists() } returns true
     every { documentSnapshot.toObject(Association::class.java) } returns testAssociation
     every { db.collection("associations").document("testId") } returns documentReference
     every { db.collection("associations") } returns collectionReference
     every { collectionReference.document("testId") } returns documentReference
     every { query.documents } returns listOf(documentSnapshot)
+
+    assoAPI = AssociationAPI(db)
   }
 
   @Test
