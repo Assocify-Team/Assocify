@@ -45,7 +45,6 @@ class ReceiptsAPITest {
   private val successfulReceipt =
       Receipt(
           uid = "successful_rid",
-          payer = "payer",
           date = LocalDate.EPOCH,
           incoming = false,
           cents = 100,
@@ -57,7 +56,6 @@ class ReceiptsAPITest {
   private val failingReceipt =
       Receipt(
           uid = "failing_rid",
-          payer = "payer",
           date = LocalDate.EPOCH,
           incoming = false,
           cents = 100,
