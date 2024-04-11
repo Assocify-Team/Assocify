@@ -1,39 +1,75 @@
 package com.github.se.assocify.ui.screens.treasury.receipt
 
-import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.database.ReceiptsAPI
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
-import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
+import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
 
 class ReceiptViewModel {
 
   private val NEW_RECEIPT_TITLE = "New Receipt"
   private val EDIT_RECEIPT_TITLE = "Edit Receipt"
 
-  private val userAPI: UserAPI
+  private val receiptApi: ReceiptsAPI
+  private val navActions: NavigationActions
 
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
 
-  constructor(userApi: UserAPI = UserAPI(Firebase.firestore)) {
-    userAPI = userApi
+  constructor(
+      navActions: NavigationActions,
+      receiptApi: ReceiptsAPI =
+          ReceiptsAPI(
+              userId = Firebase.auth.currentUser!!.uid,
+              basePath = "basePath",
+              storage = Firebase.storage,
+              db = Firebase.firestore)
+  ) {
+    this.navActions = navActions
+    this.receiptApi = receiptApi
     _uiState = MutableStateFlow(ReceiptState(pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
   }
 
-  constructor(todoUID: String, userApi: UserAPI = UserAPI(Firebase.firestore)) {
-    userAPI = userApi
+  constructor(
+      receiptUid: String,
+      navActions: NavigationActions,
+      receiptApi: ReceiptsAPI =
+          ReceiptsAPI(
+              userId = Firebase.auth.currentUser!!.uid,
+              basePath = "basePath",
+              storage = Firebase.storage,
+              db = Firebase.firestore)
+  ) {
+    this.navActions = navActions
+    this.receiptApi = receiptApi
     _uiState = MutableStateFlow(ReceiptState(pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
 
-    /*TODO: Implement fetching of receipt from database*/
+    this.receiptApi.getUserReceipts(
+        onSuccess = { receipts ->
+          receipts.forEach { receipt ->
+            if (receipt.uid == receiptUid) {
+              _uiState.value =
+                  _uiState.value.copy(
+                      title = receipt.title,
+                      description = receipt.description,
+                      amount = PriceUtil.fromCents(receipt.cents),
+                      date = DateUtil.toString(receipt.date),
+                      incoming = receipt.incoming)
+            }
+          }
+        },
+        onError = {})
   }
 
   fun setTitle(title: String) {
@@ -68,7 +104,7 @@ class ReceiptViewModel {
     }
   }
 
-  fun searchPayer(payerSearch: String) {
+  /*fun searchPayer(payerSearch: String) {
     _uiState.value = _uiState.value.copy(payerSearch = payerSearch)
     userAPI.getAllUsers { userList ->
       _uiState.value =
@@ -90,7 +126,7 @@ class ReceiptViewModel {
 
   fun unsetPayer() {
     _uiState.value = _uiState.value.copy(payer = null)
-  }
+  }*/
 
   fun setDate(date: LocalDate?) {
     _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
@@ -110,22 +146,40 @@ class ReceiptViewModel {
   }
 
   fun saveReceipt() {
+    if (_uiState.value.title.isEmpty()) {
+      _uiState.value = _uiState.value.copy(titleError = "Title cannot be empty")
+      return
+    }
+    if (_uiState.value.amount.isEmpty()) {
+      _uiState.value = _uiState.value.copy(amountError = "Price cannot be empty")
+      return
+    }
+    if (_uiState.value.date.isEmpty()) {
+      _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
+      return
+    }
+    val date = DateUtil.toDate(_uiState.value.date)
+    if (date == null) {
+      _uiState.value = _uiState.value.copy(dateError = "Invalid date")
+      return
+    }
+
     val receipt =
-        _uiState.value.payer?.let { user ->
-          DateUtil.toDate(_uiState.value.date)?.let { date ->
-            Receipt(
-                uid = "",
-                title = _uiState.value.title,
-                description = _uiState.value.description,
-                cents = PriceUtil.toCents(_uiState.value.amount),
-                payer = user.uid,
-                date = date,
-                incoming = _uiState.value.incoming,
-                phase = Phase.Unapproved,
-                photo = null)
-          }
-        }
-    /*TODO: Implement saving of receipt to database*/
+        Receipt(
+            uid = "",
+            title = _uiState.value.title,
+            description = _uiState.value.description,
+            cents = PriceUtil.toCents(_uiState.value.amount),
+            date = date,
+            incoming = _uiState.value.incoming,
+            phase = Phase.Unapproved,
+            photo = null)
+
+    receiptApi.uploadReceipt(
+        receipt,
+        onPhotoUploadSuccess = {},
+        onReceiptUploadSuccess = { navActions.back() },
+        onFailure = { b, e -> })
   }
 
   fun deleteReceipt() {}
@@ -136,13 +190,13 @@ data class ReceiptState(
     val title: String = "",
     val description: String = "",
     val amount: String = "",
-    val payerSearch: String = "",
+    /*    val payerSearch: String = "",
     val payerList: List<User> = emptyList(),
-    val payer: User? = null,
+    val payer: User? = null,*/
     val date: String = "",
     val incoming: Boolean = false,
     val titleError: String? = null,
     val amountError: String? = null,
-    val payerError: String? = null,
+    // val payerError: String? = null,
     val dateError: String? = null,
 )
