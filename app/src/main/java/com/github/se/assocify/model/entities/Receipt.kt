@@ -17,7 +17,7 @@ data class Receipt(
     val cents: Int,
     val incoming: Boolean,
     val phase: Phase,
-    val photo: MaybeRemotePhoto,
+    val photo: MaybeRemotePhoto?,
 )
 
 enum class Phase {

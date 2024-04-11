@@ -116,15 +116,15 @@ class ReceiptsAPI(
 
     fun toReceipt(uid: String) =
         Receipt(
-            uid,
-            this.payer,
-            LocalDate.parse(this.date),
-            this.incoming,
-            this.cents,
-            Phase.entries[this.phase],
-            this.title,
-            this.description,
-            MaybeRemotePhoto.Remote(photo),
+            uid = uid,
+            payer = this.payer,
+            date = LocalDate.parse(this.date),
+            incoming = this.incoming,
+            cents = this.cents,
+            phase = Phase.entries[this.phase],
+            title = this.title,
+            description = this.description,
+            photo = MaybeRemotePhoto.Remote(photo),
         )
   }
 }

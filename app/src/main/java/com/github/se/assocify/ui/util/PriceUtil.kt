@@ -15,6 +15,10 @@ object PriceUtil {
     return price.toDouble()
   }
 
+  fun toCents(price: String): Int {
+    return (toDouble(price) * 100).toInt()
+  }
+
   fun hasInvalidCharacters(price: String): Boolean {
     return price.isNotEmpty() && (!price.matches(Regex(CHARS)) || price.count { it == '.' } > 1)
   }

@@ -1,15 +1,16 @@
 package com.github.se.assocify.ui.screens.treasury.receipt
 
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
 
 class ReceiptViewModel {
 
@@ -67,21 +68,18 @@ class ReceiptViewModel {
     }
   }
 
-  fun getUserList(): List<User> {
-    return userAPI.getAllUsers()
-  }
-
   fun searchPayer(payerSearch: String) {
     _uiState.value = _uiState.value.copy(payerSearch = payerSearch)
-    _uiState.value =
-        _uiState.value.copy(
-            payerList =
-                getUserList().filter { it.name.lowercase().contains(payerSearch.lowercase()) })
+    userAPI.getAllUsers { userList ->
+      _uiState.value =
+          _uiState.value.copy(
+              payerList = userList.filter { it.name.lowercase().contains(payerSearch.lowercase()) })
 
-    if (_uiState.value.payerList.isEmpty()) {
-      _uiState.value = _uiState.value.copy(payerError = "No users found")
-    } else {
-      _uiState.value = _uiState.value.copy(payerError = null)
+      if (_uiState.value.payerList.isEmpty()) {
+        _uiState.value = _uiState.value.copy(payerError = "No users found")
+      } else {
+        _uiState.value = _uiState.value.copy(payerError = null)
+      }
     }
   }
 
@@ -113,15 +111,19 @@ class ReceiptViewModel {
 
   fun saveReceipt() {
     val receipt =
-        _uiState.value.payer?.let {
-          Receipt(
-              uid = "",
-              title = _uiState.value.title,
-              description = _uiState.value.description,
-              amount = PriceUtil.toDouble(_uiState.value.amount),
-              payer = it.uid,
-              date = DateUtil.toDate(_uiState.value.date),
-              incoming = _uiState.value.incoming)
+        _uiState.value.payer?.let { user ->
+          DateUtil.toDate(_uiState.value.date)?.let { date ->
+            Receipt(
+                uid = "",
+                title = _uiState.value.title,
+                description = _uiState.value.description,
+                cents = PriceUtil.toCents(_uiState.value.amount),
+                payer = user.uid,
+                date = date,
+                incoming = _uiState.value.incoming,
+                phase = Phase.Unapproved,
+                photo = null)
+          }
         }
     /*TODO: Implement saving of receipt to database*/
   }
