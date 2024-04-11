@@ -37,7 +37,7 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
   /**
    * Gets all users from the database
    *
-   * @param callback the callback to call with the list of users
+   * @param callback the callback to call with the list of users it isn't called if the user isn't found
    * @return a list of all users
    */
   fun getAllUsers(callback: (List<User>) -> Unit): Task<Unit> {
