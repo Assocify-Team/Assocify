@@ -18,7 +18,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,7 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.Login.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -67,11 +73,16 @@ fun rememberFirebaseAuthLauncher(
 }
 
 @Composable
-fun LoginScreen(navActions: NavigationActions) {
+fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
+  var user by remember { mutableStateOf(Firebase.auth.currentUser) }
+  val viewModel = LoginViewModel(userAPI)
 
   val launcher =
       rememberFirebaseAuthLauncher(
-          onAuthComplete = { result -> navActions.onLogin(result.user) },
+          onAuthComplete = {
+            user = it.user
+            navActions.onLogin(viewModel.existUserId())
+          },
           onAuthError = { navActions.onAuthError() })
   val token = stringResource(R.string.web_client_id)
   val context = LocalContext.current

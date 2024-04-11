@@ -2,22 +2,24 @@ package com.github.se.assocify.ui.screens.login
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.createAsso.CreateAssoScreen
-import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
 
-fun NavGraphBuilder.loginGraph(navigationActions: NavigationActions) {
-    navigation(startDestination = Destination.Login.route, route = "login"){
-        composable(route = Destination.Login.Authentication.route) {
-            LoginScreen(navigationActions)
-        }
-        composable(route = Destination.Login.SelectAsso.route) {
-            SelectAssociation(registeredAssociation = emptyList())
-        }
-        composable(route = Destination.Login.CreateAsso.route) {
-            CreateAssoScreen()
-        }
+fun NavGraphBuilder.loginGraph(
+    navigationActions: NavigationActions,
+    userAPI: UserAPI,
+    associationAPI: AssociationAPI
+) {
+  // navigation(startDestination = Destination.Login.route, route = "loginGraph") {
+  composable(route = Destination.Authentication.route) { LoginScreen(navigationActions, userAPI) }
+  /* composable(route = Destination.Login.SelectAsso.route) {
+      SelectAssociation(
+          registeredAssociation = emptyList(),
+          navigationActions = navigationActions,
+          associationAPI = associationAPI)
     }
+    composable(route = Destination.Login.CreateAsso.route) { CreateAssoScreen() }
+  }*/
 }

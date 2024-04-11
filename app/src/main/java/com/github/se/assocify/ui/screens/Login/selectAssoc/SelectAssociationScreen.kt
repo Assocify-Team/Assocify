@@ -27,6 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 
 /**
  * Screen to select an association
@@ -35,7 +38,11 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(registeredAssociation: List<String>) {
+fun SelectAssociation(
+    registeredAssociation: List<String>,
+    navigationActions: NavigationActions,
+    associationAPI: AssociationAPI
+) {
 
   // search bar var: TODO: implement search
   val isSearching = false
@@ -85,7 +92,7 @@ fun SelectAssociation(registeredAssociation: List<String>) {
       },
       bottomBar = {
         Button(
-            onClick = { /*TODO: navigate to go to newAssociation screen*/},
+            onClick = { navigationActions.navigateTo(Destination.CreateAsso) },
             modifier =
                 Modifier.fillMaxWidth().padding(16.dp).testTag("CreateNewOrganizationButton"),
             content = { Text(text = "Create new organization") },
