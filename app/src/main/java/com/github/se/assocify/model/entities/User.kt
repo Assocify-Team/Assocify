@@ -7,7 +7,7 @@ data class User(val uid: String, val name: String, val role: Role) {
     return this.role.name.uppercase().contains(role.uppercase())
   }
 
-  fun toggleRole(role: String) : User {
+  fun toggleRole(role: String): User {
     return if (hasRole(role)) {
       User(uid, name, Role("pending"))
     } else {
