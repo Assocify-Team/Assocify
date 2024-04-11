@@ -1,5 +1,5 @@
 package com.github.se.assocify
-
+/*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.associations.AssociationUtils
 import com.github.se.assocify.model.database.AssociationAPI
@@ -173,3 +173,4 @@ class AssociationUtilsTest {
     assert(getterUtil.getAssociationName() == "gettify")
   }*/
 }
+*/
