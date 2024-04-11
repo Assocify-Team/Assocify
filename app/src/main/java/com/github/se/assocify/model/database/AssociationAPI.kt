@@ -16,7 +16,8 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * Gets an association from the database
    *
    * @param id the id of the association to get
-   * @param callback the callback to call with the association
+   * @param callback the callback to call with the association, it isn't called if the association
+   *   isn't found
    * @return the association with the given id
    */
   fun getAssociation(id: String, callback: (Association) -> Unit): Task<Unit> {
@@ -27,8 +28,6 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         if (document != null && document.exists()) {
           val doc = document.toObject(Association::class.java)
           callback(doc!!)
-        } else {
-          throw Exception("No Asso found with ID: $id")
         }
       } else {
         throw task.exception ?: Exception("Unknown error occurred")

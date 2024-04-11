@@ -28,8 +28,6 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         if (document != null && document.exists()) {
           val user = document.toObject(User::class.java)
           callback(user!!)
-        } else {
-          throw Exception("No User found with ID: $id")
         }
       } else {
         throw task.exception ?: Exception("Unknown error occurred")
