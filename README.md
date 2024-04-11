@@ -38,7 +38,7 @@ Assocify is an application to centralize all of your student organization needs 
 [Project Proposal](https://docs.google.com/document/d/1_9hGwoGBIqygBJgahw5CbMNxU-d_K-2d-qFGFdvNsdA/edit)
 
 Architecture diagram:
-![img.png](architecturediagram.png)
+![Architecture diagram](architecturediagram.png)
 
 ## Setup Dev environment
 
