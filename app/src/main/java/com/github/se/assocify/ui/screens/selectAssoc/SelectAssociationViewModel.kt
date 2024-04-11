@@ -20,7 +20,9 @@ class SelectAssociationViewModel(private var associationAPI: AssociationAPI, pri
   }
 
   private fun update() {
-    //associationAPI.addAssociation(Association("newId", "TestAsso", "I wanted to create an assosiation to create a lot of tests together. This is my test to do it""))
+    associationAPI.addAssociation(Association("newId", "TestAsso", "I wanted to create an assosiation to create a lot of tests together. This is my test to do it",
+      "a", "b", emptyList(), emptyList()
+    ))
     associationAPI.getAssociations { assocList ->
       _uiState.value = SelectAssociationState(assocList, _uiState.value.searchQuery, _uiState.value.user, _uiState.value.searchState)
     }
@@ -33,16 +35,12 @@ class SelectAssociationViewModel(private var associationAPI: AssociationAPI, pri
   }
 
   fun updateSearchQuery(query: String, searchState: Boolean) {
-    _uiState.value = SelectAssociationState(_uiState.value.associations, query)
+    _uiState.value = SelectAssociationState(_uiState.value.associations, query, _uiState.value.user, searchState)
   }
 
   fun getUserId(): String{
     val user = Firebase.auth.currentUser
-    if(user == null){
-      return ""
-    } else {
-      return user.uid
-    }
+    return user?.uid ?: ""
   }
 
 }

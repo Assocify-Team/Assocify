@@ -32,16 +32,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import kotlin.math.min
 
 /**
  * Screen to select an association
@@ -67,7 +63,7 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
                   query = query,
-                  onQueryChange = { it -> query = it },
+                  onQueryChange = { it -> query = it},
                   onSearch = { model.updateSearchQuery(query, true) },
                   onActiveChange = {},
                   active = state.value.searchState,
@@ -95,7 +91,17 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
                         modifier = Modifier.clickable(onClick = { model.updateSearchQuery(query, true)}))
                     }
                   }) {
-                    // TODO: Display search results (filtered organizations)
+                    if(state.value.searchState){
+                      val filteredAssos =state.value.associations.filter { ass ->
+                        val min = min(ass.name.length, state.value.searchQuery.length)
+                        ass.name.take(min).lowercase() == state.value.searchQuery.take(min).lowercase()
+                      }
+                      filteredAssos.map{ass ->
+                        DisplayOrganization(ass)
+                      }
+                    } else {
+                      state.value.associations
+                    }
                   }
             }
       },
