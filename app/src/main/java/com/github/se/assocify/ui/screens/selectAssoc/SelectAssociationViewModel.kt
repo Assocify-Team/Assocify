@@ -10,6 +10,12 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * A viewModel for the select association screen
+ *
+ * @param associationAPI the database used to fetch the association data
+ * @param userAPI the database used to fetch the user data
+ */
 class SelectAssociationViewModel(private var associationAPI: AssociationAPI, private var userAPI: UserAPI) : ViewModel() {
   private val _uiState: MutableStateFlow<SelectAssociationState> = MutableStateFlow(SelectAssociationState())
   val uiState: StateFlow<SelectAssociationState>
@@ -20,9 +26,6 @@ class SelectAssociationViewModel(private var associationAPI: AssociationAPI, pri
   }
 
   private fun update() {
-    associationAPI.addAssociation(Association("newId", "TestAsso", "I wanted to create an assosiation to create a lot of tests together. This is my test to do it",
-      "a", "b", emptyList(), emptyList()
-    ))
     associationAPI.getAssociations { assocList ->
       _uiState.value = SelectAssociationState(assocList, _uiState.value.searchQuery, _uiState.value.user, _uiState.value.searchState)
     }
@@ -38,7 +41,7 @@ class SelectAssociationViewModel(private var associationAPI: AssociationAPI, pri
     _uiState.value = SelectAssociationState(_uiState.value.associations, query, _uiState.value.user, searchState)
   }
 
-  fun getUserId(): String{
+  private fun getUserId(): String{
     val user = Firebase.auth.currentUser
     return user?.uid ?: ""
   }

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -59,7 +60,7 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
               .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-              Text(text = "Hello " + state.value.user.name, style = MaterialTheme.typography.headlineSmall)
+              Text(text = "Hello " + state.value.user.name+ " !!", style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
                   query = query,
@@ -73,7 +74,8 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
                         imageVector = Icons.Default.Clear,
                         contentDescription = null,
                         modifier =
-                            Modifier.clickable(onClick = { model.updateSearchQuery("", false) }))
+                            Modifier.clickable(onClick = { model.updateSearchQuery("", false)
+                            query = ""}))
                   },
                   leadingIcon = {
                     if (state.value.searchState) {
@@ -82,7 +84,8 @@ fun SelectAssociation(navActions: NavigationActions, associationAPI: Association
                             contentDescription = null,
                             modifier =
                             Modifier.clickable(
-                                onClick = {model.updateSearchQuery("", false) })
+                                onClick = {model.updateSearchQuery("", false)
+                                query = ""})
                         )
                     }  else {
                     Icon(
