@@ -17,10 +17,6 @@ class NavigationActions(private val navController: NavHostController) {
     }
   }
 
-  fun navigateTo(destination: Destination) {
-    navController.navigate(destination.route)
-  }
-
   fun onLogin(user: FirebaseUser?) {
     /* Handle login */
   }

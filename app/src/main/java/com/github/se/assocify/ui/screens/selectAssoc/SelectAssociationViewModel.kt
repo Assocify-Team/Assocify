@@ -11,11 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class SelectAssociationViewModel(private var associationAPI: AssociationAPI, private var userAPI: UserAPI) : ViewModel() {
-  private val _uiState: MutableStateFlow<SelectAssociationState>
+  private val _uiState: MutableStateFlow<SelectAssociationState> = MutableStateFlow(SelectAssociationState())
   val uiState: StateFlow<SelectAssociationState>
 
   init {
-    _uiState = MutableStateFlow(SelectAssociationState())
     uiState = _uiState
     update()
   }
@@ -24,18 +23,21 @@ class SelectAssociationViewModel(private var associationAPI: AssociationAPI, pri
     associationAPI.getAssociations { assocList ->
       _uiState.value = SelectAssociationState(assocList, _uiState.value.searchQuery, _uiState.value.user, _uiState.value.searchState)
     }
+    /*
     userAPI.getUser(getUserId()) {user ->
       _uiState.value = SelectAssociationState(_uiState.value.associations, _uiState.value.searchQuery, user, _uiState.value.searchState)
     }
+     */
   }
 
   fun updateSearchQuery(query: String, searchState: Boolean) {
     _uiState.value = SelectAssociationState(_uiState.value.associations, query)
   }
-
+  /*
   fun getUserId(): String{
     return Firebase.auth.currentUser!!.uid
   }
+   */
 }
 
 data class SelectAssociationState(
