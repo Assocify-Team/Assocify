@@ -67,6 +67,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @RelaxedMockK
   lateinit var mockUserAPI: UserAPI
 
+
   /** This test checks if the "Create new organization" button is displayed */
   @Test
   fun testCreateNewOrganizationButton() {
