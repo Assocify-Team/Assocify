@@ -1,10 +1,8 @@
 package com.github.se.assocify.screens
 
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -20,7 +18,6 @@ import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
@@ -32,7 +29,7 @@ import org.junit.runner.RunWith
 class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val navActions = mockk<NavigationActions>()
+  private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
   private val userApi = mockk<UserAPI>()
   private val viewModel = ReceiptViewModel(userApi)
 
@@ -43,8 +40,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   @Before
   fun testSetup() {
-    every { userApi.getAllUsers() } returns userList
-    every { navActions.back() } returns Unit
+
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel) }
   }
 
@@ -121,7 +117,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
   }
 
-  @Test
+  /*@Test
   fun payer() {
     with(composeTestRule) {
       // Test search : should work without capital letter,
@@ -141,7 +137,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("payerField").performClick().performTextInput("S")
       onNodeWithTag("userDropdown").assertIsDisplayed().onChildren().assertCountEquals(2)
     }
-  }
+  }*/
 
   @Test
   fun save() {

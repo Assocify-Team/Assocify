@@ -21,11 +21,12 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
-import java.time.LocalDate
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
 
 @MockKExtension.ConfirmVerification
 class ReceiptsAPITest {
@@ -43,27 +44,27 @@ class ReceiptsAPITest {
 
   private val successfulReceipt =
       Receipt(
-          "successful_rid",
-          "payer",
-          LocalDate.EPOCH,
-          false,
-          100,
-          Phase.Approved,
-          "title",
-          "notes",
-          MaybeRemotePhoto.Remote("path"))
+          uid = "successful_rid",
+          payer = "payer",
+          date = LocalDate.EPOCH,
+          incoming = false,
+          cents = 100,
+          phase = Phase.Approved,
+          title = "title",
+          description = "notes",
+          photo = MaybeRemotePhoto.Remote("path"))
 
   private val failingReceipt =
       Receipt(
-          "failing_rid",
-          "payer",
-          LocalDate.EPOCH,
-          false,
-          100,
-          Phase.Approved,
-          "title",
-          "notes",
-          MaybeRemotePhoto.LocalFile("path"))
+          uid = "failing_rid",
+          payer = "payer",
+          date = LocalDate.EPOCH,
+          incoming = false,
+          cents = 100,
+          phase = Phase.Approved,
+          title = "title",
+          description = "notes",
+          photo = MaybeRemotePhoto.LocalFile("path"))
 
   inline fun <reified S, reified T : Task<S>> mockSuccessfulTask(result: S? = null): T {
     val task = mockk<T>()
