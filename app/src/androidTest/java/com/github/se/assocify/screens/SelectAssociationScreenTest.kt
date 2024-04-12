@@ -88,6 +88,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
         {
           val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
           val associations = listOf(testAssociation)
+          onSuccessCallback(associations)
         }
   }
 
@@ -132,6 +133,13 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the message is displayed when you're not registered to any organization */
   @Test
   fun testNoRegisteredOrganization() {
+    val exception = Exception("the test does not work")
+    every { mockAssocAPI.getAssociations(any(), any()) } answers
+        {
+          val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
+          val associations = emptyList<Association>()
+          onSuccessCallback(associations)
+        }
     composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
     // Find the text node with the expected message and assert it is displayed
     composeTestRule.onNodeWithText("There is no organization to display.").assertIsDisplayed()
