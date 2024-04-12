@@ -34,11 +34,11 @@ fun UserSearchTextField(
     onUserSearch: (String) -> Unit,
     onUserSelect: (User) -> Unit,
     onUserDismiss: () -> Unit,
+    expanded: Boolean,
     label: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    supportingText: @Composable (() -> Unit)? = null
+    supportingText: @Composable (() -> Unit)? = null,
 ) {
-  var expanded by remember { mutableStateOf(false) }
   val value = if (user != null) user.getName() else searchValue
   var textfieldSize by remember { mutableIntStateOf(0) }
   Column {
@@ -46,11 +46,6 @@ fun UserSearchTextField(
         value = value,
         onValueChange = {
           onUserSearch(it)
-          if (value == "" && it != "") {
-            expanded = true
-          } else if (value != "" && it == "") {
-            expanded = false
-          }
         },
         modifier = modifier then Modifier.onSizeChanged { textfieldSize = it.width },
         readOnly = user != null,
@@ -62,15 +57,6 @@ fun UserSearchTextField(
             IconButton(modifier = Modifier.testTag("userDismissButton"), onClick = onUserDismiss) {
               Icon(Icons.Default.Clear, contentDescription = "Clear")
             }
-          } else {
-            IconButton(
-                modifier = Modifier.testTag("userDropButton"), onClick = { expanded = !expanded }) {
-                  if (expanded) {
-                    Icon(Icons.Default.ArrowDropUp, contentDescription = "Collapse")
-                  } else {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
-                  }
-                }
           }
         })
     DropdownMenu(
@@ -78,7 +64,7 @@ fun UserSearchTextField(
             Modifier.testTag("userDropdown")
                 .width(with(LocalDensity.current) { textfieldSize.toDp() }),
         expanded = expanded,
-        onDismissRequest = { expanded = !expanded },
+        onDismissRequest = {  },
         properties = PopupProperties(focusable = false)) {
           userList.forEach { user ->
             DropdownMenuItem(
@@ -86,9 +72,9 @@ fun UserSearchTextField(
                 text = { Text(user.getName()) },
                 onClick = {
                   onUserSelect(user)
-                  expanded = false
                 })
           }
         }
   }
 }
+
