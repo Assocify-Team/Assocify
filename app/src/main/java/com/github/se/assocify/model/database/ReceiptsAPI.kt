@@ -1,9 +1,11 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
+import androidx.annotation.Keep
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
+import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
@@ -58,15 +60,33 @@ class ReceiptsAPI(
   }
 
   private fun parseReceiptList(snapshot: QuerySnapshot): List<Receipt> =
-      snapshot.documents.map { it.toObject(FirestoreReceipt::class.java)!!.toReceipt(it.id) }
+      snapshot.documents.map { it.toObject(FirestoreReceipt::class.java)!!.toReceipt() }
 
-  /** Gets all receipts created by the current user. */
+  /**
+   * Gets all receipts created by the current user.
+   * @param onSuccess called when the fetch succeeds with the list of receipts
+   * @param onError called when the fetch fails with the exception that occurred
+   */
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
-    dbReference
-        .get()
-        .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
-        .addOnFailureListener { onError(it) }
+      dbReference
+          .get()
+          .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
+          .addOnFailureListener { onError(it) }
   }
+
+    /**
+     * Gets a receipt by its ID.
+     * @param id the ID of the receipt to get
+     * @param onSuccess called when the receipt is fetched successfully
+     * @param onError called when the fetch fails with the exception that occurred
+     */
+    fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onError: (Exception) -> Unit) {
+        dbReference
+            .document(id)
+            .get()
+            .addOnSuccessListener { onSuccess(it.toObject(FirestoreReceipt::class.java)!!.toReceipt()) }
+            .addOnFailureListener { onError(it) }
+    }
 
   /**
    * Gets *all* receipts created by *all* users, if the current user has permissions to do so.
@@ -80,18 +100,18 @@ class ReceiptsAPI(
       onReceiptsFetched: (List<Receipt>) -> Unit,
       onError: (String?, Exception) -> Unit
   ) {
-    db.collection(collectionName)
-        .get()
-        .addOnSuccessListener { query ->
-          query.documents.forEach { snapshot ->
-            snapshot.reference
-                .collection("list")
-                .get()
-                .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
-                .addOnFailureListener { onError(snapshot.id, it) }
+      db.collection(collectionName)
+          .get()
+          .addOnSuccessListener { query ->
+              query.documents.forEach { snapshot ->
+                  snapshot.reference
+                      .collection("list")
+                      .get()
+                      .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
+                      .addOnFailureListener { onError(snapshot.id, it) }
+              }
           }
-        }
-        .addOnFailureListener { onError(null, it) }
+          .addOnFailureListener { onError(null, it) }
   }
 
   fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
@@ -102,18 +122,22 @@ class ReceiptsAPI(
         .addOnFailureListener(onFailure)
   }
 
+  @Keep
   private data class FirestoreReceipt(
-      val date: String,
-      val incoming: Boolean,
-      val cents: Int,
-      val phase: Int,
-      val title: String,
-      val description: String,
-      val photo: String,
+      @DocumentId
+      val id: String = "",
+      val date: String = "",
+      val incoming: Boolean = false,
+      val cents: Int = 0,
+      val phase: Int = 0,
+      val title: String = "",
+      val description: String = "",
+      val photo: String = "",
   ) {
     constructor(
         from: Receipt
     ) : this(
+        from.uid,
         from.date.toString(),
         from.incoming,
         from.cents,
@@ -122,9 +146,9 @@ class ReceiptsAPI(
         from.description,
         from.uid)
 
-    fun toReceipt(uid: String) =
+    fun toReceipt() =
         Receipt(
-            uid = uid,
+            uid = this.id,
             date = LocalDate.parse(this.date),
             incoming = this.incoming,
             cents = this.cents,
