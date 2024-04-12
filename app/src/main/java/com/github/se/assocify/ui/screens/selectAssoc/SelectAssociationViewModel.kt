@@ -55,9 +55,9 @@ class SelectAssociationViewModel(
     }
   }
 
-
   /**
    * A function to update the search query
+   *
    * @param query the new value we are trying to search on the bar
    * @param searchState if we are filtering the value on the bar or not
    */
@@ -68,7 +68,8 @@ class SelectAssociationViewModel(
 }
 
 /**
-* A state to represents all the data that remain in the SelectAssociationViewModel
+ * A state to represents all the data that remain in the SelectAssociationViewModel
+ *
  * @param associations the associations to display
  * @param searchQuery the current search query in the search bar
  * @param user the user that is connected in the current screen
