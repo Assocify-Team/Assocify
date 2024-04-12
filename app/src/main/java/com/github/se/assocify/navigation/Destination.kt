@@ -26,7 +26,6 @@ sealed class Destination(
   data object SelectAsso : Destination("login/selectAsso")
 
   data object CreateAsso : Destination("login/createAsso")
-  // }
 
   // data class Receipt(val id: String) : Destination("receipt/$id")
 }
