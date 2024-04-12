@@ -19,14 +19,15 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,9 +36,15 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +52,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -62,14 +70,19 @@ enum class PageIndex(val index: Int) {
   }
 }
 
-/** Main treasury screen UI */
+/** Treasury Screen composable */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun TreasuryScreen(navActions: NavigationActions) {
+fun TreasuryScreen(
+    navActions: NavigationActions,
+    viewModel: ReceiptViewmodel = ReceiptViewmodel()
+) {
+  val viewmodelState by viewModel.uiState.collectAsState()
+
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
-      topBar = { TreasuryTopBar({}, {}) },
+      topBar = { TreasuryTopBar({}, {}, viewModel) },
       bottomBar = {
         MainNavigationBar(
             onTabSelect = { navActions.navigateToMainTab(it) },
@@ -139,7 +152,7 @@ fun TreasuryScreen(navActions: NavigationActions) {
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
-              PageIndex.RECEIPT.index -> MyReceiptPage()
+              PageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
               PageIndex.BUDGET.index -> BudgetPage()
               PageIndex.BALANCE.index -> BalancePage()
             }
@@ -153,19 +166,60 @@ fun TreasuryScreen(navActions: NavigationActions) {
  * ------------------------------------------------- *
  */
 
-/** My receipts UI page */
+/** My Receipts UI page */
 @Composable
-private fun MyReceiptPage() {
-  // val receiptNames = listOf("Grocery Shopping", "Restaurant", "Gas Station", "Coffee Shop")
-  val receiptNames = List(50) { "Receipt $it" }
+private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
+  // Good practice to re-collect it as the page changes
+  val viewmodelState by viewModel.uiState.collectAsState()
+
   LazyColumn(
       modifier = Modifier.testTag("ReceiptList"),
       verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
       horizontalAlignment = Alignment.CenterHorizontally) {
-        receiptNames.forEach { receiptName ->
+        // Header for the user receipts
+        item {
+          Text(
+              text = "My created receipts",
+              style = MaterialTheme.typography.titleMedium,
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp))
+          HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+        }
+
+        if (viewmodelState.userReceipts.isNotEmpty()) {
+          // First list of receipts
+          viewmodelState.userReceipts.forEach { receipt ->
+            item {
+              ReceiptItem(receipt)
+              HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+            }
+          }
+        } else {
+          // Placeholder for empty list
           item {
-            ReceiptItem(receiptName)
-            Divider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+            Text(
+                text = "No receipts found. You can create one!",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(20.dp))
+          }
+        }
+
+        // Global receipts only appear if the user has the permission,
+        // which is handled in the viewmodel whatsoever
+        if (viewmodelState.allReceipts.isNotEmpty()) {
+          // Header for the global receipts
+          item {
+            Text(
+                text = "All receipts",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp))
+            HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+          }
+          // Second list of receipts
+          viewmodelState.allReceipts.forEach { receipt ->
+            item {
+              ReceiptItem(receipt)
+              HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+            }
           }
         }
       }
@@ -212,17 +266,72 @@ fun TreasuryTab(
 fun TreasuryTopBar(
     onAccountClick: () -> Unit,
     onSearchClick: () -> Unit,
+    viewModel: ReceiptViewmodel
 ) {
+  // Search bar state
+  var searchBarVisible by remember { mutableStateOf(false) }
+  var searchText by remember { mutableStateOf("") }
+  var searchReceipts by remember { mutableStateOf(emptyList<Receipt>()) }
+
   CenterAlignedTopAppBar(
-      title = { Text(text = "Treasury", style = MaterialTheme.typography.headlineSmall) },
+      title = {
+        // If the search icon is clicked, the top bar is replaced
+        if (!searchBarVisible) {
+          Text(text = "Treasury", style = MaterialTheme.typography.headlineSmall)
+        } else {
+          TextField(
+              value = searchText,
+              onValueChange = {
+                searchText = it
+                viewModel.setSearchQuery(it)
+                searchReceipts = viewModel.onSearch()
+              },
+              label = { Text("Search receipts") },
+              leadingIcon = {
+                Icon(imageVector = Icons.Filled.Search, contentDescription = "Search icon")
+              },
+              trailingIcon = {
+                IconButton(
+                    onClick = {
+                      searchText = ""
+                      searchReceipts = viewModel.onSearch()
+                    }) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                          contentDescription = "Back arrow")
+                    }
+              },
+              modifier = Modifier.fillMaxWidth().testTag("receiptSearch"))
+        }
+      },
       navigationIcon = {
-        IconButton(modifier = Modifier.testTag("accountIconButton"), onClick = onAccountClick) {
-          Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account logo")
+        if (!searchBarVisible) {
+          IconButton(modifier = Modifier.testTag("accountIconButton"), onClick = onAccountClick) {
+            Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account logo")
+          }
+        } else {
+          IconButton(
+              modifier = Modifier.testTag("backIconButton"),
+              onClick = {
+                searchBarVisible = false
+                searchText = ""
+              }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back arrow")
+              }
         }
       },
       actions = {
-        IconButton(modifier = Modifier.testTag("searchIconButton"), onClick = onSearchClick) {
-          Icon(imageVector = Icons.Filled.Search, contentDescription = "Search receipt")
+        if (!searchBarVisible) {
+          IconButton(
+              modifier = Modifier.testTag("searchIconButton"),
+              onClick = {
+                searchBarVisible = true
+                onSearchClick()
+              }) {
+                Icon(imageVector = Icons.Filled.Search, contentDescription = "Search receipt")
+              }
         }
       },
       colors =
@@ -232,11 +341,11 @@ fun TreasuryTopBar(
 
 /** Receipt item from the list in My Receipts page */
 @Composable
-private fun ReceiptItem(receiptName: String) {
+private fun ReceiptItem(receipt: Receipt) {
   Box(modifier = Modifier.fillMaxWidth().padding(6.dp).height(70.dp).testTag("receiptItemBox")) {
     Column(modifier = Modifier.padding(start = 20.dp)) {
       Text(
-          text = "17/04/2002",
+          text = receipt.date.toString(),
           modifier = Modifier.padding(top = 6.dp).testTag("receiptDateText"),
           style =
               TextStyle(
@@ -246,7 +355,7 @@ private fun ReceiptItem(receiptName: String) {
                   letterSpacing = 0.5.sp,
               ))
       Text(
-          text = receiptName,
+          text = receipt.title,
           modifier = Modifier.testTag("receiptNameText"),
           style =
               TextStyle(
@@ -256,7 +365,7 @@ private fun ReceiptItem(receiptName: String) {
                   letterSpacing = 0.sp,
               ))
       Text(
-          text = "Super description",
+          text = receipt.description,
           modifier = Modifier.testTag("receiptDescriptionText"),
           style =
               TextStyle(
@@ -274,7 +383,7 @@ private fun ReceiptItem(receiptName: String) {
                 .testTag("receiptPriceAndIconRow"),
         verticalAlignment = Alignment.CenterVertically) {
           Text(
-              text = "80.-",
+              text = (receipt.cents / 100.0).toString() + ".-",
               modifier = Modifier.testTag("receiptPriceText"),
               style =
                   TextStyle(
@@ -293,9 +402,9 @@ private fun ReceiptItem(receiptName: String) {
   }
 }
 
-/** Android Studio preview */
-/*@Preview
-@Composable
-private fun PreviewCardsScreen() {
-    TreasuryMainScreen()
-}*/
+/**
+ * Android Studio preview
+ *
+ * @Preview
+ * @Composable private fun PreviewCardsScreen() { MyReceiptPage() }
+ */
