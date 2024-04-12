@@ -1,11 +1,6 @@
 package com.github.se.assocify.model.associations
 
-import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.model.entities.Event
-import com.github.se.assocify.model.entities.Role
-import com.github.se.assocify.model.entities.User
-
+/*
 class AssociationUtils(
     private var user: User,
     private var assocId: String = "",
@@ -144,3 +139,4 @@ class AssociationUtils(
     }
   }
 }
+*/
