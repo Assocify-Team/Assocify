@@ -12,6 +12,8 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -195,23 +197,22 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       arrowBackButton { assertIsNotDisplayed() }
     }
   }
+
+  @Test
+  fun testWithDifferentUserId() {
+    every {
+      mockUserAPI.getUser("testId", any<(User) -> Unit>(), any<(Exception) -> Unit>())
+    } answers
+        {
+          val onSuccessCallback = secondArg<(User) -> Unit>()
+          val user = User("testId", "Ciro", Role("president"))
+          onSuccessCallback(user)
+        }
+    val currentUser = CurrentUser("testId", "testAssocId")
+    composeTestRule.setContent {
+      SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, currentUser)
+    }
+    composeTestRule.onNodeWithText("Hello Tonno !!").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("Hello Ciro !!").assertIsDisplayed()
+  }
 }
-
-/*
-    @Test
-    fun testWithDifferentUserId(){
-      every {mockUserAPI.getUser("testId", any(), any())} answers
-          {
-            val onSuccessCallback = arg<(User) -> Unit>(0)
-            val user = User("Ciro", "cane", Role("president"))
-            onSuccessCallback(user)
-          }
-      val currentUser = CurrentUser("testId", "testAssocId")
-      composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, currentUser) }
-      composeTestRule.onNodeWithText("Hello Tonno !!").assertIsNotDisplayed()
-      composeTestRule.onNodeWithText("Hello Ciro !!").assertIsDisplayed()
-
-
-
-}
-*/
