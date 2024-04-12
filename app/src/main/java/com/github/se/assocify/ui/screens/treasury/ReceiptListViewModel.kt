@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @param currentUser: Current user of the app
  * @param receiptsDatabase: Database API for receipts. A default one is passed
  */
-class ReceiptViewmodel(
+class ReceiptListViewModel(
     private val receiptsDatabase: ReceiptsAPI =
         ReceiptsAPI(
             userId = CurrentUser.userUid!!,
