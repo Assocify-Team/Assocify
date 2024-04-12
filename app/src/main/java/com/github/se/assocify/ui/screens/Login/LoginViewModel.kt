@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.Login
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
@@ -16,6 +17,7 @@ class LoginViewModel(private val userAPI: UserAPI) : ViewModel() {
 
   /** Updates the userId of the UI state */
   fun updateUser() {
+      CurrentUser.userUid = getCurrentUser()!!.uid
     userAPI.getAllUsers(
         { users: List<User> ->
           val user = users.find { it.uid == getCurrentUser()!!.uid }
