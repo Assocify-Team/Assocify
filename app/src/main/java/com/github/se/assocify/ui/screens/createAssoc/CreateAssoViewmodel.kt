@@ -109,13 +109,14 @@ class CreateAssoViewmodel() : ViewModel() {
           onSuccess = { userList ->
             _uiState.value =
                 _uiState.value.copy(
-                    searchMemberList =
-                        userList
-//                            .filterNot { user ->
-//                              _uiState.value.members.any { us -> us.uid == user.uid }
-//                            }
-//                            .filter { it.getName().lowercase().contains(searchMember.lowercase()) }
-                                                  )
+                    searchMemberList = userList
+                    //                            .filterNot { user ->
+                    //                              _uiState.value.members.any { us -> us.uid ==
+                    // user.uid }
+                    //                            }
+                    //                            .filter {
+                    // it.getName().lowercase().contains(searchMember.lowercase()) }
+                    )
           },
           onFailure = { exception ->
             Log.e("CreateAssoViewModel", "Failed to get users:${exception.message}")

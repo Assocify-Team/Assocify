@@ -4,14 +4,13 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoScreen
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoViewmodel
@@ -21,37 +20,28 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import io.mockk.mockk
-import org.junit.Before
-import com.github.se.assocify.navigation.Destination
 import io.mockk.verify
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-
 
 @RunWith(AndroidJUnit4::class)
 class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
+  // Relaxed mocks methods have a default implementation returning values
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK
-  lateinit var mockNavActions: NavigationActions
+  @RelaxedMockK lateinit var mockAssocAPI: AssociationAPI
 
   // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK
-  lateinit var mockAssocAPI: AssociationAPI
+  @RelaxedMockK lateinit var mockUserAPI: UserAPI
 
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK
-  lateinit var mockUserAPI: UserAPI
-
-  @RelaxedMockK
-  lateinit var mockCurrentUser: CurrentUser
+  @RelaxedMockK lateinit var mockCurrentUser: CurrentUser
 
   @get:Rule val mockkRule = MockKRule(this)
-
 
   val bigList =
       listOf(
@@ -68,7 +58,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   val bigView = CreateAssoViewmodel()
 
-    val smallView = CreateAssoViewmodel()
+  val smallView = CreateAssoViewmodel()
 
   @Before
   fun setupLogin() {
@@ -76,7 +66,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
         {
           val onSuccessCallback = arg<(List<User>) -> Unit>(0)
           onSuccessCallback(bigList)
-
         }
     composeTestRule.setContent { CreateAssoScreen(mockNavActions, bigView) }
   }
@@ -150,7 +139,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       // check that the asso is created
     }
   }*/
-  
+
   fun testCreateButton() {
     composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
     with(composeTestRule) {

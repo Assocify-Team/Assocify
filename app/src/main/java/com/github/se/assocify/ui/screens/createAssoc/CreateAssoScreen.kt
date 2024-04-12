@@ -44,11 +44,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Role
-import com.github.se.assocify.ui.composables.UserSearchTextField
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,10 +135,10 @@ fun CreateAssoScreen(
                       Text("Add members")
                     }
                 Button(
-                    onClick = { 
-                      viewmodel.saveAsso() 
-                      navigationActions.navigateTo(Destination.Home) 
-                      },
+                    onClick = {
+                      viewmodel.saveAsso()
+                      navigationActions.navigateTo(Destination.Home)
+                    },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
                     enabled = viewmodel.canSaveAsso()) {
                       Text("Create")
