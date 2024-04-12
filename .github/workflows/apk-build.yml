@@ -5,6 +5,11 @@ on:
       name:
         description: "Release-Build"
         default: "Generate release build"
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 jobs:
   build:
     runs-on: ubuntu-latest
