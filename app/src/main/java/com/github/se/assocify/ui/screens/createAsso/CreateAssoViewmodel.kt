@@ -19,34 +19,35 @@ class CreateAssoViewmodel() : ViewModel() {
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
   private val assoAPI = AssociationAPI(db = Firebase.firestore)
-    private val userAPI = UserAPI(db = Firebase.firestore)
-    val currUser = Firebase.auth.currentUser?.uid // maybe private, unsure yet
+  private val userAPI = UserAPI(db = Firebase.firestore)
+  val currUser = Firebase.auth.currentUser?.uid // maybe private, unsure yet
 
-    // SHLAG POUR TEST
-    private val bigList = listOf(
-        User("1", "Jean1", Role("admin")),
-        User("2", "Paul", Role("admin")),
-        User("3", "Jacques", Role("admin")),
-        User("4", "Marie", Role("admin")),
-        User("5", "Jean5", Role("admin")))
+  // SHLAG POUR TEST
+  private val bigList =
+      listOf(
+          User("1", "Jean1", Role("admin")),
+          User("2", "Paul", Role("admin")),
+          User("3", "Jacques", Role("admin")),
+          User("4", "Marie", Role("admin")),
+          User("5", "Jean5", Role("admin")))
 
-    /*
-     * Sets the name of the association
-     */
+  /*
+   * Sets the name of the association
+   */
   fun setName(name: String) {
     // need input sanitization TODO
     _uiState.value = _uiState.value.copy(name = name)
   }
 
-    private fun sortMembers(memberList: List<User>): List<User> {
-        return memberList.sortedWith(compareBy({ it.role.getRoleType().ordinal }, { it.name }))
-    }
+  private fun sortMembers(memberList: List<User>): List<User> {
+    return memberList.sortedWith(compareBy({ it.role.getRoleType().ordinal }, { it.name }))
+  }
 
-    /*
-     * Opens the edit member dialog
-     */
+  /*
+   * Opens the edit member dialog
+   */
   fun addMember() {
-      _uiState.value = _uiState.value.copy(openEdit = true)
+    _uiState.value = _uiState.value.copy(openEdit = true)
   }
 
   /*
@@ -54,11 +55,12 @@ class CreateAssoViewmodel() : ViewModel() {
    */
   fun addMemberToList() {
     // need input sanitization (editmember non null) TODO
-      // keep the list of members sorted by role then name
-    val memberList = sortMembers(_uiState.value.members.filter { user ->
-        user.uid != _uiState.value.editMember!!.uid
-    } + _uiState.value.editMember!!)
-      // can't add a member already in the list -> should be disabled by the list of names already
+    // keep the list of members sorted by role then name
+    val memberList =
+        sortMembers(
+            _uiState.value.members.filter { user -> user.uid != _uiState.value.editMember!!.uid } +
+                _uiState.value.editMember!!)
+    // can't add a member already in the list -> should be disabled by the list of names already
     _uiState.value = _uiState.value.copy(members = memberList)
     _uiState.value = _uiState.value.copy(openEdit = false)
     _uiState.value = _uiState.value.copy(editMember = null)
@@ -78,62 +80,64 @@ class CreateAssoViewmodel() : ViewModel() {
   }
 
   fun cancelModifyMember() {
-      _uiState.value = _uiState.value.copy(openEdit = false)
+    _uiState.value = _uiState.value.copy(openEdit = false)
     _uiState.value = _uiState.value.copy(editMember = null)
   }
 
   fun modifyMemberName(name: String) {
-      // TODO CHANGE
+    // TODO CHANGE
     // will need to change the uid depending on members in DB -> waiting for memberSearch merge
     _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.copy(uid = name))
     _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.copy(name = name))
   }
 
-    /*
-     * Searches for member with corresponding name in the database
-     */
-    fun searchMember(searchMember: String) {
-        // TODO
-        _uiState.value = _uiState.value.copy(searchMember = searchMember)
-        //userAPI.getAllUsers { userList ->
-        // SHLAG POUR TEST
-        bigList.let { userList ->
-            _uiState.value =
-                _uiState.value.copy(
-                    searchMemberList = userList.filterNot { user -> _uiState.value.members.any { us -> us.uid == user.uid } }
-                        .filter { it.name.lowercase().contains(searchMember.lowercase()) })
+  /*
+   * Searches for member with corresponding name in the database
+   */
+  fun searchMember(searchMember: String) {
+    // TODO
+    _uiState.value = _uiState.value.copy(searchMember = searchMember)
+    // userAPI.getAllUsers { userList ->
+    // SHLAG POUR TEST
+    bigList.let { userList ->
+      _uiState.value =
+          _uiState.value.copy(
+              searchMemberList =
+                  userList
+                      .filterNot { user -> _uiState.value.members.any { us -> us.uid == user.uid } }
+                      .filter { it.name.lowercase().contains(searchMember.lowercase()) })
 
-            if (_uiState.value.searchMemberList.isEmpty()) {
-                _uiState.value = _uiState.value.copy(memberError = "No users found")
-            } else {
-                _uiState.value = _uiState.value.copy(memberError = null)
-            }
-        }
+      if (_uiState.value.searchMemberList.isEmpty()) {
+        _uiState.value = _uiState.value.copy(memberError = "No users found")
+      } else {
+        _uiState.value = _uiState.value.copy(memberError = null)
+      }
     }
+  }
 
-    /*
-     * Selects a member from the search list
-     */
-    fun selectMember(member: User) {
-        // TODO
-        _uiState.value = _uiState.value.copy(editMember = member)
-        _uiState.value = _uiState.value.copy(searchMember = "")
-        _uiState.value = _uiState.value.copy(searchMemberList = listOf())
-    }
+  /*
+   * Selects a member from the search list
+   */
+  fun selectMember(member: User) {
+    // TODO
+    _uiState.value = _uiState.value.copy(editMember = member)
+    _uiState.value = _uiState.value.copy(searchMember = "")
+    _uiState.value = _uiState.value.copy(searchMemberList = listOf())
+  }
 
-    /*
-     * Dismisses the member search dialog
-     */
-    fun dismissMemberSearch() {
-        // TODO
-        _uiState.value = _uiState.value.copy(editMember = null)
-        _uiState.value = _uiState.value.copy(searchMember = "")
-        _uiState.value = _uiState.value.copy(searchMemberList = listOf())
-    }
+  /*
+   * Dismisses the member search dialog
+   */
+  fun dismissMemberSearch() {
+    // TODO
+    _uiState.value = _uiState.value.copy(editMember = null)
+    _uiState.value = _uiState.value.copy(searchMember = "")
+    _uiState.value = _uiState.value.copy(searchMemberList = listOf())
+  }
 
-    /*
-     * Gives/removes role to the member
-     */
+  /*
+   * Gives/removes role to the member
+   */
   fun modifyMemberRole(role: String) {
     _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.toggleRole(role))
   }

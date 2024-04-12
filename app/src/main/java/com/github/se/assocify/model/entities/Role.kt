@@ -12,7 +12,7 @@ data class Role(val name: String) {
     STAFF
   }
 
-fun getRoleType(): RoleType {
+  fun getRoleType(): RoleType {
     return when (name.lowercase()) {
       "pending" -> RoleType.PENDING
       "presidence" -> RoleType.PRESIDENCE

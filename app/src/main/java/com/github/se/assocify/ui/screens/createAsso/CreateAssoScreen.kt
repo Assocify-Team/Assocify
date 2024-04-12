@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -58,9 +57,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
       modifier = Modifier.testTag("createAssoScreen"),
       topBar = {
         TopAppBar(
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("TopAppBar"),
+            modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
               IconButton(onClick = { /* TODO : go back to previous screen */}) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -70,9 +67,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
       },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -81,9 +76,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedIconButton(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .testTag("logo"),
+                    modifier = Modifier.padding(top = 8.dp).testTag("logo"),
                     onClick = {
                       /* TODO : can add association logo // note : nowhere to put it yet because picture not handled in DB */
                     }) {
@@ -95,25 +88,19 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                     value = state.name,
                     onValueChange = { viewmodel.setName(it) },
                     label = { Text("Association Name") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("name"))
+                    modifier = Modifier.fillMaxWidth().testTag("name"))
               }
 
           LazyColumn(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .weight(1f)
-                  .testTag("MemberList"),
+              modifier = Modifier.fillMaxWidth().weight(1f).testTag("MemberList"),
               verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 state.members.forEach { member ->
                   item {
                     ListItem(
                         modifier =
-                        Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .testTag("memberListItem-${member.name}"),
+                            Modifier.clip(RoundedCornerShape(10.dp))
+                                .testTag("memberListItem-${member.name}"),
                         headlineContent = { Text(member.name) },
                         overlineContent = { Text(member.role.name) },
                         leadingContent = {
@@ -134,17 +121,13 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
                     onClick = { viewmodel.addMember() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("addMember")) {
+                    modifier = Modifier.fillMaxWidth().testTag("addMember")) {
                       Icon(Icons.Default.Add, contentDescription = "Add members")
                       Text("Add members")
                     }
                 Button( // TODO : should be disabled if no member/name empty ?
                     onClick = { viewmodel.saveAsso() /*TODO then navigate to home*/ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("create")) {
+                    modifier = Modifier.fillMaxWidth().testTag("create")) {
                       Text("Create")
                     }
               }
@@ -156,64 +139,61 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
             ElevatedCard {
               // temporary UI to see if dialog opens
               Column(
-                  modifier = Modifier
-                      .padding(16.dp)
-                      .fillMaxWidth(),
+                  modifier = Modifier.padding(16.dp).fillMaxWidth(),
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     /*OutlinedTextField(
-                        value = state.editMember.name,
-                        onValueChange = { viewmodel.modifyMemberName(it) },
+                    value = state.editMember.name,
+                    onValueChange = { viewmodel.modifyMemberName(it) },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth())*/
+                    UserSearchTextField(
+                        modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
+                        searchValue =
+                            state
+                                .searchMember, // ce qui est tapé dans barre -> vide quand y a un
+                                               // user
+                        userList = state.searchMemberList, // ce qui apparait dans la liste
+                        user = state.editMember, // ce qui est sélectionné -> null quand tu cherche
+                        onUserSearch = { viewmodel.searchMember(it) }, // on value change
+                        onUserSelect = {
+                          viewmodel.selectMember(it)
+                        }, // quand tu click qur user de dropdown
+                        onUserDismiss = { viewmodel.dismissMemberSearch() }, // click sur croix
                         label = { Text("Name") },
-                        modifier = Modifier.fillMaxWidth())*/
-                  UserSearchTextField(
-                      modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
-                      searchValue = state.searchMember, // ce qui est tapé dans barre -> vide quand y a un user
-                      userList = state.searchMemberList, // ce qui apparait dans la liste
-                      user = state.editMember, // ce qui est sélectionné -> null quand tu cherche
-                      onUserSearch = { viewmodel.searchMember(it) }, // on value change
-                      onUserSelect = { viewmodel.selectMember(it) }, // quand tu click qur user de dropdown
-                      onUserDismiss = { viewmodel.dismissMemberSearch() }, // click sur croix
-                      label = { Text("Name") },
-                  )
+                    )
                     if (state.editMember != null) {
-                        // maybe can't select role before selecting member ?
-                        Role.RoleType.entries
-                            .filter { role -> role != Role.RoleType.PENDING }
-                            .forEach { role ->
-                                ListItem(
-                                    headlineContent = { Text(role.name.uppercase()) },
-                                    trailingContent = {
-                                        RadioButton(
-                                            selected = state.editMember!!.hasRole(role.name),
-                                            onClick = { viewmodel.modifyMemberRole(role.name) })
-                                    })
-                            }
+                      // maybe can't select role before selecting member ?
+                      Role.RoleType.entries
+                          .filter { role -> role != Role.RoleType.PENDING }
+                          .forEach { role ->
+                            ListItem(
+                                headlineContent = { Text(role.name.uppercase()) },
+                                trailingContent = {
+                                  RadioButton(
+                                      selected = state.editMember!!.hasRole(role.name),
+                                      onClick = { viewmodel.modifyMemberRole(role.name) })
+                                })
+                          }
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                      Row(
+                          modifier = Modifier.fillMaxWidth().padding(4.dp),
+                          horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedButton(
                                 onClick = { viewmodel.removeMember(state.editMember!!) },
-                                modifier = Modifier
-                                    .wrapContentSize()
-                                    .weight(1f),
+                                modifier = Modifier.wrapContentSize().weight(1f),
                                 colors =
-                                ButtonDefaults.outlinedButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.error),
+                                    ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.error),
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)) {
-                                Text("Delete", textAlign = TextAlign.Center)
-                            }
+                                  Text("Delete", textAlign = TextAlign.Center)
+                                }
 
                             OutlinedButton(
                                 onClick = { viewmodel.addMemberToList() },
-                                modifier = Modifier
-                                    .wrapContentSize()
-                                    .weight(1f)) {
-                                Text(text = "Save", textAlign = TextAlign.Center)
-                            }
-                        }
+                                modifier = Modifier.wrapContentSize().weight(1f)) {
+                                  Text(text = "Save", textAlign = TextAlign.Center)
+                                }
+                          }
                     }
                   }
             }
