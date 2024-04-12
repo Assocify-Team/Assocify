@@ -1,6 +1,7 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
+import android.util.Log
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
@@ -19,11 +20,12 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
-import java.time.LocalDate
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
 
 @MockKExtension.ConfirmVerification
 class ReceiptsAPITest {
@@ -75,6 +77,10 @@ class ReceiptsAPITest {
 
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
+
+    // Temporary workaround
+    mockkStatic(Log::class)
+    every { Log.w(any(), any<String>()) }.returns(0)
 
     api =
         spyk<ReceiptsAPI>(ReceiptsAPI("uid", "aid", storage, firestore), recordPrivateCalls = true)
