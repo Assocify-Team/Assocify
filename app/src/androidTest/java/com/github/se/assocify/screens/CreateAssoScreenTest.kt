@@ -5,25 +5,53 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.testCurrentUser
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoScreen
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoViewmodel
+import com.kaspersky.components.composesupport.config.withComposeSupport
+import com.kaspersky.kaspresso.kaspresso.Kaspresso
+import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class CreateAssoScreenTest {
+
+@RunWith(AndroidJUnit4::class)
+class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-  private val userAPI = mockk<UserAPI>()
-  private val assoAPI = mockk<AssociationAPI>()
 
-  private val bigList =
+  // Relaxed mocks methods have a default implementation returning values
+  @RelaxedMockK
+  lateinit var mockNavActions: NavigationActions
+
+  // Relaxed mocks methods have a default implementation returning values
+  @RelaxedMockK
+  lateinit var mockAssocAPI: AssociationAPI
+
+  // Relaxed mocks methods have a default implementation returning values
+  @RelaxedMockK
+  lateinit var mockUserAPI: UserAPI
+
+  @RelaxedMockK
+  lateinit var mockCurrentUser: CurrentUser
+
+  @get:Rule val mockkRule = MockKRule(this)
+
+
+  val bigList =
       listOf(
           User("1", "jean", Role("")),
           User("2", "roger", Role("")),
@@ -36,28 +64,14 @@ class CreateAssoScreenTest {
           User("9", "bill", Role("")),
           User("10", "seb", Role("")))
 
-  private val bigView = CreateAssoViewmodel(testCurrentUser)
+  val bigView = CreateAssoViewmodel(testCurrentUser)
 
   @Before
   fun setupLogin() {
-    every { userAPI.getAllUsers(any(), any()) } answers
+    every { mockUserAPI.getAllUsers(any(), any()) } answers
         {
-          val bigL =
-            listOf(
-              User("1", "jean", Role("")),
-              User("2", "roger", Role("")),
-              User("3", "jacques", Role("")),
-              User("4", "marie", Role("")),
-              User("5", "killian", Role("")),
-              User("6", "paul", Role("")),
-              User("7", "james", Role("")),
-              User("8", "julie", Role("")),
-              User("9", "bill", Role("")),
-              User("10", "seb", Role("")))
-          val onSuccess = firstArg<(List<User>) -> Unit>()
-          val onFailure = secondArg<(Exception) -> Unit>()
-          onSuccess(bigL) // instantiate with a empty list: just to test login
-          onFailure(Exception("test mdr"))
+          val onSuccessCallback = arg<(List<User>) -> Unit>(0)
+          onSuccessCallback(bigList)
 
         }
     composeTestRule.setContent { CreateAssoScreen(testCurrentUser, bigView) }
