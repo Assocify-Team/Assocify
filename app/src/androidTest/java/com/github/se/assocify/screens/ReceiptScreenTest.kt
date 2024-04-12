@@ -140,10 +140,10 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun incoming() {
     with(composeTestRule) {
-      onNodeWithTag("earningChip").performClick()
+      onNodeWithTag("earningChip").performScrollTo().performClick()
       assert(viewModel.uiState.value.incoming == true)
 
-      onNodeWithTag("expenseChip").performClick()
+      onNodeWithTag("expenseChip").performScrollTo().performClick()
       assert(viewModel.uiState.value.incoming == false)
     }
   }
