@@ -3,6 +3,35 @@ package com.github.se.assocify.model.entities
 data class Role(private val name: String) {
   constructor() : this("")
 
+  /*
+   * enumeration of all roles, sorted by importance
+   */
+  enum class RoleType {
+    PENDING,
+    PRESIDENCE,
+    TREASURY,
+    COMMITTEE,
+    MEMBER,
+    STAFF
+  }
+
+  /**
+   * Returns the role type of the role
+   *
+   * @return the role type of the role
+   */
+  fun getRoleType(): RoleType {
+    return when (name.lowercase()) {
+      "pending" -> RoleType.PENDING
+      "presidence" -> RoleType.PRESIDENCE
+      "treasury" -> RoleType.TREASURY
+      "committee" -> RoleType.COMMITTEE
+      "member" -> RoleType.MEMBER
+      "staff" -> RoleType.STAFF
+      else -> RoleType.PENDING
+    }
+  }
+
   /**
    * Returns true if the name of the role is the same as the name of the other role
    *
