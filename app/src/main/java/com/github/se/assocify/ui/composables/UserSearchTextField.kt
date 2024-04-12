@@ -1,5 +1,5 @@
 package com.github.se.assocify.ui.composables
-
+/*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -93,3 +93,4 @@ fun UserSearchTextField(
         }
   }
 }
+*/
