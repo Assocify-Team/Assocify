@@ -104,7 +104,7 @@ fun CreateAssoScreen(
                     ListItem(
                         modifier =
                             Modifier.clip(RoundedCornerShape(10.dp))
-                                .testTag("memberListItem-${member.getName()}"),
+                                .testTag("MemberListItem-${member.getName()}"),
                         headlineContent = { Text(member.getName()) },
                         overlineContent = { Text(member.getRole().name) },
                         leadingContent = {
@@ -182,7 +182,7 @@ fun CreateAssoScreen(
                           horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedButton(
                                 onClick = { viewmodel.removeMember(state.editMember!!) },
-                                modifier = Modifier.wrapContentSize().weight(1f),
+                                modifier = Modifier.wrapContentSize().weight(1f).testTag("deleteMember"),
                                 colors =
                                     ButtonDefaults.outlinedButtonColors(
                                         contentColor = MaterialTheme.colorScheme.error),
@@ -192,7 +192,7 @@ fun CreateAssoScreen(
 
                             OutlinedButton(
                                 onClick = { viewmodel.addMemberToList() },
-                                modifier = Modifier.wrapContentSize().weight(1f)) {
+                                modifier = Modifier.wrapContentSize().weight(1f).testTag("addMemberButton")) {
                                   Text(text = "Save", textAlign = TextAlign.Center)
                                 }
                           }

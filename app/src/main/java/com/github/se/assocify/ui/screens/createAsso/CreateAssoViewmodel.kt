@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
@@ -19,16 +20,22 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
   private val assoAPI = AssociationAPI(db = Firebase.firestore)
+    private val userAPI = UserAPI(db = Firebase.firestore)
   val currUser = currentUser.userUid
 
   // SHLAG POUR TEST
   private val bigList =
       listOf(
-          User("testUserUid", "Jean1", Role("admin")),
-          User("2", "Paul", Role("admin")),
-          User("3", "Jacques", Role("admin")),
-          User("4", "Marie", Role("admin")),
-          User("5", "Jean5", Role("admin")))
+          User("1", "jean", Role("")),
+          User("2", "roger", Role("")),
+          User("3", "jacques", Role("")),
+          User("4", "marie", Role("")),
+          User("5", "killian", Role("")),
+          User("6", "paul", Role("")),
+          User("7", "james", Role("")),
+          User("8", "julie", Role("")),
+          User("9", "bill", Role("")),
+          User("10", "seb", Role("")))
 
   /*
    * Sets the name of the association
@@ -98,24 +105,35 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
     _uiState.value = _uiState.value.copy(searchMember = searchMember) // ?
     // TODO
     if (searchMember.isNotBlank()) {
-      // userAPI.getAllUsers { userList ->
-      // SHLAG POUR TEST
+//       userAPI.getAllUsers( onSuccess =  { userList ->
+//        _uiState.value =
+//            _uiState.value.copy(
+//                searchMemberList =
+//                    userList
+//                        .filterNot { user ->
+//                          _uiState.value.members.any { us -> us.uid == user.uid }
+//                        }
+//                        .filter { it.getName().lowercase().contains(searchMember.lowercase()) })},
+//           onFailure =  { exception -> Log.e("CreateAssoViewModel", "Failed to get users: ${exception.message}") }
+//       )
+        // VERSION SHLAG POUR TEST
       bigList.let { userList ->
-        _uiState.value =
-            _uiState.value.copy(
-                searchMemberList =
-                    userList
-                        .filterNot { user ->
+          _uiState.value =
+              _uiState.value.copy(
+                  searchMemberList =
+                  userList
+                      .filterNot { user ->
                           _uiState.value.members.any { us -> us.uid == user.uid }
-                        }
-                        .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
+                      }
+                      .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
+      }
 
         if (_uiState.value.searchMemberList.isEmpty()) {
           _uiState.value = _uiState.value.copy(memberError = "No users found")
         } else {
           _uiState.value = _uiState.value.copy(memberError = null)
         }
-      }
+
     } else { // idk
       _uiState.value = _uiState.value.copy(memberError = null)
     }
