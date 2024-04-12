@@ -42,8 +42,23 @@ class CreateAssoScreenTest {
   fun setupLogin() {
     every { userAPI.getAllUsers(any(), any()) } answers
         {
+          val bigL =
+            listOf(
+              User("1", "jean", Role("")),
+              User("2", "roger", Role("")),
+              User("3", "jacques", Role("")),
+              User("4", "marie", Role("")),
+              User("5", "killian", Role("")),
+              User("6", "paul", Role("")),
+              User("7", "james", Role("")),
+              User("8", "julie", Role("")),
+              User("9", "bill", Role("")),
+              User("10", "seb", Role("")))
           val onSuccess = firstArg<(List<User>) -> Unit>()
-          onSuccess(bigList) // instantiate with a empty list: just to test login
+          val onFailure = secondArg<(Exception) -> Unit>()
+          onSuccess(bigL) // instantiate with a empty list: just to test login
+          onFailure(Exception("test mdr"))
+
         }
     composeTestRule.setContent { CreateAssoScreen(testCurrentUser, bigView) }
   }
@@ -67,6 +82,7 @@ class CreateAssoScreenTest {
       onNodeWithTag("memberSearchField").assertIsDisplayed()
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       assert(bigView.uiState.value.searchMember == "j")
+      println("pute " + bigView.uiState.value.searchMemberList)
       assert(bigView.uiState.value.searchMemberList.size == 4)
       onNodeWithTag("userDropdownItem-1").assertIsDisplayed()
       onNodeWithTag("userDropdownItem-3").assertIsDisplayed()

@@ -11,7 +11,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.intent.rule.IntentsRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.Login.LoginScreen
+import com.github.se.assocify.ui.screens.login.LoginScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase

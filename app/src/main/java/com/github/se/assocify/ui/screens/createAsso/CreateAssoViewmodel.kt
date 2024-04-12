@@ -105,7 +105,23 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
     _uiState.value = _uiState.value.copy(searchMember = searchMember) // ?
     // TODO
     if (searchMember.isNotBlank()) {
-      //       userAPI.getAllUsers( onSuccess =  { userList ->
+      userAPI.getAllUsers(
+          onSuccess = { userList ->
+            _uiState.value =
+                _uiState.value.copy(
+                    searchMemberList =
+                        userList
+//                            .filterNot { user ->
+//                              _uiState.value.members.any { us -> us.uid == user.uid }
+//                            }
+//                            .filter { it.getName().lowercase().contains(searchMember.lowercase()) }
+                                                  )
+          },
+          onFailure = { exception ->
+            Log.e("CreateAssoViewModel", "Failed to get users:${exception.message}")
+          })
+      // VERSION SHLAG POUR TEST
+      //      bigList.let { userList ->
       //        _uiState.value =
       //            _uiState.value.copy(
       //                searchMemberList =
@@ -114,21 +130,8 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
       //                          _uiState.value.members.any { us -> us.uid == user.uid }
       //                        }
       //                        .filter {
-      // it.getName().lowercase().contains(searchMember.lowercase()) })},
-      //           onFailure =  { exception -> Log.e("CreateAssoViewModel", "Failed to get users:
-      // ${exception.message}") }
-      //       )
-      // VERSION SHLAG POUR TEST
-      bigList.let { userList ->
-        _uiState.value =
-            _uiState.value.copy(
-                searchMemberList =
-                    userList
-                        .filterNot { user ->
-                          _uiState.value.members.any { us -> us.uid == user.uid }
-                        }
-                        .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
-      }
+      // it.getName().lowercase().contains(searchMember.lowercase()) })
+      //      }
 
       if (_uiState.value.searchMemberList.isEmpty()) {
         _uiState.value = _uiState.value.copy(memberError = "No users found")
