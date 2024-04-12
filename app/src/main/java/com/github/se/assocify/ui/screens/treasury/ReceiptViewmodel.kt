@@ -36,7 +36,11 @@ class ReceiptViewmodel(
 
   init {
     // Define user entity
-    userAPI.getUser(Firebase.auth.currentUser!!.uid, callback = { user = it })
+    userAPI.getUser(Firebase.auth.currentUser!!.uid,
+      onSuccess = { user = it },
+      onFailure = { // TODO on sprint 4 with error API
+      }
+    )
     updateUserReceipts()
     updateAllReceipts()
   }
