@@ -127,7 +127,6 @@ class ReceiptsAPI(
   @Keep
   private data class FirestoreReceipt(
       @DocumentId val id: String = "",
-      val payer: String = "",
       val date: String = "",
       val incoming: Boolean = false,
       val cents: Int = 0,
@@ -140,7 +139,6 @@ class ReceiptsAPI(
         from: Receipt
     ) : this(
         from.uid,
-        from.payer,
         from.date.toString(),
         from.incoming,
         from.cents,
@@ -151,15 +149,14 @@ class ReceiptsAPI(
 
     fun toReceipt() =
         Receipt(
-            this.id,
-            this.payer,
-            LocalDate.parse(this.date),
-            this.incoming,
-            this.cents,
-            Phase.entries[this.phase],
-            this.title,
-            this.description,
-            MaybeRemotePhoto.Remote(photo),
+            uid = this.id,
+            date = LocalDate.parse(this.date),
+            incoming = this.incoming,
+            cents = this.cents,
+            phase = Phase.entries[this.phase],
+            title = this.title,
+            description = this.description,
+            photo = MaybeRemotePhoto.Remote(photo),
         )
   }
 }

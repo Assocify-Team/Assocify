@@ -1,6 +1,7 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
+import android.util.Log
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
@@ -20,7 +21,8 @@ import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
 import java.time.LocalDate
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,27 +43,25 @@ class ReceiptsAPITest {
 
   private val successfulReceipt =
       Receipt(
-          "successful_rid",
-          "payer",
-          LocalDate.EPOCH,
-          false,
-          100,
-          Phase.Approved,
-          "title",
-          "notes",
-          MaybeRemotePhoto.Remote("path"))
+          uid = "successful_rid",
+          date = LocalDate.EPOCH,
+          incoming = false,
+          cents = 100,
+          phase = Phase.Approved,
+          title = "title",
+          description = "notes",
+          photo = MaybeRemotePhoto.Remote("path"))
 
   private val failingReceipt =
       Receipt(
-          "failing_rid",
-          "payer",
-          LocalDate.EPOCH,
-          false,
-          100,
-          Phase.Approved,
-          "title",
-          "notes",
-          MaybeRemotePhoto.LocalFile("path"))
+          uid = "failing_rid",
+          date = LocalDate.EPOCH,
+          incoming = false,
+          cents = 100,
+          phase = Phase.Approved,
+          title = "title",
+          description = "notes",
+          photo = MaybeRemotePhoto.LocalFile("path"))
 
   @Before
   fun setUp() {
@@ -77,6 +77,10 @@ class ReceiptsAPITest {
 
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
+
+    // Temporary workaround
+    mockkStatic(Log::class)
+    every { Log.w(any(), any<String>()) }.returns(0)
 
     api =
         spyk<ReceiptsAPI>(ReceiptsAPI("uid", "aid", storage, firestore), recordPrivateCalls = true)
