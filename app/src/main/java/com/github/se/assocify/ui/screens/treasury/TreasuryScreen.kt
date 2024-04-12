@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -46,11 +45,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.se.assocify.model.database.ReceiptsAPI
-import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -75,6 +72,8 @@ enum class PageIndex(val index: Int) {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TreasuryScreen(navActions: NavigationActions, viewModel: ReceiptViewmodel = ReceiptViewmodel()) {
+  val viewmodelState by viewModel.uiState.collectAsState()
+
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}) },
@@ -166,9 +165,8 @@ fun TreasuryScreen(navActions: NavigationActions, viewModel: ReceiptViewmodel = 
  */
 @Composable
 private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
-  val overviewState by viewModel.uiState.collectAsState()
-  val firstReceiptList = List(3) { "Receipt 1-$it" }
-  val secondReceiptList = List(3) { "Receipt 2-$it" }
+  // Good practice to re-collect it as the page changes
+  val viewmodelState by viewModel.uiState.collectAsState()
 
   LazyColumn(
     modifier = Modifier.testTag("ReceiptList"),
@@ -186,30 +184,47 @@ private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
       )
       HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
     }
-    // First list of receipts
-    overviewState.userReceipts.forEach { receiptName ->
+
+    if (viewmodelState.userReceipts.isNotEmpty()) {
+      // First list of receipts
+      viewmodelState.userReceipts.forEach { receipt ->
+        item {
+          ReceiptItem(receipt)
+          HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+        }
+      }
+    } else {
+      // Placeholder for empty list
       item {
-        ReceiptItem(receiptName)
-        HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+        Text(
+          text = "No receipts found. You can create one!",
+          style = MaterialTheme.typography.bodyMedium,
+          modifier = Modifier.padding(20.dp)
+        )
       }
     }
 
-    // Header for the global receipts
-    item {
-      Text(
-        text = "All receipts",
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 20.dp, vertical = 16.dp)
-      )
-      HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
-    }
-    // Second list of receipts
-    overviewState.allReceipts.forEach { receiptName ->
+
+    // Global receipts only appear if the user has the permission,
+    // which is handled in the viewmodel whatsoever
+    if (viewmodelState.allReceipts.isNotEmpty()) {
+      // Header for the global receipts
       item {
-        ReceiptItem(receiptName.title)
+        Text(
+          text = "All receipts",
+          style = MaterialTheme.typography.titleMedium,
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+        )
         HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+      }
+      // Second list of receipts
+      viewmodelState.allReceipts.forEach { receipt ->
+        item {
+          ReceiptItem(receipt)
+          HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+        }
       }
     }
   }
@@ -284,11 +299,11 @@ fun TreasuryTopBar(
 
 /** Receipt item from the list in My Receipts page */
 @Composable
-private fun ReceiptItem(receiptName: String) {
+private fun ReceiptItem(receipt: Receipt) {
   Box(modifier = Modifier.fillMaxWidth().padding(6.dp).height(70.dp).testTag("receiptItemBox")) {
     Column(modifier = Modifier.padding(start = 20.dp)) {
       Text(
-          text = "17/04/2002",
+          text = receipt.date.toString(),
           modifier = Modifier.padding(top = 6.dp).testTag("receiptDateText"),
           style =
               TextStyle(
@@ -298,7 +313,7 @@ private fun ReceiptItem(receiptName: String) {
                   letterSpacing = 0.5.sp,
               ))
       Text(
-          text = receiptName,
+          text = receipt.title,
           modifier = Modifier.testTag("receiptNameText"),
           style =
               TextStyle(
@@ -308,7 +323,7 @@ private fun ReceiptItem(receiptName: String) {
                   letterSpacing = 0.sp,
               ))
       Text(
-          text = "Super description",
+          text = receipt.description,
           modifier = Modifier.testTag("receiptDescriptionText"),
           style =
               TextStyle(
@@ -326,7 +341,7 @@ private fun ReceiptItem(receiptName: String) {
                 .testTag("receiptPriceAndIconRow"),
         verticalAlignment = Alignment.CenterVertically) {
           Text(
-              text = "80.-",
+              text = (receipt.cents / 100.0).toString() + ".-",
               modifier = Modifier.testTag("receiptPriceText"),
               style =
                   TextStyle(
@@ -345,9 +360,10 @@ private fun ReceiptItem(receiptName: String) {
   }
 }
 
-/** Android Studio preview */
+/** Android Studio preview
 @Preview
 @Composable
 private fun PreviewCardsScreen() {
     MyReceiptPage()
 }
+*/
