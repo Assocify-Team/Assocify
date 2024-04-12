@@ -67,7 +67,6 @@ class CreateAssoScreenTest {
       onNodeWithTag("memberSearchField").assertIsDisplayed()
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       assert(bigView.uiState.value.searchMember == "j")
-      println("PUTE " + bigView.uiState.value.searchMemberList)
       assert(bigView.uiState.value.searchMemberList.size == 4)
       onNodeWithTag("userDropdownItem-1").assertIsDisplayed()
       onNodeWithTag("userDropdownItem-3").assertIsDisplayed()
@@ -82,6 +81,23 @@ class CreateAssoScreenTest {
       assert(bigView.uiState.value.members.size == 1)
       assert(bigView.uiState.value.members[0].getName() == "jacques")
       onNodeWithTag("MemberListItem-jacques").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testDeleteMember() {
+    with(composeTestRule) {
+      onNodeWithTag("addMember").performClick()
+      onNodeWithTag("memberSearchField").performClick().performTextInput("j")
+      onNodeWithTag("userDropdownItem-3").performClick() // jacques
+      onNodeWithTag("addMemberButton").performClick()
+      onNodeWithTag("MemberListItem-jacques").assertIsDisplayed()
+      onNodeWithTag("editMember-jacques").performClick()
+      assert(bigView.uiState.value.editMember?.getName() == "jacques")
+      onNodeWithTag("deleteMember").assertIsDisplayed()
+      onNodeWithTag("deleteMember").performClick()
+      assert(bigView.uiState.value.members.isEmpty())
+      onNodeWithTag("MemberListItem-jacques").assertDoesNotExist()
     }
   }
 }
