@@ -38,6 +38,10 @@ class CreateAssoViewmodel() : ViewModel() {
     _uiState.value = _uiState.value.copy(name = name)
   }
 
+    private fun sortMembers(memberList: List<User>): List<User> {
+        return memberList.sortedWith(compareBy({ it.role.getRoleType().ordinal }, { it.name }))
+    }
+
     /*
      * Opens the edit member dialog
      */
@@ -50,18 +54,17 @@ class CreateAssoViewmodel() : ViewModel() {
    */
   fun addMemberToList() {
     // need input sanitization (editmember non null) TODO
-    _uiState.value =
-        _uiState.value.copy(
-            members =
-                _uiState.value.members.filter { user ->
-                  user.uid != _uiState.value.editMember!!.uid
-                } + _uiState.value.editMember!!)
+      // keep the list of members sorted by role then name
+    val memberList = sortMembers(_uiState.value.members.filter { user ->
+        user.uid != _uiState.value.editMember!!.uid
+    } + _uiState.value.editMember!!)
+      // can't add a member already in the list -> should be disabled by the list of names already
+    _uiState.value = _uiState.value.copy(members = memberList)
     _uiState.value = _uiState.value.copy(openEdit = false)
     _uiState.value = _uiState.value.copy(editMember = null)
   }
 
   fun removeMember(member: User) {
-    // need input sanitization TODO
     _uiState.value = _uiState.value.copy(openEdit = false)
     _uiState.value = _uiState.value.copy(editMember = null)
     _uiState.value = _uiState.value.copy(members = _uiState.value.members - member)
