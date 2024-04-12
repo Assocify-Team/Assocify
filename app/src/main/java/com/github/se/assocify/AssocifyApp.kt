@@ -17,7 +17,6 @@ fun AssocifyApp() {
   val db: FirebaseFirestore = FirebaseFirestore.getInstance()
   val userAPI = UserAPI(db)
   val associationAPI = AssociationAPI(db)
-
   NavHost(navController = navController, startDestination = Destination.Login.route) {
     mainNavGraph(navActions = navActions, userAPI = userAPI, associationAPI = associationAPI)
   }

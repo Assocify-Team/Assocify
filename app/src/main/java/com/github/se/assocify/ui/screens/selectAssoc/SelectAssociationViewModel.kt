@@ -17,8 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class SelectAssociationViewModel(
     private var associationAPI: AssociationAPI,
-    private var userAPI: UserAPI,
-    private var currentUser: CurrentUser
+    private var userAPI: UserAPI
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<SelectAssociationState> =
       MutableStateFlow(SelectAssociationState())
@@ -40,9 +39,9 @@ class SelectAssociationViewModel(
                   _uiState.value.searchState)
         },
         {})
-    if (currentUser.userUid != "") {
+    if (CurrentUser.userUid != "") {
       userAPI.getUser(
-          currentUser.userUid,
+          CurrentUser.userUid!!,
           { user ->
             _uiState.value =
                 SelectAssociationState(
