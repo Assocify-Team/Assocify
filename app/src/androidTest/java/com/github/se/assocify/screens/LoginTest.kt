@@ -61,7 +61,7 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
     every { userAPI.getAllUsers(any(), any()) } answers
         {
           val onSuccess = firstArg<(List<User>) -> Unit>()
-          onSuccess(listOf()) //instantiate with a empty list: just to test login
+          onSuccess(listOf()) // instantiate with a empty list: just to test login
         }
     composeTestRule.setContent { LoginScreen(navActions, userAPI) }
   }

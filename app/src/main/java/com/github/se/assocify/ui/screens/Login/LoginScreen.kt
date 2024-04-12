@@ -77,9 +77,9 @@ fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = {
-              viewModel.updateUser()
-              navActions.onLogin(viewModel.existUserId()) },
-
+            viewModel.updateUser()
+            navActions.onLogin(viewModel.existUserId())
+          },
           onAuthError = {
             println("Error: $it")
             navActions.onAuthError()

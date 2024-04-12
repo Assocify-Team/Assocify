@@ -15,40 +15,44 @@ class LoginViewModel(private val userAPI: UserAPI) : ViewModel() {
   private val _uiState = MutableStateFlow(UserUIState())
 
   /** Updates the userId of the UI state */
-   fun updateUser() {
+  fun updateUser() {
     userAPI.getAllUsers(
         { users: List<User> ->
           val user = users.find { it.uid == getCurrentUser()!!.uid }
           if (user != null) {
             _uiState.value = UserUIState(user, true)
           } else {
-            _uiState.value = UserUIState(User(getCurrentUser()!!.uid, getCurrentUser()!!.displayName!!, Role()), false)
+            _uiState.value =
+                UserUIState(
+                    User(getCurrentUser()!!.uid, getCurrentUser()!!.displayName!!, Role()), false)
           }
         },
-        { exception -> Log.e("LoginViewModel", "Failed to get users: ${exception.message}")})
+        { exception -> Log.e("LoginViewModel", "Failed to get users: ${exception.message}") })
   }
 
   /** Gets the current user id */
-  fun getCurrentUser(): FirebaseUser?{
+  fun getCurrentUser(): FirebaseUser? {
     return Firebase.auth.currentUser!!
   }
 
   /** Gets the current user name */
-    fun getCurrentUserName(): String {
-        return Firebase.auth.currentUser!!.displayName!!
-    }
+  fun getCurrentUserName(): String {
+    return Firebase.auth.currentUser!!.displayName!!
+  }
 
   /** Adds a user to the database */
   fun addUser(user: User) {
     userAPI.addUser(
-      user,
-      onSuccess = {},
-      onFailure = { exception ->
-        Log.e("LoginViewModel", "Failed to add user: ${exception.message}")
-      })
+        user,
+        onSuccess = {},
+        onFailure = { exception ->
+          Log.e("LoginViewModel", "Failed to add user: ${exception.message}")
+        })
   }
 
-  /** Returns true if the current user exists in the database and if they not, add them to database*/
+  /**
+   * Returns true if the current user exists in the database and if they not, add them to database
+   */
   fun existUserId(): Boolean {
     val exist = _uiState.value.exists
     val user = _uiState.value.user
