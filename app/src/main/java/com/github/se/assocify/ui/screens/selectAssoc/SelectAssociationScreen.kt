@@ -90,17 +90,18 @@ fun SelectAssociation(
                           contentDescription = null,
                           modifier =
                               Modifier.clickable(
-                                  onClick = {
-                                    model.updateSearchQuery("", false)
-                                    query = ""
-                                  }))
+                                      onClick = {
+                                        model.updateSearchQuery("", false)
+                                        query = ""
+                                      })
+                                  .testTag("ArrowBackButton"))
                     } else {
                       Icon(
                           imageVector = Icons.Default.Search,
                           contentDescription = null,
                           modifier =
-                              Modifier.clickable(
-                                  onClick = { model.updateSearchQuery(query, true) }))
+                              Modifier.clickable(onClick = { model.updateSearchQuery(query, true) })
+                                  .testTag("SOB"))
                     }
                   }) {
                     if (state.value.searchState) {
