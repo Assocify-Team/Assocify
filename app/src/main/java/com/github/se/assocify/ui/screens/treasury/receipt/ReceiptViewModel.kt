@@ -192,8 +192,7 @@ class ReceiptViewModel {
                   actionLabel = "Retry",
               )
             }
-          }
-      )
+          })
     }
   }
 }
