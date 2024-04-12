@@ -176,7 +176,8 @@ fun CreateAssoScreen(
                                   RadioButton(
                                       selected = state.editMember!!.hasRole(role.name),
                                       onClick = { viewmodel.modifyMemberRole(role.name) })
-                                })
+                                },
+                                modifier = Modifier.testTag("role-${role.name.uppercase()}"))
                           }
 
                       Row(
