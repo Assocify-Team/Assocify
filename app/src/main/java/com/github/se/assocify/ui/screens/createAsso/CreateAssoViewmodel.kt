@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
@@ -162,7 +161,7 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
    * Checks if the association can be saved : the current user is a member, all members have a role and the name of the association is not blank
    */
   fun canSaveAsso(): Boolean {
-    return (_uiState.value.members.find({ user -> user.uid == currUser }) != null) &&
+    return (_uiState.value.members.find { user -> user.uid == currUser } != null) &&
         _uiState.value.members.all { it.getRole().getRoleType() != Role.RoleType.PENDING } &&
         _uiState.value.name.isNotBlank()
   }
