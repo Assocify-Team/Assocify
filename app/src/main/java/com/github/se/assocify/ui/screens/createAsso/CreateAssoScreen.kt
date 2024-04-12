@@ -158,7 +158,10 @@ fun CreateAssoScreen(currentUser: CurrentUser,
                           viewmodel.selectMember(it)
                         }, // quand tu click qur user de dropdown
                         onUserDismiss = { viewmodel.dismissMemberSearch() }, // click sur croix
+                        expanded = state.searchMemberList.isNotEmpty(), // dropdown ouvert ou pas
                         label = { Text("Name") },
+                        isError  = viewmodel.searchError(),
+                        supportingText = state.memberError?.let { { Text(it) } }
                     )
                     if (state.editMember != null) {
                       // maybe can't select role before selecting member ?
