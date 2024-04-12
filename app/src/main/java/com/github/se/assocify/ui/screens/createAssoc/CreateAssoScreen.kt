@@ -47,12 +47,15 @@ import com.github.se.assocify.R
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.ui.composables.UserSearchTextField
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAssoScreen(
     currentUser: CurrentUser,
     viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(currentUser)
+    navigationActions: NavigationActions,
 ) {
 
   val state by viewmodel.uiState.collectAsState()
@@ -63,9 +66,10 @@ fun CreateAssoScreen(
         TopAppBar(
             modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
-              IconButton(onClick = { /* TODO : go back to previous screen */}) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-              }
+              IconButton(
+                  onClick = { navigationActions.back() }, modifier = Modifier.testTag("Back")) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                  }
             },
             title = { Text(text = "Create your association") })
       },
@@ -133,7 +137,10 @@ fun CreateAssoScreen(
                       Text("Add members")
                     }
                 Button(
-                    onClick = { viewmodel.saveAsso() /*TODO then navigate to home*/ },
+                    onClick = { 
+                      viewmodel.saveAsso() 
+                      navigationActions.navigateTo(Destination.Home) 
+                      },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
                     enabled = viewmodel.canSaveAsso()) {
                       Text("Create")

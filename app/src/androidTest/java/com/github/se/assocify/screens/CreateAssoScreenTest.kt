@@ -24,6 +24,15 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import org.junit.Before
+import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.createAsso.CreateAssoScreen
+import com.github.se.assocify.ui.screens.createAsso.CreateAssoViewmodel
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
+import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +41,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule val mockkRule = MockKRule(this)
+
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK
@@ -78,7 +90,8 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   }
 
   @Test
-  fun display() {
+  fun displaySmall() {
+    composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
     with(composeTestRule) {
       onNodeWithTag("createAssoScreen").assertIsDisplayed()
       onNodeWithTag("TopAppBar").assertIsDisplayed()
@@ -143,6 +156,23 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
       onNodeWithTag("create").performClick()
       // check that the asso is created
+    }
+  }
+  
+  fun testCreateButton() {
+    composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
+    with(composeTestRule) {
+      onNodeWithTag("create").performClick()
+      verify { mockNavActions.navigateTo(Destination.Home) }
+    }
+  }
+
+  @Test
+  fun testGoBackButton() {
+    composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
+    with(composeTestRule) {
+      onNodeWithTag("Back").performClick()
+      verify { mockNavActions.back() }
     }
   }
 }
