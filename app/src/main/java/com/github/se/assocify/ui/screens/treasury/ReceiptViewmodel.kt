@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.screens.treasury
 
 import androidx.lifecycle.ViewModel
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.FirebaseApi
 import com.github.se.assocify.model.database.ReceiptsAPI
@@ -18,17 +19,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ReceiptViewmodel(
-  private val receiptsDatabase: ReceiptsAPI =
+  private val currentUser: CurrentUser, private val receiptsDatabase: ReceiptsAPI =
     ReceiptsAPI(
-      userId = Firebase.auth.currentUser!!.uid,
-      basePath = "basePath",
+      userId = currentUser.userUid,
+      basePath = "associations/" + currentUser.associationUid,
       storage = Firebase.storage,
       db = Firebase.firestore
     )
-) : ViewModel() {
+) {
+
   // ViewModel states
-  private val _uiState = MutableStateFlow(ReceiptUIState())
-  val uiState: StateFlow<ReceiptUIState> = _uiState
+  private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
+  val uiState: StateFlow<ReceiptUIState>
+
 
   // User entity and it's API
   private val userAPI = UserAPI(receiptsDatabase.db)
@@ -36,7 +39,7 @@ class ReceiptViewmodel(
 
   init {
     // Define user entity
-    userAPI.getUser(Firebase.auth.currentUser!!.uid,
+    userAPI.getUser(currentUser.userUid,
       onSuccess = { user = it },
       onFailure = { // TODO on sprint 4 with error API
       }
@@ -77,8 +80,6 @@ class ReceiptViewmodel(
     )
   }
 
-
-
   fun onSearch(): List<Receipt> {
     val filter = _uiState.value.searchQuery.trim()
     return _uiState.value.allReceipts.filter { receipt -> receipt.title.contains(filter, ignoreCase = true)
@@ -92,6 +93,10 @@ class ReceiptViewmodel(
       allReceipts = _uiState.value.allReceipts,
       searchQuery = query
     )
+  }
+
+  init {
+    uiState = _uiState
   }
 }
 
