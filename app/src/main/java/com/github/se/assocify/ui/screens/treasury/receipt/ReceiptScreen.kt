@@ -54,7 +54,13 @@ import com.github.se.assocify.ui.composables.DatePickerWithDialog
 fun ReceiptScreen(
     navActions: NavigationActions,
     currentUser: CurrentUser,
-    viewModel: ReceiptViewModel = ReceiptViewModel(navActions, currentUser)
+    receiptUid: String = "",
+    viewModel: ReceiptViewModel =
+        if (receiptUid.isEmpty()) {
+          ReceiptViewModel(navActions, currentUser)
+        } else {
+          ReceiptViewModel(receiptUid, navActions, currentUser)
+        }
 ) {
 
   val receiptState by viewModel.uiState.collectAsState()
