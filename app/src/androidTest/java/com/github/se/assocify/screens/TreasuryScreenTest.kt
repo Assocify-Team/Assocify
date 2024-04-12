@@ -1,11 +1,14 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -28,7 +31,9 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Before
   fun testSetup() {
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    composeTestRule.setContent { TreasuryScreen(navActions = navActions) }
+    CurrentUser.userUid = "testUser"
+    CurrentUser.associationUid = "testAssociation"
+    composeTestRule.setContent { TreasuryScreen(navActions) }
   }
 
   @Test
@@ -66,6 +71,30 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     with(composeTestRule) {
       onNodeWithTag("createReceipt").assertIsDisplayed()
       onNodeWithTag("createReceipt").performClick()
+    }
+  }
+
+  @Test
+  fun topBar() = run {
+    with(composeTestRule) {
+      onNodeWithTag("accountIconButton").assertIsDisplayed()
+      onNodeWithTag("accountIconButton").performClick()
+    }
+  }
+
+  @Test
+  fun searchBar() = run {
+    with(composeTestRule) {
+      // First open the search bar
+      onNodeWithTag("receiptSearch").assertIsNotDisplayed()
+      onNodeWithTag("searchIconButton").performClick()
+      onNodeWithTag("receiptSearch").assertIsDisplayed()
+      onNodeWithTag("receiptSearch").performTextInput("salut cest bob lennon")
+      // onNodeWithTag("receiptSearch").assertTextEquals("salut cest bob lennon")
+      onNodeWithTag("receiptSearch").performClick()
+      onNodeWithTag("backIconButton").performClick()
+      onNodeWithTag("receiptSearch").assertIsNotDisplayed()
+      // onNodeWithTag("receiptSearch").assert("")
     }
   }
 }
