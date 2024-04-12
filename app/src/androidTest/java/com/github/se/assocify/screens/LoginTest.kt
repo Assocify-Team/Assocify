@@ -57,11 +57,11 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   fun setupLogin() {
     every { navActions.onLogin(any()) } answers { authSuccess = true }
     every { navActions.onAuthError() } answers { authError = true }
-
+    // mock getAllUsers for user API
     every { userAPI.getAllUsers(any(), any()) } answers
         {
           val onSuccess = firstArg<(List<User>) -> Unit>()
-          onSuccess(listOf())
+          onSuccess(listOf()) // empty list to test login success
         }
     composeTestRule.setContent { LoginScreen(navActions, userAPI) }
   }
