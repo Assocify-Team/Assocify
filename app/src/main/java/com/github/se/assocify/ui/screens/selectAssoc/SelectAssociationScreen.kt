@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -49,9 +50,10 @@ import kotlin.math.min
 fun SelectAssociation(
     navActions: NavigationActions,
     associationAPI: AssociationAPI,
-    userAPI: UserAPI
+    userAPI: UserAPI,
+    currentUser: CurrentUser
 ) {
-  val model = SelectAssociationViewModel(associationAPI, userAPI)
+  val model = SelectAssociationViewModel(associationAPI, userAPI, currentUser)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
   Scaffold(

@@ -1,12 +1,11 @@
 package com.github.se.assocify.ui.screens.selectAssoc
 
 import androidx.lifecycle.ViewModel
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -18,7 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class SelectAssociationViewModel(
     private var associationAPI: AssociationAPI,
-    private var userAPI: UserAPI
+    private var userAPI: UserAPI,
+    private var currentUser: CurrentUser
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<SelectAssociationState> =
       MutableStateFlow(SelectAssociationState())
@@ -40,9 +40,9 @@ class SelectAssociationViewModel(
                   _uiState.value.searchState)
         },
         {})
-    if (SelectAssociationUtils().getUserId() != "") {
+    if (currentUser.userUid != "") {
       userAPI.getUser(
-          SelectAssociationUtils().getUserId(),
+          currentUser.userUid,
           { user ->
             _uiState.value =
                 SelectAssociationState(
@@ -67,10 +67,3 @@ data class SelectAssociationState(
     val user: User = User(),
     val searchState: Boolean = false
 )
-
-class SelectAssociationUtils {
-  fun getUserId(): String {
-    val user = Firebase.auth.currentUser
-    return user?.uid ?: ""
-  }
-}

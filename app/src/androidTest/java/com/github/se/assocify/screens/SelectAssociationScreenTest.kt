@@ -8,12 +8,12 @@ import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
-import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociationUtils
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -65,6 +65,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
 @RunWith(AndroidJUnit4::class)
 class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
+
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
@@ -74,7 +75,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockUserAPI: UserAPI
 
-  @RelaxedMockK lateinit var mockScreenAssociationUtils: SelectAssociationUtils
+  @RelaxedMockK lateinit var mockCurrentUser: CurrentUser
 
   @get:Rule val mockkRule = MockKRule(this)
 
@@ -102,7 +103,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the "Create new organization" button is displayed */
   @Test
   fun testCreateNewOrganizationButton() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, mockCurrentUser)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       createOrgaButton {
         assertIsDisplayed()
@@ -114,7 +117,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the search organization field is displayed */
   @Test
   fun testSearchOrganization() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, mockCurrentUser)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       searchOrganization { assertIsDisplayed() }
     }
@@ -123,7 +128,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the registered organization list is correctly displayed */
   @Test
   fun testRegisteredOrganizationList() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, mockCurrentUser)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       registeredList {
         assertIsDisplayed()
@@ -147,7 +154,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           val associations = emptyList<Association>()
           onSuccessCallback(associations)
         }
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, mockCurrentUser)
+    }
     // Find the text node with the expected message and assert it is displayed
     composeTestRule.onNodeWithText("There is no organization to display.").assertIsDisplayed()
   }
@@ -155,7 +164,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the organization name and icon are displayed */
   @Test
   fun testDisplayOrganization() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, mockCurrentUser)
+    }
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
       organizationName { assertIsDisplayed() }
       organizationIcon { assertIsDisplayed() }
@@ -165,35 +176,42 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /* This test check if, when searching with the search bar the icons change */
   @Test
   fun testSearchBarWorksWithNoResult() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, mockCurrentUser)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
+      // Checking initial state
       searchOrgaButton { assertIsDisplayed() }
       arrowBackButton { assertIsNotDisplayed() }
       registeredList { assertIsDisplayed() }
       searchOrganization { assertIsDisplayed() }
+      // Check what happens if clicking the organizing button
       searchOrgaButton { performClick() }
       searchOrgaButton { assertIsNotDisplayed() }
       arrowBackButton { assertIsDisplayed() }
-      // composeTestRule.onNodeWithText(testAssociation.getName()).assertIsNotDisplayed()
-
+      // Check what happens if clicking the back button
+      arrowBackButton { performClick() }
+      searchOrgaButton { assertIsDisplayed() }
+      arrowBackButton { assertIsNotDisplayed() }
     }
   }
+}
 
-  /*
+/*
     @Test
     fun testWithDifferentUserId(){
-      every {mockScreenAssociationUtils.getUserId()} returns "testId"
-      every {mockUserAPI.getUser(any(), any(), any())} answers
+      every {mockUserAPI.getUser("testId", any(), any())} answers
           {
             val onSuccessCallback = arg<(User) -> Unit>(0)
             val user = User("Ciro", "cane", Role("president"))
             onSuccessCallback(user)
           }
+      val currentUser = CurrentUser("testId", "testAssocId")
+      composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI, currentUser) }
+      composeTestRule.onNodeWithText("Hello Tonno !!").assertIsNotDisplayed()
+      composeTestRule.onNodeWithText("Hello Ciro !!").assertIsDisplayed()
 
-      ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
-        helloText {assertIsDisplayed()
-        assertTextEquals("Hello Ciro !!")}
-      }
-    }
-  */
+
+
 }
+*/
