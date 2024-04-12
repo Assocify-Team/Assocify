@@ -35,11 +35,6 @@ class LoginViewModel(private val userAPI: UserAPI) : ViewModel() {
     return Firebase.auth.currentUser!!
   }
 
-  /** Gets the current user name */
-  fun getCurrentUserName(): String {
-    return Firebase.auth.currentUser!!.displayName!!
-  }
-
   /** Adds a user to the database */
   fun addUser(user: User) {
     userAPI.addUser(
