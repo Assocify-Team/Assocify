@@ -344,7 +344,7 @@ fun TreasuryTopBar(
                           contentDescription = "Back arrow")
                     }
               },
-              modifier = Modifier.fillMaxWidth())
+              modifier = Modifier.fillMaxWidth().testTag("receiptSearch"))
         }
       },
       navigationIcon = {
