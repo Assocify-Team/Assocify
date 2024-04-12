@@ -72,7 +72,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   @Test
   fun displaySmall() {
-    composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
     with(composeTestRule) {
       onNodeWithTag("createAssoScreen").assertIsDisplayed()
       onNodeWithTag("TopAppBar").assertIsDisplayed()
@@ -141,7 +140,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   }*/
 
   fun testCreateButton() {
-    composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
     with(composeTestRule) {
       onNodeWithTag("create").performClick()
       verify { mockNavActions.navigateTo(Destination.Home) }
@@ -150,7 +148,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   @Test
   fun testGoBackButton() {
-    composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
     with(composeTestRule) {
       onNodeWithTag("Back").performClick()
       verify { mockNavActions.back() }
