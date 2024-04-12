@@ -1,9 +1,8 @@
-package com.github.se.assocify.navigation
-
 import androidx.navigation.NavHostController
-import com.google.firebase.auth.FirebaseUser
-import io.mockk.every
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,33 +11,45 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class NavigationActionsTest {
 
-  private val navController = mockk<NavHostController>()
-  private var destination: String? = null
-
-  private val user = mockk<FirebaseUser>()
+  private lateinit var navController: NavHostController
+  private lateinit var navigationActions: NavigationActions
 
   @Before
-  fun setupLogin() {
-    every { navController.navigate(route = any(), builder = any()) } answers
-        {
-          destination = firstArg()
-        }
+  fun setUp() {
+    navController = mockk(relaxed = true)
+    navigationActions = NavigationActions(navController)
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun `navigateToMainTab throws exception when destination is not main tab`() {
+    navigationActions.navigateToMainTab(Destination.Login)
   }
 
   @Test
-  fun test() {
-    val navActions = NavigationActions(navController)
-    navActions.navigateToMainTab(Destination.Home)
-    assert(destination == Destination.Home.route)
-    try {
-      navActions.navigateToMainTab(Destination.Login)
-    } catch (e: IllegalArgumentException) {
-      assert(e.message == "Destination Login is not a main tab")
-    }
+  fun `navigateTo performs navigation`() {
+    navigationActions.navigateTo(Destination.Login)
 
-    navActions.onAuthError()
-    navActions.onLogin(user)
+    verify { navController.navigate(Destination.Login.route) }
+  }
 
-    navActions.back()
+  @Test
+  fun `onLogin navigates to Home when user exists`() {
+    navigationActions.onLogin(true)
+
+    verify { navController.navigate(Destination.Home.route) }
+  }
+
+  @Test
+  fun `onLogin navigates to SelectAsso when user does not exist`() {
+    navigationActions.onLogin(false)
+
+    verify { navController.navigate(Destination.SelectAsso.route) }
+  }
+
+  @Test
+  fun `back navigates back`() {
+    navigationActions.back()
+
+    verify { navController.popBackStack() }
   }
 }

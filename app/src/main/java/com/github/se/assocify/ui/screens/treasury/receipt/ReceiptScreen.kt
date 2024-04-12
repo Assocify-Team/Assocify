@@ -45,7 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.R
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 
@@ -53,13 +52,12 @@ import com.github.se.assocify.ui.composables.DatePickerWithDialog
 @Composable
 fun ReceiptScreen(
     navActions: NavigationActions,
-    currentUser: CurrentUser,
     receiptUid: String = "",
     viewModel: ReceiptViewModel =
         if (receiptUid.isEmpty()) {
-          ReceiptViewModel(navActions, currentUser)
+          ReceiptViewModel(navActions)
         } else {
-          ReceiptViewModel(receiptUid, navActions, currentUser)
+          ReceiptViewModel(receiptUid = receiptUid, navActions = navActions)
         }
 ) {
 

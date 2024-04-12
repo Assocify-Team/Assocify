@@ -11,12 +11,12 @@ import com.github.se.assocify.ui.util.PriceUtil
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class ReceiptViewModel {
 
@@ -31,11 +31,10 @@ class ReceiptViewModel {
 
   constructor(
       navActions: NavigationActions,
-      currentUser: CurrentUser,
       receiptApi: ReceiptsAPI =
           ReceiptsAPI(
-              userId = currentUser.userUid,
-              basePath = "associations/" + currentUser.associationUid,
+              userId = CurrentUser.userUid!!,
+              basePath = "associations/" + CurrentUser.associationUid!!,
               storage = Firebase.storage,
               db = Firebase.firestore)
   ) {
@@ -48,11 +47,10 @@ class ReceiptViewModel {
   constructor(
       receiptUid: String,
       navActions: NavigationActions,
-      currentUser: CurrentUser,
       receiptApi: ReceiptsAPI =
           ReceiptsAPI(
-              userId = currentUser.userUid,
-              basePath = "associations/" + currentUser.associationUid,
+              userId = CurrentUser.userUid!!,
+              basePath = "associations/" + CurrentUser.associationUid!!,
               storage = Firebase.storage,
               db = Firebase.firestore)
   ) {
