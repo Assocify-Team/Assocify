@@ -10,11 +10,11 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptsAPI
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.testCurrentUser
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
 import com.github.se.assocify.ui.util.DateUtil
@@ -37,12 +37,11 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private val receiptsAPI = mockk<ReceiptsAPI>(relaxUnitFun = true)
   private val viewModel =
       ReceiptViewModel(
-          navActions = navActions, currentUser = testCurrentUser, receiptApi = receiptsAPI)
+          navActions = navActions, receiptApi = receiptsAPI)
   private val viewModel2 =
       ReceiptViewModel(
           receiptUid = "testReceipt",
           navActions = navActions,
-          currentUser = testCurrentUser,
           receiptApi = receiptsAPI)
 
   private var expectedReceipt =
@@ -74,13 +73,15 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   @Before
   fun testSetup() {
+      CurrentUser.userUid = "testUser"
+      CurrentUser.associationUid = "testUser"
     every { receiptsAPI.uploadReceipt(any(), any(), any(), any()) } answers
         {
           capturedReceipt = firstArg()
           navActions.back()
         }
     composeTestRule.setContent {
-      ReceiptScreen(navActions = navActions, currentUser = testCurrentUser, viewModel = viewModel)
+      ReceiptScreen(navActions = navActions, viewModel = viewModel)
     }
   }
 
@@ -231,7 +232,6 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       ReceiptViewModel(
           receiptUid = "testReceipt",
           navActions = navActions,
-          currentUser = testCurrentUser,
           receiptApi = receiptsAPI)
 
   private var expectedReceipt =
@@ -263,6 +263,8 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
   @Before
   fun testSetup() {
+      CurrentUser.userUid = "testUser"
+      CurrentUser.associationUid = "testUser"
     every { receiptsAPI.uploadReceipt(any(), any(), any(), any()) } answers
         {
           capturedReceipt = firstArg()
@@ -275,7 +277,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           println("TEST:getUserReceipts")
         }
     composeTestRule.setContent {
-      ReceiptScreen(navActions = navActions, currentUser = testCurrentUser, viewModel = viewModel)
+      ReceiptScreen(navActions = navActions, viewModel = viewModel)
     }
   }
 
