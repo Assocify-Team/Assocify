@@ -2,21 +2,42 @@ package com.github.se.assocify.ui.screens.treasury
 
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.FirebaseApi
 import com.github.se.assocify.model.database.ReceiptsAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.database.database
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ReceiptViewmodel(
-  private var user: User,
-  private val receiptsDatabase: ReceiptsAPI
-) {
+  private val receiptsDatabase: ReceiptsAPI =
+    ReceiptsAPI(
+      userId = Firebase.auth.currentUser!!.uid,
+      basePath = "basePath",
+      storage = Firebase.storage,
+      db = Firebase.firestore
+    )
+) : ViewModel() {
+  // Viewmodel states
   private val _uiState = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState> = _uiState
 
+  // User entity and it's API
+  private val userAPI = UserAPI(receiptsDatabase.db)
+  var user: User? = null
+
+
   init {
+    // Define user entity
+    userAPI.getUser(Firebase.auth.currentUser!!.uid, callback = { user = it })
     updateUserReceipts()
     updateAllReceipts()
   }
@@ -30,14 +51,15 @@ class ReceiptViewmodel(
           searchQuery = _uiState.value.searchQuery
         )
       },
-      onError = { exception ->
-        // What should I do here
+      onError = {
+        // TODO on sprint 4 with error API
       }
     )
   }
 
   fun updateAllReceipts() {
-    // TODO : check perm
+    // All receipts should be seen by admins only
+    //if (user?.role?.equals("lol") == true)
     receiptsDatabase.getAllReceipts(
       onReceiptsFetched = { receipts ->
         _uiState.value = ReceiptUIState(
@@ -47,7 +69,7 @@ class ReceiptViewmodel(
         )
       },
       onError = { error, exception ->
-        // what to do here
+        // TODO on sprint 4 with error API
       }
     )
   }

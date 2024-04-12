@@ -27,6 +27,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,14 +38,19 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.assocify.model.database.ReceiptsAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -66,7 +72,7 @@ enum class PageIndex(val index: Int) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun TreasuryScreen(navActions: NavigationActions) {
+fun TreasuryScreen(navActions: NavigationActions, viewModel: ReceiptViewmodel = ReceiptViewmodel()) {
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}) },
@@ -156,19 +162,52 @@ fun TreasuryScreen(navActions: NavigationActions) {
 /** My receipts UI page */
 @Composable
 private fun MyReceiptPage() {
-  // val receiptNames = listOf("Grocery Shopping", "Restaurant", "Gas Station", "Coffee Shop")
-  val receiptNames = List(50) { "Receipt $it" }
+  val firstReceiptList = List(3) { "Receipt 1-$it" }
+  val secondReceiptList = List(3) { "Receipt 2-$it" }
+
   LazyColumn(
-      modifier = Modifier.testTag("ReceiptList"),
-      verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        receiptNames.forEach { receiptName ->
-          item {
-            ReceiptItem(receiptName)
-            Divider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
-          }
-        }
+    modifier = Modifier.testTag("ReceiptList"),
+    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    // Header for the user receipts
+    item {
+      Text(
+        text = "My created receipts",
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 20.dp, vertical = 16.dp)
+      )
+      HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+    }
+    // First list of receipts
+    firstReceiptList.forEach { receiptName ->
+      item {
+        ReceiptItem(receiptName)
+        HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
       }
+    }
+
+    // Header for the global receipts
+    item {
+      Text(
+        text = "All receipts",
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 20.dp, vertical = 16.dp)
+      )
+      HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+    }
+    // Second list of receipts
+    secondReceiptList.forEach { receiptName ->
+      item {
+        ReceiptItem(receiptName)
+        HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+      }
+    }
+  }
 }
 
 /** Budget UI page */
@@ -294,8 +333,8 @@ private fun ReceiptItem(receiptName: String) {
 }
 
 /** Android Studio preview */
-/*@Preview
+@Preview
 @Composable
 private fun PreviewCardsScreen() {
-    TreasuryMainScreen()
-}*/
+    MyReceiptPage()
+}
