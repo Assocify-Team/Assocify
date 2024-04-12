@@ -12,14 +12,5 @@ fun NavGraphBuilder.loginGraph(
     userAPI: UserAPI,
     associationAPI: AssociationAPI
 ) {
-  // navigation(startDestination = Destination.Login.route, route = "loginGraph") {
   composable(route = Destination.Login.route) { LoginScreen(navigationActions, userAPI) }
-  /* composable(route = Destination.Login.SelectAsso.route) {
-      SelectAssociation(
-          registeredAssociation = emptyList(),
-          navigationActions = navigationActions,
-          associationAPI = associationAPI)
-    }
-    composable(route = Destination.Login.CreateAsso.route) { CreateAssoScreen() }
-  }*/
 }

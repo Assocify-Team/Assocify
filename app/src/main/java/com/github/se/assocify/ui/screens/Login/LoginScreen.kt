@@ -19,8 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -74,12 +72,11 @@ fun rememberFirebaseAuthLauncher(
 
 @Composable
 fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
-  var user by remember { mutableStateOf(Firebase.auth.currentUser) }
   val viewModel = LoginViewModel(userAPI)
 
   val launcher =
       rememberFirebaseAuthLauncher(
-          onAuthComplete = { navActions.onLogin(viewModel.existUserId()) },
+          onAuthComplete = { navActions.onLogin(viewModel.existUserId())},
           onAuthError = {
             println("Error: $it")
             navActions.onAuthError()
