@@ -38,10 +38,16 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private val viewModel =
       ReceiptViewModel(
           navActions = navActions, currentUser = testCurrentUser, receiptApi = receiptsAPI)
+  private val viewModel2 =
+      ReceiptViewModel(
+          receiptUid = "testReceipt",
+          navActions = navActions,
+          currentUser = testCurrentUser,
+          receiptApi = receiptsAPI)
 
   private var expectedReceipt =
       Receipt(
-          uid = "",
+          uid = "testReceipt",
           title = "Test Title",
           description = "",
           cents = 10000,
@@ -52,6 +58,19 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       )
 
   private var capturedReceipt: Receipt? = null
+
+  private var receiptList =
+      listOf(
+          Receipt(
+              uid = "testReceipt",
+              title = "Edited Receipt",
+              description = "",
+              cents = 10000,
+              date = DateUtil.toDate("01/01/2021")!!,
+              incoming = false,
+              phase = Phase.Unapproved,
+              photo = null,
+          ))
 
   @Before
   fun testSetup() {
@@ -198,6 +217,74 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("datePickerDialogCancel").performClick()
       onNodeWithTag("datePickerDialog").assertDoesNotExist()
       onNodeWithTag("dateField").assertTextContains("Date cannot be empty")
+    }
+  }
+}
+
+@RunWith(AndroidJUnit4::class)
+class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+  @get:Rule val composeTestRule = createComposeRule()
+
+  private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
+  private val receiptsAPI = mockk<ReceiptsAPI>(relaxUnitFun = true)
+  private val viewModel =
+      ReceiptViewModel(
+          receiptUid = "testReceipt",
+          navActions = navActions,
+          currentUser = testCurrentUser,
+          receiptApi = receiptsAPI)
+
+  private var expectedReceipt =
+      Receipt(
+          uid = "testReceipt",
+          title = "Test Title",
+          description = "",
+          cents = 10000,
+          date = DateUtil.toDate("01/01/2021")!!,
+          incoming = false,
+          phase = Phase.Unapproved,
+          photo = null,
+      )
+
+  private var capturedReceipt: Receipt? = null
+
+  private var receiptList =
+      listOf(
+          Receipt(
+              uid = "testReceipt",
+              title = "Edited Receipt",
+              description = "",
+              cents = 10000,
+              date = DateUtil.toDate("01/01/2021")!!,
+              incoming = false,
+              phase = Phase.Unapproved,
+              photo = null,
+          ))
+
+  @Before
+  fun testSetup() {
+    every { receiptsAPI.uploadReceipt(any(), any(), any(), any()) } answers
+        {
+          capturedReceipt = firstArg()
+          navActions.back()
+        }
+    every { receiptsAPI.getUserReceipts(any(), any()) } answers
+        {
+          firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
+          navActions.back()
+          println("TEST:getUserReceipts")
+        }
+    composeTestRule.setContent {
+      ReceiptScreen(navActions = navActions, currentUser = testCurrentUser, viewModel = viewModel)
+    }
+  }
+
+  @Test
+  fun editReceipt() {
+    with(composeTestRule) {
+      onNodeWithTag("receiptScreen").assertIsDisplayed()
+      onNodeWithTag("receiptScreenTitle").assertIsDisplayed().assertTextContains("Edit Receipt")
+      verify { receiptsAPI.getUserReceipts(any(), any()) }
     }
   }
 }

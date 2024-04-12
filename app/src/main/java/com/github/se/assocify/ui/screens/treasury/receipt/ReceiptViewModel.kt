@@ -67,7 +67,6 @@ class ReceiptViewModel {
             if (receipt.uid == receiptUid) {
               _uiState.value =
                   _uiState.value.copy(
-                      isNewReceipt = false,
                       title = receipt.title,
                       description = receipt.description,
                       amount = PriceUtil.fromCents(receipt.cents),
