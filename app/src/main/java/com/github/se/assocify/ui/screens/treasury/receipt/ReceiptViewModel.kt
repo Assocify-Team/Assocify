@@ -11,12 +11,12 @@ import com.github.se.assocify.ui.util.PriceUtil
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class ReceiptViewModel {
 
@@ -182,7 +182,18 @@ class ReceiptViewModel {
     if (_uiState.value.isNewReceipt) {
       navActions.back()
     } else {
-      /*TODO: Implement receipt deletion*/
+      receiptApi.deleteReceipt(
+          id = "",
+          onSuccess = { navActions.back() },
+          onFailure = { _ ->
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarHostState.showSnackbar(
+                  message = "Failed to delete receipt",
+                  actionLabel = "Retry",
+              )
+            }
+          }
+      )
     }
   }
 }
