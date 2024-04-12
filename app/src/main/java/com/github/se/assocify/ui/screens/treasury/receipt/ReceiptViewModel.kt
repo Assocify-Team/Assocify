@@ -146,23 +146,16 @@ class ReceiptViewModel {
   }
 
   fun saveReceipt() {
-    if (_uiState.value.title.isEmpty()) {
-      _uiState.value = _uiState.value.copy(titleError = "Title cannot be empty")
+    setTitle(_uiState.value.title)
+    setAmount(_uiState.value.amount)
+    setDate(DateUtil.toDate(_uiState.value.date))
+
+    if (_uiState.value.titleError != null ||
+        _uiState.value.amountError != null ||
+        _uiState.value.dateError != null) {
       return
     }
-    if (_uiState.value.amount.isEmpty()) {
-      _uiState.value = _uiState.value.copy(amountError = "Price cannot be empty")
-      return
-    }
-    if (_uiState.value.date.isEmpty()) {
-      _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
-      return
-    }
-    val date = DateUtil.toDate(_uiState.value.date)
-    if (date == null) {
-      _uiState.value = _uiState.value.copy(dateError = "Invalid date")
-      return
-    }
+    val date = DateUtil.toDate(_uiState.value.date) ?: return
 
     val receipt =
         Receipt(
@@ -182,7 +175,9 @@ class ReceiptViewModel {
         onFailure = { _, _ -> })
   }
 
-  fun deleteReceipt() {}
+  fun deleteReceipt() {
+    /*TODO: Implement deletion*/
+  }
 }
 
 data class ReceiptState(

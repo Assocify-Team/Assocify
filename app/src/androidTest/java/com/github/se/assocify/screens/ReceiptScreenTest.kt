@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -11,12 +12,16 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.ReceiptsAPI
+import com.github.se.assocify.model.entities.Phase
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
+import com.github.se.assocify.ui.util.DateUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
@@ -37,8 +42,27 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   val userSido = User("3", "Sido", Role())
   val userList = listOf(userMai, userSeb, userSido)*/
 
+  private var expectedReceipt =
+      Receipt(
+          uid = "",
+          title = "Test Title",
+          description = "",
+          cents = 10000,
+          date = DateUtil.toDate("01/01/2021")!!,
+          incoming = false,
+          phase = Phase.Unapproved,
+          photo = null,
+      )
+
+  private var capturedReceipt: Receipt? = null
+
   @Before
   fun testSetup() {
+    every { receiptsAPI.uploadReceipt(any(), any(), any(), any()) } answers
+        {
+          capturedReceipt = firstArg()
+          navActions.back()
+        }
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel) }
   }
 
@@ -141,8 +165,28 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   @Test
   fun save() {
-    with(composeTestRule) { onNodeWithTag("saveButton").performScrollTo().performClick() }
-    /* TODO: verify { viewModel.save() } */
+    with(composeTestRule) {
+      onNodeWithTag("saveButton").performScrollTo().performClick()
+      onNodeWithTag("titleField").assertTextContains("Title cannot be empty")
+      onNodeWithTag("amountField").assertTextContains("Price cannot be empty")
+      onNodeWithTag("dateField").assertTextContains("Date cannot be empty")
+
+      onNodeWithTag("titleField").performClick().performTextInput("Test Title")
+
+      onNodeWithTag("amountField").performClick().performTextInput("100")
+
+      onNodeWithTag("dateField").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012021")
+      onNodeWithTag("datePickerDialogOk").performClick()
+      onNodeWithTag("dateField").assertTextContains("01/01/2021")
+
+      assert(viewModel.uiState.value.titleError == null)
+      assert(viewModel.uiState.value.amountError == null)
+      assert(viewModel.uiState.value.dateError == null)
+
+      onNodeWithTag("saveButton").performClick()
+    }
   }
 
   @Test
