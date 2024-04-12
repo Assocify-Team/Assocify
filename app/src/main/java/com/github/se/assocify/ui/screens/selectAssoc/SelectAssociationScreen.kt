@@ -10,23 +10,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.navigation.NavigationActions
+import kotlin.math.min
 
 /**
  * Screen to select an association
@@ -35,11 +47,15 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(registeredAssociation: List<String>) {
-
-  // search bar var: TODO: implement search
-  val isSearching = false
-
+fun SelectAssociation(
+    navActions: NavigationActions,
+    associationAPI: AssociationAPI,
+    userAPI: UserAPI,
+    currentUser: CurrentUser
+) {
+  val model = SelectAssociationViewModel(associationAPI, userAPI, currentUser)
+  val state = model.uiState.collectAsState()
+  var query by remember { mutableStateOf("") }
   Scaffold(
       modifier = Modifier.testTag("SelectAssociationScreen"),
       topBar = {
@@ -47,39 +63,61 @@ fun SelectAssociation(registeredAssociation: List<String>) {
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
-              /*TODO: replace user by user's actual name*/
-              Text(text = "Hello User", style = MaterialTheme.typography.headlineSmall)
+              Text(
+                  modifier = Modifier.testTag("HelloText"),
+                  text = "Hello " + state.value.user.getName() + " !!",
+                  style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
-                  query = "",
-                  onQueryChange = {},
-                  onSearch = {},
+                  query = query,
+                  onQueryChange = { query = it },
+                  onSearch = { model.updateSearchQuery(query, true) },
                   onActiveChange = {},
-                  active = isSearching,
+                  active = state.value.searchState,
                   placeholder = { Text(text = "Search an organization") },
                   trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = null,
-                        modifier = Modifier.clickable(onClick = { /*TODO: clear the search*/}))
+                        modifier =
+                            Modifier.clickable(
+                                onClick = {
+                                  model.updateSearchQuery("", false)
+                                  query = ""
+                                }))
                   },
                   leadingIcon = {
-                    /* if (isSearching) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = null,
-                            modifier =
-                            Modifier.clickable(
-                                onClick = {/*TODO: go back to selectOrganization screen*/ })
-                        )
-                    }  else {*/
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        modifier = Modifier.clickable(onClick = { /*TODO: search*/}))
-                    /*}*/
+                    if (state.value.searchState) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                          contentDescription = null,
+                          modifier =
+                              Modifier.clickable(
+                                      onClick = {
+                                        model.updateSearchQuery("", false)
+                                        query = ""
+                                      })
+                                  .testTag("ArrowBackButton"))
+                    } else {
+                      Icon(
+                          imageVector = Icons.Default.Search,
+                          contentDescription = null,
+                          modifier =
+                              Modifier.clickable(onClick = { model.updateSearchQuery(query, true) })
+                                  .testTag("SOB"))
+                    }
                   }) {
-                    // TODO: Display search results (filtered organizations)
+                    if (state.value.searchState) {
+                      val filteredAssos =
+                          state.value.associations.filter { ass ->
+                            val min = min(ass.getName().length, state.value.searchQuery.length)
+                            ass.getName().take(min).lowercase() ==
+                                state.value.searchQuery.take(min).lowercase()
+                          }
+                      filteredAssos.map { ass -> DisplayOrganization(ass) }
+                    } else {
+                      state.value.associations
+                    }
                   }
             }
       },
@@ -100,6 +138,7 @@ fun SelectAssociation(registeredAssociation: List<String>) {
             modifier =
                 Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")) {
               // Display only registered organization
+              val registeredAssociation = state.value.associations
               if (registeredAssociation.isEmpty()) {
                 item { Text(text = "There is no organization to display.") }
               } else {
@@ -107,7 +146,7 @@ fun SelectAssociation(registeredAssociation: List<String>) {
                   DisplayOrganization(organization)
                   // Add a Divider for each organization except the last one
                   if (index < registeredAssociation.size - 1) {
-                    Divider(Modifier.fillMaxWidth().padding(8.dp))
+                    HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))
                   }
                 }
               }
@@ -120,10 +159,8 @@ fun SelectAssociation(registeredAssociation: List<String>) {
  *
  * @param organization the name of the organization
  */
-
-// TODO: change the parameter to organization object (should have name, logo, etc)
 @Composable
-fun DisplayOrganization(organization: String) {
+fun DisplayOrganization(organization: Association) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("DisplayOrganizationScreen"),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -133,7 +170,7 @@ fun DisplayOrganization(organization: String) {
             contentDescription = "Organization Icon",
             modifier = Modifier.testTag("OrganizationIcon"))
         Text(
-            text = organization,
+            text = organization.getName(),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.testTag("OrganizationName"))
       }
