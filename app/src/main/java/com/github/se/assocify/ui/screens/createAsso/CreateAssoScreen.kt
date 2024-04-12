@@ -188,33 +188,33 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                                             onClick = { viewmodel.modifyMemberRole(role.name) })
                                     })
                             }
-                    }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                          OutlinedButton(
-                              onClick = { viewmodel.removeMember(state.editMember!!) },
-                              modifier = Modifier
-                                  .wrapContentSize()
-                                  .weight(1f),
-                              colors =
-                                  ButtonDefaults.outlinedButtonColors(
-                                      contentColor = MaterialTheme.colorScheme.error),
-                              border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            OutlinedButton(
+                                onClick = { viewmodel.removeMember(state.editMember!!) },
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .weight(1f),
+                                colors =
+                                ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.error),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)) {
                                 Text("Delete", textAlign = TextAlign.Center)
-                              }
+                            }
 
-                          OutlinedButton(
-                              onClick = { viewmodel.addMemberToList() },
-                              modifier = Modifier
-                                  .wrapContentSize()
-                                  .weight(1f)) {
+                            OutlinedButton(
+                                onClick = { viewmodel.addMemberToList() },
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .weight(1f)) {
                                 Text(text = "Save", textAlign = TextAlign.Center)
-                              }
+                            }
                         }
+                    }
                   }
             }
           }
