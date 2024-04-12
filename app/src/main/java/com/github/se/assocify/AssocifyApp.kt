@@ -12,6 +12,7 @@ import com.github.se.assocify.navigation.mainNavGraph
 fun AssocifyApp() {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController)
+
   NavHost(navController = navController, startDestination = Destination.Home.route) {
     // Need to have a currentUser, however we can't still tie it to the real auth system so this is
     // left as such
