@@ -1,12 +1,9 @@
 package com.github.se.assocify.screens
 
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
@@ -24,7 +21,7 @@ import org.junit.Test
 class CreateAssoScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private val userAPI = mockk<UserAPI>()
-    private val assoAPI = mockk<AssociationAPI>()
+  private val assoAPI = mockk<AssociationAPI>()
 
   private val bigList =
       listOf(
@@ -39,7 +36,7 @@ class CreateAssoScreenTest {
           User("9", "bill", Role("")),
           User("10", "seb", Role("")))
 
-    private val bigView = CreateAssoViewmodel(testCurrentUser)
+  private val bigView = CreateAssoViewmodel(testCurrentUser)
 
   @Before
   fun setupLogin() {
@@ -63,29 +60,28 @@ class CreateAssoScreenTest {
     }
   }
 
-    @Test
-    fun testAddMember() {
-        with(composeTestRule) {
-            onNodeWithTag("addMember").performClick()
-            onNodeWithTag("memberSearchField").assertIsDisplayed()
-            onNodeWithTag("memberSearchField").performClick().performTextInput("j")
-            assert(bigView.uiState.value.searchMember == "j")
-            println("PUTE " + bigView.uiState.value.searchMemberList)
-            assert(bigView.uiState.value.searchMemberList.size == 4)
-            onNodeWithTag("userDropdownItem-1").assertIsDisplayed()
-            onNodeWithTag("userDropdownItem-3").assertIsDisplayed()
-            onNodeWithTag("userDropdownItem-7").assertIsDisplayed()
-            onNodeWithTag("userDropdownItem-8").assertIsDisplayed()
-            onNodeWithTag("userDropdownItem-3").performClick() // jacques
-            assert(bigView.uiState.value.editMember?.getName() == "jacques")
-            assert(bigView.uiState.value.editMember!!.hasRole(""))
-            onNodeWithTag("addMemberButton").assertIsDisplayed()
-            onNodeWithTag("deleteMember").assertIsDisplayed()
-            onNodeWithTag("addMemberButton").performClick()
-            assert(bigView.uiState.value.members.size == 1)
-            assert(bigView.uiState.value.members[0].getName() == "jacques")
-            onNodeWithTag("MemberListItem-jacques").assertIsDisplayed()
-
-        }
+  @Test
+  fun testAddMember() {
+    with(composeTestRule) {
+      onNodeWithTag("addMember").performClick()
+      onNodeWithTag("memberSearchField").assertIsDisplayed()
+      onNodeWithTag("memberSearchField").performClick().performTextInput("j")
+      assert(bigView.uiState.value.searchMember == "j")
+      println("PUTE " + bigView.uiState.value.searchMemberList)
+      assert(bigView.uiState.value.searchMemberList.size == 4)
+      onNodeWithTag("userDropdownItem-1").assertIsDisplayed()
+      onNodeWithTag("userDropdownItem-3").assertIsDisplayed()
+      onNodeWithTag("userDropdownItem-7").assertIsDisplayed()
+      onNodeWithTag("userDropdownItem-8").assertIsDisplayed()
+      onNodeWithTag("userDropdownItem-3").performClick() // jacques
+      assert(bigView.uiState.value.editMember?.getName() == "jacques")
+      assert(bigView.uiState.value.editMember!!.hasRole(""))
+      onNodeWithTag("addMemberButton").assertIsDisplayed()
+      onNodeWithTag("deleteMember").assertIsDisplayed()
+      onNodeWithTag("addMemberButton").performClick()
+      assert(bigView.uiState.value.members.size == 1)
+      assert(bigView.uiState.value.members[0].getName() == "jacques")
+      onNodeWithTag("MemberListItem-jacques").assertIsDisplayed()
     }
+  }
 }

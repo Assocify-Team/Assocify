@@ -20,7 +20,7 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
   private val assoAPI = AssociationAPI(db = Firebase.firestore)
-    private val userAPI = UserAPI(db = Firebase.firestore)
+  private val userAPI = UserAPI(db = Firebase.firestore)
   val currUser = currentUser.userUid
 
   // SHLAG POUR TEST
@@ -105,35 +105,36 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
     _uiState.value = _uiState.value.copy(searchMember = searchMember) // ?
     // TODO
     if (searchMember.isNotBlank()) {
-//       userAPI.getAllUsers( onSuccess =  { userList ->
-//        _uiState.value =
-//            _uiState.value.copy(
-//                searchMemberList =
-//                    userList
-//                        .filterNot { user ->
-//                          _uiState.value.members.any { us -> us.uid == user.uid }
-//                        }
-//                        .filter { it.getName().lowercase().contains(searchMember.lowercase()) })},
-//           onFailure =  { exception -> Log.e("CreateAssoViewModel", "Failed to get users: ${exception.message}") }
-//       )
-        // VERSION SHLAG POUR TEST
+      //       userAPI.getAllUsers( onSuccess =  { userList ->
+      //        _uiState.value =
+      //            _uiState.value.copy(
+      //                searchMemberList =
+      //                    userList
+      //                        .filterNot { user ->
+      //                          _uiState.value.members.any { us -> us.uid == user.uid }
+      //                        }
+      //                        .filter {
+      // it.getName().lowercase().contains(searchMember.lowercase()) })},
+      //           onFailure =  { exception -> Log.e("CreateAssoViewModel", "Failed to get users:
+      // ${exception.message}") }
+      //       )
+      // VERSION SHLAG POUR TEST
       bigList.let { userList ->
-          _uiState.value =
-              _uiState.value.copy(
-                  searchMemberList =
-                  userList
-                      .filterNot { user ->
+        _uiState.value =
+            _uiState.value.copy(
+                searchMemberList =
+                    userList
+                        .filterNot { user ->
                           _uiState.value.members.any { us -> us.uid == user.uid }
-                      }
-                      .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
+                        }
+                        .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
       }
 
-        if (_uiState.value.searchMemberList.isEmpty()) {
-          _uiState.value = _uiState.value.copy(memberError = "No users found")
-        } else {
-          _uiState.value = _uiState.value.copy(memberError = null)
-        }
-
+      if (_uiState.value.searchMemberList.isEmpty()) {
+        _uiState.value = _uiState.value.copy(memberError = "No users found")
+      } else {
+        _uiState.value = _uiState.value.copy(memberError = null)
+      }
     } else { // idk
       _uiState.value = _uiState.value.copy(memberError = null)
     }
