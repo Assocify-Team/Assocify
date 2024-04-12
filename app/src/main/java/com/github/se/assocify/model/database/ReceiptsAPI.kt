@@ -98,28 +98,28 @@ class ReceiptsAPI(
 
   @Keep
   private data class FirestoreReceipt(
-    @DocumentId val id: String = "",
-    val payer: String = "",
-    val date: String = "",
-    val incoming: Boolean = false,
-    val cents: Int = 0,
-    val phase: Int = 0,
-    val title: String = "",
-    val description: String = "",
-    val photo: String = "",
+      @DocumentId val id: String = "",
+      val payer: String = "",
+      val date: String = "",
+      val incoming: Boolean = false,
+      val cents: Int = 0,
+      val phase: Int = 0,
+      val title: String = "",
+      val description: String = "",
+      val photo: String = "",
   ) {
     constructor(
-      from: Receipt
+        from: Receipt
     ) : this(
-      from.uid,
-      from.payer,
-      from.date.toString(),
-      from.incoming,
-      from.cents,
-      from.phase.ordinal,
-      from.title,
-      from.description,
-      from.uid)
+        from.uid,
+        from.payer,
+        from.date.toString(),
+        from.incoming,
+        from.cents,
+        from.phase.ordinal,
+        from.title,
+        from.description,
+        from.uid)
 
     fun toReceipt(uid: String) =
         Receipt(
