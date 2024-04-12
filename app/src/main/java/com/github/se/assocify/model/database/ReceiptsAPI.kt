@@ -64,29 +64,31 @@ class ReceiptsAPI(
 
   /**
    * Gets all receipts created by the current user.
+   *
    * @param onSuccess called when the fetch succeeds with the list of receipts
    * @param onError called when the fetch fails with the exception that occurred
    */
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
-      dbReference
-          .get()
-          .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
-          .addOnFailureListener { onError(it) }
+    dbReference
+        .get()
+        .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
+        .addOnFailureListener { onError(it) }
   }
 
-    /**
-     * Gets a receipt by its ID.
-     * @param id the ID of the receipt to get
-     * @param onSuccess called when the receipt is fetched successfully
-     * @param onError called when the fetch fails with the exception that occurred
-     */
-    fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onError: (Exception) -> Unit) {
-        dbReference
-            .document(id)
-            .get()
-            .addOnSuccessListener { onSuccess(it.toObject(FirestoreReceipt::class.java)!!.toReceipt()) }
-            .addOnFailureListener { onError(it) }
-    }
+  /**
+   * Gets a receipt by its ID.
+   *
+   * @param id the ID of the receipt to get
+   * @param onSuccess called when the receipt is fetched successfully
+   * @param onError called when the fetch fails with the exception that occurred
+   */
+  fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onError: (Exception) -> Unit) {
+    dbReference
+        .document(id)
+        .get()
+        .addOnSuccessListener { onSuccess(it.toObject(FirestoreReceipt::class.java)!!.toReceipt()) }
+        .addOnFailureListener { onError(it) }
+  }
 
   /**
    * Gets *all* receipts created by *all* users, if the current user has permissions to do so.
@@ -100,18 +102,18 @@ class ReceiptsAPI(
       onReceiptsFetched: (List<Receipt>) -> Unit,
       onError: (String?, Exception) -> Unit
   ) {
-      db.collection(collectionName)
-          .get()
-          .addOnSuccessListener { query ->
-              query.documents.forEach { snapshot ->
-                  snapshot.reference
-                      .collection("list")
-                      .get()
-                      .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
-                      .addOnFailureListener { onError(snapshot.id, it) }
-              }
+    db.collection(collectionName)
+        .get()
+        .addOnSuccessListener { query ->
+          query.documents.forEach { snapshot ->
+            snapshot.reference
+                .collection("list")
+                .get()
+                .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
+                .addOnFailureListener { onError(snapshot.id, it) }
           }
-          .addOnFailureListener { onError(null, it) }
+        }
+        .addOnFailureListener { onError(null, it) }
   }
 
   fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
@@ -124,8 +126,8 @@ class ReceiptsAPI(
 
   @Keep
   private data class FirestoreReceipt(
-      @DocumentId
-      val id: String = "",
+      @DocumentId val id: String = "",
+      val payer: String = "",
       val date: String = "",
       val incoming: Boolean = false,
       val cents: Int = 0,
