@@ -21,7 +21,6 @@ sealed class Destination(
   data object Profile :
       Destination("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
 
-  // data object Login : Destination("login") {
   data object Login : Destination("login/authentication")
 
   data object SelectAsso : Destination("login/selectAsso")
