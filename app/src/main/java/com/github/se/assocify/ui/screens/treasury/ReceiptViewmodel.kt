@@ -11,6 +11,12 @@ import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * Viewmodel for the "Receipts" page in Treasury menu
+ *
+ * @param currentUser: Current user of the app
+ * @param receiptsDatabase: Database API for receipts. A default one is passed
+ */
 class ReceiptViewmodel(
     private val currentUser: CurrentUser,
     private val receiptsDatabase: ReceiptsAPI =
@@ -20,7 +26,6 @@ class ReceiptViewmodel(
             storage = Firebase.storage,
             db = Firebase.firestore)
 ) {
-
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState>
@@ -38,8 +43,10 @@ class ReceiptViewmodel(
         })
     updateUserReceipts()
     updateAllReceipts()
+    uiState = _uiState
   }
 
+  /** Update the user's receipts */
   fun updateUserReceipts() {
     receiptsDatabase.getUserReceipts(
         onSuccess = { receipts ->
@@ -54,9 +61,11 @@ class ReceiptViewmodel(
         })
   }
 
+  /** Update all receipts, if you have permissions */
   fun updateAllReceipts() {
-    // All receipts should be seen by admins only
-    // if (user?.role?.equals("lol") == true)
+    // TODO : Add a permission check.
+    // TODO Note : not done because permissions & database will change
+    // TODO Note : on sprint 4.
     receiptsDatabase.getAllReceipts(
         onReceiptsFetched = { receipts ->
           _uiState.value =
@@ -70,6 +79,7 @@ class ReceiptViewmodel(
         })
   }
 
+  /** Filter the list of receipts when the user types in the search bar. */
   fun onSearch(): List<Receipt> {
     val filter = _uiState.value.searchQuery.trim()
     return _uiState.value.allReceipts.filter { receipt ->
@@ -78,6 +88,7 @@ class ReceiptViewmodel(
     }
   }
 
+  /** Set the search query when changed in the search bar */
   fun setSearchQuery(query: String) {
     _uiState.value =
         ReceiptUIState(
@@ -85,12 +96,15 @@ class ReceiptViewmodel(
             allReceipts = _uiState.value.allReceipts,
             searchQuery = query)
   }
-
-  init {
-    uiState = _uiState
-  }
 }
 
+/**
+ * UI state for the Receipts page
+ *
+ * @param userReceipts: List of receipts of the user
+ * @param allReceipts: List of all receipts from admin's view
+ * @param searchQuery: Search query in the search bar
+ */
 data class ReceiptUIState(
     val userReceipts: List<Receipt> = listOf(),
     val allReceipts: List<Receipt> = listOf(),

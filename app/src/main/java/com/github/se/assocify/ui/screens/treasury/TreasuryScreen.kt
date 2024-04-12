@@ -53,14 +53,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
-import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 // Index of each tag for navigation
@@ -177,43 +174,6 @@ private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
   // Good practice to re-collect it as the page changes
   val viewmodelState by viewModel.uiState.collectAsState()
 
-  val placeholderReceiptList =
-      listOf(
-          Receipt(
-              uid = "1",
-              payer = "John Doe",
-              date = LocalDate.of(2023, 2, 15),
-              incoming = false,
-              cents = 5000,
-              phase = Phase.Unapproved,
-              title = "Grocery Shopping",
-              description = "Bought groceries at the local store",
-              photo = MaybeRemotePhoto.LocalFile(""),
-          ),
-          Receipt(
-              uid = "2",
-              payer = "Jane Smith",
-              date = LocalDate.of(2023, 2, 14),
-              incoming = true,
-              cents = 2500,
-              phase = Phase.Approved,
-              title = "Restaurant",
-              description = "Dinner with friends",
-              photo = MaybeRemotePhoto.Remote(""),
-          ),
-          Receipt(
-              uid = "3",
-              payer = "Alice Johnson",
-              date = LocalDate.of(2023, 2, 13),
-              incoming = false,
-              cents = 10000,
-              phase = Phase.PaidBack,
-              title = "Gas Station",
-              description = "Filled up the car",
-              photo = MaybeRemotePhoto.LocalFile(""),
-          ),
-      )
-
   LazyColumn(
       modifier = Modifier.testTag("ReceiptList"),
       verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
@@ -310,15 +270,14 @@ fun TreasuryTopBar(
     onSearchClick: () -> Unit,
     viewModel: ReceiptViewmodel
 ) {
+  // Search bar state
   var searchBarVisible by remember { mutableStateOf(false) }
   var searchText by remember { mutableStateOf("") }
-
   var searchReceipts by remember { mutableStateOf(emptyList<Receipt>()) }
-
-  val viewmodelState by viewModel.uiState.collectAsState()
 
   CenterAlignedTopAppBar(
       title = {
+        // If the search icon is clicked, the top bar is replaced
         if (!searchBarVisible) {
           Text(text = "Treasury", style = MaterialTheme.typography.headlineSmall)
         } else {
