@@ -18,5 +18,3 @@ fun AssocifyApp() {
     mainNavGraph(navActions = navActions, currentUser = CurrentUser("testUser", "testAssociation"))
   }
 }
-
-g
