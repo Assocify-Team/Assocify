@@ -15,6 +15,7 @@ import com.github.se.assocify.model.database.ReceiptsAPI
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.testCurrentUser
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
 import com.github.se.assocify.ui.util.DateUtil
@@ -35,7 +36,9 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
   private val receiptsAPI = mockk<ReceiptsAPI>(relaxUnitFun = true)
-  private val viewModel = ReceiptViewModel(navActions, receiptsAPI)
+  private val viewModel =
+      ReceiptViewModel(
+          navActions = navActions, currentUser = testCurrentUser, receiptApi = receiptsAPI)
 
   private var expectedReceipt =
       Receipt(
@@ -58,7 +61,9 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
           capturedReceipt = firstArg()
           navActions.back()
         }
-    composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel) }
+    composeTestRule.setContent {
+      ReceiptScreen(navActions = navActions, currentUser = testCurrentUser)
+    }
   }
 
   @Test

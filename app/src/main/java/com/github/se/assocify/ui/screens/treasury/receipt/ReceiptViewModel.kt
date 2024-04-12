@@ -1,5 +1,7 @@
 package com.github.se.assocify.ui.screens.treasury.receipt
 
+import androidx.compose.material3.SnackbarHostState
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptsAPI
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
@@ -7,12 +9,14 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
+import java.time.LocalDate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 class ReceiptViewModel {
 
@@ -27,10 +31,11 @@ class ReceiptViewModel {
 
   constructor(
       navActions: NavigationActions,
+      currentUser: CurrentUser,
       receiptApi: ReceiptsAPI =
           ReceiptsAPI(
-              userId = Firebase.auth.currentUser!!.uid,
-              basePath = "basePath",
+              userId = currentUser.userUid,
+              basePath = "associations/" + currentUser.associationUid,
               storage = Firebase.storage,
               db = Firebase.firestore)
   ) {
@@ -43,18 +48,17 @@ class ReceiptViewModel {
   constructor(
       receiptUid: String,
       navActions: NavigationActions,
+      currentUser: CurrentUser,
       receiptApi: ReceiptsAPI =
           ReceiptsAPI(
-              userId = Firebase.auth.currentUser!!.uid,
-              basePath = "basePath",
+              userId = currentUser.userUid,
+              basePath = currentUser.associationUid,
               storage = Firebase.storage,
               db = Firebase.firestore)
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
-    _uiState = MutableStateFlow(
-        ReceiptState(pageTitle = EDIT_RECEIPT_TITLE)
-    )
+    _uiState = MutableStateFlow(ReceiptState(pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
 
     this.receiptApi.getUserReceipts(
@@ -138,7 +142,7 @@ class ReceiptViewModel {
 
     val receipt =
         Receipt(
-            uid = "",
+            uid = receiptApi.getNewId(),
             title = _uiState.value.title,
             description = _uiState.value.description,
             cents = PriceUtil.toCents(_uiState.value.amount),
@@ -151,14 +155,30 @@ class ReceiptViewModel {
         receipt,
         onPhotoUploadSuccess = {},
         onReceiptUploadSuccess = { navActions.back() },
-        onFailure = { _, _ -> })
+        onFailure = { receiptFail, _ ->
+          if (receiptFail) {
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarHostState.showSnackbar(
+                  message = "Failed to save receipt",
+                  actionLabel = "Retry",
+              )
+            }
+          } else {
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarHostState.showSnackbar(
+                  message = "Failed to save image",
+                  actionLabel = "Retry",
+              )
+            }
+          }
+        })
   }
 
   fun deleteReceipt() {
     if (_uiState.value.isNewReceipt) {
       navActions.back()
     } else {
-        /*TODO: Implement receipt deletion*/
+      /*TODO: Implement receipt deletion*/
     }
   }
 }
@@ -174,4 +194,5 @@ data class ReceiptState(
     val titleError: String? = null,
     val amountError: String? = null,
     val dateError: String? = null,
+    val snackbarHostState: SnackbarHostState = SnackbarHostState()
 )

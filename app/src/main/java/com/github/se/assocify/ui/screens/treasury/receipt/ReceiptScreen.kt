@@ -31,6 +31,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -43,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.R
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 
@@ -50,7 +53,8 @@ import com.github.se.assocify.ui.composables.DatePickerWithDialog
 @Composable
 fun ReceiptScreen(
     navActions: NavigationActions,
-    viewModel: ReceiptViewModel = ReceiptViewModel(navActions)
+    currentUser: CurrentUser,
+    viewModel: ReceiptViewModel = ReceiptViewModel(navActions, currentUser)
 ) {
 
   val receiptState by viewModel.uiState.collectAsState()
@@ -69,7 +73,12 @@ fun ReceiptScreen(
                   }
             })
       },
-      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp)) { paddingValues ->
+      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp),
+      snackbarHost = {
+        SnackbarHost(
+            hostState = receiptState.snackbarHostState,
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+      }) { paddingValues ->
         Column(
             modifier =
                 Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
@@ -160,12 +169,14 @@ fun ReceiptScreen(
                 OutlinedButton(
                     modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
                     onClick = { viewModel.deleteReceipt() },
-                    content = { Text(
-                        if (receiptState.isNewReceipt) {
+                    content = {
+                      Text(
+                          if (receiptState.isNewReceipt) {
                             "Cancel"
-                        } else {
+                          } else {
                             "Delete"
-                        }) },
+                          })
+                    },
                     colors =
                         ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.error),
