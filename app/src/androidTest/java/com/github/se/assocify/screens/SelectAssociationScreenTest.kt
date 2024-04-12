@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -15,7 +16,10 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
+import io.mockk.confirmVerified
 import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
+import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,12 +59,11 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
 @RunWith(AndroidJUnit4::class)
 class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule val mockkRule = MockKRule(this)
+
   val registeredAssociation = listOf("CLIC", "GAME*")
 
-  // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
-  // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockAssocAPI: AssociationAPI
 
   /** This test checks if the "Create new organization" button is displayed */
@@ -73,8 +76,12 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       createOrgaButton {
         assertIsDisplayed()
         hasClickAction()
+        performClick()
       }
     }
+    // assert: the nav action has been called
+    verify { mockNavActions.navigateTo(Destination.CreateAsso)}
+    confirmVerified(mockNavActions)
   }
 
   /** This test checks if the search organization field is displayed */

@@ -9,9 +9,12 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.login.loginGraph
+import com.google.firebase.firestore.FirebaseFirestore
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -23,8 +26,11 @@ import org.junit.runner.RunWith
 fun LoginApp() {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController)
+  val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+  val userAPI = UserAPI(db)
+  val associationAPI = AssociationAPI(db)
   NavHost(navController = navController, startDestination = Destination.Login.route) {
-    loginGraph(navigationActions = navActions)
+    loginGraph(navigationActions = navActions, userAPI = userAPI, associationAPI = associationAPI)
   }
 }
 

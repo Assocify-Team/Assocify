@@ -5,15 +5,26 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.navigation.ActivityNavigator
+import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoScreen
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoViewmodel
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
+import io.mockk.verify
 import org.junit.Rule
 import org.junit.Test
 
 class CreateAssoScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
+    @get:Rule val mockkRule = MockKRule(this)
+
+    @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
   private val bigList =
       listOf(
@@ -38,7 +49,7 @@ class CreateAssoScreenTest {
 
   @Test
   fun displaySmall() {
-    composeTestRule.setContent { CreateAssoScreen(smallView) }
+    composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
     with(composeTestRule) {
       onNodeWithTag("createAssoScreen").assertIsDisplayed()
       onNodeWithTag("TopAppBar").assertIsDisplayed()
@@ -50,4 +61,22 @@ class CreateAssoScreenTest {
       onNodeWithTag("create").assertIsDisplayed()
     }
   }
+
+    @Test
+    fun testCreateButton(){
+        composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
+        with(composeTestRule){
+            onNodeWithTag("create").performClick()
+            verify { mockNavActions.navigateTo(Destination.Home) }
+        }
+    }
+
+    @Test
+    fun testGoBackButton(){
+        composeTestRule.setContent { CreateAssoScreen(mockNavActions, smallView) }
+        with(composeTestRule){
+            onNodeWithTag("Back").performClick()
+            verify { mockNavActions.back() }
+        }
+    }
 }
