@@ -1,21 +1,19 @@
 package com.github.se.assocify.ui.util
 
-/**
- * Utility class for price related operations.
- */
+/** Utility class for price related operations. */
 object PriceUtil {
 
   /*
-    * Regular expression for valid price characters.
+   * Regular expression for valid price characters.
    */
   const val VALID_CHARS = """^[0-9.]+$"""
 
-    /**
-     * Formats the given price to a string with two decimal places.
-     *
-     * @param price the price to format
-     * @return the formatted price
-     */
+  /**
+   * Formats the given price to a string with two decimal places.
+   *
+   * @param price the price to format
+   * @return the formatted price
+   */
   fun formatPrice(price: Double): String {
     return "%.2f".format(price)
   }
@@ -30,12 +28,12 @@ object PriceUtil {
     return price.toDouble()
   }
 
-    /**
-     * Converts the given price to cents
-     *
-     * @param price the price to format
-     * @return the formatted price
-     */
+  /**
+   * Converts the given price to cents
+   *
+   * @param price the price to format
+   * @return the formatted price
+   */
   fun toCents(price: String): Int {
     return (toDouble(price) * 100).toInt()
   }
@@ -47,7 +45,8 @@ object PriceUtil {
    * @return true if the price has invalid characters, false otherwise
    */
   fun hasInvalidCharacters(price: String): Boolean {
-    return price.isNotEmpty() && (!price.matches(Regex(VALID_CHARS)) || price.count { it == '.' } > 1)
+    return price.isNotEmpty() &&
+        (!price.matches(Regex(VALID_CHARS)) || price.count { it == '.' } > 1)
   }
 
   /**
@@ -60,43 +59,43 @@ object PriceUtil {
     return price == "." || (price.toDoubleOrNull() == 0.0)
   }
 
-    /**
-     * Checks if the given price is too large.
-     *
-     * @param price the price to check
-     * @return true if the price is too large, false otherwise
-     */
+  /**
+   * Checks if the given price is too large.
+   *
+   * @param price the price to check
+   * @return true if the price is too large, false otherwise
+   */
   fun isTooLarge(price: String): Boolean {
     return price.toDouble() > 999999.99
   }
 
-    /**
-     * Checks if the given price has more than 2 decimal places
-     *
-     * @param price the price to check
-     * @return true if the price is too precise, false otherwise
-     */
+  /**
+   * Checks if the given price has more than 2 decimal places
+   *
+   * @param price the price to check
+   * @return true if the price is too precise, false otherwise
+   */
   fun isTooPrecise(price: String): Boolean {
     val dot = price.indexOf('.')
     return if (dot == -1) false else price.length - dot > 3
   }
 
-    /**
-     * Checks if the given price is a valid double value
-     *
-     * @param price the price to check
-     * @return true if the price is valid, false otherwise
-     */
+  /**
+   * Checks if the given price is a valid double value
+   *
+   * @param price the price to check
+   * @return true if the price is valid, false otherwise
+   */
   fun isValid(price: String): Boolean {
     return price.toDoubleOrNull() != null && price.toDouble() >= 0
   }
 
-    /**
-     * Converts the given cents to a string price
-     *
-     * @param cents the cents to convert
-     * @return the string price
-     */
+  /**
+   * Converts the given cents to a string price
+   *
+   * @param cents the cents to convert
+   * @return the string price
+   */
   fun fromCents(cents: Int): String {
     return (cents.toDouble() / 100).toString()
   }
