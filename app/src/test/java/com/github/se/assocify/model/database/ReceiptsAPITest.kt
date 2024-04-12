@@ -4,9 +4,6 @@ import android.net.Uri
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -64,35 +61,6 @@ class ReceiptsAPITest {
           description = "notes",
           photo = MaybeRemotePhoto.LocalFile("path"))
 
-  inline fun <reified S, reified T : Task<S>> mockSuccessfulTask(result: S? = null): T {
-    val task = mockk<T>()
-    every { task.addOnSuccessListener(any()) }
-        .answers {
-          @Suppress("UNCHECKED_CAST")
-          (it.invocation.args[0] as OnSuccessListener<S>).onSuccess(result)
-          task
-        }
-
-    every { task.addOnFailureListener(any()) }.returns(task)
-
-    return task
-  }
-
-  inline fun <reified S, reified T : Task<S>> mockFailingTask(
-      exception: Exception = Exception("Test exception")
-  ): T {
-    val task = mockk<T>()
-    every { task.addOnFailureListener(any()) }
-        .answers {
-          (it.invocation.args[0] as OnFailureListener).onFailure(exception)
-          task
-        }
-
-    every { task.addOnSuccessListener(any()) }.returns(task)
-
-    return task
-  }
-
   @Before
   fun setUp() {
 
@@ -100,10 +68,10 @@ class ReceiptsAPITest {
     every { firestore.collection("aid/receipts/uid/list") }.returns(collectionReference)
 
     every { collectionReference.document("successful_rid").set(any()) }
-        .answers { mockSuccessfulTask<Void, Task<Void>>() }
+        .answers { APITestUtils.mockSuccessfulTask<Void>() }
 
     every { collectionReference.document("failing_rid").set(any()) }
-        .answers { mockFailingTask<Void, Task<Void>>() }
+        .answers { APITestUtils.mockFailingTask<Void>() }
 
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
@@ -119,7 +87,7 @@ class ReceiptsAPITest {
   fun uploadReceipt() {
     every { storageReference.child("successful_rid") }.returns(storageReference)
 
-    every { storageReference.putFile(any()) }.returns(mockSuccessfulTask())
+    every { storageReference.putFile(any()) }.returns(APITestUtils.mockSuccessfulTaskAdvanced())
 
     val successMock = mockk<() -> Unit>(relaxed = true)
     api.uploadReceipt(
@@ -129,7 +97,7 @@ class ReceiptsAPITest {
 
     every { storageReference.child("failing_rid") }.returns(storageReference)
 
-    every { storageReference.putFile(any()) }.returns(mockFailingTask())
+    every { storageReference.putFile(any()) }.returns(APITestUtils.mockFailingTaskAdvanced())
 
     val failureMock = mockk<(Boolean, Exception) -> Unit>(relaxed = true)
     api.uploadReceipt(
@@ -144,14 +112,14 @@ class ReceiptsAPITest {
   @Test
   fun getUserReceipts() {
     every { collectionReference.get() }
-        .returns(mockSuccessfulTask<QuerySnapshot, Task<QuerySnapshot>>(mockk()))
+        .returns(APITestUtils.mockSuccessfulTask<QuerySnapshot>(mockk()))
 
     val successMock = mockk<(List<Receipt>) -> Unit>(relaxed = true)
     api.getUserReceipts(successMock, { fail("Should not fail") })
 
     verify { successMock.invoke(listOf(successfulReceipt, failingReceipt)) }
 
-    every { collectionReference.get() }.returns(mockFailingTask())
+    every { collectionReference.get() }.returns(APITestUtils.mockFailingTaskAdvanced())
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getUserReceipts({ fail("Should not succeed") }, failureMock)
@@ -171,17 +139,17 @@ class ReceiptsAPITest {
         listOf(userADocumentSnapshot, userBDocumentSnapshot)
 
     every { userADocumentSnapshot.reference.collection("list").get() } returns
-        mockSuccessfulTask(userAQuerySnapshot)
+        APITestUtils.mockSuccessfulTask(userAQuerySnapshot)
 
     every { userBDocumentSnapshot.reference.collection("list").get() } returns
-        mockSuccessfulTask(userBQuerySnapshot)
+        APITestUtils.mockSuccessfulTask(userBQuerySnapshot)
 
     every { userADocumentSnapshot.id } returns "userA"
 
     every { userBDocumentSnapshot.id } returns "userB"
 
     every { firestore.collection("aid/receipts").get() } returns
-        mockSuccessfulTask(collectionQuerySnapshot)
+        APITestUtils.mockSuccessfulTask(collectionQuerySnapshot)
 
     every { api["parseReceiptList"](userAQuerySnapshot) } returns
         listOf(successfulReceipt, failingReceipt)
@@ -197,9 +165,11 @@ class ReceiptsAPITest {
       successMock.invoke(listOf(failingReceipt))
     }
 
-    every { userADocumentSnapshot.reference.collection("list").get() } returns mockFailingTask()
+    every { userADocumentSnapshot.reference.collection("list").get() } returns
+        APITestUtils.mockFailingTask()
 
-    every { userBDocumentSnapshot.reference.collection("list").get() } returns mockFailingTask()
+    every { userBDocumentSnapshot.reference.collection("list").get() } returns
+        APITestUtils.mockFailingTask()
 
     val failureMock = mockk<(String?, Exception) -> Unit>(relaxed = true)
     api.getAllReceipts({ fail("Should not succeed") }, failureMock)
@@ -209,7 +179,7 @@ class ReceiptsAPITest {
       failureMock.invoke("userB", any())
     }
 
-    every { firestore.collection("aid/receipts").get() } returns mockFailingTask()
+    every { firestore.collection("aid/receipts").get() } returns APITestUtils.mockFailingTask()
 
     api.getAllReceipts({ fail("Should not succeed") }, failureMock)
 
