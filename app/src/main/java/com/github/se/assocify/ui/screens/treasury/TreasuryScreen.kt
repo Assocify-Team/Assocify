@@ -47,12 +47,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.assocify.model.entities.MaybeRemotePhoto
+import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 // Index of each tag for navigation
 enum class PageIndex(val index: Int) {
@@ -168,6 +171,42 @@ private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
   // Good practice to re-collect it as the page changes
   val viewmodelState by viewModel.uiState.collectAsState()
 
+  val placeholderReceiptList = listOf(
+    Receipt(
+      uid = "1",
+      payer = "John Doe",
+      date = LocalDate.of(2023, 2, 15),
+      incoming = false,
+      cents = 5000,
+      phase = Phase.Unapproved,
+      title = "Grocery Shopping",
+      description = "Bought groceries at the local store",
+      photo = MaybeRemotePhoto.LocalFile(""),
+    ),
+    Receipt(
+      uid = "2",
+      payer = "Jane Smith",
+      date = LocalDate.of(2023, 2, 14),
+      incoming = true,
+      cents = 2500,
+      phase = Phase.Approved,
+      title = "Restaurant",
+      description = "Dinner with friends",
+      photo = MaybeRemotePhoto.Remote(""),
+    ),
+    Receipt(
+      uid = "3",
+      payer = "Alice Johnson",
+      date = LocalDate.of(2023, 2, 13),
+      incoming = false,
+      cents = 10000,
+      phase = Phase.PaidBack,
+      title = "Gas Station",
+      description = "Filled up the car",
+      photo = MaybeRemotePhoto.LocalFile(""),
+    ),
+  )
+
   LazyColumn(
     modifier = Modifier.testTag("ReceiptList"),
     verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
@@ -185,9 +224,9 @@ private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
       HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
     }
 
-    if (viewmodelState.userReceipts.isNotEmpty()) {
+    if (placeholderReceiptList.isNotEmpty()) {
       // First list of receipts
-      viewmodelState.userReceipts.forEach { receipt ->
+      placeholderReceiptList.forEach { receipt ->
         item {
           ReceiptItem(receipt)
           HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
@@ -207,7 +246,7 @@ private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
 
     // Global receipts only appear if the user has the permission,
     // which is handled in the viewmodel whatsoever
-    if (viewmodelState.allReceipts.isNotEmpty()) {
+    if (placeholderReceiptList.isNotEmpty()) {
       // Header for the global receipts
       item {
         Text(
@@ -220,7 +259,7 @@ private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
         HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
       }
       // Second list of receipts
-      viewmodelState.allReceipts.forEach { receipt ->
+      placeholderReceiptList.forEach { receipt ->
         item {
           ReceiptItem(receipt)
           HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
