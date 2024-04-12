@@ -33,10 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlin.math.min
 
@@ -50,10 +50,9 @@ import kotlin.math.min
 fun SelectAssociation(
     navActions: NavigationActions,
     associationAPI: AssociationAPI,
-    userAPI: UserAPI,
-    currentUser: CurrentUser
+    userAPI: UserAPI
 ) {
-  val model = SelectAssociationViewModel(associationAPI, userAPI, currentUser)
+  val model = SelectAssociationViewModel(associationAPI, userAPI)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
   Scaffold(
@@ -123,7 +122,7 @@ fun SelectAssociation(
       },
       bottomBar = {
         Button(
-            onClick = { /*TODO: navigate to go to newAssociation screen*/},
+            onClick = { navActions.navigateTo(Destination.CreateAsso) },
             modifier =
                 Modifier.fillMaxWidth().padding(16.dp).testTag("CreateNewOrganizationButton"),
             content = { Text(text = "Create new organization") },

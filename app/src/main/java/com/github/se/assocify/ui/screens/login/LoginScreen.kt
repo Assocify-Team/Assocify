@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -67,12 +68,16 @@ fun rememberFirebaseAuthLauncher(
 }
 
 @Composable
-fun LoginScreen(navActions: NavigationActions) {
+fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
+  val viewModel = LoginViewModel(userAPI, navActions)
 
   val launcher =
       rememberFirebaseAuthLauncher(
-          onAuthComplete = { result -> navActions.onLogin(result.user) },
-          onAuthError = { navActions.onAuthError() })
+          onAuthComplete = { viewModel.updateUser() },
+          onAuthError = {
+            println("Error: $it")
+            navActions.onAuthError()
+          })
   val token = stringResource(R.string.web_client_id)
   val context = LocalContext.current
 
