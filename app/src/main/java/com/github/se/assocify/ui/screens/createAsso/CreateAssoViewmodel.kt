@@ -55,14 +55,12 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
    * Adds the editMember to the list of members in the database
    */
   fun addMemberToList() {
-    // need input sanitization (editmember non null) TODO
-    // keep the list of members sorted by role then name
-    val memberList =
-        sortMembers(
-            _uiState.value.members.filter { user -> user.uid != _uiState.value.editMember!!.uid } +
-                _uiState.value.editMember!!)
-    // can't add a member already in the list -> should be disabled by the list of names already
-    _uiState.value = _uiState.value.copy(members = memberList, openEdit = false, editMember = null)
+    _uiState.value.editMember?.let {
+        // keep the list of members sorted by role then name + can't add a member already in the list
+        val memberList = sortMembers(_uiState.value.members.filter { user -> user.uid != it.uid } + it)
+        _uiState.value = _uiState.value.copy(members = memberList, openEdit = false, editMember = null)
+    }
+
   }
 
   fun removeMember(member: User) {
@@ -81,36 +79,38 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
     _uiState.value = _uiState.value.copy(editMember = null)
   }
 
-  fun modifyMemberName(name: String) {
-    // TODO CHANGE
-    // will need to change the uid depending on members in DB -> waiting for memberSearch merge
-    _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.copy(uid = name))
-    _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.copy(name = name))
-  }
-
   /*
    * Searches for member with corresponding name in the database
    */
   fun searchMember(searchMember: String) {
+      _uiState.value = _uiState.value.copy(searchMember = searchMember) // ?
     // TODO
-    _uiState.value = _uiState.value.copy(searchMember = searchMember)
-    // userAPI.getAllUsers { userList ->
-    // SHLAG POUR TEST
-    bigList.let { userList ->
-      _uiState.value =
-          _uiState.value.copy(
-              searchMemberList =
-                  userList
-                      .filterNot { user -> _uiState.value.members.any { us -> us.uid == user.uid } }
-                      .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
+      if (searchMember.isNotBlank()) {
+          // userAPI.getAllUsers { userList ->
+          // SHLAG POUR TEST
+          bigList.let { userList ->
+              _uiState.value =
+                  _uiState.value.copy(
+                      searchMemberList =
+                      userList
+                          .filterNot { user -> _uiState.value.members.any { us -> us.uid == user.uid } }
+                          .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
 
-      if (_uiState.value.searchMemberList.isEmpty()) {
-        _uiState.value = _uiState.value.copy(memberError = "No users found")
-      } else {
-        _uiState.value = _uiState.value.copy(memberError = null)
+              if (_uiState.value.searchMemberList.isEmpty()) {
+                  _uiState.value = _uiState.value.copy(memberError = "No users found")
+              } else {
+                  _uiState.value = _uiState.value.copy(memberError = null)
+              }
+          }
+      } else { //idk
+          _uiState.value = _uiState.value.copy(memberError = null)
       }
-    }
   }
+
+    fun searchError(): Boolean {
+        return _uiState.value.memberError != null
+    }
+
 
   /*
    * Selects a member from the search list
@@ -136,7 +136,12 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
    * Gives/removes role to the member
    */
   fun modifyMemberRole(role: String) {
-        _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.toggleRole(role))
+      if (_uiState.value.editMember != null) {
+          _uiState.value.editMember?.let {
+              _uiState.value =
+                  _uiState.value.copy(editMember = it.toggleRole(role))
+          }
+      }
   }
 
     fun canSaveAsso(): Boolean {
