@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -16,8 +17,10 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,6 +71,26 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
   @get:Rule val mockkRule = MockKRule(this)
 
+  val testAssociation =
+      Association(
+          "testAssociation",
+          "an association to test the viewModel",
+          "a",
+          "b",
+          "c",
+          emptyList(),
+          emptyList())
+
+  @Before
+  fun setup() {
+    val exception = Exception("the test does not work")
+    every { mockAssocAPI.getAssociations(any(), any()) } answers
+        {
+          val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
+          val associations = listOf(testAssociation)
+        }
+  }
+
   /** This test checks if the "Create new organization" button is displayed */
   @Test
   fun testCreateNewOrganizationButton() {
@@ -88,6 +111,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       searchOrganization { assertIsDisplayed() }
     }
   }
+
   /** This test checks if the registered organization list is correctly displayed */
   @Test
   fun testRegisteredOrganizationList() {
@@ -99,9 +123,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       }
     }
     // Check if the organizations are displayed
-    val organizations = listOf("CLIC", "GAME*")
+    val organizations = listOf(testAssociation)
     organizations.forEach { organization ->
-      composeTestRule.onNodeWithText(organization).assertIsDisplayed()
+      composeTestRule.onNodeWithText(organization.getName()).assertIsDisplayed()
     }
   }
 

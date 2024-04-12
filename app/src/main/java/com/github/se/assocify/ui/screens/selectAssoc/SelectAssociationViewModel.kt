@@ -30,23 +30,28 @@ class SelectAssociationViewModel(
   }
 
   private fun update() {
-    associationAPI.getAssociations ({ assocList ->
-      _uiState.value =
-          SelectAssociationState(
-              assocList,
-              _uiState.value.searchQuery,
-              _uiState.value.user,
-              _uiState.value.searchState)
-    }, { })
+    associationAPI.getAssociations(
+        { assocList ->
+          _uiState.value =
+              SelectAssociationState(
+                  assocList,
+                  _uiState.value.searchQuery,
+                  _uiState.value.user,
+                  _uiState.value.searchState)
+        },
+        {})
     if (getUserId() != "") {
-      userAPI.getUser(getUserId(), { user ->
-        _uiState.value =
-            SelectAssociationState(
-                _uiState.value.associations,
-                _uiState.value.searchQuery,
-                user,
-                _uiState.value.searchState)
-      }, { })
+      userAPI.getUser(
+          getUserId(),
+          { user ->
+            _uiState.value =
+                SelectAssociationState(
+                    _uiState.value.associations,
+                    _uiState.value.searchQuery,
+                    user,
+                    _uiState.value.searchState)
+          },
+          {})
     }
   }
 
