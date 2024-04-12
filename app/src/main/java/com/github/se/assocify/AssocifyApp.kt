@@ -9,6 +9,8 @@ import com.github.se.assocify.navigation.mainNavGraph
 
 @Composable
 fun AssocifyApp() {
+
+
   val navController = rememberNavController()
   val navActions = NavigationActions(navController)
   NavHost(navController = navController, startDestination = Destination.Home.route) {

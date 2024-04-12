@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -6,11 +8,18 @@ plugins {
     id("org.sonarqube") version "4.4.1.3373"
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+
+    // Supabase
+    kotlin("plugin.serialization") version "1.9.23"
 }
 
 android {
     namespace = "com.github.se.assocify"
     compileSdk = 34
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.github.se.assocify"
@@ -23,6 +32,16 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // SUPABASE CONFIG
+        val propertiesFile = rootProject.file("local.properties")
+        val properties = Properties()
+        if (propertiesFile.exists()) {
+            properties.load(FileInputStream(propertiesFile))
+        }
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties["SUPABASE_ANON_KEY"]}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${properties["SUPABASE_URL"]}\"")
+
     }
 
     buildTypes {
@@ -146,6 +165,14 @@ dependencies {
     testImplementation("io.mockk:mockk-agent:1.13.7")
     androidTestImplementation("io.mockk:mockk-android:1.13.7")
     androidTestImplementation("io.mockk:mockk-agent:1.13.7")
+
+    //Supabase
+    implementation ("io.github.jan-tennert.supabase:postgrest-kt:2.2.3")
+    implementation( "io.github.jan-tennert.supabase:storage-kt:2.2.3")
+    implementation ("io.github.jan-tennert.supabase:gotrue-kt:2.2.3")
+    implementation ("io.ktor:ktor-client-android:2.3.10")
+    implementation ("io.ktor:ktor-client-core:2.3.10")
+    implementation ("io.ktor:ktor-utils:2.3.10")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
