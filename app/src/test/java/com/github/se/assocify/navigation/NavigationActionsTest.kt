@@ -1,63 +1,54 @@
-package com.github.se.assocify.navigation
-
-import androidx.navigation.NavHostController
-import com.google.firebase.auth.FirebaseUser
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import io.mockk.every
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.junit4.MockKRule
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
+import androidx.navigation.NavHostController
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 
 class NavigationActionsTest {
-  @get:Rule val mockkRule = MockKRule(this)
 
-  private var destination: String? = null
-  @RelaxedMockK
-  lateinit var mockNavController: NavHostController
+  private lateinit var navController: NavHostController
+  private lateinit var navigationActions: NavigationActions
 
   @Before
-  fun setupLogin() {
-    every { mockNavController.navigate(route = any(), builder = any()) } answers
-        {
-          destination = firstArg()
-        }
+  fun setUp() {
+    navController = mockk(relaxed = true)
+    navigationActions = NavigationActions(navController)
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun `navigateToMainTab throws exception when destination is not main tab`() {
+    navigationActions.navigateToMainTab(Destination.Login)
   }
 
   @Test
-  fun test() {
-    val navActions = NavigationActions(mockNavController)
-    navActions.navigateToMainTab(Destination.Home)
-    assert(destination == Destination.Home.route)
-    /*try {
-      navActions.navigateTo(Destination.Login)
-    } catch (e: IllegalArgumentException) {
-      assert(e.message == "Destination Login is not a main tab")
-    }*/
+  fun `navigateTo performs navigation`() {
+    navigationActions.navigateTo(Destination.Login)
+
+    verify { navController.navigate(Destination.Login.route) }
   }
 
-  /**
-   * Test the onLogin function when user exists
-   */
   @Test
-  fun onLoginTestToHome() {
-    val navActions = NavigationActions(mockNavController)
-    val userExists = true
-    navActions.onLogin(userExists)
-    assert(destination == Destination.Home.route)
+  fun `onLogin navigates to Home when user exists`() {
+    navigationActions.onLogin(true)
+
+    verify { navController.navigate(Destination.Home.route) }
   }
 
-  /**
-   * Test the onLogin function when user does not exist
-   */
   @Test
-  fun onLoginTestToSelect() {
-    val navActions = NavigationActions(mockNavController)
-    val userExists = false
-    navActions.onLogin(userExists)
-    assert(destination == Destination.SelectAsso.route){
-        "Expected destination to be ${Destination.SelectAsso.route}, but was $destination"
-    }
+  fun `onLogin navigates to SelectAsso when user does not exist`() {
+    navigationActions.onLogin(false)
+
+    verify { navController.navigate(Destination.SelectAsso.route) }
+  }
+
+  @Test
+  fun `back navigates back`() {
+    navigationActions.back()
+
+    verify { navController.popBackStack() }
   }
 }
