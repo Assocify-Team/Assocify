@@ -13,7 +13,6 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.testCurrentUser
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoScreen
 import com.github.se.assocify.ui.screens.createAsso.CreateAssoViewmodel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -67,9 +66,9 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           User("9", "bill", Role("")),
           User("10", "seb", Role("")))
 
-  val bigView = CreateAssoViewmodel(testCurrentUser)
+  val bigView = CreateAssoViewmodel()
 
-    val smallView = CreateAssoViewmodel(testCurrentUser)
+    val smallView = CreateAssoViewmodel()
 
   @Before
   fun setupLogin() {
@@ -79,7 +78,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           onSuccessCallback(bigList)
 
         }
-    composeTestRule.setContent { CreateAssoScreen(testCurrentUser, bigView) }
+    composeTestRule.setContent { CreateAssoScreen(mockNavActions, bigView) }
   }
 
   @Test

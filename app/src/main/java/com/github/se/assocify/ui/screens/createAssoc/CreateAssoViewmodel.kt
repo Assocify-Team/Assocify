@@ -15,13 +15,13 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
+class CreateAssoViewmodel() : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
   private val assoAPI = AssociationAPI(db = Firebase.firestore)
   private val userAPI = UserAPI(db = Firebase.firestore)
-  val currUser = currentUser.userUid
+  val currUser = CurrentUser.userUid
 
   // SHLAG POUR TEST
   private val bigList =

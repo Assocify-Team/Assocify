@@ -54,7 +54,7 @@ import com.github.se.assocify.navigation.NavigationActions
 @Composable
 fun CreateAssoScreen(
     navigationActions: NavigationActions,
-    viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(CurrentUser)
+    viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()
 ) {
 
   val state by viewmodel.uiState.collectAsState()
