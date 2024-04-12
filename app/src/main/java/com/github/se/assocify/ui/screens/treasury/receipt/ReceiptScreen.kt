@@ -105,17 +105,6 @@ fun ReceiptScreen(
                   label = { Text("Date") },
                   isError = receiptState.dateError != null,
                   supportingText = { receiptState.dateError?.let { Text(it) } })
-              /*UserSearchTextField(
-              modifier = Modifier.testTag("payerField").fillMaxWidth(),
-              searchValue = receiptState.payerSearch,
-              userList = receiptState.payerList,
-              user = receiptState.payer,
-              onUserSearch = { viewModel.searchPayer(it) },
-              onUserSelect = { viewModel.setPayer(it) },
-              onUserDismiss = { viewModel.unsetPayer() },
-              label = { Text("Payer") },
-              isError = receiptState.payerError != null,
-              supportingText = receiptState.payerError?.let { { Text(it) } })*/
               Card(
                   modifier =
                       Modifier.testTag("imageCard")
@@ -171,7 +160,12 @@ fun ReceiptScreen(
                 OutlinedButton(
                     modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
                     onClick = { viewModel.deleteReceipt() },
-                    content = { Text("Delete") },
+                    content = { Text(
+                        if (receiptState.isNewReceipt) {
+                            "Cancel"
+                        } else {
+                            "Delete"
+                        }) },
                     colors =
                         ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.error),

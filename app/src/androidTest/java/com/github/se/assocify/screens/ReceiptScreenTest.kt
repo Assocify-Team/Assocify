@@ -37,11 +37,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private val receiptsAPI = mockk<ReceiptsAPI>(relaxUnitFun = true)
   private val viewModel = ReceiptViewModel(navActions, receiptsAPI)
 
-  /*val userMai = User("1", "Maï", Role())
-  val userSeb = User("2", "Sebastien", Role())
-  val userSido = User("3", "Sido", Role())
-  val userList = listOf(userMai, userSeb, userSido)*/
-
   private var expectedReceipt =
       Receipt(
           uid = "",
@@ -78,7 +73,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("titleField").assertIsDisplayed()
       onNodeWithTag("descriptionField").assertIsDisplayed()
       onNodeWithTag("amountField").performScrollTo().assertIsDisplayed()
-      // onNodeWithTag("payerField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("imageCard").performScrollTo().assertIsDisplayed()
       onNodeWithTag("editImageButton").performScrollTo().assertIsDisplayed()
@@ -141,28 +135,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
   }
 
-  /*@Test
-  fun payer() {
-    with(composeTestRule) {
-      // Test search : should work without capital letter,
-      onNodeWithTag("payerField").performClick().performTextInput("maï")
-      onNodeWithTag("userDropdown").assertIsDisplayed()
-      onNodeWithTag("userDropdownItem-1").assertIsDisplayed().performClick()
-      assert(viewModel.uiState.value.payer == userMai)
-      onNodeWithTag("payerField").assertTextContains("Maï")
-
-      onNodeWithTag("userDismissButton").assertIsDisplayed().performClick()
-      assert(viewModel.uiState.value.payerSearch == "")
-
-      onNodeWithTag("payerField").performClick().performTextInput("Ya")
-      onNodeWithTag("payerField").assertTextContains("No users found")
-
-      onNodeWithTag("payerField").performClick().performTextClearance()
-      onNodeWithTag("payerField").performClick().performTextInput("S")
-      onNodeWithTag("userDropdown").assertIsDisplayed().onChildren().assertCountEquals(2)
-    }
-  }*/
-
   @Test
   fun save() {
     with(composeTestRule) {
@@ -186,6 +158,14 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       assert(viewModel.uiState.value.dateError == null)
 
       onNodeWithTag("saveButton").performClick()
+    }
+  }
+
+  @Test
+  fun delete() {
+    with(composeTestRule) {
+      onNodeWithTag("deleteButton").performScrollTo().performClick()
+      verify { navActions.back() }
     }
   }
 

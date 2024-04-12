@@ -10,9 +10,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
 
 class ReceiptViewModel {
 
@@ -52,7 +52,9 @@ class ReceiptViewModel {
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
-    _uiState = MutableStateFlow(ReceiptState(pageTitle = EDIT_RECEIPT_TITLE))
+    _uiState = MutableStateFlow(
+        ReceiptState(pageTitle = EDIT_RECEIPT_TITLE)
+    )
     uiState = _uiState
 
     this.receiptApi.getUserReceipts(
@@ -61,6 +63,7 @@ class ReceiptViewModel {
             if (receipt.uid == receiptUid) {
               _uiState.value =
                   _uiState.value.copy(
+                      isNewReceipt = false,
                       title = receipt.title,
                       description = receipt.description,
                       amount = PriceUtil.fromCents(receipt.cents),
@@ -103,30 +106,6 @@ class ReceiptViewModel {
       _uiState.value = _uiState.value.copy(amountError = null)
     }
   }
-
-  /*fun searchPayer(payerSearch: String) {
-    _uiState.value = _uiState.value.copy(payerSearch = payerSearch)
-    userAPI.getAllUsers { userList ->
-      _uiState.value =
-          _uiState.value.copy(
-              payerList = userList.filter { it.name.lowercase().contains(payerSearch.lowercase()) })
-
-      if (_uiState.value.payerList.isEmpty()) {
-        _uiState.value = _uiState.value.copy(payerError = "No users found")
-      } else {
-        _uiState.value = _uiState.value.copy(payerError = null)
-      }
-    }
-  }
-
-  fun setPayer(payer: User) {
-    _uiState.value = _uiState.value.copy(payer = payer)
-    _uiState.value = _uiState.value.copy(payerSearch = "")
-  }
-
-  fun unsetPayer() {
-    _uiState.value = _uiState.value.copy(payer = null)
-  }*/
 
   fun setDate(date: LocalDate?) {
     _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
@@ -176,22 +155,23 @@ class ReceiptViewModel {
   }
 
   fun deleteReceipt() {
-    /*TODO: Implement deletion*/
+    if (_uiState.value.isNewReceipt) {
+      navActions.back()
+    } else {
+        /*TODO: Implement receipt deletion*/
+    }
   }
 }
 
 data class ReceiptState(
+    val isNewReceipt: Boolean = true,
     val pageTitle: String,
     val title: String = "",
     val description: String = "",
     val amount: String = "",
-    /*    val payerSearch: String = "",
-    val payerList: List<User> = emptyList(),
-    val payer: User? = null,*/
     val date: String = "",
     val incoming: Boolean = false,
     val titleError: String? = null,
     val amountError: String? = null,
-    // val payerError: String? = null,
     val dateError: String? = null,
 )
