@@ -60,13 +60,33 @@ class ReceiptsAPI(
   }
 
   private fun parseReceiptList(snapshot: QuerySnapshot): List<Receipt> =
-      snapshot.documents.map { it.toObject(FirestoreReceipt::class.java)!!.toReceipt(it.id) }
+      snapshot.documents.map { it.toObject(FirestoreReceipt::class.java)!!.toReceipt() }
 
-  /** Gets all receipts created by the current user. */
+  /**
+   * Gets all receipts created by the current user.
+   *
+   * @param onSuccess called when the fetch succeeds with the list of receipts
+   * @param onError called when the fetch fails with the exception that occurred
+   */
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
     dbReference
         .get()
         .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
+        .addOnFailureListener { onError(it) }
+  }
+
+  /**
+   * Gets a receipt by its ID.
+   *
+   * @param id the ID of the receipt to get
+   * @param onSuccess called when the receipt is fetched successfully
+   * @param onError called when the fetch fails with the exception that occurred
+   */
+  fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onError: (Exception) -> Unit) {
+    dbReference
+        .document(id)
+        .get()
+        .addOnSuccessListener { onSuccess(it.toObject(FirestoreReceipt::class.java)!!.toReceipt()) }
         .addOnFailureListener { onError(it) }
   }
 
@@ -96,6 +116,14 @@ class ReceiptsAPI(
         .addOnFailureListener { onError(null, it) }
   }
 
+  fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    dbReference
+        .document(id)
+        .delete()
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener(onFailure)
+  }
+
   @Keep
   private data class FirestoreReceipt(
       @DocumentId val id: String = "",
@@ -121,9 +149,9 @@ class ReceiptsAPI(
         from.description,
         from.uid)
 
-    fun toReceipt(uid: String) =
+    fun toReceipt() =
         Receipt(
-            uid,
+            this.id,
             this.payer,
             LocalDate.parse(this.date),
             this.incoming,

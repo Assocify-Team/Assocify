@@ -53,4 +53,12 @@ class RoleTest {
     val role = Role("admin")
     assert(role.getName() == "admin")
   }
+
+  @Test
+  fun testGetRoleType() {
+    Role.RoleType.entries.forEach { roleType ->
+      val role = Role(roleType.name.lowercase())
+      assert(role.getRoleType() == roleType)
+    }
+  }
 }
