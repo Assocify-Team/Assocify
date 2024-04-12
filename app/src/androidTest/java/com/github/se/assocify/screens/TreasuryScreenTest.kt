@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -28,7 +29,10 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Before
   fun testSetup() {
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    composeTestRule.setContent { TreasuryScreen(navActions = navActions) }
+    CurrentUser("testUser", "testAssociation")
+    composeTestRule.setContent {
+      TreasuryScreen(navActions, CurrentUser("testUser", "testAssociation"))
+    }
   }
 
   @Test
