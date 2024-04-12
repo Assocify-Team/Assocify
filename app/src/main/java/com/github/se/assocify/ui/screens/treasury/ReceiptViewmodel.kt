@@ -18,11 +18,10 @@ import kotlinx.coroutines.flow.StateFlow
  * @param receiptsDatabase: Database API for receipts. A default one is passed
  */
 class ReceiptViewmodel(
-    private val currentUser: CurrentUser,
     private val receiptsDatabase: ReceiptsAPI =
         ReceiptsAPI(
-            userId = currentUser.userUid,
-            basePath = "associations/" + currentUser.associationUid,
+            userId = CurrentUser.userUid!!,
+            basePath = "associations/" + CurrentUser.associationUid!!,
             storage = Firebase.storage,
             db = Firebase.firestore)
 ) {
@@ -37,7 +36,7 @@ class ReceiptViewmodel(
   init {
     // Define user entity
     userAPI.getUser(
-        currentUser.userUid,
+        CurrentUser.userUid!!,
         onSuccess = { user = it },
         onFailure = { // TODO on sprint 4 with error API
         })

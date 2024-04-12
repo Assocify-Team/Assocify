@@ -18,7 +18,7 @@ fun NavGraphBuilder.mainNavGraph(
     associationAPI: AssociationAPI
 ) {
   homeGraph(navActions)
-  treasuryGraph(navActions, currentUser)
+  treasuryGraph(navActions)
   eventGraph(navActions)
   chatGraph(navActions)
   profileGraph(navActions)

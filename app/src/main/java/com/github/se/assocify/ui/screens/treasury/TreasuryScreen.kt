@@ -52,7 +52,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
@@ -77,8 +76,7 @@ enum class PageIndex(val index: Int) {
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    currentUser: CurrentUser,
-    viewModel: ReceiptViewmodel = ReceiptViewmodel(currentUser = currentUser)
+    viewModel: ReceiptViewmodel = ReceiptViewmodel()
 ) {
   val viewmodelState by viewModel.uiState.collectAsState()
 
