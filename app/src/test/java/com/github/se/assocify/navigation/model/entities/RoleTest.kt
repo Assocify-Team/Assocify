@@ -51,7 +51,7 @@ class RoleTest {
   @Test
   fun testGetName() {
     val role = Role("admin")
-    assert(role.getName() == "admin")
+    assert(role.name == "admin")
   }
 
   @Test
