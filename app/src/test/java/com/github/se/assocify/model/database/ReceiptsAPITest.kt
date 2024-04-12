@@ -186,4 +186,21 @@ class ReceiptsAPITest {
 
     verify { failureMock.invoke(null, any()) }
   }
+
+  @Test
+  fun deleteReceipt() {
+    every { collectionReference.document("successful_rid").delete() }.returns(mockSuccessfulTask())
+
+    val successMock = mockk<() -> Unit>(relaxed = true)
+    api.deleteReceipt("successful_rid", successMock, { fail("Should not fail") })
+
+    verify { successMock.invoke() }
+
+    every { collectionReference.document("failing_rid").delete() }.returns(mockFailingTask())
+
+    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
+    api.deleteReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
+
+    verify { failureMock.invoke(any()) }
+  }
 }

@@ -94,6 +94,14 @@ class ReceiptsAPI(
         .addOnFailureListener { onError(null, it) }
   }
 
+  fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    dbReference
+        .document(id)
+        .delete()
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener(onFailure)
+  }
+
   private data class FirestoreReceipt(
       val payer: String,
       val date: String,
