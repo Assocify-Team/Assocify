@@ -50,8 +50,10 @@ import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAssoScreen(currentUser: CurrentUser,
-                     viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(currentUser)) {
+fun CreateAssoScreen(
+    currentUser: CurrentUser,
+    viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(currentUser)
+) {
 
   val state by viewmodel.uiState.collectAsState()
 
@@ -148,9 +150,8 @@ fun CreateAssoScreen(currentUser: CurrentUser,
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
                         searchValue =
-                            state
-                                .searchMember, // ce qui est tapé dans barre -> vide quand y a un
-                                               // user
+                            state.searchMember, // ce qui est tapé dans barre -> vide quand y a un
+                        // user
                         userList = state.searchMemberList, // ce qui apparait dans la liste
                         user = state.editMember, // ce qui est sélectionné -> null quand tu cherche
                         onUserSearch = { viewmodel.searchMember(it) }, // on value change
@@ -160,9 +161,8 @@ fun CreateAssoScreen(currentUser: CurrentUser,
                         onUserDismiss = { viewmodel.dismissMemberSearch() }, // click sur croix
                         expanded = state.searchMemberList.isNotEmpty(), // dropdown ouvert ou pas
                         label = { Text("Name") },
-                        isError  = viewmodel.searchError(),
-                        supportingText = state.memberError?.let { { Text(it) } }
-                    )
+                        isError = viewmodel.searchError(),
+                        supportingText = state.memberError?.let { { Text(it) } })
                     if (state.editMember != null) {
                       // maybe can't select role before selecting member ?
                       Role.RoleType.entries

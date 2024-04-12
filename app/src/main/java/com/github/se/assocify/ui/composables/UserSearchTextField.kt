@@ -3,8 +3,6 @@ package com.github.se.assocify.ui.composables
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -15,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -44,9 +41,7 @@ fun UserSearchTextField(
   Column {
     OutlinedTextField(
         value = value,
-        onValueChange = {
-          onUserSearch(it)
-        },
+        onValueChange = { onUserSearch(it) },
         modifier = modifier then Modifier.onSizeChanged { textfieldSize = it.width },
         readOnly = user != null,
         isError = isError,
@@ -64,17 +59,14 @@ fun UserSearchTextField(
             Modifier.testTag("userDropdown")
                 .width(with(LocalDensity.current) { textfieldSize.toDp() }),
         expanded = expanded,
-        onDismissRequest = {  },
+        onDismissRequest = {},
         properties = PopupProperties(focusable = false)) {
           userList.forEach { user ->
             DropdownMenuItem(
                 modifier = Modifier.testTag("userDropdownItem-${user.uid}"),
                 text = { Text(user.getName()) },
-                onClick = {
-                  onUserSelect(user)
-                })
+                onClick = { onUserSelect(user) })
           }
         }
   }
 }
-
