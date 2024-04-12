@@ -62,6 +62,7 @@ fun SelectAssociation(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
+                  modifier = Modifier.testTag("HelloText"),
                   text = "Hello " + state.value.user.getName() + " !!",
                   style = MaterialTheme.typography.headlineSmall)
               SearchBar(

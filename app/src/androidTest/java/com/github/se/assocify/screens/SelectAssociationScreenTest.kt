@@ -13,7 +13,7 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
-import com.google.firebase.Firebase
+import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociationUtils
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -36,11 +36,12 @@ class SelectAssociationScreenTest(semanticsProvider: SemanticsNodeInteractionsPr
     ComposeScreen<SelectAssociationScreenTest>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("SelectAssociationScreen") }) {
-  val searchOrganization: KNode = onNode { hasTestTag("SearchOrganization") }
-  val registeredList: KNode = onNode { hasTestTag("RegisteredList") }
-  val createOrgaButton: KNode = onNode { hasTestTag("CreateNewOrganizationButton") }
+  val searchOrganization: KNode = child { hasTestTag("SearchOrganization") }
+  val registeredList: KNode = child { hasTestTag("RegisteredList") }
+  val createOrgaButton: KNode = child { hasTestTag("CreateNewOrganizationButton") }
   val searchOrgaButton: KNode = onNode { hasTestTag("SOB") }
   val arrowBackButton: KNode = onNode { hasTestTag("ArrowBackButton") }
+  val helloText: KNode = onNode { hasTestTag("HelloText") }
 }
 
 /**
@@ -73,7 +74,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockUserAPI: UserAPI
 
-  @RelaxedMockK lateinit var mockFirebase: Firebase
+  @RelaxedMockK lateinit var mockScreenAssociationUtils: SelectAssociationUtils
 
   @get:Rule val mockkRule = MockKRule(this)
 
@@ -177,4 +178,22 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
     }
   }
+
+  /*
+    @Test
+    fun testWithDifferentUserId(){
+      every {mockScreenAssociationUtils.getUserId()} returns "testId"
+      every {mockUserAPI.getUser(any(), any(), any())} answers
+          {
+            val onSuccessCallback = arg<(User) -> Unit>(0)
+            val user = User("Ciro", "cane", Role("president"))
+            onSuccessCallback(user)
+          }
+
+      ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
+        helloText {assertIsDisplayed()
+        assertTextEquals("Hello Ciro !!")}
+      }
+    }
+  */
 }

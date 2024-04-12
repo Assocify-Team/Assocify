@@ -40,9 +40,9 @@ class SelectAssociationViewModel(
                   _uiState.value.searchState)
         },
         {})
-    if (getUserId() != "") {
+    if (SelectAssociationUtils().getUserId() != "") {
       userAPI.getUser(
-          getUserId(),
+          SelectAssociationUtils().getUserId(),
           { user ->
             _uiState.value =
                 SelectAssociationState(
@@ -59,11 +59,6 @@ class SelectAssociationViewModel(
     _uiState.value =
         SelectAssociationState(_uiState.value.associations, query, _uiState.value.user, searchState)
   }
-
-  private fun getUserId(): String {
-    val user = Firebase.auth.currentUser
-    return user?.uid ?: ""
-  }
 }
 
 data class SelectAssociationState(
@@ -72,3 +67,10 @@ data class SelectAssociationState(
     val user: User = User(),
     val searchState: Boolean = false
 )
+
+class SelectAssociationUtils {
+  fun getUserId(): String {
+    val user = Firebase.auth.currentUser
+    return user?.uid ?: ""
+  }
+}
