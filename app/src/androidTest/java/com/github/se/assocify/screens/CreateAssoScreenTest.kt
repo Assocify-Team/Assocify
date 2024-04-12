@@ -101,15 +101,15 @@ class CreateAssoScreenTest {
     }
   }
 
-    @Test
+  @Test
   fun testCreateAsso() {
     with(composeTestRule) {
       onNodeWithTag("name").performTextInput("assoName")
-        onNodeWithTag("addMember").performClick()
-        onNodeWithTag("memberSearchField").performClick().performTextInput("j")
-        onNodeWithTag("userDropdownItem-1").performClick() // jean
+      onNodeWithTag("addMember").performClick()
+      onNodeWithTag("memberSearchField").performClick().performTextInput("j")
+      onNodeWithTag("userDropdownItem-1").performClick() // jean
       onNodeWithTag("role-PRESIDENCE").performClick()
-        onNodeWithTag("addMemberButton").performClick()
+      onNodeWithTag("addMemberButton").performClick()
 
       onNodeWithTag("create").performClick()
       // check that the asso is created
