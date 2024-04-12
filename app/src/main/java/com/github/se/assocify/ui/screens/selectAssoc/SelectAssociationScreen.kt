@@ -70,7 +70,7 @@ fun SelectAssociation(
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
                   query = query,
-                  onQueryChange = { it -> query = it },
+                  onQueryChange = { query = it },
                   onSearch = { model.updateSearchQuery(query, true) },
                   onActiveChange = {},
                   active = state.value.searchState,

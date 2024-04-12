@@ -13,7 +13,6 @@ import com.google.firebase.firestore.firestore
 fun AssocifyApp() {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController)
-  val db = Firebase.firestore
 
   NavHost(navController = navController, startDestination = Destination.Home.route) {
     mainNavGraph(navActions = navActions)
