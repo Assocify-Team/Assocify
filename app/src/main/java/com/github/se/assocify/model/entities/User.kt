@@ -4,7 +4,7 @@ data class User(val uid: String, private val name: String, private val role: Rol
   constructor() : this("", "", Role("pending"))
 
   fun hasRole(role: String): Boolean {
-    return this.role.name.uppercase().contains(role.uppercase())
+    return this.role.getName().uppercase().contains(role.uppercase())
   }
 
   fun toggleRole(role: String): User {

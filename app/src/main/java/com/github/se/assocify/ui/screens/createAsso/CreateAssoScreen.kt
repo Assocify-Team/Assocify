@@ -100,9 +100,9 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                     ListItem(
                         modifier =
                             Modifier.clip(RoundedCornerShape(10.dp))
-                                .testTag("memberListItem-${member.name}"),
-                        headlineContent = { Text(member.name) },
-                        overlineContent = { Text(member.role.name) },
+                                .testTag("memberListItem-${member.getName()}"),
+                        headlineContent = { Text(member.getName()) },
+                        overlineContent = { Text(member.getRole().getName()) },
                         leadingContent = {
                           Icon(Icons.Default.Person, contentDescription = "Person")
                         },

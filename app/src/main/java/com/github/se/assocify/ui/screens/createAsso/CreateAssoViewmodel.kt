@@ -40,7 +40,7 @@ class CreateAssoViewmodel() : ViewModel() {
   }
 
   private fun sortMembers(memberList: List<User>): List<User> {
-    return memberList.sortedWith(compareBy({ it.role.getRoleType().ordinal }, { it.name }))
+    return memberList.sortedWith(compareBy({ it.getRole().getRoleType().ordinal }, { it.getName() }))
   }
 
   /*
@@ -105,7 +105,7 @@ class CreateAssoViewmodel() : ViewModel() {
               searchMemberList =
                   userList
                       .filterNot { user -> _uiState.value.members.any { us -> us.uid == user.uid } }
-                      .filter { it.name.lowercase().contains(searchMember.lowercase()) })
+                      .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
 
       if (_uiState.value.searchMemberList.isEmpty()) {
         _uiState.value = _uiState.value.copy(memberError = "No users found")
@@ -150,7 +150,7 @@ class CreateAssoViewmodel() : ViewModel() {
     val asso =
         Association(
             assoAPI.getNewId(), _uiState.value.name, "", date, "", _uiState.value.members, listOf())
-    assoAPI.addAssociation(asso)
+    assoAPI.addAssociation(asso, onSuccess = { println("Association added") }, onFailure = { println(it) })
   }
 }
 

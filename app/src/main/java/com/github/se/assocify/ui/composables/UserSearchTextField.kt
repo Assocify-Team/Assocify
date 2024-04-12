@@ -39,7 +39,7 @@ fun UserSearchTextField(
     supportingText: @Composable (() -> Unit)? = null
 ) {
   var expanded by remember { mutableStateOf(false) }
-  val value = if (user != null) user.name else searchValue
+  val value = if (user != null) user.getName() else searchValue
   var textfieldSize by remember { mutableIntStateOf(0) }
   Column {
     OutlinedTextField(
@@ -83,7 +83,7 @@ fun UserSearchTextField(
           userList.forEach { user ->
             DropdownMenuItem(
                 modifier = Modifier.testTag("userDropdownItem-${user.uid}"),
-                text = { Text(user.name) },
+                text = { Text(user.getName()) },
                 onClick = {
                   onUserSelect(user)
                   expanded = false
