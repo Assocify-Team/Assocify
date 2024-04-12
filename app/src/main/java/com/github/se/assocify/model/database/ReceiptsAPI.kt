@@ -127,7 +127,6 @@ class ReceiptsAPI(
   @Keep
   private data class FirestoreReceipt(
       @DocumentId val id: String = "",
-      val payer: String = "",
       val date: String = "",
       val incoming: Boolean = false,
       val cents: Int = 0,
