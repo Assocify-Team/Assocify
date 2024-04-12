@@ -1,5 +1,3 @@
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
@@ -7,7 +5,10 @@ import org.junit.Test
 import androidx.navigation.NavHostController
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
+@RunWith(JUnit4::class)
 class NavigationActionsTest {
 
   private lateinit var navController: NavHostController

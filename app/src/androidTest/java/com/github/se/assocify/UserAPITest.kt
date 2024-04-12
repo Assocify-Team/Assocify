@@ -1,5 +1,6 @@
 package com.github.se.assocify
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
@@ -11,9 +12,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 
+@RunWith(AndroidJUnit4::class)
 class UserAPITest {
 
   @Mock private lateinit var db: FirebaseFirestore

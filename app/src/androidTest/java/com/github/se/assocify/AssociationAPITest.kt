@@ -1,5 +1,6 @@
 package com.github.se.assocify
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.Association
 import com.google.android.gms.tasks.Tasks
@@ -10,9 +11,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 
+@RunWith(AndroidJUnit4::class)
 class AssociationAPITest {
 
   @Mock private lateinit var db: FirebaseFirestore
@@ -38,7 +41,7 @@ class AssociationAPITest {
     Mockito.`when`(documentSnapshot.toObject(Association::class.java)).thenReturn(asso)
     Mockito.`when`(documentReference.get()).thenReturn(Tasks.forResult(documentSnapshot))
 
-    val task = Tasks.forResult(documentSnapshot)
+    Tasks.forResult(documentSnapshot)
     Mockito.`when`(db.collection(Mockito.any())).thenReturn(Mockito.mock())
     Mockito.`when`(db.collection(Mockito.any()).document(Mockito.any()))
         .thenReturn(documentReference)

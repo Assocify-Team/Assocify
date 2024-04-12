@@ -37,6 +37,9 @@ Assocify is an application to centralize all of your student organization needs 
 
 [Project Proposal](https://docs.google.com/document/d/1_9hGwoGBIqygBJgahw5CbMNxU-d_K-2d-qFGFdvNsdA/edit)
 
+Architecture diagram:
+![Architecture diagram](architecturediagram.png)
+
 ## Setup Dev environment
 
 This repository uses client hooks to ensure the quality of the commits. You need to install the `pre-commit` python package to set it up :

@@ -31,7 +31,7 @@ class AssociationUtils(
     if (_associationState == null) {
       return emptyList()
     }
-    return _associationState!!.members.filter { x -> x.role == Role("pending") }
+    return _associationState!!.getMembers().filter { x -> x.getRole() == Role("pending") }
   }
 
   fun getRecordedUsers(): List<User> {
@@ -39,7 +39,7 @@ class AssociationUtils(
     if (_associationState == null) {
       return emptyList()
     }
-    return _associationState!!.members.filter { x -> x.role != Role("pending") }
+    return _associationState!!.getMembers().filter { x -> x.getRole() != Role("pending") }
   }
 
   fun getAllUsers(): List<User> {
@@ -47,46 +47,46 @@ class AssociationUtils(
     if (_associationState == null) {
       return emptyList()
     }
-    return _associationState!!.members
+    return _associationState!!.getMembers()
   }
 
   fun getAssociationName(): String {
     if (_associationState == null) return ""
-    return _associationState!!.name
+    return _associationState!!.getName()
   }
 
   fun getAssociationDescription(): String {
     if (_associationState == null) return ""
-    return _associationState!!.description
+    return _associationState!!.getDescription()
   }
 
   fun getCreationDate(): String {
     if (_associationState == null) return ""
-    return _associationState!!.creationDate
+    return _associationState!!.getCreationDate()
   }
 
   fun getEvents(): List<Event> {
     if (_associationState == null) return emptyList()
-    return _associationState!!.events
+    return _associationState!!.getEvents()
   }
 
   fun acceptNewUser(uid: String, role: String) {
     if (_associationState != null &&
-        (user.role == Role("president") || user.role == Role("co-president"))) {
+        (user.getRole() == Role("president") || user.getRole() == Role("co-president"))) {
       val userList = getPendingUsers().filter { u -> u.uid == uid }
       if (userList.isEmpty()) return
       val user = userList[0]
-      val updatedUser = User(uid, user.name, Role(role))
+      val updatedUser = User(uid, user.getName(), Role(role))
       val ass = _associationState!!
       val updatedAssoc =
           Association(
               ass.uid,
-              ass.name,
-              ass.description,
-              ass.creationDate,
-              ass.status,
-              ass.members.filter { us -> us.uid != uid } + updatedUser,
-              ass.events)
+              ass.getName(),
+              ass.getDescription(),
+              ass.getCreationDate(),
+              ass.getStatus(),
+              ass.getMembers().filter { us -> us.uid != uid } + updatedUser,
+              ass.getEvents())
       associationDatabase.addAssociation(updatedAssoc)
     }
   }
@@ -97,12 +97,12 @@ class AssociationUtils(
       val updatedAssoc =
           Association(
               ass.uid,
-              ass.name,
-              ass.description,
-              ass.creationDate,
-              ass.status,
-              ass.members + User(user.uid, user.name, Role("pending")),
-              ass.events)
+              ass.getName(),
+              ass.getDescription(),
+              ass.getCreationDate(),
+              ass.getStatus(),
+              ass.getMembers() + User(user.uid, user.getName(), Role("pending")),
+              ass.getEvents())
       associationDatabase.addAssociation(updatedAssoc)
     }
   }
@@ -124,13 +124,13 @@ class AssociationUtils(
   }
 
   fun deleteAssoc() {
-    if (user.role != Role("president")) return
+    if (user.getRole() != Role("president")) return
     associationDatabase.deleteAssociation(assocId)
     assocId = ""
     _associationState = null
   }
 
-  fun getAllAssociations(): List<Association> {
+  private fun getAllAssociations(): List<Association> {
     if (_associationState == null) return emptyList()
     var result: List<Association>? = null
     associationDatabase.getAssociations() { associations -> result = associations }
@@ -140,7 +140,7 @@ class AssociationUtils(
 
   fun getFilteredAssociations(searchQuery: String): List<Association> {
     return getAllAssociations().filter { ass ->
-      ass.name == searchQuery || ass.description == searchQuery
+      ass.getName() == searchQuery || ass.getDescription() == searchQuery
     }
   }
 }
