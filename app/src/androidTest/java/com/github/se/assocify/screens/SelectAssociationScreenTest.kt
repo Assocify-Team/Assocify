@@ -59,11 +59,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
   val organizationIcon: KNode = child { hasTestTag("OrganizationIcon") }
 }
 
-/**
- * This class represents the SelectAssociationScreen
- *
- *
- */
+/** This class represents the SelectAssociationScreen */
 @RunWith(AndroidJUnit4::class)
 class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
