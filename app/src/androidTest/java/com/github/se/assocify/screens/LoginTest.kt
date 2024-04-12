@@ -11,6 +11,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.intent.rule.IntentsRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.login.LoginScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -56,6 +57,12 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   fun setupLogin() {
     every { navActions.onLogin(any()) } answers { authSuccess = true }
     every { navActions.onAuthError() } answers { authError = true }
+
+    every { userAPI.getAllUsers(any(), any()) } answers
+        {
+          val onSuccess = firstArg<(List<User>) -> Unit>()
+          onSuccess(listOf())
+        }
     composeTestRule.setContent { LoginScreen(navActions, userAPI) }
   }
 
