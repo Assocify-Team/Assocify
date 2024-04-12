@@ -60,10 +60,10 @@ fun CreateAssoScreen(
         TopAppBar(
             modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
-              IconButton(onClick = { navigationActions.back() }, modifier = Modifier.testTag("Back")){
-                Icon(Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back")
-              }
+              IconButton(
+                  onClick = { navigationActions.back() }, modifier = Modifier.testTag("Back")) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                  }
             },
             title = { Text(text = "Create your association") })
       },

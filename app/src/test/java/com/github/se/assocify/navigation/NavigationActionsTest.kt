@@ -1,10 +1,10 @@
+import androidx.navigation.NavHostController
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import androidx.navigation.NavHostController
-import com.github.se.assocify.navigation.Destination
-import com.github.se.assocify.navigation.NavigationActions
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 

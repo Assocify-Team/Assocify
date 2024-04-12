@@ -80,7 +80,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       }
     }
     // assert: the nav action has been called
-    verify { mockNavActions.navigateTo(Destination.CreateAsso)}
+    verify { mockNavActions.navigateTo(Destination.CreateAsso) }
     confirmVerified(mockNavActions)
   }
 
