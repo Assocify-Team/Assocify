@@ -5,9 +5,8 @@ object PriceUtil {
   const val ZERO_PRICE_STRING = "0.0"
   const val CHARS = """^[0-9.]+$"""
 
-  fun toString(price: Double): String {
-    /*TODO: Implement currency formatting and add appropriate checks*/
-    return price.toString()
+  fun formatPrice(price: Double): String {
+    return "%.2f".format(price)
   }
 
   fun toDouble(price: String): Double {
