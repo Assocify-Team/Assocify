@@ -18,9 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.Login.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -72,14 +69,11 @@ fun rememberFirebaseAuthLauncher(
 
 @Composable
 fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
-  val viewModel = LoginViewModel(userAPI)
+  val viewModel = LoginViewModel(userAPI, navActions)
 
   val launcher =
       rememberFirebaseAuthLauncher(
-          onAuthComplete = {
-            viewModel.updateUser()
-            navActions.onLogin(viewModel.existUserId())
-          },
+          onAuthComplete = { viewModel.updateUser() },
           onAuthError = {
             println("Error: $it")
             navActions.onAuthError()
