@@ -111,9 +111,11 @@ fun CreateAssoScreen(
                           Icon(Icons.Default.Person, contentDescription = "Person")
                         },
                         trailingContent = {
-                          IconButton(onClick = { viewmodel.modifyMember(member) }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit")
-                          }
+                          IconButton(
+                              onClick = { viewmodel.modifyMember(member) },
+                              modifier = Modifier.testTag("editMember-${member.getName()}")) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                              }
                         },
                     )
                     HorizontalDivider()
