@@ -76,7 +76,7 @@ enum class PageIndex(val index: Int) {
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    viewModel: ReceiptListViewModel = ReceiptListViewModel()
+    viewModel: ReceiptViewmodel = ReceiptViewmodel()
 ) {
   val viewmodelState by viewModel.uiState.collectAsState()
 
@@ -94,7 +94,7 @@ fun TreasuryScreen(
             modifier = Modifier.testTag("createReceipt"),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
-            onClick = { navActions.navigateTo(Destination.Receipt) },
+            onClick = {},
         ) {
           Icon(Icons.Outlined.Add, "Create")
         }
@@ -168,7 +168,7 @@ fun TreasuryScreen(
 
 /** My Receipts UI page */
 @Composable
-private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
+private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
   // Good practice to re-collect it as the page changes
   val viewmodelState by viewModel.uiState.collectAsState()
 
@@ -266,7 +266,7 @@ fun TreasuryTab(
 fun TreasuryTopBar(
     onAccountClick: () -> Unit,
     onSearchClick: () -> Unit,
-    viewModel: ReceiptListViewModel
+    viewModel: ReceiptViewmodel
 ) {
   // Search bar state
   var searchBarVisible by remember { mutableStateOf(false) }
