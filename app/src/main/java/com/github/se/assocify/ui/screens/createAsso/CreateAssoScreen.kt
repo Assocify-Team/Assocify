@@ -44,12 +44,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
+fun CreateAssoScreen(currentUser: CurrentUser,
+                     viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(currentUser)) {
 
   val state by viewmodel.uiState.collectAsState()
 
@@ -102,7 +104,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                             Modifier.clip(RoundedCornerShape(10.dp))
                                 .testTag("memberListItem-${member.getName()}"),
                         headlineContent = { Text(member.getName()) },
-                        overlineContent = { Text(member.getRole().getName()) },
+                        overlineContent = { Text(member.getRole().name) },
                         leadingContent = {
                           Icon(Icons.Default.Person, contentDescription = "Person")
                         },
@@ -116,6 +118,7 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                   }
                 }
               }
+
           Column(
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier = Modifier.fillMaxWidth()) {
@@ -125,9 +128,10 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
                       Icon(Icons.Default.Add, contentDescription = "Add members")
                       Text("Add members")
                     }
-                Button( // TODO : should be disabled if no member/name empty ?
+                Button(
                     onClick = { viewmodel.saveAsso() /*TODO then navigate to home*/ },
-                    modifier = Modifier.fillMaxWidth().testTag("create")) {
+                    modifier = Modifier.fillMaxWidth().testTag("create"),
+                    enabled = viewmodel.canSaveAsso()) {
                       Text("Create")
                     }
               }
@@ -141,11 +145,6 @@ fun CreateAssoScreen(viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()) {
               Column(
                   modifier = Modifier.padding(16.dp).fillMaxWidth(),
                   horizontalAlignment = Alignment.CenterHorizontally) {
-                    /*OutlinedTextField(
-                    value = state.editMember.name,
-                    onValueChange = { viewmodel.modifyMemberName(it) },
-                    label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth())*/
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
                         searchValue =

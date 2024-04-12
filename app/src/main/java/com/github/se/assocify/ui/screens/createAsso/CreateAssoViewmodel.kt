@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.screens.createAsso
 
 import androidx.lifecycle.ViewModel
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -14,18 +15,18 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class CreateAssoViewmodel() : ViewModel() {
+class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
   private val assoAPI = AssociationAPI(db = Firebase.firestore)
   private val userAPI = UserAPI(db = Firebase.firestore)
-  val currUser = Firebase.auth.currentUser?.uid // maybe private, unsure yet
+  val currUser = currentUser.userUid
 
   // SHLAG POUR TEST
   private val bigList =
       listOf(
-          User("1", "Jean1", Role("admin")),
+          User("testUserUid", "Jean1", Role("admin")),
           User("2", "Paul", Role("admin")),
           User("3", "Jacques", Role("admin")),
           User("4", "Marie", Role("admin")),
@@ -61,15 +62,11 @@ class CreateAssoViewmodel() : ViewModel() {
             _uiState.value.members.filter { user -> user.uid != _uiState.value.editMember!!.uid } +
                 _uiState.value.editMember!!)
     // can't add a member already in the list -> should be disabled by the list of names already
-    _uiState.value = _uiState.value.copy(members = memberList)
-    _uiState.value = _uiState.value.copy(openEdit = false)
-    _uiState.value = _uiState.value.copy(editMember = null)
+    _uiState.value = _uiState.value.copy(members = memberList, openEdit = false, editMember = null)
   }
 
   fun removeMember(member: User) {
-    _uiState.value = _uiState.value.copy(openEdit = false)
-    _uiState.value = _uiState.value.copy(editMember = null)
-    _uiState.value = _uiState.value.copy(members = _uiState.value.members - member)
+    _uiState.value = _uiState.value.copy(openEdit = false, editMember = null, members = _uiState.value.members - member)
   }
 
   // unsure if this is needed yet
@@ -139,12 +136,17 @@ class CreateAssoViewmodel() : ViewModel() {
    * Gives/removes role to the member
    */
   fun modifyMemberRole(role: String) {
-    _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.toggleRole(role))
+        _uiState.value = _uiState.value.copy(editMember = _uiState.value.editMember!!.toggleRole(role))
   }
 
-  fun saveAsso() {
-    // TODO check that all is valid : at least one member (current user), name not empty
+    fun canSaveAsso(): Boolean {
+        return (_uiState.value.members.find({user -> user.uid == currUser}) != null) &&
+        _uiState.value.members.all { it.getRole().getRoleType() != Role.RoleType.PENDING } &&
+        _uiState.value.name.isNotBlank()
 
+    }
+
+  fun saveAsso() {
     // create asso today
     val date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
     val asso =
