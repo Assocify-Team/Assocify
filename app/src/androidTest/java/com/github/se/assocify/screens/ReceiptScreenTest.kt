@@ -136,6 +136,17 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   }
 
   @Test
+  fun incoming() {
+    with(composeTestRule) {
+      onNodeWithTag("earningChip").performClick()
+      assert(viewModel.uiState.value.incoming == true)
+
+      onNodeWithTag("expenseChip").performClick()
+      assert(viewModel.uiState.value.incoming == false)
+    }
+  }
+
+  @Test
   fun save() {
     with(composeTestRule) {
       onNodeWithTag("saveButton").performScrollTo().performClick()
