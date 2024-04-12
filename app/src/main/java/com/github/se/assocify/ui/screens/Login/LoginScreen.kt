@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.login
+package com.github.se.assocify.ui.screens.Login
 
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher

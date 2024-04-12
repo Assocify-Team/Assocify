@@ -43,7 +43,7 @@ import kotlin.math.min
 /**
  * Screen to select an association
  *
- * @param registeredAssociation list of organizations in the database
+ * @param navActions the navigation actions
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

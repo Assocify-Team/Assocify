@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.login
+package com.github.se.assocify.ui.screens.Login
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

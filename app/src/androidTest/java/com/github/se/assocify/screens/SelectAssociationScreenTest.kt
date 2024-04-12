@@ -62,7 +62,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
 /**
  * This class represents the SelectAssociationScreen
  *
- * @param semanticsProvider the semantics provider
+ *
  */
 @RunWith(AndroidJUnit4::class)
 class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
