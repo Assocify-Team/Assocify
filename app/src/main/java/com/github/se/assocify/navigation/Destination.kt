@@ -26,6 +26,8 @@ sealed class Destination(
   data object SelectAsso : Destination("login/selectAsso")
 
   data object CreateAsso : Destination("login/createAsso")
+
+  data object Receipt : Destination("treasury/receipt")
 }
 
 val MAIN_TABS_LIST =
