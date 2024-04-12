@@ -1,6 +1,5 @@
 package com.github.se.assocify.screens
 
-import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -62,15 +61,13 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
           navActions.back()
         }
     composeTestRule.setContent {
-      ReceiptScreen(navActions = navActions, currentUser = testCurrentUser)
+      ReceiptScreen(navActions = navActions, currentUser = testCurrentUser, viewModel = viewModel)
     }
   }
 
   @Test
   fun display() {
     with(composeTestRule) {
-      Log.e("LMAO", "Huluberlu")
-
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("receiptScreenTitle").assertIsDisplayed()
       onNodeWithTag("backButton").assertIsDisplayed()

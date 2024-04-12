@@ -41,7 +41,7 @@ class ReceiptViewModel {
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
-    _uiState = MutableStateFlow(ReceiptState(pageTitle = NEW_RECEIPT_TITLE))
+    _uiState = MutableStateFlow(ReceiptState(isNewReceipt = true, pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
   }
 
@@ -58,7 +58,7 @@ class ReceiptViewModel {
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
-    _uiState = MutableStateFlow(ReceiptState(pageTitle = EDIT_RECEIPT_TITLE))
+    _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
 
     this.receiptApi.getUserReceipts(
@@ -184,7 +184,7 @@ class ReceiptViewModel {
 }
 
 data class ReceiptState(
-    val isNewReceipt: Boolean = true,
+    val isNewReceipt: Boolean,
     val pageTitle: String,
     val title: String = "",
     val description: String = "",
