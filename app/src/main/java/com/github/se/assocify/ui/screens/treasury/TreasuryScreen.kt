@@ -68,7 +68,9 @@ enum class PageIndex(val index: Int) {
   }
 }
 
-/** Main treasury screen UI */
+/**
+ * Treasury Screen composable
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -145,7 +147,7 @@ fun TreasuryScreen(navActions: NavigationActions, viewModel: ReceiptViewmodel = 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
-              PageIndex.RECEIPT.index -> MyReceiptPage()
+              PageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
               PageIndex.BUDGET.index -> BudgetPage()
               PageIndex.BALANCE.index -> BalancePage()
             }
@@ -159,9 +161,12 @@ fun TreasuryScreen(navActions: NavigationActions, viewModel: ReceiptViewmodel = 
  * ------------------------------------------------- *
  */
 
-/** My receipts UI page */
+/**
+ * My Receipts UI page
+ */
 @Composable
-private fun MyReceiptPage() {
+private fun MyReceiptPage(viewModel: ReceiptViewmodel) {
+  val overviewState by viewModel.uiState.collectAsState()
   val firstReceiptList = List(3) { "Receipt 1-$it" }
   val secondReceiptList = List(3) { "Receipt 2-$it" }
 
@@ -182,7 +187,7 @@ private fun MyReceiptPage() {
       HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
     }
     // First list of receipts
-    firstReceiptList.forEach { receiptName ->
+    overviewState.userReceipts.forEach { receiptName ->
       item {
         ReceiptItem(receiptName)
         HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
@@ -201,19 +206,23 @@ private fun MyReceiptPage() {
       HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
     }
     // Second list of receipts
-    secondReceiptList.forEach { receiptName ->
+    overviewState.allReceipts.forEach { receiptName ->
       item {
-        ReceiptItem(receiptName)
+        ReceiptItem(receiptName.title)
         HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
       }
     }
   }
 }
 
-/** Budget UI page */
+/**
+ * Budget UI page
+ */
 @Composable private fun BudgetPage() {}
 
-/** Balance UI page */
+/**
+ * Balance UI page
+ */
 @Composable private fun BalancePage() {}
 
 /**
@@ -221,7 +230,9 @@ private fun MyReceiptPage() {
  * ------------------------------------------------- *
  */
 
-/** Top tabs component */
+/**
+ Top tabs component
+ */
 @Composable
 fun TreasuryTab(
     selected: Boolean,
@@ -245,7 +256,9 @@ fun TreasuryTab(
       modifier = modifier)
 }
 
-/** Main top bar with search and account icon */
+/**
+ Main top bar with search and account icon
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TreasuryTopBar(

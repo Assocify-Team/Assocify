@@ -26,14 +26,13 @@ class ReceiptViewmodel(
       db = Firebase.firestore
     )
 ) : ViewModel() {
-  // Viewmodel states
+  // ViewModel states
   private val _uiState = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState> = _uiState
 
   // User entity and it's API
   private val userAPI = UserAPI(receiptsDatabase.db)
-  var user: User? = null
-
+  private var user: User? = null
 
   init {
     // Define user entity
@@ -73,6 +72,8 @@ class ReceiptViewmodel(
       }
     )
   }
+
+
 
   fun onSearch(): List<Receipt> {
     val filter = _uiState.value.searchQuery.trim()
