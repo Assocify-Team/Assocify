@@ -31,6 +31,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Before
   fun testSetup() {
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
+    every { navActions.navigateTo(any()) } answers {}
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
     composeTestRule.setContent { TreasuryScreen(navActions) }
