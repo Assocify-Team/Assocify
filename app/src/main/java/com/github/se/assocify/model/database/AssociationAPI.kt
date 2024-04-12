@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.Association
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -16,59 +15,70 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * Gets an association from the database
    *
    * @param id the id of the association to get
-   * @param callback the callback to call with the association
+   * @param onSuccess called on success with the association
+   * @param onFailure called on failure
    * @return the association with the given id
    */
-  fun getAssociation(id: String, callback: (Association) -> Unit): Task<Unit> {
-
-    return db.collection(collectionName).document(id).get().continueWith { task ->
-      if (task.isSuccessful) {
-        val document = task.result
-        if (document != null && document.exists()) {
-          val doc = document.toObject(Association::class.java)
-          callback(doc!!)
-        } else {
-          throw Exception("No Asso found with ID: $id")
+  fun getAssociation(id: String, onSuccess: (Association) -> Unit, onFailure: (Exception) -> Unit) {
+    db.collection(collectionName)
+        .document(id)
+        .get()
+        .addOnSuccessListener {
+          val doc = it.toObject(Association::class.java)
+          onSuccess(doc!!)
         }
-      } else {
-        throw task.exception ?: Exception("Unknown error occurred")
-      }
-    }
+        .addOnFailureListener { onFailure(it) }
   }
 
   /**
    * Gets all associations from the database
    *
-   * @param callback the callback to call with the list of associations
+   * @param onSuccess called on success with the list of associations
+   * @param onFailure called on failure
    * @return a list of all associations
    */
-  fun getAssociations(callback: (List<Association>) -> Unit): Task<Unit> {
-    return db.collection(collectionName).get().continueWith { task ->
-      if (task.isSuccessful) {
-        val associations =
-            task.result!!.documents.map { document -> document.toObject(Association::class.java)!! }
-        callback(associations)
-      } else {
-        throw task.exception ?: Exception("Unknown error occurred")
-      }
-    }
+  fun getAssociations(onSuccess: (List<Association>) -> Unit, onFailure: (Exception) -> Unit) {
+    db.collection(collectionName)
+        .get()
+        .addOnSuccessListener {
+          val associations =
+              it.documents.map { document -> document.toObject(Association::class.java)!! }
+          onSuccess(associations)
+        }
+        .addOnFailureListener { onFailure(it) }
   }
 
   /**
    * Adds/edit an association to the database
    *
    * @param association the association to add/edit
+   * @param onSuccess called on success on success (by default does nothing)
+   * @param onFailure called on failure
    */
-  fun addAssociation(association: Association): Task<Void> {
-    return db.collection(collectionName).document(association.uid).set(association)
+  fun addAssociation(
+      association: Association,
+      onSuccess: () -> Unit = {},
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(collectionName)
+        .document(association.uid)
+        .set(association)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener(onFailure)
   }
 
   /**
    * Deletes an association from the database
    *
    * @param id the id of the association to delete
+   * @param onSuccess called on success (by default does nothing)
+   * @param onFailure called on failure
    */
-  fun deleteAssociation(id: String): Task<Void> {
-    return db.collection(collectionName).document(id).delete()
+  fun deleteAssociation(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    db.collection(collectionName)
+        .document(id)
+        .delete()
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener(onFailure)
   }
 }

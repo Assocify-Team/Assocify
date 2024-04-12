@@ -1,8 +1,6 @@
 package com.github.se.assocify.model.database
 
-import android.util.Log
 import com.github.se.assocify.model.entities.User
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -18,58 +16,62 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * Gets a user from the database
    *
    * @param id the id of the user to get
-   * @param callback the callback to call with the user
+   * @param onSuccess called on success with the user
    * @return the user with the given id
    */
-  fun getUser(id: String, callback: (User) -> Unit): Task<Unit> {
-    return db.collection(collectionName).document(id).get().continueWith { task ->
-      if (task.isSuccessful) {
-        val document = task.result
-        if (document != null && document.exists()) {
-          val user = document.toObject(User::class.java)
-          callback(user!!)
-        } else {
-          throw Exception("No User found with ID: $id")
+  fun getUser(id: String, onSuccess: (User) -> Unit, onFailure: (Exception) -> Unit) {
+    db.collection(collectionName)
+        .document(id)
+        .get()
+        .addOnSuccessListener {
+          val user = it.toObject(User::class.java)
+          onSuccess(user!!)
         }
-      } else {
-        throw task.exception ?: Exception("Unknown error occurred")
-      }
-    }
+        .addOnFailureListener(onFailure)
   }
   /**
    * Gets all users from the database
    *
-   * @param callback the callback to call with the list of users
+   * @param onSuccess called on success with the list of users
+   * @param onFailure called on failure
    * @return a list of all users
    */
-  fun getAllUsers(callback: (List<User>) -> Unit): Task<Unit> {
-
-    return db.collection(collectionName).get().continueWith { task ->
-      if (task.isSuccessful) {
-        val users =
-            task.result!!.documents.map { document -> document.toObject(User::class.java)!! }
-        Log.d("UserAPI", "Users: $users")
-        callback(users)
-      } else {
-        throw task.exception ?: Exception("Unknown error occurred")
-      }
-    }
+  fun getAllUsers(onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
+    db.collection(collectionName)
+        .get()
+        .addOnSuccessListener {
+          val users = it.documents.map { document -> document.toObject(User::class.java)!! }
+          onSuccess(users)
+        }
+        .addOnFailureListener(onFailure)
   }
 
   /**
    * Adds/edit a user to the database
    *
    * @param user the user to add/edit
+   * @param onSuccess called on success on success (by default does nothing)
+   * @param onFailure called on failure
    */
-  fun addUser(user: User): Task<Void> {
-    return db.collection(collectionName).document(user.uid).set(user)
+  fun addUser(user: User, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    db.collection(collectionName)
+        .document(user.uid)
+        .set(user)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener(onFailure)
   }
   /**
    * Deletes a user from the database
    *
    * @param id the id of the user to delete
+   * @param onSuccess called on success (by default does nothing)
+   * @param onFailure called on failure
    */
-  fun deleteUser(id: String): Task<Void> {
-    return db.collection(collectionName).document(id).delete()
+  fun deleteUser(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    db.collection(collectionName)
+        .document(id)
+        .delete()
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener(onFailure)
   }
 }
