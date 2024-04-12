@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.createAsso
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -40,19 +41,22 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
     _uiState.value = _uiState.value.copy(name = name)
   }
 
+    /*
+     * Utility function : Sorts the members by role then name
+     */
   private fun sortMembers(memberList: List<User>): List<User> {
     return memberList.sortedWith(compareBy({ it.getRole().getRoleType().ordinal }, { it.getName() }))
   }
 
   /*
-   * Opens the edit member dialog
+   * Opens the edit member dialog when adding a member
    */
   fun addMember() {
     _uiState.value = _uiState.value.copy(openEdit = true)
   }
 
   /*
-   * Adds the editMember to the list of members in the database
+   * Adds the editMember to the list of members in the list of members
    */
   fun addMemberToList() {
     _uiState.value.editMember?.let {
@@ -63,17 +67,24 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
 
   }
 
+    /*
+     * Removes a member from the list of members
+     */
   fun removeMember(member: User) {
     _uiState.value = _uiState.value.copy(openEdit = false, editMember = null, members = _uiState.value.members - member)
   }
 
-  // unsure if this is needed yet
+  /*
+    * Opens the edit member dialog when modifying a member
+   */
   fun modifyMember(member: User) {
-    // need input sanitization TODO
     _uiState.value = _uiState.value.copy(openEdit = true)
     _uiState.value = _uiState.value.copy(editMember = member)
   }
 
+    /*
+     * Cancels the modification of a member (on dismiss)
+     */
   fun cancelModifyMember() {
     _uiState.value = _uiState.value.copy(openEdit = false)
     _uiState.value = _uiState.value.copy(editMember = null)
@@ -107,6 +118,9 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
       }
   }
 
+    /*
+     * Checks if there is an error in the search of member
+     */
     fun searchError(): Boolean {
         return _uiState.value.memberError != null
     }
@@ -116,7 +130,6 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
    * Selects a member from the search list
    */
   fun selectMember(member: User) {
-    // TODO
     _uiState.value = _uiState.value.copy(editMember = member)
     _uiState.value = _uiState.value.copy(searchMember = "")
     _uiState.value = _uiState.value.copy(searchMemberList = listOf())
@@ -126,7 +139,6 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
    * Dismisses the member search dialog
    */
   fun dismissMemberSearch() {
-    // TODO
     _uiState.value = _uiState.value.copy(editMember = null)
     _uiState.value = _uiState.value.copy(searchMember = "")
     _uiState.value = _uiState.value.copy(searchMemberList = listOf())
@@ -144,6 +156,9 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
       }
   }
 
+    /*
+     * Checks if the association can be saved : the current user is a member, all members have a role and the name of the association is not blank
+     */
     fun canSaveAsso(): Boolean {
         return (_uiState.value.members.find({user -> user.uid == currUser}) != null) &&
         _uiState.value.members.all { it.getRole().getRoleType() != Role.RoleType.PENDING } &&
@@ -151,13 +166,17 @@ class CreateAssoViewmodel(currentUser: CurrentUser) : ViewModel() {
 
     }
 
+    /*
+        * Saves the association in the database
+     */
   fun saveAsso() {
     // create asso today
     val date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
     val asso =
         Association(
             assoAPI.getNewId(), _uiState.value.name, "", date, "", _uiState.value.members, listOf())
-    assoAPI.addAssociation(asso, onSuccess = { println("Association added") }, onFailure = { println(it) })
+    assoAPI.addAssociation(asso, onSuccess = { /* navigate to home page with the new association as the current asso */ },
+        onFailure = { exception -> Log.e("CreateAssoViewModel", "Failed to add asso: ${exception.message}") })
   }
 }
 
