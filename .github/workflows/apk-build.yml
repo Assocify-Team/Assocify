@@ -36,14 +36,14 @@ jobs:
 
       - name: Decode Signing Data
         env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
           ENCODED_KEYSTORE: ${{ secrets.KEYSTORE_FILE }}
           ENCODED_PASSWORDS: ${{ secrets.KEYSTORE_PASSWORDS }}
 
         run: |
-          echo $ENCODED_KEYSTORE > keystore-b64.txt
-          base64 -d keystore-b64.txt > keystore.jks
-          echo $ENCODED_PASSWORDS > passwords-b64.txt
-          base64 -d passwords-b64.txt > keystore.properties
+          echo $GOOGLE_SERVICES_JSON | base64 -di > ./app/google-services.json
+          echo $ENCODED_KEYSTORE | base64 -di > keystore.jks
+          echo $ENCODED_PASSWORDS | base64 -di passwords-b64.txt > keystore.properties
 
       - name: Build Release apk
         run: |
