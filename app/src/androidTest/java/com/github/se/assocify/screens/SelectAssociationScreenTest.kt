@@ -3,6 +3,7 @@ package com.github.se.assocify.screens
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -87,8 +88,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       searchOrganization { assertIsDisplayed() }
     }
   }
-
-  /*
   /** This test checks if the registered organization list is correctly displayed */
   @Test
   fun testRegisteredOrganizationList() {
@@ -101,12 +100,10 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     }
     // Check if the organizations are displayed
     val organizations = listOf("CLIC", "GAME*")
-    mockAssocAPI.addAssociation()
     organizations.forEach { organization ->
       composeTestRule.onNodeWithText(organization).assertIsDisplayed()
     }
   }
-   */
 
   /** This test checks if the message is displayed when you're not registered to any organization */
   @Test
@@ -116,7 +113,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     composeTestRule.onNodeWithText("There is no organization to display.").assertIsDisplayed()
   }
 
-  /*
   /** This test checks if the organization name and icon are displayed */
   @Test
   fun testDisplayOrganization() {
@@ -126,5 +122,4 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       organizationIcon { assertIsDisplayed() }
     }
   }
-   */
 }
