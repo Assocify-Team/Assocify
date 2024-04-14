@@ -11,7 +11,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import java.time.LocalDate
 
-class ReceiptsAPI(
+class ReceiptAPI(
     userId: String,
     basePath: String,
     storage: FirebaseStorage,
@@ -31,7 +31,7 @@ class ReceiptsAPI(
    * @param onReceiptUploadSuccess called when the receipt data has been uploaded successfully.
    * @param onFailure called when any upload has failed. The boolean parameter indicates whether it
    *   failed on the receipt or the image (`true` when the receipt failed). The second parameter is
-   *   the exception that occured.
+   *   the exception that occurred.
    */
   fun uploadReceipt(
       receipt: Receipt,

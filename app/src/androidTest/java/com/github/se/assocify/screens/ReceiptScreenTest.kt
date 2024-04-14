@@ -11,7 +11,7 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.database.ReceiptsAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
@@ -34,7 +34,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @get:Rule val composeTestRule = createComposeRule()
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val receiptsAPI = mockk<ReceiptsAPI>(relaxUnitFun = true)
+  private val receiptsAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
   private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptsAPI)
   private val viewModel2 =
       ReceiptViewModel(
@@ -221,7 +221,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @get:Rule val composeTestRule = createComposeRule()
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val receiptsAPI = mockk<ReceiptsAPI>(relaxUnitFun = true)
+  private val receiptsAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
   private val viewModel =
       ReceiptViewModel(
           receiptUid = "testReceipt", navActions = navActions, receiptApi = receiptsAPI)
