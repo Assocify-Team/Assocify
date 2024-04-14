@@ -1,10 +1,12 @@
 package com.github.se.assocify.ui.screens.treasury
 
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.database.ReceiptsAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
@@ -18,8 +20,9 @@ import kotlinx.coroutines.flow.StateFlow
  * @param receiptsDatabase: Database API for receipts. A default one is passed
  */
 class ReceiptListViewModel(
-    private val receiptsDatabase: ReceiptsAPI =
-        ReceiptsAPI(
+    private val navActions: NavigationActions,
+    private val receiptsDatabase: ReceiptAPI =
+        ReceiptAPI(
             userId = CurrentUser.userUid!!,
             basePath = "associations/" + CurrentUser.associationUid!!,
             storage = Firebase.storage,
@@ -94,6 +97,10 @@ class ReceiptListViewModel(
             userReceipts = _uiState.value.userReceipts,
             allReceipts = _uiState.value.allReceipts,
             searchQuery = query)
+  }
+
+  fun onReceiptClick(receipt: Receipt) {
+    navActions.navigateTo(Destination.EditReceipt(receipt.uid))
   }
 }
 
