@@ -97,6 +97,6 @@ object PriceUtil {
    * @return the string price
    */
   fun fromCents(cents: Int): String {
-    return (cents.toDouble() / 100).toString()
+    return "%.2f".format(cents.toDouble() / 100)
   }
 }

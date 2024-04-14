@@ -73,7 +73,7 @@ class PriceUtilTest {
   @Test
   fun testFromCents() {
     val cents = 10000
-    val expected = "100.0"
+    val expected = "100.00"
     val actual = PriceUtil.fromCents(cents)
     assertEquals(expected, actual)
   }

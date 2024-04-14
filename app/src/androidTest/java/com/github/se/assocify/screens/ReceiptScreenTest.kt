@@ -33,49 +33,36 @@ import org.junit.runner.RunWith
 class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val receiptsAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
-  private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptsAPI)
-  private val viewModel2 =
-      ReceiptViewModel(
-          receiptUid = "testReceipt", navActions = navActions, receiptApi = receiptsAPI)
-
-  private var expectedReceipt =
-      Receipt(
-          uid = "testReceipt",
-          title = "Test Title",
-          description = "",
-          cents = 10000,
-          date = DateUtil.toDate("01/01/2021")!!,
-          incoming = false,
-          phase = Phase.Unapproved,
-          photo = null,
-      )
-
   private var capturedReceipt: Receipt? = null
+  private var expectedReceipt =
+        Receipt(
+            uid = "testReceipt",
+            title = "Test Title",
+            description = "",
+            cents = 10000,
+            date = DateUtil.toDate("01/01/2021")!!,
+            incoming = false,
+            phase = Phase.Unapproved,
+            photo = null,
+        )
 
-  private var receiptList =
-      listOf(
-          Receipt(
-              uid = "testReceipt",
-              title = "Edited Receipt",
-              description = "",
-              cents = 10000,
-              date = DateUtil.toDate("01/01/2021")!!,
-              incoming = false,
-              phase = Phase.Unapproved,
-              photo = null,
-          ))
+  private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
+  private val receiptAPI = mockk<ReceiptAPI>(){
+      every { uploadReceipt(any(), any(), any(), any()) } answers
+              {
+                  capturedReceipt = firstArg<Receipt>()
+                  println("capturedReceiptRightNow: $capturedReceipt")
+                  navActions.back()
+              }
+      every { getNewId() } returns "testReceipt"
+      every { deleteReceipt(any(), any(), any()) } answers { }
+  }
+  private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptAPI)
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testUser"
-    every { receiptsAPI.uploadReceipt(any(), any(), any(), any()) } answers
-        {
-          capturedReceipt = firstArg()
-          navActions.back()
-        }
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel = viewModel) }
   }
 
@@ -155,10 +142,10 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   fun incoming() {
     with(composeTestRule) {
       onNodeWithTag("earningChip").performScrollTo().performClick()
-      assert(viewModel.uiState.value.incoming == true)
+      assert(viewModel.uiState.value.incoming)
 
       onNodeWithTag("expenseChip").performScrollTo().performClick()
-      assert(viewModel.uiState.value.incoming == false)
+      assert(!viewModel.uiState.value.incoming)
     }
   }
 
@@ -184,7 +171,9 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       assert(viewModel.uiState.value.amountError == null)
       assert(viewModel.uiState.value.dateError == null)
 
-      onNodeWithTag("saveButton").performClick()
+      onNodeWithTag("saveButton").performScrollTo().performClick()
+      verify { receiptAPI.uploadReceipt(any(), any(), any(), any()) }
+      assert(capturedReceipt == expectedReceipt)
     }
   }
 
@@ -220,54 +209,54 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
+    private var receiptList =
+        listOf(
+        Receipt(
+            uid = "testReceipt",
+            title = "Edited Receipt",
+            description = "",
+            cents = 10000,
+            date = DateUtil.toDate("01/01/2021")!!,
+            incoming = false,
+            phase = Phase.Unapproved,
+            photo = null,
+        ))
+
+    private var expectedReceipt =
+        Receipt(
+            uid = "testReceipt",
+            title = "Test Title",
+            description = "",
+            cents = 10000,
+            date = DateUtil.toDate("01/01/2021")!!,
+            incoming = false,
+            phase = Phase.Unapproved,
+            photo = null,
+        )
+    private var capturedReceipt: Receipt? = null
+
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val receiptsAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
+  private val receiptsAPI = mockk<ReceiptAPI> {
+      every { uploadReceipt(any(), any(), any(), any()) } answers
+              {
+                  capturedReceipt = firstArg()
+                  navActions.back()
+              }
+      every { getUserReceipts(any(), any()) } answers
+              {
+                  firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
+                  navActions.back()
+              }
+      every { getNewId() } answers { "testReceipt" }
+  }
   private val viewModel =
       ReceiptViewModel(
           receiptUid = "testReceipt", navActions = navActions, receiptApi = receiptsAPI)
-
-  private var expectedReceipt =
-      Receipt(
-          uid = "testReceipt",
-          title = "Test Title",
-          description = "",
-          cents = 10000,
-          date = DateUtil.toDate("01/01/2021")!!,
-          incoming = false,
-          phase = Phase.Unapproved,
-          photo = null,
-      )
-
-  private var capturedReceipt: Receipt? = null
-
-  private var receiptList =
-      listOf(
-          Receipt(
-              uid = "testReceipt",
-              title = "Edited Receipt",
-              description = "",
-              cents = 10000,
-              date = DateUtil.toDate("01/01/2021")!!,
-              incoming = false,
-              phase = Phase.Unapproved,
-              photo = null,
-          ))
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testUser"
-    every { receiptsAPI.uploadReceipt(any(), any(), any(), any()) } answers
-        {
-          capturedReceipt = firstArg()
-          navActions.back()
-        }
-    every { receiptsAPI.getUserReceipts(any(), any()) } answers
-        {
-          firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
-          navActions.back()
-          println("TEST:getUserReceipts")
-        }
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel = viewModel) }
   }
 
@@ -277,6 +266,9 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("receiptScreenTitle").assertIsDisplayed().assertTextContains("Edit Receipt")
       verify { receiptsAPI.getUserReceipts(any(), any()) }
+      onNodeWithTag("titleField").assertTextContains("Edited Receipt")
+      onNodeWithTag("amountField").assertTextContains("100.00")
+      onNodeWithTag("dateField").assertTextContains("01/01/2021")
     }
   }
 }
