@@ -35,28 +35,29 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   private var capturedReceipt: Receipt? = null
   private var expectedReceipt =
-        Receipt(
-            uid = "testReceipt",
-            title = "Test Title",
-            description = "",
-            cents = 10000,
-            date = DateUtil.toDate("01/01/2021")!!,
-            incoming = false,
-            phase = Phase.Unapproved,
-            photo = null,
-        )
+      Receipt(
+          uid = "testReceipt",
+          title = "Test Title",
+          description = "",
+          cents = 10000,
+          date = DateUtil.toDate("01/01/2021")!!,
+          incoming = false,
+          phase = Phase.Unapproved,
+          photo = null,
+      )
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val receiptAPI = mockk<ReceiptAPI>(){
-      every { uploadReceipt(any(), any(), any(), any()) } answers
-              {
-                  capturedReceipt = firstArg<Receipt>()
-                  println("capturedReceiptRightNow: $capturedReceipt")
-                  navActions.back()
-              }
-      every { getNewId() } returns "testReceipt"
-      every { deleteReceipt(any(), any(), any()) } answers { }
-  }
+  private val receiptAPI =
+      mockk<ReceiptAPI>() {
+        every { uploadReceipt(any(), any(), any(), any()) } answers
+            {
+              capturedReceipt = firstArg<Receipt>()
+              println("capturedReceiptRightNow: $capturedReceipt")
+              navActions.back()
+            }
+        every { getNewId() } returns "testReceipt"
+        every { deleteReceipt(any(), any(), any()) } answers {}
+      }
   private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptAPI)
 
   @Before
@@ -209,46 +210,47 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-    private var receiptList =
-        listOf(
-        Receipt(
-            uid = "testReceipt",
-            title = "Edited Receipt",
-            description = "",
-            cents = 10000,
-            date = DateUtil.toDate("01/01/2021")!!,
-            incoming = false,
-            phase = Phase.Unapproved,
-            photo = null,
-        ))
+  private var receiptList =
+      listOf(
+          Receipt(
+              uid = "testReceipt",
+              title = "Edited Receipt",
+              description = "",
+              cents = 10000,
+              date = DateUtil.toDate("01/01/2021")!!,
+              incoming = false,
+              phase = Phase.Unapproved,
+              photo = null,
+          ))
 
-    private var expectedReceipt =
-        Receipt(
-            uid = "testReceipt",
-            title = "Test Title",
-            description = "",
-            cents = 10000,
-            date = DateUtil.toDate("01/01/2021")!!,
-            incoming = false,
-            phase = Phase.Unapproved,
-            photo = null,
-        )
-    private var capturedReceipt: Receipt? = null
+  private var expectedReceipt =
+      Receipt(
+          uid = "testReceipt",
+          title = "Test Title",
+          description = "",
+          cents = 10000,
+          date = DateUtil.toDate("01/01/2021")!!,
+          incoming = false,
+          phase = Phase.Unapproved,
+          photo = null,
+      )
+  private var capturedReceipt: Receipt? = null
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val receiptsAPI = mockk<ReceiptAPI> {
-      every { uploadReceipt(any(), any(), any(), any()) } answers
-              {
-                  capturedReceipt = firstArg()
-                  navActions.back()
-              }
-      every { getUserReceipts(any(), any()) } answers
-              {
-                  firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
-                  navActions.back()
-              }
-      every { getNewId() } answers { "testReceipt" }
-  }
+  private val receiptsAPI =
+      mockk<ReceiptAPI> {
+        every { uploadReceipt(any(), any(), any(), any()) } answers
+            {
+              capturedReceipt = firstArg()
+              navActions.back()
+            }
+        every { getUserReceipts(any(), any()) } answers
+            {
+              firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
+              navActions.back()
+            }
+        every { getNewId() } answers { "testReceipt" }
+      }
   private val viewModel =
       ReceiptViewModel(
           receiptUid = "testReceipt", navActions = navActions, receiptApi = receiptsAPI)
