@@ -101,7 +101,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics") // google analytics
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.1") // authentication (remove version numbre?)
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1") // authentication (remove version number?)
     implementation("com.google.firebase:firebase-database-ktx:20.3.1")
 
     // Google Authentication
@@ -161,9 +161,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
     // Kaspresso
-    val kaspressoVersion = "1.5.5"
+    val kaspressoVersion = "1.4.3"
     androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspressoVersion")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspressoVersion") // allure support
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspressoVersion") // allure support (remove ?)
     androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspressoVersion") // compose support
 
     // Robolectric
