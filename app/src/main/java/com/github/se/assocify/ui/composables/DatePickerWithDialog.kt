@@ -23,16 +23,51 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
+/**
+ * An enumeration representing different date restrictions for selectable dates.
+ */
 enum class DateRestriction {
-  ANY,
-  NONE,
-  FUTURE,
-  FUTURE_OR_NOW,
-  PAST,
-  PAST_OR_NOW,
-  NOW
+    /**
+     * Any date can be selected.
+     */
+    ANY,
+    /**
+     * No date is selectable.
+     */
+    NONE,
+    /**
+     * Only future dates are selectable.
+     */
+    FUTURE,
+    /**
+     * Future dates or the current date are selectable.
+     */
+    FUTURE_OR_NOW,
+    /**
+     * Only past dates are selectable.
+     */
+    PAST,
+    /**
+     * Past dates or the current date are selectable.
+     */
+    PAST_OR_NOW,
+    /**
+     * Only the current date is selectable.
+     */
+    NOW
 }
 
+/**
+ * A Composable that displays a Date TextField, that opens a DatePickerDialog when clicked.
+ *
+ * @param value The current value of the Date Field, formatted as a string.
+ * @param onDateSelect Callback function invoked when a date is selected or the dialog is dismissed.
+ * @param modifier The modifier to be applied to the composable.
+ * @param label The label to be displayed above the text field.
+ * @param isSelectableDate The restriction on selectable dates.
+ * @param isError Whether the DatePicker is in an error state.
+ * @param supportingText Additional supporting text to be displayed below the DatePicker.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerWithDialog(
