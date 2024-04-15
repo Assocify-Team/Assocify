@@ -13,5 +13,7 @@ fun NavGraphBuilder.createAssoGraph(
     userAPI: UserAPI,
     associationAPI: AssociationAPI
 ) {
-  composable(route = Destination.CreateAsso.route) { CreateAssoScreen(navigationActions) }
+  composable(route = Destination.CreateAsso.route) {
+    CreateAssoScreen(navigationActions, associationAPI, userAPI)
+  }
 }
