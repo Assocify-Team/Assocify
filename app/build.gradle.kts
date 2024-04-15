@@ -101,8 +101,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics") // google analytics
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.1") // authentication (remove version number?)
-    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
+    implementation("com.google.firebase:firebase-auth-ktx") // authentication
+    implementation("com.google.firebase:firebase-database-ktx") // database
 
     // Google Authentication
     implementation("com.google.android.gms:play-services-auth:21.0.0")
