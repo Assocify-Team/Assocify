@@ -161,16 +161,15 @@ fun CreateAssoScreen(
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
                         searchValue =
-                            state.searchMember, // ce qui est tapé dans barre -> vide quand y a un
-                        // user
-                        userList = state.searchMemberList, // ce qui apparait dans la liste
-                        user = state.editMember, // ce qui est sélectionné -> null quand tu cherche
-                        onUserSearch = { viewmodel.searchMember(it) }, // on value change
+                            state.searchMember,
+                        userList = state.searchMemberList,
+                        user = state.editMember,
+                        onUserSearch = { viewmodel.searchMember(it) },
                         onUserSelect = {
                           viewmodel.selectMember(it)
-                        }, // quand tu click qur user de dropdown
-                        onUserDismiss = { viewmodel.dismissMemberSearch() }, // click sur croix
-                        expanded = state.searchMemberList.isNotEmpty(), // dropdown ouvert ou pas
+                        },
+                        onUserDismiss = { viewmodel.dismissMemberSearch() },
+                        expanded = state.searchMemberList.isNotEmpty(),
                         label = { Text("Name") },
                         isError = viewmodel.searchError(),
                         supportingText = state.memberError?.let { { Text(it) } })
