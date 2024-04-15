@@ -136,7 +136,8 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   fun testCreateButton() {
     with(composeTestRule) {
       onNodeWithTag("create").performClick()
-      verify { mockNavActions.navigateTo(Destination.Home) }
+      verify { bigView.saveAsso() }
+      verify { mockNavActions.navigateToMainTab(Destination.Home) }
     }
   }
 
@@ -146,5 +147,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("Back").performClick()
       verify { mockNavActions.back() }
     }
+  }
   }
 }

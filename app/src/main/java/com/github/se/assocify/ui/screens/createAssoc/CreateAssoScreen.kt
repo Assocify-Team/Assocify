@@ -141,7 +141,7 @@ fun CreateAssoScreen(
                 Button(
                     onClick = {
                       viewmodel.saveAsso()
-                      navigationActions.navigateTo(Destination.Home)
+                      navigationActions.navigateToMainTab(Destination.Home)
                     },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
                     enabled = viewmodel.canSaveAsso()) {
@@ -154,7 +154,6 @@ fun CreateAssoScreen(
         if (state.openEdit) {
           Dialog(onDismissRequest = { viewmodel.cancelModifyMember() }) {
             ElevatedCard {
-              // temporary UI to see if dialog opens
               Column(
                   modifier = Modifier.padding(16.dp).fillMaxWidth(),
                   horizontalAlignment = Alignment.CenterHorizontally) {
