@@ -148,5 +148,4 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       verify { mockNavActions.back() }
     }
   }
-  }
 }
