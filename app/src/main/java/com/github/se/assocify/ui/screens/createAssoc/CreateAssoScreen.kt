@@ -160,14 +160,11 @@ fun CreateAssoScreen(
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
-                        searchValue =
-                            state.searchMember,
+                        searchValue = state.searchMember,
                         userList = state.searchMemberList,
                         user = state.editMember,
                         onUserSearch = { viewmodel.searchMember(it) },
-                        onUserSelect = {
-                          viewmodel.selectMember(it)
-                        },
+                        onUserSelect = { viewmodel.selectMember(it) },
                         onUserDismiss = { viewmodel.dismissMemberSearch() },
                         expanded = state.searchMemberList.isNotEmpty(),
                         label = { Text("Name") },

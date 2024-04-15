@@ -23,38 +23,22 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-/**
- * An enumeration representing different date restrictions for selectable dates.
- */
+/** An enumeration representing different date restrictions for selectable dates. */
 enum class DateRestriction {
-    /**
-     * Any date can be selected.
-     */
-    ANY,
-    /**
-     * No date is selectable.
-     */
-    NONE,
-    /**
-     * Only future dates are selectable.
-     */
-    FUTURE,
-    /**
-     * Future dates or the current date are selectable.
-     */
-    FUTURE_OR_NOW,
-    /**
-     * Only past dates are selectable.
-     */
-    PAST,
-    /**
-     * Past dates or the current date are selectable.
-     */
-    PAST_OR_NOW,
-    /**
-     * Only the current date is selectable.
-     */
-    NOW
+  /** Any date can be selected. */
+  ANY,
+  /** No date is selectable. */
+  NONE,
+  /** Only future dates are selectable. */
+  FUTURE,
+  /** Future dates or the current date are selectable. */
+  FUTURE_OR_NOW,
+  /** Only past dates are selectable. */
+  PAST,
+  /** Past dates or the current date are selectable. */
+  PAST_OR_NOW,
+  /** Only the current date is selectable. */
+  NOW
 }
 
 /**
