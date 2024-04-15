@@ -142,7 +142,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2") // json serialization
 
     // Compose
-    implementation(platform("androidx.compose:compose-bom:2024.03.00")) // latest ?
+    implementation(platform("androidx.compose:compose-bom:2024.04.00")) // latest ?
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -150,7 +150,7 @@ dependencies {
     // Junit & Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.03.00")) // remove ?
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.00")) // remove ?
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.4")
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.4")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.4")
