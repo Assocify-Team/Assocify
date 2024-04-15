@@ -97,7 +97,7 @@ dependencies {
     // When using the BoM, don't specify versions in order to use latest of each in library
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.4")) // Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1")) // Firebase BoM
     implementation("com.google.firebase:firebase-analytics") // google analytics
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-firestore")
