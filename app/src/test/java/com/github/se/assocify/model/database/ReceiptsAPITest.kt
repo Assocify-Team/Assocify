@@ -39,7 +39,7 @@ class ReceiptsAPITest {
 
   @MockK lateinit var collectionReference: CollectionReference
 
-  private lateinit var api: ReceiptsAPI
+  private lateinit var api: ReceiptAPI
 
   private val successfulReceipt =
       Receipt(
@@ -82,8 +82,7 @@ class ReceiptsAPITest {
     mockkStatic(Log::class)
     every { Log.w(any(), any<String>()) }.returns(0)
 
-    api =
-        spyk<ReceiptsAPI>(ReceiptsAPI("uid", "aid", storage, firestore), recordPrivateCalls = true)
+    api = spyk<ReceiptAPI>(ReceiptAPI("uid", "aid", storage, firestore), recordPrivateCalls = true)
 
     every { api["parseReceiptList"](any<QuerySnapshot>()) } returns
         listOf(successfulReceipt, failingReceipt)
