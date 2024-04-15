@@ -108,7 +108,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
     // Google Maps
-    val mapsComposeVersion = "4.3.0" // update to 4.3.3 ?
+    val mapsComposeVersion = "4.3.3"
     implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
     implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
