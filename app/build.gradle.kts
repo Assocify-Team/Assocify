@@ -138,7 +138,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.0.0")
 
     // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:3.14.9")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2") // json serialization
 
     // Compose
