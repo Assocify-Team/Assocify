@@ -119,7 +119,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.appcompat:appcompat:1.6.1") // access to newer API from older API
     implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4") // maybe unused?
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     // Material Design 3
     implementation("androidx.compose.material3:material3:1.2.1")
@@ -133,13 +133,16 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$navVersion") // compose
 
     // Coil (image loading)
-    implementation("io.coil-kt:coil-compose:2.0.0")
+    val coilVersion = "2.0.0"
+    implementation("io.coil-kt:coil-compose:$coilVersion")
 
     // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    val okHttpVersion = "4.12.0"
+    implementation("com.squareup.okhttp3:okhttp:$okHttpVersion")
 
     // JSON Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    val serializationVersion = "1.6.2"
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
     // Compose
     implementation(platform("androidx.compose:compose-bom:2024.04.00"))
@@ -160,13 +163,14 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
     // Kaspresso
-    val kaspressoVersion = "1.5.4"
+    val kaspressoVersion = "1.4.3"
     androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspressoVersion")
     androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspressoVersion") // allure support
     androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspressoVersion") // compose support
 
     // Robolectric
-    testImplementation("org.robolectric:robolectric:4.11.1")
+    val robolectricVersion = "4.11.1"
+    testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
     // Mockito
     val mockitoVersion = "5.11.0"
