@@ -137,7 +137,9 @@ dependencies {
 
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2") // json serialization
+
+    // JSON Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     // Compose
     implementation(platform("androidx.compose:compose-bom:2024.04.00"))
@@ -158,7 +160,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
     // Kaspresso
-    val kaspressoVersion = "1.4.3"
+    val kaspressoVersion = "1.5.4"
     androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspressoVersion")
     androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspressoVersion") // allure support
     androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspressoVersion") // compose support
