@@ -132,10 +132,14 @@ dependencies {
     val navVersion = "2.7.7"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
-    implementation("androidx.navigation:navigation-compose:$navVersion") // compose
+    implementation("androidx.navigation:navigation-compose:2.6.0-rc01") // compose
 
     // Coil (image loading)
     implementation("io.coil-kt:coil-compose:2.0.0")
+
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:3.14.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2") // json serialization
 
     // Compose
     implementation(platform("androidx.compose:compose-bom:2024.03.00")) // latest ?
@@ -146,8 +150,8 @@ dependencies {
     // Junit & Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.4")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.03.00")) // remove ?
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.4")
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.4")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.4")
 
@@ -161,10 +165,6 @@ dependencies {
     androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspressoVersion")
     androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspressoVersion") // allure support
     androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspressoVersion") // compose support
-
-    // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2") // json serialization
 
     // Robolectric
     testImplementation("org.robolectric:robolectric:4.11.1")
