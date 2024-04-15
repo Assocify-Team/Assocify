@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -18,8 +19,7 @@ import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.junit4.MockKRule
+import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
@@ -30,20 +30,7 @@ import org.junit.runner.RunWith
 class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockAssocAPI: AssociationAPI
-
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockUserAPI: UserAPI
-
-  @RelaxedMockK lateinit var mockCurrentUser: CurrentUser
-
-  @get:Rule val mockkRule = MockKRule(this)
-
-  val bigList =
+  private val bigList =
       listOf(
           User("1", "jean", Role("")),
           User("2", "roger", Role("")),
@@ -56,18 +43,25 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           User("9", "bill", Role("")),
           User("10", "seb", Role("")))
 
-  val bigView = CreateAssoViewmodel()
+  private val mockNavActions = mockk<NavigationActions>(relaxUnitFun = true)
+  private val mockAssocAPI = mockk<AssociationAPI>()
+  private val mockUserAPI =
+      mockk<UserAPI> {
+        every { getAllUsers(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<User>) -> Unit>()
+              onSuccessCallback(bigList)
+            }
+      }
 
-  val smallView = CreateAssoViewmodel()
+  val bigView = CreateAssoViewmodel(mockAssocAPI, mockUserAPI)
 
   @Before
-  fun setupLogin() {
-    every { mockUserAPI.getAllUsers(any(), any()) } answers
-        {
-          val onSuccessCallback = arg<(List<User>) -> Unit>(0)
-          onSuccessCallback(bigList)
-        }
-    composeTestRule.setContent { CreateAssoScreen(mockNavActions, bigView) }
+  fun setup() {
+    CurrentUser.userUid = "1"
+    composeTestRule.setContent {
+      CreateAssoScreen(mockNavActions, mockAssocAPI, mockUserAPI, bigView)
+    }
   }
 
   @Test
@@ -82,7 +76,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     }
   }
 
-  /*
   @Test
   fun testAddMember() {
     with(composeTestRule) {
@@ -90,6 +83,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("memberSearchField").assertIsDisplayed()
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       assert(bigView.uiState.value.searchMember == "j")
+      println("TESTSIZE ${bigView.uiState.value.searchMemberList.size}")
       assert(bigView.uiState.value.searchMemberList.size == 4)
       onNodeWithTag("userDropdownItem-1").assertIsDisplayed()
       onNodeWithTag("userDropdownItem-3").assertIsDisplayed()
@@ -137,7 +131,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("create").performClick()
       // check that the asso is created
     }
-  }*/
+  }
 
   fun testCreateButton() {
     with(composeTestRule) {
