@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.createAsso
+package com.github.se.assocify.ui.screens.createAssociation
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -13,12 +13,12 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class CreateAssociationViewmodel(private val assoAPI: AssociationAPI, private val userAPI: UserAPI) :
-    ViewModel() {
+class CreateAssociationViewmodel(
+    private val assoAPI: AssociationAPI,
+    private val userAPI: UserAPI
+) : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
-
-  val currUser = CurrentUser.userUid
 
   /*
    * Sets the name of the association
@@ -153,7 +153,7 @@ class CreateAssociationViewmodel(private val assoAPI: AssociationAPI, private va
    * Checks if the association can be saved : the current user is a member, all members have a role and the name of the association is not blank
    */
   fun canSaveAsso(): Boolean {
-    return (_uiState.value.members.find { user -> user.uid == currUser } != null) &&
+    return (_uiState.value.members.find { user -> user.uid == CurrentUser.userUid } != null) &&
         _uiState.value.members.all { it.getRole().getRoleType() != Role.RoleType.PENDING } &&
         _uiState.value.name.isNotBlank()
   }

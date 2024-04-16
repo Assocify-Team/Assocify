@@ -6,7 +6,6 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.createAsso.CreateAssociationScreen
 
 fun NavGraphBuilder.createAssociationGraph(
     navigationActions: NavigationActions,

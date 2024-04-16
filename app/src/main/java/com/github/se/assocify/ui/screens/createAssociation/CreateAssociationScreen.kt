@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.createAsso
+package com.github.se.assocify.ui.screens.createAssociation
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement

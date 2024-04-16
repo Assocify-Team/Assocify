@@ -13,8 +13,8 @@ import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.createAsso.CreateAssociationScreen
-import com.github.se.assocify.ui.screens.createAsso.CreateAssociationViewmodel
+import com.github.se.assocify.ui.screens.createAssociation.CreateAssociationScreen
+import com.github.se.assocify.ui.screens.createAssociation.CreateAssociationViewmodel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
