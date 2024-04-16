@@ -1,5 +1,11 @@
 package com.github.se.assocify.ui.screens.treasury.receipt
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -38,15 +44,24 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.R
+import com.github.se.assocify.createImageFile
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
+import java.util.Objects
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +77,29 @@ fun ReceiptScreen(
 ) {
 
   val receiptState by viewModel.uiState.collectAsState()
+
+  val context = LocalContext.current
+  val file = context.createImageFile()
+  val uri =
+      FileProvider.getUriForFile(
+          Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file)
+
+  var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
+
+  val cameraLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+        capturedImageUri = uri
+      }
+
+  val permissionLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) {
+          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+          cameraLauncher.launch(uri)
+        } else {
+          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+      }
 
   Scaffold(
       modifier = Modifier.testTag("receiptScreen"),
@@ -136,7 +174,18 @@ fun ReceiptScreen(
                               Modifier.testTag("editImageButton")
                                   .align(Alignment.BottomEnd)
                                   .padding(10.dp),
-                          onClick = { viewModel.setImage() },
+                          onClick = {
+                            viewModel.setImage()
+                            val permissionCheckResult =
+                                ContextCompat.checkSelfPermission(
+                                    context, Manifest.permission.CAMERA)
+                            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                              cameraLauncher.launch(uri)
+                            } else {
+                              // Request a permission
+                              permissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                          },
                       ) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
                       }
