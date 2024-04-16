@@ -7,7 +7,7 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
-fun NavGraphBuilder.selectAssoGraph(
+fun NavGraphBuilder.selectAssociationGraph(
     navigationActions: NavigationActions,
     userAPI: UserAPI,
     associationAPI: AssociationAPI

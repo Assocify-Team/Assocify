@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class CreateAssoViewmodel(private val assoAPI: AssociationAPI, private val userAPI: UserAPI) :
+class CreateAssociationViewmodel(private val assoAPI: AssociationAPI, private val userAPI: UserAPI) :
     ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState

@@ -53,11 +53,11 @@ import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAssoScreen(
+fun CreateAssociationScreen(
     navigationActions: NavigationActions,
     assoAPI: AssociationAPI,
     userAPI: UserAPI,
-    viewmodel: CreateAssoViewmodel = CreateAssoViewmodel(assoAPI, userAPI)
+    viewmodel: CreateAssociationViewmodel = CreateAssociationViewmodel(assoAPI, userAPI)
 ) {
 
   val state by viewmodel.uiState.collectAsState()
