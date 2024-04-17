@@ -7,9 +7,10 @@ data class Event(
     private val startDate: String,
     private val endDate: String,
     private val organizers: List<User>,
-    private val staffers: List<User>
+    private val staffers: List<User>,
+    private val tasks: List<Task>,
 ) {
-  constructor() : this("", "", "", "", "", listOf(), listOf())
+  constructor() : this("", "", "", "", "", listOf(), listOf(), listOf())
 
   override fun equals(other: Any?): Boolean {
     if (other?.javaClass != this.javaClass) {
