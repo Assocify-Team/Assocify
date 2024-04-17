@@ -31,7 +31,11 @@ import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventScreen(navActions: NavigationActions, event: Event = Event(), currentTab:EventTab=EventTab.Tasks) {
+fun EventScreen(
+    navActions: NavigationActions,
+    event: Event = Event(),
+    currentTab: EventTab = EventTab.Tasks
+) {
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       bottomBar = {
@@ -40,60 +44,49 @@ fun EventScreen(navActions: NavigationActions, event: Event = Event(), currentTa
             tabList = MAIN_TABS_LIST,
             selectedTab = Destination.Event)
       },
-      topBar = {
-        EventTopBar()
-      }
-  ) {
-    Column(
-      modifier = Modifier.padding(it)
-    ) {
-      TabRow(selectedTabIndex = currentTab.index) {
-        Tab(
-          text = { Text("Tasks") },
-          selected = currentTab == EventTab.Tasks,
-          onClick = { /*TODO*/ }
-        )
-        Tab(
-          text = { Text("Map") },
-          selected = currentTab == EventTab.Map,
-          onClick = { /*TODO*/ }
-        )
-        Tab(
-          text = { Text("Schedule") },
-          selected = currentTab == EventTab.Schedule,
-          onClick = { /*TODO*/ }
-        )
-      }
-      when(currentTab){
-        EventTab.Tasks -> EventTaskScreen()
-        EventTab.Map -> EventMapScreen()
-        EventTab.Schedule -> EventScheduleScreen()
-      }
-    }
+      topBar = { EventTopBar() }) {
+        Column(modifier = Modifier.padding(it)) {
+          TabRow(selectedTabIndex = currentTab.index) {
+            Tab(
+                text = { Text("Tasks") },
+                selected = currentTab == EventTab.Tasks,
+                onClick = { /*TODO*/})
+            Tab(
+                text = { Text("Map") },
+                selected = currentTab == EventTab.Map,
+                onClick = { /*TODO*/})
+            Tab(
+                text = { Text("Schedule") },
+                selected = currentTab == EventTab.Schedule,
+                onClick = { /*TODO*/})
+          }
+          when (currentTab) {
+            EventTab.Tasks -> EventTaskScreen()
+            EventTab.Map -> EventMapScreen()
+            EventTab.Schedule -> EventScheduleScreen()
+          }
+        }
       }
 }
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventTopBar(){
+fun EventTopBar() {
   CenterAlignedTopAppBar(
-    title = { Text(text = "Event") },
-    navigationIcon = {IconButton(onClick = { /*TODO*/ }) {
-      Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
-    }},
-    actions = {
-      IconButton(onClick = { /*TODO*/ }) {
-        Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
-      }
-    }
-    )
+      title = { Text(text = "Event") },
+      navigationIcon = {
+        IconButton(onClick = { /*TODO*/}) {
+          Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
+        }
+      },
+      actions = {
+        IconButton(onClick = { /*TODO*/}) {
+          Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+        }
+      })
 }
 
-
-enum class EventTab(val index: Int){
+enum class EventTab(val index: Int) {
   Tasks(0),
   Map(1),
   Schedule(2)
