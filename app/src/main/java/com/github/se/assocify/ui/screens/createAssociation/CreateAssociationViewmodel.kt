@@ -21,10 +21,9 @@ class CreateAssociationViewmodel(
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
   /*
-   * Sets the name of the association
+   * Sets the name of the association : can be any string
    */
   fun setName(name: String) {
-    // need input sanitization TODO
     _uiState.value = _uiState.value.copy(name = name)
   }
 
@@ -85,8 +84,7 @@ class CreateAssociationViewmodel(
    * Searches for member with corresponding name in the database
    */
   fun searchMember(searchMember: String) {
-    _uiState.value = _uiState.value.copy(searchMember = searchMember) // ?
-    // TODO
+    _uiState.value = _uiState.value.copy(searchMember = searchMember)
     if (searchMember.isNotBlank()) {
       userAPI.getAllUsers(
           onSuccess = { userList ->
@@ -98,26 +96,18 @@ class CreateAssociationViewmodel(
                               _uiState.value.members.any { us -> us.uid == user.uid }
                             }
                             .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
+            if (_uiState.value.searchMemberList.isEmpty()) {
+              _uiState.value = _uiState.value.copy(memberError = "No users found")
+            } else {
+              _uiState.value = _uiState.value.copy(memberError = null)
+            }
           },
           onFailure = { exception ->
             Log.e("CreateAssoViewModel", "Failed to get users:${exception.message}")
           })
-
-      if (_uiState.value.searchMemberList.isEmpty()) {
-        _uiState.value = _uiState.value.copy(memberError = "No users found")
-      } else {
-        _uiState.value = _uiState.value.copy(memberError = null)
-      }
-    } else { // idk
+    } else {
       _uiState.value = _uiState.value.copy(memberError = null)
     }
-  }
-
-  /*
-   * Checks if there is an error in the search of member
-   */
-  fun searchError(): Boolean {
-    return _uiState.value.memberError != null
   }
 
   /*
