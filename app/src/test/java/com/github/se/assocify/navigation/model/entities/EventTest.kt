@@ -9,7 +9,7 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class EventTest {
-  
+
   @Test
   fun testNotSameClassEquals() {
     val event = Event()
@@ -28,7 +28,6 @@ class EventTest {
     val event2 = Event("uid2", "name2", " ", " ", "", listOf(), listOf())
     assert(event1 != event2)
   }
-
 
   @Test
   fun testGetStartDate() {
