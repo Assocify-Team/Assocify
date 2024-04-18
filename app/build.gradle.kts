@@ -17,9 +17,7 @@ android {
     namespace = "com.github.se.assocify"
     compileSdk = 34
 
-    buildFeatures {
-        buildConfig = true
-    }
+
 
     defaultConfig {
         applicationId = "com.github.se.assocify"
@@ -42,26 +40,28 @@ android {
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties["SUPABASE_ANON_KEY"]}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties["SUPABASE_URL"]}\"")
 
-    }
+        val keystorePropertiesFile = rootProject.file("keystore.properties")
 
-    val keystorePropertiesFile = rootProject.file("keystore.properties")
+        // Initialize a new Properties() object called keystoreProperties.
+        val keystoreProperties = Properties()
 
-    // Initialize a new Properties() object called keystoreProperties.
-    val keystoreProperties = Properties()
+        // Load your keystore.properties file into the keystoreProperties object.
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-    // Load your keystore.properties file into the keystoreProperties object.
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-
-    signingConfigs {
-        create("release") {
-            // You need to specify either an absolute path or include the
-            // keystore file in the same directory as the build.gradle file.
-            storeFile = file("../keystore.jks")
-            storePassword = keystoreProperties["storePassword"] as String
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
+        signingConfigs {
+            create("release") {
+                // You need to specify either an absolute path or include the
+                // keystore file in the same directory as the build.gradle file.
+                storeFile = file("../keystore.jks")
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
         }
+
     }
+
+
 
 
     buildTypes {
@@ -87,6 +87,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -202,8 +203,8 @@ dependencies {
     androidTestImplementation("io.mockk:mockk-agent:1.13.7")
 
     //Supabase
-    val supabaseVersion = 2.2.3
-    val ktorVersion = 2.3.10
+    val supabaseVersion = "2.2.3"
+    val ktorVersion = "2.3.10"
     implementation ("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
     implementation( "io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
     implementation ("io.github.jan-tennert.supabase:gotrue-kt:$supabaseVersion")
