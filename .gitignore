@@ -8,6 +8,7 @@
 .DS_Store
 captures
 local.properties
+keystore.properties
 
 # Gradle files
 .gradle/

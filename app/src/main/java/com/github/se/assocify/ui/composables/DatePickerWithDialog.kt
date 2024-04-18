@@ -18,17 +18,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
+import com.github.se.assocify.ui.util.DateUtil
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
+enum class DateRestriction {
+  ANY,
+  NONE,
+  FUTURE,
+  FUTURE_OR_NOW,
+  PAST,
+  PAST_OR_NOW,
+  NOW
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerWithDialog(
+    value: String,
+    onDateSelect: (LocalDate?) -> Unit,
     modifier: Modifier = Modifier,
-    label: @Composable () -> Unit,
-    dateValue: String,
-    onDateSelected: (LocalDate?) -> Unit
+    label: @Composable (() -> Unit)? = null,
+    isSelectableDate: DateRestriction = DateRestriction.ANY,
+    isError: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null
 ) {
   var showDialog by remember { mutableStateOf(false) }
   val datePickerState =
@@ -36,12 +50,27 @@ fun DatePickerWithDialog(
           selectableDates =
               object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                  return utcTimeMillis >=
+                  val nowStart =
                       LocalDate.now()
                           .atStartOfDay()
                           .atZone(ZoneId.systemDefault())
                           .toInstant()
                           .toEpochMilli()
+                  val nowEnd =
+                      LocalDate.now()
+                          .atTime(23, 59, 59)
+                          .atZone(ZoneId.systemDefault())
+                          .toInstant()
+                          .toEpochMilli()
+                  return when (isSelectableDate) {
+                    DateRestriction.ANY -> true
+                    DateRestriction.NONE -> false
+                    DateRestriction.PAST_OR_NOW -> utcTimeMillis <= nowEnd
+                    DateRestriction.PAST -> utcTimeMillis < nowStart
+                    DateRestriction.NOW -> utcTimeMillis in nowStart..nowEnd
+                    DateRestriction.FUTURE_OR_NOW -> utcTimeMillis >= nowStart
+                    DateRestriction.FUTURE -> utcTimeMillis > nowEnd
+                  }
                 }
               })
   val selectedDate =
@@ -52,11 +81,13 @@ fun DatePickerWithDialog(
   Box {
     OutlinedTextField(
         modifier = modifier,
-        value = dateValue,
+        value = value,
         onValueChange = {},
         readOnly = true,
-        label = { label() },
-        placeholder = { Text("--/--/--") })
+        label = label,
+        placeholder = { Text(DateUtil.NULL_DATE_STRING) },
+        isError = isError,
+        supportingText = supportingText)
     Box(modifier = Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
   }
 
@@ -66,17 +97,21 @@ fun DatePickerWithDialog(
         onDismissRequest = { showDialog = false },
         confirmButton = {
           Button(
+              modifier = Modifier.testTag("datePickerDialogOk"),
               onClick = {
                 showDialog = false
-                onDateSelected(selectedDate)
+                onDateSelect(selectedDate)
               }) {
                 Text(text = "OK")
               }
         },
         dismissButton = {
           Button(
-              modifier = Modifier.testTag("datePickerDialogDismiss"),
-              onClick = { showDialog = false }) {
+              modifier = Modifier.testTag("datePickerDialogCancel"),
+              onClick = {
+                showDialog = false
+                onDateSelect(null)
+              }) {
                 Text(text = "Cancel")
               }
         }) {

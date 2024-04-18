@@ -21,9 +21,15 @@ sealed class Destination(
   data object Profile :
       Destination("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
 
-  data object Login : Destination("login")
+  data object Login : Destination("login/authentication")
 
-  // data class Receipt(val id: String) : Destination("receipt/$id")
+  data object SelectAsso : Destination("login/selectAsso")
+
+  data object CreateAsso : Destination("login/createAsso")
+
+  data object NewReceipt : Destination("treasury/receipt")
+
+  data class EditReceipt(val receiptUid: String) : Destination("treasury/receipt/$receiptUid")
 }
 
 val MAIN_TABS_LIST =

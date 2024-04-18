@@ -10,14 +10,13 @@ sealed class MaybeRemotePhoto {
 
 data class Receipt(
     val uid: String,
-    val payer: String,
-    val date: LocalDate,
-    val incoming: Boolean,
-    val cents: Int,
-    val phase: Phase,
     val title: String,
     val description: String,
-    val photo: MaybeRemotePhoto,
+    val date: LocalDate,
+    val cents: Int,
+    val incoming: Boolean,
+    val phase: Phase,
+    val photo: MaybeRemotePhoto?,
 )
 
 enum class Phase {
