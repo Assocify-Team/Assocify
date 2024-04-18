@@ -13,12 +13,12 @@ import com.github.se.assocify.ui.util.PriceUtil
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class ReceiptViewModel {
 
@@ -131,28 +131,26 @@ class ReceiptViewModel {
     _uiState.value = _uiState.value.copy(incoming = incoming)
   }
 
-    fun showBottomSheet() {
-        _uiState.value = _uiState.value.copy(showBottomSheet = true)
-    }
+  fun showBottomSheet() {
+    _uiState.value = _uiState.value.copy(showBottomSheet = true)
+  }
 
-    fun hideBottomSheet() {
-        _uiState.value = _uiState.value.copy(showBottomSheet = false)
-    }
+  fun hideBottomSheet() {
+    _uiState.value = _uiState.value.copy(showBottomSheet = false)
+  }
 
   fun setImage(uri: Uri?) {
-      if (uri == null) return
+    if (uri == null) return
     _uiState.value = _uiState.value.copy(receiptImageURI = uri)
     /*TODO: Implement image selection / capture and saving*/
   }
 
-    fun signalCameraPermissionDenied(accepted: Boolean) {
-        CoroutineScope(Dispatchers.Main).launch {
-            _uiState.value.snackbarHostState.showSnackbar(
-                message = "Camera permission denied",
-                duration = SnackbarDuration.Short
-            )
-        }
+  fun signalCameraPermissionDenied(accepted: Boolean) {
+    CoroutineScope(Dispatchers.Main).launch {
+      _uiState.value.snackbarHostState.showSnackbar(
+          message = "Camera permission denied", duration = SnackbarDuration.Short)
     }
+  }
 
   fun saveReceipt() {
     setTitle(_uiState.value.title)
@@ -232,5 +230,5 @@ data class ReceiptState(
     val dateError: String? = null,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     val showBottomSheet: Boolean = false,
-    val receiptImageURI : Uri? = null
+    val receiptImageURI: Uri? = null
 )

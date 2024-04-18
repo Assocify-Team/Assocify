@@ -86,15 +86,14 @@ fun ReceiptScreen(
 
   val context = LocalContext.current
 
-    val tempUri = remember { mutableStateOf<Uri?>(null) }
+  val tempUri = remember { mutableStateOf<Uri?>(null) }
 
-    fun getTempUri(): Uri? {
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context),
-            BuildConfig.APPLICATION_ID + ".provider",
-            context.createImageFile()
-        )
-    }
+  fun getTempUri(): Uri? {
+    return FileProvider.getUriForFile(
+        Objects.requireNonNull(context),
+        BuildConfig.APPLICATION_ID + ".provider",
+        context.createImageFile())
+  }
 
   val cameraLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
@@ -178,20 +177,20 @@ fun ReceiptScreen(
                           .aspectRatio(1f)
                           .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        if (receiptState.receiptImageURI != null) {
-                          AsyncImage(
-                              model = receiptState.receiptImageURI,
-                              modifier = Modifier.align(Alignment.Center),
-                              contentDescription = "receipt image",
-                          )
-                        } else {
-                          Image(
-                              modifier = Modifier.align(Alignment.Center),
-                              painter =
-                                  painterResource(
-                                      id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
-                              contentDescription = "Receipt")
-                        }
+                      if (receiptState.receiptImageURI != null) {
+                        AsyncImage(
+                            model = receiptState.receiptImageURI,
+                            modifier = Modifier.align(Alignment.Center),
+                            contentDescription = "receipt image",
+                        )
+                      } else {
+                        Image(
+                            modifier = Modifier.align(Alignment.Center),
+                            painter =
+                                painterResource(
+                                    id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
+                            contentDescription = "Receipt")
+                      }
                       FilledIconButton(
                           modifier =
                               Modifier.testTag("editImageButton")
@@ -252,9 +251,7 @@ fun ReceiptScreen(
             }
 
         if (receiptState.showBottomSheet) {
-          ModalBottomSheet(
-              onDismissRequest = { viewModel.hideBottomSheet()}
-          ) {
+          ModalBottomSheet(onDismissRequest = { viewModel.hideBottomSheet() }) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 60.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
@@ -264,29 +261,31 @@ fun ReceiptScreen(
                       style = MaterialTheme.typography.titleLarge,
                       textAlign = TextAlign.Center)
                   ListItem(
-                      modifier = Modifier.clickable {
-                          viewModel.hideBottomSheet()
-                          val permissionCheckResult =
-                              ContextCompat.checkSelfPermission(
-                                  context, Manifest.permission.CAMERA)
-                          if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                      modifier =
+                          Modifier.clickable {
+                            viewModel.hideBottomSheet()
+                            val permissionCheckResult =
+                                ContextCompat.checkSelfPermission(
+                                    context, Manifest.permission.CAMERA)
+                            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
                               tempUri.value = getTempUri()
-                            cameraLauncher.launch(tempUri.value)
-                          } else {
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
-                          }
-                      },
+                              cameraLauncher.launch(tempUri.value)
+                            } else {
+                              permissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                          },
                       headlineContent = {
                         Text(text = "Take photo", style = MaterialTheme.typography.titleMedium)
                       },
                       leadingContent = { Icon(Icons.Default.Camera, "Camera icon") })
                   ListItem(
-                      modifier = Modifier.clickable {
-                          viewModel.hideBottomSheet()
-                          imagePicker.launch(
-                              PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                          )
-                      },
+                      modifier =
+                          Modifier.clickable {
+                            viewModel.hideBottomSheet()
+                            imagePicker.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly))
+                          },
                       headlineContent = {
                         Text(text = "Select image", style = MaterialTheme.typography.titleMedium)
                       },
