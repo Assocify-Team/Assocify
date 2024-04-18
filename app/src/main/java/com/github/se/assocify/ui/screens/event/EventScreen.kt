@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -31,6 +33,7 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.event.map.EventMapScreen
 import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -41,6 +44,9 @@ fun EventScreen(
 ) {
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
+      floatingActionButton = { FloatingActionButton(onClick = { /*TODO*/ }) {
+        Icon(imageVector = Icons.Default.Add, contentDescription = null)
+      }},
       bottomBar = {
         MainNavigationBar(
             onTabSelect = { navActions.navigateToMainTab(it) },
@@ -64,7 +70,10 @@ fun EventScreen(
                 selected = currentTab == EventTab.Schedule,
                 onClick = { /*TODO*/})
           }
-          val testTasks = listOf(Task(), Task(), Task())
+          val t1 = Task("task 1", "the task 1", true)
+          val t2 = Task("task 2", "the task 2", false)
+          val t3 = Task("task 3", "the task 3", true)
+          val testTasks = listOf(t1, t2, t3)
           when (currentTab) {
             EventTab.Tasks -> EventTaskScreen(testTasks)
             EventTab.Map -> EventMapScreen()
@@ -113,6 +122,7 @@ enum class EventTab(val index: Int) {
 @Preview
 @Composable
 fun EventScreenPreview() {
+  val t1 = Task("task 1", "the task 1", true)
   val event1 =
       Event(
           "1",
