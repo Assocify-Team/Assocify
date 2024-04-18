@@ -143,7 +143,7 @@ class CreateAssociationViewmodel(
    * Checks if the association can be saved : the current user is a member, all members have a role and the name of the association is not blank
    */
   fun canSaveAsso(): Boolean {
-    return (_uiState.value.members.find { user -> user.uid == CurrentUser.userUid } != null) &&
+    return (_uiState.value.members.any { user -> user.uid == CurrentUser.userUid }) &&
         _uiState.value.members.all { it.getRole().getRoleType() != Role.RoleType.PENDING } &&
         _uiState.value.name.isNotBlank()
   }
