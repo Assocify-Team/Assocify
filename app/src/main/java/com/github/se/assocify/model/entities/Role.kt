@@ -31,4 +31,13 @@ data class Role(val name: String) {
       else -> RoleType.PENDING
     }
   }
+
+  /**
+   * Whether the role is an active role
+   *
+   * @return whether the role is an active role
+   */
+  fun isAnActiveRole(): Boolean {
+    return getRoleType() != RoleType.PENDING
+  }
 }
