@@ -142,6 +142,7 @@ enum class EventTab(val index: Int) {
 }
 
 /** Preview of the event screen. */
+/*
 @Preview
 @Composable
 fun EventScreenPreview() {
@@ -151,8 +152,8 @@ fun EventScreenPreview() {
           "1",
           "Event 1",
           "Event 1 description",
-          "2022-01-01",
-          "2022-01-02",
+          "2022-08-01",
+          "2023-01-02",
           emptyList(),
           emptyList(),
           emptyList())
@@ -162,7 +163,7 @@ fun EventScreenPreview() {
           "Event 3",
           "Event 1 description",
           "2022-01-01",
-          "2022-01-02",
+          "2022-02-02",
           emptyList(),
           emptyList(),
           emptyList())
@@ -171,10 +172,12 @@ fun EventScreenPreview() {
           "3",
           "Event 3",
           "Event 1 description",
-          "2022-01-01",
-          "2022-01-02",
+          "2022-15-01",
+          "2022-20-02",
           emptyList(),
           emptyList(),
           emptyList())
   EventScreen(NavigationActions(rememberNavController()), event = listOf(event1, event2, event3))
 }
+
+ */
