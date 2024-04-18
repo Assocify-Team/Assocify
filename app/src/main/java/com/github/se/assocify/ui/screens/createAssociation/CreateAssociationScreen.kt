@@ -167,10 +167,10 @@ fun CreateAssociationScreen(
                         onUserDismiss = { viewmodel.dismissMemberSearch() },
                         expanded = state.searchMemberList.isNotEmpty(),
                         label = { Text("Name") },
-                        isError = viewmodel.searchError(),
+                        isError = (state.memberError != null),
                         supportingText = state.memberError?.let { { Text(it) } })
                     if (state.editMember != null) {
-                      // maybe can't select role before selecting member ?
+                      // can't select role before selecting member
                       Role.RoleType.entries
                           .filter { role -> role != Role.RoleType.PENDING }
                           .forEach { role ->
