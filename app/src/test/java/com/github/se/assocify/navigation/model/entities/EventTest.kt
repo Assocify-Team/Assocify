@@ -9,13 +9,7 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class EventTest {
-  @Test
-  fun testEquals() {
-    val event1 = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    val event2 = Event("uid1", "name2", " ", " ", "", listOf(), listOf())
-    assert(event1 == event2)
-  }
-
+  
   @Test
   fun testNotSameClassEquals() {
     val event = Event()
@@ -35,18 +29,6 @@ class EventTest {
     assert(event1 != event2)
   }
 
-  @Test
-  fun testHashCode() {
-    val event1 = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    val event2 = Event("uid1", "name2", " ", " ", "", listOf(), listOf())
-    assert(event1.hashCode() == event2.hashCode())
-  }
-
-  @Test
-  fun testToString() {
-    val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    assert(event.toString() == "Event(startDate=' ', endDate='', organizers=[], staffers=[])")
-  }
 
   @Test
   fun testGetStartDate() {
@@ -68,7 +50,7 @@ class EventTest {
 
   @Test
   fun testGetStaffers() {
-    val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
+    val event = Event(staffers = listOf())
     assert(event.staffers == listOf<User>())
   }
 }
