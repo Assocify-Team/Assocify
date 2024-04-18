@@ -16,6 +16,7 @@ import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.selectAssoc.DisplayOrganization
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
 import com.google.firebase.Firebase
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -169,7 +170,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
    */
   @Test
   fun testNavigateToHomeWithSelectButton() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent { DisplayOrganization(organization = testAssociation, navActions = mockNavActions) }
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
       organizationSelect { performClick() }
     }
