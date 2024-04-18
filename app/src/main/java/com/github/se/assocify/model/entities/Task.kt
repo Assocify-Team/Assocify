@@ -21,6 +21,6 @@ data class Task(
     val isCompleted: Boolean = false,
     val startTime: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
     val peopleNeeded: Int = 0,
-    val type: String = "Committee",
+    val category: String = "Committee",
     val location: String = "Here"
 )
