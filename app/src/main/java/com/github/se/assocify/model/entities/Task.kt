@@ -19,7 +19,7 @@ data class Task(
     val name: String = "testName",
     val description: String = "description",
     val isCompleted: Boolean = false,
-    val startTime: String = DateUtil.NULL_DATE_STRING,
+    val startTime: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
     val peopleNeeded: Int = 0,
     val type: String = "Committee",
     val location: String = "Here"
