@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.event.task
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Checkbox
@@ -21,12 +22,13 @@ fun EventTaskScreen(tasks: List<Task>) {
     tasks.forEach {
       item {
         ListItem(
+            modifier = Modifier.clickable { /*TODO: navigate to the task details screen*/},
             headlineContent = { Text(it.name) },
             supportingContent = { Text(it.category) },
             trailingContent = {
               Checkbox(
                   checked = it.isCompleted,
-                  onCheckedChange = { /*TODO what happens if the button is clicked*/},
+                  onCheckedChange = { /*TODO what happens if the checkbox is clicked*/},
               )
             },
             overlineContent = { Text(it.startTime) })

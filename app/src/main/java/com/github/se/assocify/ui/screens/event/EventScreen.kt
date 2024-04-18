@@ -52,10 +52,11 @@ fun EventScreen(
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
-        FloatingActionButton(onClick = {
-        /*TODO: adapt the action button depending on the current screen and modify it's navigations */}) {
-          Icon(imageVector = Icons.Default.Add, contentDescription = null)
-        }
+        FloatingActionButton(
+            onClick = {
+              /*TODO: adapt the action button depending on the current screen and modify it's navigations */ }) {
+              Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            }
       },
       bottomBar = {
         MainNavigationBar(
@@ -70,19 +71,19 @@ fun EventScreen(
             Tab(
                 text = { Text("Tasks") },
                 selected = currentTab == EventTab.Tasks,
-                onClick = { /*TODO*/})
+                onClick = { /*TODO: manage the switching to the next tab*/})
             Tab(
                 text = { Text("Map") },
                 selected = currentTab == EventTab.Map,
-                onClick = { /*TODO*/})
+                onClick = { /*TODO: manage the switching to the next tab*/})
             Tab(
                 text = { Text("Schedule") },
                 selected = currentTab == EventTab.Schedule,
-                onClick = { /*TODO*/})
+                onClick = { /*TODO: manage the switching to the next tab*/})
           }
-          val t1 = Task("uid1","task 1", "the task 1", true)
-          val t2 = Task("uid2","task 2", "the task 2", false)
-          val t3 = Task("uid3","task 3", "the task 3", true)
+          val t1 = Task("uid1", "task 1", "the task 1", true)
+          val t2 = Task("uid2", "task 2", "the task 2", false)
+          val t3 = Task("uid3", "task 3", "the task 3", true)
           val testTasks = listOf(t1, t2, t3)
           when (currentTab) {
             EventTab.Tasks -> EventTaskScreen(testTasks)
@@ -93,21 +94,19 @@ fun EventScreen(
       }
 }
 
-/**
- * Top bar of the event screen.
- */
+/** Top bar( of the event screen. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventTopBar() {
   CenterAlignedTopAppBar(
       title = { Text(text = "Event") },
       navigationIcon = {
-        IconButton(onClick = { /*TODO*/}) {
+        IconButton(onClick = { /*TODO: navigate to the profile page*/}) {
           Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
         }
       },
       actions = {
-        IconButton(onClick = { /*TODO*/}) {
+        IconButton(onClick = { /*TODO: apply the string filtering of the tasks*/}) {
           Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
         }
       })
@@ -125,7 +124,7 @@ fun EventFilterBar(events: List<Event>) {
       FilterChip(
           label = { Text(it.name) },
           selected = true,
-          onClick = { /*TODO*/},
+          onClick = { /*TODO: apply the filtering of the tasks of the chip*/},
           modifier = Modifier.padding(8.dp))
     }
   }
@@ -142,9 +141,7 @@ enum class EventTab(val index: Int) {
   Schedule(2)
 }
 
-/**
- * Preview of the event screen.
- */
+/** Preview of the event screen. */
 @Preview
 @Composable
 fun EventScreenPreview() {
