@@ -17,8 +17,6 @@ android {
     namespace = "com.github.se.assocify"
     compileSdk = 34
 
-
-
     defaultConfig {
         applicationId = "com.github.se.assocify"
         minSdk = 29
@@ -39,30 +37,26 @@ android {
         }
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties["SUPABASE_ANON_KEY"]}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties["SUPABASE_URL"]}\"")
-
-        val keystorePropertiesFile = rootProject.file("keystore.properties")
-
-        // Initialize a new Properties() object called keystoreProperties.
-        val keystoreProperties = Properties()
-
-        // Load your keystore.properties file into the keystoreProperties object.
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-
-        signingConfigs {
-            create("release") {
-                // You need to specify either an absolute path or include the
-                // keystore file in the same directory as the build.gradle file.
-                storeFile = file("../keystore.jks")
-                storePassword = keystoreProperties["storePassword"] as String
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-            }
-        }
-
     }
 
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
 
+    // Initialize a new Properties() object called keystoreProperties.
+    val keystoreProperties = Properties()
 
+    // Load your keystore.properties file into the keystoreProperties object.
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
+    signingConfigs {
+        create("release") {
+            // You need to specify either an absolute path or include the
+            // keystore file in the same directory as the build.gradle file.
+            storeFile = file("../keystore.jks")
+            storePassword = keystoreProperties["storePassword"] as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+        }
+    }
 
     buildTypes {
         release {
@@ -197,12 +191,12 @@ dependencies {
     //Supabase
     val supabaseVersion = "2.2.3"
     val ktorVersion = "2.3.10"
-    implementation ("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
-    implementation( "io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
-    implementation ("io.github.jan-tennert.supabase:gotrue-kt:$supabaseVersion")
-    implementation ("io.ktor:ktor-client-android:$ktorVersion")
-    implementation ("io.ktor:ktor-client-core:$ktorVersion")
-    implementation ("io.ktor:ktor-utils:$ktorVersion")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
+    implementation("io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:$supabaseVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-utils:$ktorVersion")
 
     // Mockk
     val mockkVersion = "1.13.10"
