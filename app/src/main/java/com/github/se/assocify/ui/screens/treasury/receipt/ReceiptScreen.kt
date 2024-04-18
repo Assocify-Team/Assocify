@@ -3,11 +3,12 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,8 +24,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,7 +36,9 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -46,16 +51,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.R
 import com.github.se.assocify.createImageFile
@@ -79,25 +85,34 @@ fun ReceiptScreen(
   val receiptState by viewModel.uiState.collectAsState()
 
   val context = LocalContext.current
-  val file = context.createImageFile()
-  val uri =
-      FileProvider.getUriForFile(
-          Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file)
 
-  var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
+    val tempUri = remember { mutableStateOf<Uri?>(null) }
+
+    fun getTempUri(): Uri? {
+        return FileProvider.getUriForFile(
+            Objects.requireNonNull(context),
+            BuildConfig.APPLICATION_ID + ".provider",
+            context.createImageFile()
+        )
+    }
 
   val cameraLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-        capturedImageUri = uri
+        viewModel.setImage(tempUri.value)
       }
+
+  val imagePicker =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.PickVisualMedia(),
+          onResult = { imageUri -> viewModel.setImage(imageUri) })
 
   val permissionLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
-          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-          cameraLauncher.launch(uri)
+          tempUri.value = getTempUri()
+          cameraLauncher.launch(tempUri.value)
         } else {
-          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+          viewModel.signalCameraPermissionDenied(it)
         }
       }
 
@@ -163,29 +178,26 @@ fun ReceiptScreen(
                           .aspectRatio(1f)
                           .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                      Image(
-                          modifier = Modifier.align(Alignment.Center),
-                          painter =
-                              painterResource(
-                                  id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
-                          contentDescription = "Receipt")
+                        if (receiptState.receiptImageURI != null) {
+                          AsyncImage(
+                              model = receiptState.receiptImageURI,
+                              modifier = Modifier.align(Alignment.Center),
+                              contentDescription = "receipt image",
+                          )
+                        } else {
+                          Image(
+                              modifier = Modifier.align(Alignment.Center),
+                              painter =
+                                  painterResource(
+                                      id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
+                              contentDescription = "Receipt")
+                        }
                       FilledIconButton(
                           modifier =
                               Modifier.testTag("editImageButton")
                                   .align(Alignment.BottomEnd)
                                   .padding(10.dp),
-                          onClick = {
-                            viewModel.setImage()
-                            val permissionCheckResult =
-                                ContextCompat.checkSelfPermission(
-                                    context, Manifest.permission.CAMERA)
-                            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                              cameraLauncher.launch(uri)
-                            } else {
-                              // Request a permission
-                              permissionLauncher.launch(Manifest.permission.CAMERA)
-                            }
-                          },
+                          onClick = { viewModel.showBottomSheet() },
                       ) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
                       }
@@ -238,5 +250,49 @@ fun ReceiptScreen(
 
               Spacer(modifier = Modifier.weight(1.0f))
             }
+
+        if (receiptState.showBottomSheet) {
+          ModalBottomSheet(
+              onDismissRequest = { viewModel.hideBottomSheet()}
+          ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 60.dp),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                  Text(
+                      modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                      text = "Choose option",
+                      style = MaterialTheme.typography.titleLarge,
+                      textAlign = TextAlign.Center)
+                  ListItem(
+                      modifier = Modifier.clickable {
+                          viewModel.hideBottomSheet()
+                          val permissionCheckResult =
+                              ContextCompat.checkSelfPermission(
+                                  context, Manifest.permission.CAMERA)
+                          if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                              tempUri.value = getTempUri()
+                            cameraLauncher.launch(tempUri.value)
+                          } else {
+                            permissionLauncher.launch(Manifest.permission.CAMERA)
+                          }
+                      },
+                      headlineContent = {
+                        Text(text = "Take photo", style = MaterialTheme.typography.titleMedium)
+                      },
+                      leadingContent = { Icon(Icons.Default.Camera, "Camera icon") })
+                  ListItem(
+                      modifier = Modifier.clickable {
+                          viewModel.hideBottomSheet()
+                          imagePicker.launch(
+                              PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                          )
+                      },
+                      headlineContent = {
+                        Text(text = "Select image", style = MaterialTheme.typography.titleMedium)
+                      },
+                      leadingContent = { Icon(Icons.Default.Image, "Image icon") })
+                }
+          }
+        }
       }
 }
