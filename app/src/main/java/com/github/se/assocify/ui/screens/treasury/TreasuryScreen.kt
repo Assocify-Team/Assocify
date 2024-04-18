@@ -404,10 +404,3 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
             }
       }
 }
-
-/**
- * Android Studio preview
- *
- * @Preview
- * @Composable private fun PreviewCardsScreen() { MyReceiptPage() }
- */
