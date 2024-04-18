@@ -170,7 +170,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
    */
   @Test
   fun testNavigateToHomeWithSelectButton() {
-    composeTestRule.setContent { DisplayOrganization(organization = testAssociation, navActions = mockNavActions) }
+    composeTestRule.setContent {
+      DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
+    }
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
       organizationSelect { performClick() }
     }
