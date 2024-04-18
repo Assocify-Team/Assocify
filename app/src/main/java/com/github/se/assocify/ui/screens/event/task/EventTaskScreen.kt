@@ -10,6 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.se.assocify.model.entities.Task
 
+/**
+ * A screen to display the different tasks that need to be completed for an event.
+ *
+ * @param tasks List of tasks to be displayed.
+ */
 @Composable
 fun EventTaskScreen(tasks: List<Task>) {
   LazyColumn(modifier = Modifier.fillMaxWidth()) {

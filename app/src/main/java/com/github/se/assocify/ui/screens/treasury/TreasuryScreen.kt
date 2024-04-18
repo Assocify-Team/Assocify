@@ -50,10 +50,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
@@ -74,7 +72,7 @@ enum class PageIndex(val index: Int) {
 
 /** Treasury Screen composable */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
@@ -402,16 +400,4 @@ private fun ReceiptItem(receipt: Receipt) {
           )
         }
   }
-}
-
-/**
- * Android Studio preview
- *
- * @Preview
- * @Composable private fun PreviewCardsScreen() { MyReceiptPage() }
- */
-@Preview
-@Composable
-fun TreasuryScreenPreview() {
-  TreasuryScreen(NavigationActions(rememberNavController()))
 }
