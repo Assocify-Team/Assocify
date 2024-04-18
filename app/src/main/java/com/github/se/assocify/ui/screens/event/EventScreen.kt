@@ -44,9 +44,11 @@ fun EventScreen(
 ) {
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
-      floatingActionButton = { FloatingActionButton(onClick = { /*TODO*/ }) {
-        Icon(imageVector = Icons.Default.Add, contentDescription = null)
-      }},
+      floatingActionButton = {
+        FloatingActionButton(onClick = { /*TODO*/}) {
+          Icon(imageVector = Icons.Default.Add, contentDescription = null)
+        }
+      },
       bottomBar = {
         MainNavigationBar(
             onTabSelect = { navActions.navigateToMainTab(it) },
