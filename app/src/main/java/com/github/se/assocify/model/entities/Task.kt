@@ -11,7 +11,7 @@ import com.github.se.assocify.ui.util.DateUtil
  * @param isCompleted whether the task is completed
  * @param startTime time when the task should start
  * @param peopleNeeded number of people needed to complete the task
- * @param type category of the task
+ * @param category what the task is for (catering, committee...)
  * @param location location where the task should be completed
  */
 data class Task(
