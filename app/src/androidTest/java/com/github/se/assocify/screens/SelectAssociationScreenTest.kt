@@ -17,6 +17,7 @@ import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
+import com.google.firebase.Firebase
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -60,6 +61,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
         viewBuilderAction = { hasTestTag("DisplayOrganizationScreen") }) {
   val organizationName: KNode = child { hasTestTag("OrganizationName") }
   val organizationIcon: KNode = child { hasTestTag("OrganizationIcon") }
+  val organizationSelect: KNode = child { hasTestTag("SelectIcon") }
 }
 
 /** This class represents the SelectAssociationScreen */
@@ -78,6 +80,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
   @RelaxedMockK lateinit var mockCurrentUser: CurrentUser
 
+  @RelaxedMockK lateinit var mockFirebase: Firebase
   val testAssociation =
       Association(
           "testAssociation",
@@ -91,6 +94,8 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @Before
   fun setup() {
     val exception = Exception("the test does not work")
+    CurrentUser.userUid = "adfslkj"
+    CurrentUser.associationUid = "testAssocId"
     every { mockAssocAPI.getAssociations(any(), any()) } answers
         {
           val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
@@ -158,14 +163,18 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     composeTestRule.onNodeWithText("There is no organization to display.").assertIsDisplayed()
   }
 
-  /** This test checks if the organization name and icon are displayed */
+  /**
+   * This test checks if the navigation to the home screen is triggered when selecting an
+   * organization
+   */
   @Test
-  fun testDisplayOrganization() {
+  fun testNavigateToHomeWithSelectButton() {
     composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
-      organizationName { assertIsDisplayed() }
-      organizationIcon { assertIsDisplayed() }
+      organizationSelect { performClick() }
     }
+    verify { mockNavActions.navigateTo(Destination.Home) }
+    confirmVerified(mockNavActions)
   }
 
   /* This test check if, when searching with the search bar the icons change */
