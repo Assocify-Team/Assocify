@@ -194,14 +194,6 @@ dependencies {
     val mockitoVersion = "5.11.0"
     androidTestImplementation("org.mockito:mockito-android:$mockitoVersion")
 
-    // Mockk
-
-    testImplementation("io.mockk:mockk:1.13.7")
-    testImplementation("io.mockk:mockk-android:1.13.7")
-    testImplementation("io.mockk:mockk-agent:1.13.7")
-    androidTestImplementation("io.mockk:mockk-android:1.13.7")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
-
     //Supabase
     val supabaseVersion = "2.2.3"
     val ktorVersion = "2.3.10"
