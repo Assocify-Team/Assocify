@@ -19,7 +19,7 @@ data class Event(
     val name: String = "testName",
     val description: String = "description",
     val startDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    val endDate: String = DateUtil.NULL_DATE_STRING,
+    val endDate: String = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
     val organizers: List<User> = emptyList(),
     val staffers: List<User> = emptyList(),
     val tasks: List<Task> = emptyList(),
