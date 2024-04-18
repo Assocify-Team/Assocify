@@ -35,6 +35,13 @@ import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
+/**
+ * An event screen that displays the tasks, map, and schedule of an event.
+ *
+ * @param navActions Navigation actions to navigate to other screens.
+ * @param event List of events to display.
+ * @param currentTab Current tab to display.
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun EventScreen(
@@ -45,7 +52,8 @@ fun EventScreen(
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
-        FloatingActionButton(onClick = { /*TODO*/}) {
+        FloatingActionButton(onClick = {
+        /*TODO: adapt the action button depending on the current screen and modify it's navigations */}) {
           Icon(imageVector = Icons.Default.Add, contentDescription = null)
         }
       },
@@ -72,9 +80,9 @@ fun EventScreen(
                 selected = currentTab == EventTab.Schedule,
                 onClick = { /*TODO*/})
           }
-          val t1 = Task("task 1", "the task 1", true)
-          val t2 = Task("task 2", "the task 2", false)
-          val t3 = Task("task 3", "the task 3", true)
+          val t1 = Task("uid1","task 1", "the task 1", true)
+          val t2 = Task("uid2","task 2", "the task 2", false)
+          val t3 = Task("uid3","task 3", "the task 3", true)
           val testTasks = listOf(t1, t2, t3)
           when (currentTab) {
             EventTab.Tasks -> EventTaskScreen(testTasks)
@@ -85,6 +93,9 @@ fun EventScreen(
       }
 }
 
+/**
+ * Top bar of the event screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventTopBar() {
@@ -102,6 +113,11 @@ fun EventTopBar() {
       })
 }
 
+/**
+ * Filter bar of the event screen.
+ *
+ * @param events List of events to filter.
+ */
 @Composable
 fun EventFilterBar(events: List<Event>) {
   Row() {
@@ -115,16 +131,24 @@ fun EventFilterBar(events: List<Event>) {
   }
 }
 
+/**
+ * Enum class for the event tabs.
+ *
+ * @param index Index of the tab.
+ */
 enum class EventTab(val index: Int) {
   Tasks(0),
   Map(1),
   Schedule(2)
 }
 
+/**
+ * Preview of the event screen.
+ */
 @Preview
 @Composable
 fun EventScreenPreview() {
-  val t1 = Task("task 1", "the task 1", true)
+  val t1 = Task("uid", "the task 1", "a short description", true)
   val event1 =
       Event(
           "1",

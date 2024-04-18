@@ -7,4 +7,5 @@ import androidx.compose.runtime.Composable
 @Composable
 fun EventMapScreen() {
   Text("This functionality has yet to be implemented")
+  /*TODO: Implement the map screen*/
 }

@@ -7,4 +7,5 @@ import androidx.compose.runtime.Composable
 @Composable
 fun EventScheduleScreen() {
   Text("This functionality has yet to be implemented")
+  /*TODO: Implement the schedule screen*/
 }
