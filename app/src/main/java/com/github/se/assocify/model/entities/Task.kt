@@ -1,7 +1,5 @@
 package com.github.se.assocify.model.entities
 
-import com.github.se.assocify.ui.util.DateUtil
-
 /**
  * Data class representing a task that needs to be completed
  *

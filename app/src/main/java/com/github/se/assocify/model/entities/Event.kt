@@ -1,7 +1,5 @@
 package com.github.se.assocify.model.entities
 
-import com.github.se.assocify.ui.util.DateUtil
-
 /**
  * Data class representing an event of an association
  *
@@ -19,7 +17,8 @@ data class Event(
     val name: String = "testName",
     val description: String = "description",
     val startDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    val endDate: String = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+    val endDate: String =
+        LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
     val organizers: List<User> = emptyList(),
     val staffers: List<User> = emptyList(),
     val tasks: List<Task> = emptyList(),
