@@ -8,6 +8,9 @@ plugins {
     id("org.sonarqube") version "4.4.1.3373"
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+
+    // Supabase
+    kotlin("plugin.serialization") version "1.9.23"
 }
 
 android {
@@ -25,6 +28,15 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // SUPABASE CONFIG
+        val propertiesFile = rootProject.file("local.properties")
+        val properties = Properties()
+        if (propertiesFile.exists()) {
+            properties.load(FileInputStream(propertiesFile))
+        }
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties["SUPABASE_ANON_KEY"]}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${properties["SUPABASE_URL"]}\"")
     }
 
     val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -45,7 +57,6 @@ android {
             keyPassword = keystoreProperties["keyPassword"] as String
         }
     }
-
 
     buildTypes {
         release {
@@ -70,6 +81,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -175,6 +187,16 @@ dependencies {
     // Mockito
     val mockitoVersion = "5.11.0"
     androidTestImplementation("org.mockito:mockito-android:$mockitoVersion")
+
+    //Supabase
+    val supabaseVersion = "2.2.3"
+    val ktorVersion = "2.3.10"
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
+    implementation("io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:$supabaseVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-utils:$ktorVersion")
 
     // Mockk
     val mockkVersion = "1.13.10"
