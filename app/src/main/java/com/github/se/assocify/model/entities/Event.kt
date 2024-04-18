@@ -1,5 +1,8 @@
 package com.github.se.assocify.model.entities
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 /**
  * Data class representing an event of an association
  *
