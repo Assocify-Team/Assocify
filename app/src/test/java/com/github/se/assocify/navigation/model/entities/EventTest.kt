@@ -51,24 +51,24 @@ class EventTest {
   @Test
   fun testGetStartDate() {
     val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    assert(event.getStartDate() == " ")
+    assert(event.startDate == " ")
   }
 
   @Test
   fun testGetEndDate() {
     val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    assert(event.getEndDate() == "")
+    assert(event.endDate == "")
   }
 
   @Test
   fun testGetOrganizers() {
     val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    assert(event.getOrganizers() == listOf<User>())
+    assert(event.organizers == listOf<User>())
   }
 
   @Test
   fun testGetStaffers() {
     val event = Event("uid1", "name1", " ", " ", "", listOf(), listOf())
-    assert(event.getStaffers() == listOf<User>())
+    assert(event.staffers == listOf<User>())
   }
 }
