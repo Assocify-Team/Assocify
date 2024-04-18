@@ -94,81 +94,96 @@ android {
 }
 
 dependencies {
+    // When using the BoM, don't specify versions in order to use latest of each in library
 
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    //Add the dependency for the Firebase SDK for Google Analytics
-    implementation("com.google.firebase:firebase-analytics")
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1")) // Firebase BoM
+    implementation("com.google.firebase:firebase-analytics") // google analytics
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth-ktx") // authentication
+    implementation("com.google.firebase:firebase-database-ktx") // database
 
+    // Google Authentication
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
+    // Google Maps
+    val mapsComposeVersion = "4.3.3"
+    implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
+    implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    // Androidx
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.appcompat:appcompat:1.6.1") // access to newer API from older API
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
+    // Material Design 3
     implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.compose.material3:material3-android:1.2.1")
-    implementation("androidx.navigation:navigation-compose:2.6.0-rc01")
-    implementation("io.coil-kt:coil-compose:2.0.0")
-    implementation("androidx.compose.ui:ui:1.6.4")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.4")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.material:material-icons-extended") // extra icons
 
-    implementation("com.google.maps.android:maps-compose:4.3.0")
-    implementation("com.google.maps.android:maps-compose-utils:4.3.0")
+    // Navigation
+    val navVersion = "2.7.7"
+    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-compose:$navVersion") // compose
 
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
-    implementation(platform("androidx.compose:compose-bom:2024.03.00"))
+    // Coil (image loading)
+    val coilVersion = "2.0.0"
+    implementation("io.coil-kt:coil-compose:$coilVersion")
+
+    // OkHttp
+    val okHttpVersion = "4.12.0"
+    implementation("com.squareup.okhttp3:okhttp:$okHttpVersion")
+
+    // JSON Serialization
+    val serializationVersion = "1.6.2"
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+
+    // Compose
+    implementation(platform("androidx.compose:compose-bom:2024.04.00"))
+    implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
-    implementation("com.google.android.gms:play-services-auth:21.0.0")
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
-    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
-    // Junit
-    testImplementation("junit:junit:4.13.2")
+    implementation("androidx.compose.ui:ui-tooling-preview")
 
+    // Junit & Testing
+    testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.03.00"))
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.4")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Espresso
+    val espressoVersion = "3.5.1"
+    androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
     // Kaspresso
-    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
-    // Allure support
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:1.4.3")
-    // Jetpack Compose support
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.4.1")
+    val kaspressoVersion = "1.4.3"
+    androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspressoVersion")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspressoVersion") // allure support
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspressoVersion") // compose support
 
-    // Support for intents in instrumented tests
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
-
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-
-    implementation("com.squareup.okhttp3:okhttp:3.14.9")
+    // Robolectric
+    val robolectricVersion = "4.11.1"
+    testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
     // Mockito
-    androidTestImplementation("org.mockito:mockito-android:5.11.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-
-    // Roboelectric
-    testImplementation("org.robolectric:robolectric:4.11.1")
+    val mockitoVersion = "5.11.0"
+    androidTestImplementation("org.mockito:mockito-android:$mockitoVersion")
 
     // Mockk
-    testImplementation("io.mockk:mockk:1.13.10")
-    testImplementation("io.mockk:mockk-android:1.13.10")
-    testImplementation("io.mockk:mockk-agent:1.13.10")
-    androidTestImplementation("io.mockk:mockk-android:1.13.10")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.10")
+    val mockkVersion = "1.13.10"
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("io.mockk:mockk-android:$mockkVersion")
+    testImplementation("io.mockk:mockk-agent:$mockkVersion")
+    androidTestImplementation("io.mockk:mockk-android:$mockkVersion")
+    androidTestImplementation("io.mockk:mockk-agent:$mockkVersion")
+
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
@@ -187,14 +202,14 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         "**/*Test*.*",
         "android/**/*.*",
     )
-    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
+    val debugTree = fileTree("${project.layout.buildDirectory}/tmp/kotlin-classes/debug") {
         exclude(fileFilter)
     }
     val mainSrc = "${project.projectDir}/src/main/java"
 
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree(project.buildDir) {
+    executionData.setFrom(fileTree(project.layout.buildDirectory) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })

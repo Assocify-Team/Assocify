@@ -2,7 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.database.ReceiptsAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
@@ -23,16 +23,17 @@ class ReceiptViewModel {
   private val NEW_RECEIPT_TITLE = "New Receipt"
   private val EDIT_RECEIPT_TITLE = "Edit Receipt"
 
-  private val receiptApi: ReceiptsAPI
+  private val receiptApi: ReceiptAPI
   private val navActions: NavigationActions
+  private val receiptUid: String
 
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
 
   constructor(
       navActions: NavigationActions,
-      receiptApi: ReceiptsAPI =
-          ReceiptsAPI(
+      receiptApi: ReceiptAPI =
+          ReceiptAPI(
               userId = CurrentUser.userUid!!,
               basePath = "associations/" + CurrentUser.associationUid!!,
               storage = Firebase.storage,
@@ -40,6 +41,7 @@ class ReceiptViewModel {
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
+    this.receiptUid = receiptApi.getNewId()
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = true, pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
   }
@@ -47,8 +49,8 @@ class ReceiptViewModel {
   constructor(
       receiptUid: String,
       navActions: NavigationActions,
-      receiptApi: ReceiptsAPI =
-          ReceiptsAPI(
+      receiptApi: ReceiptAPI =
+          ReceiptAPI(
               userId = CurrentUser.userUid!!,
               basePath = "associations/" + CurrentUser.associationUid!!,
               storage = Firebase.storage,
@@ -56,6 +58,7 @@ class ReceiptViewModel {
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
+    this.receiptUid = receiptUid
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
 
@@ -144,7 +147,7 @@ class ReceiptViewModel {
 
     val receipt =
         Receipt(
-            uid = receiptApi.getNewId(),
+            uid = receiptUid,
             title = _uiState.value.title,
             description = _uiState.value.description,
             cents = PriceUtil.toCents(_uiState.value.amount),
@@ -181,7 +184,7 @@ class ReceiptViewModel {
       navActions.back()
     } else {
       receiptApi.deleteReceipt(
-          id = "",
+          id = receiptUid,
           onSuccess = { navActions.back() },
           onFailure = { _ ->
             CoroutineScope(Dispatchers.Main).launch {

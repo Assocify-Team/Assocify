@@ -27,7 +27,9 @@ sealed class Destination(
 
   data object CreateAsso : Destination("login/createAsso")
 
-  data object Receipt : Destination("treasury/receipt")
+  data object NewReceipt : Destination("treasury/receipt")
+
+  data class EditReceipt(val receiptUid: String) : Destination("treasury/receipt/$receiptUid")
 }
 
 val MAIN_TABS_LIST =
