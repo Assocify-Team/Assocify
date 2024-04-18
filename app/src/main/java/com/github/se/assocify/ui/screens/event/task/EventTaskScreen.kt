@@ -24,7 +24,7 @@ fun EventTaskScreen(tasks: List<Task>) {
         ListItem(
             modifier = Modifier.clickable { /*TODO: navigate to the task details screen*/},
             headlineContent = { Text(it.name) },
-            supportingContent = { Text(it.category) },
+            supportingContent = { Text(it.type) },
             trailingContent = {
               Checkbox(
                   checked = it.isCompleted,

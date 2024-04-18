@@ -40,6 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  * @param event List of events to display.
  * @param currentTab Current tab to display.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun EventScreen(
@@ -62,7 +63,20 @@ fun EventScreen(
             tabList = MAIN_TABS_LIST,
             selectedTab = Destination.Event)
       },
-      topBar = { EventTopBar() }) {
+      topBar = {
+        CenterAlignedTopAppBar(
+            title = { Text(text = "Event") },
+            navigationIcon = {
+              IconButton(onClick = { /*TODO: navigate to the profile page*/}) {
+                Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
+              }
+            },
+            actions = {
+              IconButton(onClick = { /*TODO: apply the string filtering of the tasks*/}) {
+                Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+              }
+            })
+      }) {
         Column(modifier = Modifier.padding(it)) {
           EventFilterBar(events = event)
           TabRow(selectedTabIndex = currentTab.index) {
@@ -90,24 +104,6 @@ fun EventScreen(
           }
         }
       }
-}
-
-/** Top bar( of the event screen. */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EventTopBar() {
-  CenterAlignedTopAppBar(
-      title = { Text(text = "Event") },
-      navigationIcon = {
-        IconButton(onClick = { /*TODO: navigate to the profile page*/}) {
-          Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
-        }
-      },
-      actions = {
-        IconButton(onClick = { /*TODO: apply the string filtering of the tasks*/}) {
-          Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
-        }
-      })
 }
 
 /**
