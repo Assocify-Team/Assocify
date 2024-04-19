@@ -87,19 +87,14 @@ fun ReceiptScreen(
 
   val tempUri = remember { mutableStateOf<Uri?>(null) }
 
-    fun getTempUri(): Uri? {
-        val file = File.createTempFile(
-            "image_" + System.currentTimeMillis().toString(),
-            ".jpg",
-            context.externalCacheDir
-        )
+  fun getTempUri(): Uri? {
+    val file =
+        File.createTempFile(
+            "image_" + System.currentTimeMillis().toString(), ".jpg", context.externalCacheDir)
 
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context),
-            BuildConfig.APPLICATION_ID + ".provider",
-            file
-        )
-    }
+    return FileProvider.getUriForFile(
+        Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file)
+  }
 
   val cameraLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
