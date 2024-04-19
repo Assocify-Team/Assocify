@@ -34,8 +34,7 @@ import java.io.File
 import java.util.Objects
 
 /**
- * A modal bottom sheet with options to take a photo or select an image
- * from the gallery.
+ * A modal bottom sheet with options to take a photo or select an image from the gallery.
  *
  * @param visible whether the sheet should be visible
  * @param hideSheet a callback to hide the sheet
