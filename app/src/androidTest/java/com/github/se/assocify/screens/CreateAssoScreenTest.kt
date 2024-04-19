@@ -1,6 +1,10 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -9,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
@@ -44,7 +49,9 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           User("10", "seb", Role("")))
 
   private val mockNavActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val mockAssocAPI = mockk<AssociationAPI>()
+  private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true) {
+    every { getNewId() } answers { "1" }
+  }
   private val mockUserAPI =
       mockk<UserAPI> {
         every { getAllUsers(any(), any()) } answers
@@ -124,11 +131,32 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("addMember").performClick()
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       onNodeWithTag("userDropdownItem-1").performClick() // jean
+      onNodeWithTag("role-PRESIDENCE").assertIsDisplayed()
+      onNodeWithTag("role-PRESIDENCE").performClick()
+      assert(bigView.uiState.value.editMember!!.hasRole("PRESIDENCE"))
+      onNodeWithTag("addMemberButton").performClick()
+      onNodeWithTag("create").assertHasClickAction()
+      onNodeWithTag("create").assertIsEnabled()
+      onNodeWithTag("create").performClick()
+      verify { mockAssocAPI.addAssociation(any(), any(), any()) }
+    }
+  }
+
+  @Test
+  fun testCantCreateAsso() {
+    with(composeTestRule) {
+      onNodeWithTag("name").performTextInput("assoName")
+      onNodeWithTag("create").assertIsNotEnabled()
+      onNodeWithTag("addMember").performClick()
+      onNodeWithTag("memberSearchField").performClick().performTextInput("j")
+      onNodeWithTag("userDropdownItem-1").performClick() // jean
+      onNodeWithTag("addMemberButton").performClick()
+      onNodeWithTag("create").assertIsNotEnabled()
+      onNodeWithTag("editMember-jean").performClick()
       onNodeWithTag("role-PRESIDENCE").performClick()
       onNodeWithTag("addMemberButton").performClick()
-
       onNodeWithTag("create").performClick()
-      // check that the asso is created
+      verify { mockAssocAPI.addAssociation(any(), any(), any()) }
     }
   }
 
