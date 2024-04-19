@@ -11,11 +11,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
@@ -84,9 +82,12 @@ fun ProfileScreen(navActions: NavigationActions) {
                   Text("Role", modifier = Modifier.testTag("profileRole"))
                 }
 
-                IconButton(onClick = { /*TODO modify profile infos */}, modifier = Modifier.testTag("editProfile")) {
-                  Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit Profile Icon")
-                }
+                IconButton(
+                    onClick = { /*TODO modify profile infos */},
+                    modifier = Modifier.testTag("editProfile")) {
+                      Icon(
+                          imageVector = Icons.Filled.Edit, contentDescription = "Edit Profile Icon")
+                    }
               }
 
           ExposedDropdownMenuBox(
@@ -124,9 +125,9 @@ fun ProfileScreen(navActions: NavigationActions) {
           Column {
             ListItem(
                 leadingContent = {
-                    Icon(
-                        imageVector = Icons.Default.LightMode,
-                        contentDescription = "manage roles icon")
+                  Icon(
+                      imageVector = Icons.Default.LightMode,
+                      contentDescription = "manage roles icon")
                 },
                 headlineContent = { Text(text = "Theme") },
                 trailingContent = {
@@ -140,9 +141,7 @@ fun ProfileScreen(navActions: NavigationActions) {
                 modifier = Modifier.testTag("Theme"))
             ListItem(
                 leadingContent = {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = "manage roles icon")
+                  Icon(imageVector = Icons.Default.Lock, contentDescription = "manage roles icon")
                 },
                 headlineContent = { Text(text = "Privacy/Security") },
                 trailingContent = {
@@ -156,9 +155,9 @@ fun ProfileScreen(navActions: NavigationActions) {
                 modifier = Modifier.testTag("Privacy"))
             ListItem(
                 leadingContent = {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "manage roles icon")
+                  Icon(
+                      imageVector = Icons.Default.Notifications,
+                      contentDescription = "manage roles icon")
                 },
                 headlineContent = { Text(text = "Notifications") },
                 trailingContent = {
@@ -177,9 +176,7 @@ fun ProfileScreen(navActions: NavigationActions) {
           Column {
             ListItem(
                 leadingContent = {
-                    Icon(
-                        imageVector = Icons.Default.People,
-                        contentDescription = "manage roles icon")
+                  Icon(imageVector = Icons.Default.People, contentDescription = "manage roles icon")
                 },
                 headlineContent = { Text(text = "Members") },
                 trailingContent = {
@@ -210,10 +207,11 @@ fun ProfileScreen(navActions: NavigationActions) {
           }
 
           TextButton(
-              onClick = { /*TODO*/ },
+              onClick = { /*TODO*/},
               modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
               contentPadding = ButtonDefaults.TextButtonContentPadding,
-              colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+              colors =
+                  ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Logout,
                     contentDescription = "Log out Icon")

@@ -32,7 +32,20 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   @Test
   fun display() {
-    with(composeTestRule) { onNodeWithTag("profileScreen").assertIsDisplayed() }
+    with(composeTestRule) {
+      onNodeWithTag("profileScreen").assertIsDisplayed()
+      onNodeWithTag("profilePicture").assertIsDisplayed()
+      onNodeWithTag("profileName").assertIsDisplayed()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithTag("editProfile").assertIsDisplayed()
+      onNodeWithTag("associationDropdown").assertIsDisplayed()
+      onNodeWithTag("Theme").assertIsDisplayed()
+      onNodeWithTag("Privacy").assertIsDisplayed()
+      onNodeWithTag("Notifications").assertIsDisplayed()
+      onNodeWithTag("manageMembers").assertIsDisplayed()
+      onNodeWithTag("manageRoles").assertIsDisplayed()
+      onNodeWithTag("logoutButton").assertIsDisplayed()
+    }
   }
 
   @Test
