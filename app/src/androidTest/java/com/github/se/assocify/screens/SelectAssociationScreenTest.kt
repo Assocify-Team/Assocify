@@ -178,9 +178,10 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
       organizationSelect {
         assertIsDisplayed()
-        performClick() }
+        performClick()
+      }
     }
-    //verify(timeout = 250) { mockNavActions.navigateTo(Destination.Home) }
+    // verify(timeout = 250) { mockNavActions.navigateTo(Destination.Home) }
   }
 
   /**
@@ -194,7 +195,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     }
     composeTestRule.onNodeWithTag("DisplayOrganizationScreen").performClick()
   }
-
 
   /* This test check if, when searching with the search bar the icons change */
   @Test
