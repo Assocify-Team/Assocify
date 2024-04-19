@@ -33,6 +33,15 @@ import com.github.se.assocify.BuildConfig
 import java.io.File
 import java.util.Objects
 
+/**
+ * A modal bottom sheet with options to take a photo or select an image
+ * from the gallery.
+ *
+ * @param visible whether the sheet should be visible
+ * @param hideSheet a callback to hide the sheet
+ * @param setImageUri a callback to set the image URI
+ * @param signalCameraPermissionDenied a callback to signal that the camera permission was denied
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoSelectionSheet(
