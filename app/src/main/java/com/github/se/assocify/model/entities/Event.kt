@@ -1,46 +1,15 @@
 package com.github.se.assocify.model.entities
 
+import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Event(
-    val uid: String = "",
-    private val name: String = "",
-    private val description: String = "",
-    private val startDate: String,
-    private val endDate: String,
-    private val organizers: List<User>,
-    private val staffers: List<User>
-) {
-  constructor() : this("", "", "", "", "", listOf(), listOf())
-
-  override fun equals(other: Any?): Boolean {
-    if (other?.javaClass != this.javaClass) {
-      return false
-    }
-    if (this === other) return true
-    other as Event
-    return uid == other.uid
-  }
-
-  override fun hashCode(): Int {
-    return startDate.hashCode()
-  }
-
-  override fun toString(): String {
-    return "Event(startDate='$startDate', endDate='$endDate', organizers=$organizers, staffers=$staffers)"
-  }
-
-  fun getStartDate(): String {
-    return startDate
-  }
-
-  fun getEndDate(): String {
-    return endDate
-  }
-
-  fun getOrganizers(): List<User> {
-    return organizers
-  }
-
-  fun getStaffers(): List<User> {
-    return staffers
-  }
-}
+    val uid: String,
+    private val name: String,
+    private val description: String,
+    private val startDate: LocalDate,
+    private val endDate: LocalDate,
+    private val guestsOrArtists: List<String>,
+    private val location: String
+    )
