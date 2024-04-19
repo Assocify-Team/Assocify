@@ -1,9 +1,12 @@
 package com.github.se.assocify.ui.screens.event
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -14,11 +17,13 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -31,7 +36,19 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.event.map.EventMapScreen
 import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
+import kotlinx.coroutines.launch
+
+// Index of each tag for navigation
+enum class EventPageIndex(val index: Int) {
+  TASKS(0),
+  MAP(1),
+  SCHEDULE(2);
+
+  companion object {
+    val NUMBER_OF_PAGES: Int = entries.size
+  }
+}
 
 /**
  * An event screen that displays the tasks, map, and schedule of an event.
@@ -40,13 +57,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  * @param event List of events to display.
  * @param currentTab Current tab to display.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun EventScreen(
     navActions: NavigationActions,
     event: List<Event> = emptyList(),
-    currentTab: EventTab = EventTab.Tasks
+    currentTab: EventPageIndex = EventPageIndex.TASKS
 ) {
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
@@ -78,32 +95,69 @@ fun EventScreen(
             })
       }) {
         Column(modifier = Modifier.padding(it)) {
+          val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
+          val coroutineRoute = rememberCoroutineScope()
+
           EventFilterBar(events = event)
           TabRow(selectedTabIndex = currentTab.index) {
-            Tab(
-                text = { Text("Tasks") },
-                selected = currentTab == EventTab.Tasks,
-                onClick = { /*TODO: manage the switching to the next tab*/})
-            Tab(
-                text = { Text("Map") },
-                selected = currentTab == EventTab.Map,
-                onClick = { /*TODO: manage the switching to the next tab*/})
-            Tab(
-                text = { Text("Schedule") },
-                selected = currentTab == EventTab.Schedule,
-                onClick = { /*TODO: manage the switching to the next tab*/})
+            EventTab(
+                text = "Tasks",
+                modifier = Modifier.testTag("tasksTab"),
+                selected = pagerState.currentPage == EventPageIndex.TASKS.index,
+                onClick = {
+                  coroutineRoute.launch {
+                    pagerState.animateScrollToPage(EventPageIndex.TASKS.index)
+                  }
+                })
+            EventTab(
+                text = "Map",
+                modifier = Modifier.testTag("mapTab"),
+                selected = pagerState.currentPage == EventPageIndex.MAP.index,
+                onClick = {
+                  coroutineRoute.launch { pagerState.animateScrollToPage(EventPageIndex.MAP.index) }
+                })
+            EventTab(
+                text = "Schedule",
+                modifier = Modifier.testTag("scheduleTab"),
+                selected = pagerState.currentPage == EventPageIndex.SCHEDULE.index,
+                onClick = {
+                  coroutineRoute.launch {
+                    pagerState.animateScrollToPage(EventPageIndex.SCHEDULE.index)
+                  }
+                })
           }
           val t1 = Task("uid1", "task 1", "the task 1", true)
           val t2 = Task("uid2", "task 2", "the task 2", false)
           val t3 = Task("uid3", "task 3", "the task 3", true)
           val testTasks = listOf(t1, t2, t3)
-          when (currentTab) {
-            EventTab.Tasks -> EventTaskScreen(testTasks)
-            EventTab.Map -> EventMapScreen()
-            EventTab.Schedule -> EventScheduleScreen()
+          HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
+            when (page) {
+              TreasuryPageIndex.RECEIPT.index -> EventTaskScreen(testTasks)
+              TreasuryPageIndex.BUDGET.index -> EventMapScreen()
+              TreasuryPageIndex.BALANCE.index -> EventScheduleScreen()
+            }
           }
         }
       }
+}
+
+/** Tab of the event screen */
+@Composable
+fun EventTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
+  Tab(
+      selected = selected,
+      onClick = onClick,
+      text = {
+        Text(
+            text = text,
+            color =
+                if (selected) {
+                  MaterialTheme.colorScheme.primary
+                } else {
+                  MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                })
+      },
+      modifier = modifier)
 }
 
 /**
@@ -124,19 +178,8 @@ fun EventFilterBar(events: List<Event>) {
   }
 }
 
-/**
- * Enum class for the event tabs.
- *
- * @param index Index of the tab.
- */
-enum class EventTab(val index: Int) {
-  Tasks(0),
-  Map(1),
-  Schedule(2)
-}
-
-/** Preview of the event screen. */
 /*
+/** Preview of the event screen. */
 @Preview
 @Composable
 fun EventScreenPreview() {
@@ -173,5 +216,4 @@ fun EventScreenPreview() {
           emptyList())
   EventScreen(NavigationActions(rememberNavController()), event = listOf(event1, event2, event3))
 }
-
- */
+*/
