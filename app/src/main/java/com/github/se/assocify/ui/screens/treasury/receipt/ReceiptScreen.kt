@@ -63,9 +63,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.github.se.assocify.BuildConfig
-import com.github.se.assocify.createImageFile
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
+import java.io.File
 import java.util.Objects
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,12 +87,19 @@ fun ReceiptScreen(
 
   val tempUri = remember { mutableStateOf<Uri?>(null) }
 
-  fun getTempUri(): Uri? {
-    return FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        BuildConfig.APPLICATION_ID + ".provider",
-        context.createImageFile())
-  }
+    fun getTempUri(): Uri? {
+        val file = File.createTempFile(
+            "image_" + System.currentTimeMillis().toString(),
+            ".jpg",
+            context.externalCacheDir
+        )
+
+        return FileProvider.getUriForFile(
+            Objects.requireNonNull(context),
+            BuildConfig.APPLICATION_ID + ".provider",
+            file
+        )
+    }
 
   val cameraLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
