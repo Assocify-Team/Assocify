@@ -124,15 +124,12 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
       filter: (User) -> Boolean
   ) {
     db.collection(collectionName)
+        .document(assocId)
         .get()
         .addOnSuccessListener {
-          val users =
-              it.documents
-                  .map { document -> document.toObject(Association::class.java)!! }
-                  .map { association -> association.getMembers() }
-                  .flatten()
-                  .filter { user -> filter(user) }
-          onSuccess(users)
+          val doc =
+              it.toObject(Association::class.java)!!.getMembers().filter { user -> filter(user) }
+          onSuccess(doc)
         }
         .addOnFailureListener { onFailure(it) }
   }
