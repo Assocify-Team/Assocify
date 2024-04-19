@@ -77,14 +77,14 @@ fun ProfileScreen(navActions: NavigationActions) {
               horizontalArrangement = Arrangement.SpaceBetween) {
 
                 // profile picture
-                Text(text = "Profile Picture")
+                Text(text = "Profile Picture", modifier = Modifier.testTag("profilePicture"))
 
                 Column {
-                  Text("Name")
-                  Text("Role")
+                  Text("Name", modifier = Modifier.testTag("profileName"))
+                  Text("Role", modifier = Modifier.testTag("profileRole"))
                 }
 
-                IconButton(onClick = { /*TODO modify profile infos */}) {
+                IconButton(onClick = { /*TODO modify profile infos */}, modifier = Modifier.testTag("editProfile")) {
                   Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit Profile Icon")
                 }
               }
@@ -94,7 +94,7 @@ fun ProfileScreen(navActions: NavigationActions) {
               onExpandedChange = {
                 /*expanded = !expanded*/
               },
-              modifier = Modifier.fillMaxWidth()) {
+              modifier = Modifier.fillMaxWidth().testTag("associationDropdown")) {
                 TextField(
                     value = "oui" /*selectedText*/,
                     onValueChange = {},
@@ -136,7 +136,8 @@ fun ProfileScreen(navActions: NavigationActions) {
                 },
                 colors =
                     ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+                        containerColor = MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier.testTag("Theme"))
             ListItem(
                 leadingContent = {
                     Icon(
@@ -151,7 +152,8 @@ fun ProfileScreen(navActions: NavigationActions) {
                 },
                 colors =
                     ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+                        containerColor = MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier.testTag("Privacy"))
             ListItem(
                 leadingContent = {
                     Icon(
@@ -166,7 +168,8 @@ fun ProfileScreen(navActions: NavigationActions) {
                 },
                 colors =
                     ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+                        containerColor = MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier.testTag("Notifications"))
           }
 
           Text(text = "Manage ${"Association"}")
@@ -186,7 +189,8 @@ fun ProfileScreen(navActions: NavigationActions) {
                 },
                 colors =
                     ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+                        containerColor = MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier.testTag("manageMembers"))
             ListItem(
                 leadingContent = {
                   Icon(
@@ -201,12 +205,13 @@ fun ProfileScreen(navActions: NavigationActions) {
                 },
                 colors =
                     ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+                        containerColor = MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier.testTag("manageRoles"))
           }
 
           TextButton(
               onClick = { /*TODO*/ },
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
               contentPadding = ButtonDefaults.TextButtonContentPadding,
               colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
                 Icon(
