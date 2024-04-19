@@ -16,6 +16,7 @@ import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.selectAssoc.DisplayOrganization
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
 import com.google.firebase.Firebase
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -167,7 +168,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
    * This test checks if the navigation to the home screen is triggered when selecting an
    * organization
    */
-  /*@Test
+  @Test
   fun testNavigateToHomeWithSelectButton() {
     composeTestRule.setContent {
       DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
@@ -176,7 +177,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       organizationSelect { performClick() }
     }
     verify { mockNavActions.navigateTo(Destination.Home) }
-  }*/
+  }
 
   /* This test check if, when searching with the search bar the icons change */
   @Test
