@@ -17,6 +17,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -25,9 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.Destination
@@ -101,23 +100,26 @@ fun EventScreen(
 
           EventFilterBar(events = event)
           TabRow(selectedTabIndex = currentTab.index) {
-            Tab(
-                text = { Text("Tasks") },
-                selected = currentTab == EventPageIndex.TASKS,
+            EventTab(
+                text = "Tasks",
+                modifier = Modifier.testTag("tasksTab"),
+                selected = pagerState.currentPage == EventPageIndex.TASKS.index,
                 onClick = {
                   coroutineRoute.launch {
                     pagerState.animateScrollToPage(EventPageIndex.TASKS.index)
                   }
                 })
-            Tab(
-                text = { Text("Map") },
-                selected = currentTab == EventPageIndex.MAP,
+            EventTab(
+                text = "Map",
+                modifier = Modifier.testTag("mapTab"),
+                selected = pagerState.currentPage == EventPageIndex.MAP.index,
                 onClick = {
                   coroutineRoute.launch { pagerState.animateScrollToPage(EventPageIndex.MAP.index) }
                 })
-            Tab(
-                text = { Text("Schedule") },
-                selected = currentTab == EventPageIndex.SCHEDULE,
+            EventTab(
+                text = "Schedule",
+                modifier = Modifier.testTag("scheduleTab"),
+                selected = pagerState.currentPage == EventPageIndex.SCHEDULE.index,
                 onClick = {
                   coroutineRoute.launch {
                     pagerState.animateScrollToPage(EventPageIndex.SCHEDULE.index)
@@ -139,6 +141,25 @@ fun EventScreen(
       }
 }
 
+/** Tab of the event screen */
+@Composable
+fun EventTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
+  Tab(
+      selected = selected,
+      onClick = onClick,
+      text = {
+        Text(
+            text = text,
+            color =
+                if (selected) {
+                  MaterialTheme.colorScheme.primary
+                } else {
+                  MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                })
+      },
+      modifier = modifier)
+}
+
 /**
  * Filter bar of the event screen.
  *
@@ -157,6 +178,7 @@ fun EventFilterBar(events: List<Event>) {
   }
 }
 
+/*
 /** Preview of the event screen. */
 @Preview
 @Composable
@@ -194,3 +216,4 @@ fun EventScreenPreview() {
           emptyList())
   EventScreen(NavigationActions(rememberNavController()), event = listOf(event1, event2, event3))
 }
+*/
