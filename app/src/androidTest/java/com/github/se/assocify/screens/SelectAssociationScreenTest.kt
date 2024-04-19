@@ -49,7 +49,6 @@ class SelectAssociationScreenTest(semanticsProvider: SemanticsNodeInteractionsPr
   val createOrgaButton: KNode = child { hasTestTag("CreateNewOrganizationButton") }
   val searchOrgaButton: KNode = onNode { hasTestTag("SOB") }
   val arrowBackButton: KNode = onNode { hasTestTag("ArrowBackButton") }
-  val helloText: KNode = onNode { hasTestTag("HelloText") }
 }
 
 /**
