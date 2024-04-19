@@ -18,11 +18,11 @@ fun Budget() {
 }
 
 @Composable
-fun DisplayBudgetLine(){
+fun DisplayBudgetLine(category: String, amount: String){
     ListItem(
-        headlineContent = { /*title*/},
+        headlineContent = { Text(category) },
         trailingContent = { /*total amount*/},
-        modifier = Modifier.clickable{ /*TODO*/}
+        modifier = Modifier.clickable{ /*TODO: open screen of the selected budget category*/}
     )
 
 }
