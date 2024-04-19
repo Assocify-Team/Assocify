@@ -7,8 +7,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -16,12 +21,12 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,99 +50,139 @@ fun ProfileScreen(navActions: NavigationActions) {
             selectedTab = Destination.Profile)
       },
       topBar = {
-          CenterAlignedTopAppBar(
-              title = { Text("Profile") },
-              navigationIcon = {
-                  IconButton(onClick = { /* TODO onAssoClick ?? */ }) {
-                      Icon(
-                          imageVector = Icons.Filled.AccountCircle,
-                          contentDescription = "Association Profile Icon"
-                      )
-                  }
+        CenterAlignedTopAppBar(
+            title = { Text("Profile") },
+            navigationIcon = {
+              IconButton(onClick = { /* TODO onAssoClick ?? */}) {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "Association Profile Icon")
               }
-          )
+            })
       },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp),
-      ) { innerPadding ->
-          Column(modifier = Modifier.padding(innerPadding), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+  ) { innerPadding ->
+    Column(
+        modifier = Modifier.padding(innerPadding),
+        verticalArrangement = Arrangement.spacedBy(16.dp)) {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(16.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.SpaceBetween) {
 
-              Row(
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(16.dp),
-                  verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                // profile picture
+                Text(text = "Profile Picture")
 
-              ) {
-                  // profile picture
-                  Text(text = "Profile Picture")
+                Column {
+                  Text("Name")
+                  Text("Role")
+                }
 
-                  Column {
-                        Text("Name")
-                        Text("Role")
-                  }
-
-                  IconButton(onClick = { /*TODO modify profile infos */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Edit,
-                            contentDescription = "Edit Profile Icon"
-                        )
-                  }
+                IconButton(onClick = { /*TODO modify profile infos */}) {
+                  Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit Profile Icon")
+                }
               }
 
-              ExposedDropdownMenuBox(
-                  expanded = false /*expanded*/,
-                  onExpandedChange = {
-                      /*expanded = !expanded*/
-                  },
-                  modifier = Modifier.fillMaxWidth()
-              ) {
-                  TextField(
-                      value = "oui"/*selectedText*/,
-                      onValueChange = {},
-                      readOnly = true,
-                      trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = false/*expanded*/) },
-                      modifier = Modifier
-                          .menuAnchor()
-                          .fillMaxWidth()
-                  )
+          ExposedDropdownMenuBox(
+              expanded = false /*expanded*/,
+              onExpandedChange = {
+                /*expanded = !expanded*/
+              },
+              modifier = Modifier.fillMaxWidth()) {
+                TextField(
+                    value = "oui" /*selectedText*/,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = false /*expanded*/)
+                    },
+                    modifier = Modifier.menuAnchor().fillMaxWidth())
 
-                  ExposedDropdownMenu(
-                      expanded = false/*expanded*/,
-                      onDismissRequest = { /*expanded = false*/ }
-                  ) {/*
-                      coffeeDrinks.forEach { item ->
-                          DropdownMenuItem(
-                              text = { Text(text = item) },
-                              onClick = {
-                                  selectedText = item
-                                  expanded = false
-                                  Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
-                              }
-                          )
-                      }*/
-                  }
+                ExposedDropdownMenu(
+                    expanded = false /*expanded*/,
+                    onDismissRequest = { /*expanded = false*/}) { /*
+                                                                  coffeeDrinks.forEach { item ->
+                                                                      DropdownMenuItem(
+                                                                          text = { Text(text = item) },
+                                                                          onClick = {
+                                                                              selectedText = item
+                                                                              expanded = false
+                                                                              Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                                                                          }
+                                                                      )
+                                                                  }*/}
               }
 
-              Text(text = "Settings")
+          Text(text = "Settings")
 
-              Column {
-                ListItem(headlineContent = { Text(text = "Theme") })
-                ListItem(headlineContent = { Text(text = "Privacy/Security") })
-                ListItem(headlineContent = { Text(text = "Notifications") })
-              }
-
-              Text(text = "Manage ${"Association"}")
-
-              Column {
-                ListItem(headlineContent = { Text(text = "Members") })
-                ListItem(headlineContent = { Text(text = "Roles") })
-              }
-
-              TextButton(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
-                  Text(text = "Log out", textAlign = TextAlign.Center)
-              }
-
+          Column {
+            ListItem(
+                headlineContent = { Text(text = "Theme") },
+                trailingContent = {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                      contentDescription = "Go to theme settings")
+                },
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+            ListItem(
+                headlineContent = { Text(text = "Privacy/Security") },
+                trailingContent = {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                      contentDescription = "Go to privacy/security settings")
+                },
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+            ListItem(
+                headlineContent = { Text(text = "Notifications") },
+                trailingContent = {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                      contentDescription = "Go to notification settings")
+                },
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer))
           }
-      }
+
+          Text(text = "Manage ${"Association"}")
+
+          Column {
+            ListItem(
+                headlineContent = { Text(text = "Members") },
+                trailingContent = {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                      contentDescription = "Go to members settings")
+                },
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+            ListItem(
+                headlineContent = { Text(text = "Roles") },
+                trailingContent = {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                      contentDescription = "Go to roles settings")
+                },
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer))
+          }
+
+          TextButton(
+              onClick = { /*TODO*/ },
+              modifier = Modifier.fillMaxWidth(),
+              colors =
+                  ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Log out Icon")
+                Text(text = "Log out", textAlign = TextAlign.Center)
+              }
+        }
+  }
 }
