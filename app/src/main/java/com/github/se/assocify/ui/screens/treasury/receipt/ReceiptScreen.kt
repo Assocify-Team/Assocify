@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -55,7 +56,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,7 +63,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.github.se.assocify.BuildConfig
-import com.github.se.assocify.R
 import com.github.se.assocify.createImageFile
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
@@ -186,10 +185,8 @@ fun ReceiptScreen(
                       } else {
                         Image(
                             modifier = Modifier.align(Alignment.Center),
-                            painter =
-                                painterResource(
-                                    id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
-                            contentDescription = "Receipt")
+                            imageVector = Icons.Outlined.ReceiptLong,
+                            contentDescription = "receipt icon")
                       }
                       FilledIconButton(
                           modifier =
