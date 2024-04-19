@@ -18,6 +18,7 @@ import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.selectAssociation.DisplayOrganization
 import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociation
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -60,8 +61,6 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
     ComposeScreen<DisplayOrganizationScreenTest>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("DisplayOrganizationScreen") }) {
-  val organizationName: KNode = child { hasTestTag("OrganizationName") }
-  val organizationIcon: KNode = child { hasTestTag("OrganizationIcon") }
   val organizationSelect: KNode = child { hasTestTag("SelectIcon") }
 }
 
@@ -70,8 +69,6 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
 class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
   @get:Rule val mockkRule = MockKRule(this)
-
-  val registeredAssociation = listOf("CLIC", "GAME*")
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockAssocAPI: AssociationAPI
@@ -91,7 +88,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
   @Before
   fun setup() {
-    val exception = Exception("the test does not work")
     CurrentUser.userUid = "adfslkj"
     CurrentUser.associationUid = "testAssocId"
     every { mockAssocAPI.getAssociations(any(), any()) } answers
