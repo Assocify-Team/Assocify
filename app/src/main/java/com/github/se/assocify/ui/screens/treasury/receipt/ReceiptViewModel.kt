@@ -14,12 +14,12 @@ import com.github.se.assocify.ui.util.PriceUtil
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class ReceiptViewModel {
 
@@ -145,7 +145,7 @@ class ReceiptViewModel {
     _uiState.value = _uiState.value.copy(receiptImageURI = uri)
   }
 
-  fun signalCameraPermissionDenied(accepted: Boolean) {
+  fun signalCameraPermissionDenied() {
     CoroutineScope(Dispatchers.Main).launch {
       _uiState.value.snackbarHostState.showSnackbar(
           message = "Camera permission denied", duration = SnackbarDuration.Short)
