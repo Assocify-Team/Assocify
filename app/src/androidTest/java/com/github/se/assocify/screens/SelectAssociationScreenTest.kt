@@ -176,9 +176,12 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
     }
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
-      organizationSelect { performClick() }
+      organizationSelect {
+        assertIsDisplayed()
+        performClick()
+      }
     }
-    // verify(timeout = 250) { mockNavActions.navigateTo(Destination.Home) }
+    verify(timeout = 250) { mockNavActions.navigateTo(Destination.Home) }
   }
 
   /**

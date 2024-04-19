@@ -3,7 +3,6 @@ package com.github.se.assocify.ui.screens.selectAssoc
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,6 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -164,25 +164,20 @@ fun SelectAssociation(
  */
 @Composable
 fun DisplayOrganization(organization: Association, navActions: NavigationActions) {
-  Row(
-      modifier =
-          Modifier.fillMaxWidth().padding(16.dp).testTag("DisplayOrganizationScreen").clickable {
-            CurrentUser.associationUid = organization.uid
-            navActions.navigateTo(Destination.Home)
-          },
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          Icon(
-              imageVector = Icons.Default.AccountCircle,
-              contentDescription = "Organization Icon",
-              modifier = Modifier.testTag("OrganizationIcon"))
-          Text(
-              text = organization.getName(),
-              style = MaterialTheme.typography.bodyLarge,
-              modifier = Modifier.testTag("OrganizationName"))
-        }
-
+  ListItem(
+      headlineContent = {
+        Text(
+            text = organization.getName(),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.testTag("OrganizationName"))
+      },
+      leadingContent = {
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Organization Icon",
+            modifier = Modifier.testTag("OrganizationIcon"))
+      },
+      trailingContent = {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = "Select Icon",
@@ -191,5 +186,11 @@ fun DisplayOrganization(organization: Association, navActions: NavigationActions
                   CurrentUser.associationUid = organization.uid
                   navActions.navigateTo(Destination.Home)
                 })
-      }
+      },
+      modifier =
+          Modifier.clickable {
+                CurrentUser.associationUid = organization.uid
+                navActions.navigateTo(Destination.Home)
+              }
+              .testTag("DisplayOrganizationScreen"))
 }
