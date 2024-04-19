@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -12,6 +13,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
@@ -33,6 +35,8 @@ import org.junit.runner.RunWith
 class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
+  private var testUri = Uri.parse("content://test")
+
   private var capturedReceipt: Receipt? = null
   private var expectedReceipt =
       Receipt(
@@ -43,7 +47,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
           date = DateUtil.toDate("01/01/2021")!!,
           incoming = false,
           phase = Phase.Unapproved,
-          photo = null,
+          photo = MaybeRemotePhoto.LocalFile(testUri),
       )
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
@@ -172,6 +176,9 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       assert(viewModel.uiState.value.amountError == null)
       assert(viewModel.uiState.value.dateError == null)
 
+      viewModel.setImage(testUri)
+      assert(viewModel.uiState.value.receiptImageURI != null)
+
       onNodeWithTag("saveButton").performScrollTo().performClick()
       verify { receiptAPI.uploadReceipt(any(), any(), any(), any()) }
       assert(capturedReceipt == expectedReceipt)
@@ -210,19 +217,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private var receiptList =
-      listOf(
-          Receipt(
-              uid = "testReceipt",
-              title = "Edited Receipt",
-              description = "",
-              cents = 10000,
-              date = DateUtil.toDate("01/01/2021")!!,
-              incoming = false,
-              phase = Phase.Unapproved,
-              photo = null,
-          ))
-
   private var expectedReceipt =
       Receipt(
           uid = "testReceipt",
@@ -234,6 +228,9 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           phase = Phase.Unapproved,
           photo = null,
       )
+
+  private var receiptList = listOf(expectedReceipt)
+
   private var capturedReceipt: Receipt? = null
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
@@ -271,6 +268,8 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       onNodeWithTag("titleField").assertTextContains("Edited Receipt")
       onNodeWithTag("amountField").assertTextContains("100.00")
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
+      onNodeWithTag("saveButton").performScrollTo().performClick()
+      assert(capturedReceipt == expectedReceipt)
     }
   }
 }
