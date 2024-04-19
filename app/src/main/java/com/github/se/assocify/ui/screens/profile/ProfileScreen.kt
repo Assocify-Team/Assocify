@@ -3,6 +3,7 @@ package com.github.se.assocify.ui.screens.profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,7 +13,12 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.ManageAccounts
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -117,6 +123,11 @@ fun ProfileScreen(navActions: NavigationActions) {
 
           Column {
             ListItem(
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.LightMode,
+                        contentDescription = "manage roles icon")
+                },
                 headlineContent = { Text(text = "Theme") },
                 trailingContent = {
                   Icon(
@@ -127,6 +138,11 @@ fun ProfileScreen(navActions: NavigationActions) {
                     ListItemDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer))
             ListItem(
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "manage roles icon")
+                },
                 headlineContent = { Text(text = "Privacy/Security") },
                 trailingContent = {
                   Icon(
@@ -137,6 +153,11 @@ fun ProfileScreen(navActions: NavigationActions) {
                     ListItemDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer))
             ListItem(
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "manage roles icon")
+                },
                 headlineContent = { Text(text = "Notifications") },
                 trailingContent = {
                   Icon(
@@ -152,6 +173,11 @@ fun ProfileScreen(navActions: NavigationActions) {
 
           Column {
             ListItem(
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.People,
+                        contentDescription = "manage roles icon")
+                },
                 headlineContent = { Text(text = "Members") },
                 trailingContent = {
                   Icon(
@@ -162,6 +188,11 @@ fun ProfileScreen(navActions: NavigationActions) {
                     ListItemDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer))
             ListItem(
+                leadingContent = {
+                  Icon(
+                      imageVector = Icons.Default.ManageAccounts,
+                      contentDescription = "manage roles icon")
+                },
                 headlineContent = { Text(text = "Roles") },
                 trailingContent = {
                   Icon(
@@ -176,11 +207,12 @@ fun ProfileScreen(navActions: NavigationActions) {
           TextButton(
               onClick = { /*TODO*/ },
               modifier = Modifier.fillMaxWidth(),
-              colors =
-                  ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+              contentPadding = ButtonDefaults.TextButtonContentPadding,
+              colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Logout,
                     contentDescription = "Log out Icon")
+                Spacer(modifier = Modifier.padding(4.dp))
                 Text(text = "Log out", textAlign = TextAlign.Center)
               }
         }
