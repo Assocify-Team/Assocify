@@ -92,15 +92,21 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param filter the filter to apply to the associations
    * @return a list of all associations that match the filter
    */
-  fun getFilteredAssociations(onSuccess: (List<Association>) -> Unit, onFailure: (Exception) -> Unit, filter: (Association) -> Boolean){
+  fun getFilteredAssociations(
+      onSuccess: (List<Association>) -> Unit,
+      onFailure: (Exception) -> Unit,
+      filter: (Association) -> Boolean
+  ) {
     db.collection(collectionName)
-      .get()
-      .addOnSuccessListener {
-        val associations =
-          it.documents.map { document -> document.toObject(Association::class.java)!! }.filter { associations -> filter(associations) }
-        onSuccess(associations)
-      }
-      .addOnFailureListener { onFailure(it) }
+        .get()
+        .addOnSuccessListener {
+          val associations =
+              it.documents
+                  .map { document -> document.toObject(Association::class.java)!! }
+                  .filter { associations -> filter(associations) }
+          onSuccess(associations)
+        }
+        .addOnFailureListener { onFailure(it) }
   }
 
   /**
@@ -111,15 +117,24 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param onFailure called on failure
    * @param filter the filter to apply to the users
    */
-  private fun getFilteredUsers(assocId: String,onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit, filter: (User) -> Boolean) {
+  private fun getFilteredUsers(
+      assocId: String,
+      onSuccess: (List<User>) -> Unit,
+      onFailure: (Exception) -> Unit,
+      filter: (User) -> Boolean
+  ) {
     db.collection(collectionName)
-      .get()
-      .addOnSuccessListener {
-        val users =
-          it.documents.map { document -> document.toObject(Association::class.java)!! }.map{ association -> association.getMembers() }.flatten().filter { user -> filter(user) }
-        onSuccess(users)
-      }
-      .addOnFailureListener { onFailure(it) }
+        .get()
+        .addOnSuccessListener {
+          val users =
+              it.documents
+                  .map { document -> document.toObject(Association::class.java)!! }
+                  .map { association -> association.getMembers() }
+                  .flatten()
+                  .filter { user -> filter(user) }
+          onSuccess(users)
+        }
+        .addOnFailureListener { onFailure(it) }
   }
 
   /**
@@ -130,11 +145,12 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param onFailure called on failure
    * @return a list of all pending users
    */
-  fun getPendingUsers(assocId: String, onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
-    getFilteredUsers(assocId,
-      onSuccess,
-      onFailure
-    ) { user -> user.getRole() == Role("pending") }
+  fun getPendingUsers(
+      assocId: String,
+      onSuccess: (List<User>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    getFilteredUsers(assocId, onSuccess, onFailure) { user -> user.getRole() == Role("pending") }
   }
 
   /**
@@ -145,26 +161,27 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
    * @param onFailure called on failure
    * @return a list of all accepted users
    */
-  fun getAcceptedUsers(assocId: String, onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
-    getFilteredUsers(assocId,
-      onSuccess,
-      onFailure
-    ) { user -> user.getRole() != Role("pending") }
+  fun getAcceptedUsers(
+      assocId: String,
+      onSuccess: (List<User>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    getFilteredUsers(assocId, onSuccess, onFailure) { user -> user.getRole() != Role("pending") }
   }
 
   /**
-   * Gets all users from the  given association
+   * Gets all users from the given association
    *
    * @param assocId the id of the association
    * @param onSuccess called on success with the list of users
    * @param onFailure called on failure
    * @return a list of all users
    */
-  fun getAllUsers(assocId: String, onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit){
-    getFilteredUsers(assocId,
-      onSuccess,
-      onFailure
-    ) { true }
+  fun getAllUsers(
+      assocId: String,
+      onSuccess: (List<User>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    getFilteredUsers(assocId, onSuccess, onFailure) { true }
   }
-
 }
