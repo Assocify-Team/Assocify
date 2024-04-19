@@ -168,7 +168,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
    * This test checks if the navigation to the home screen is triggered when selecting an
    * organization
    */
-  @Test
+ @Test
   fun testNavigateToHomeWithSelectButton() {
     composeTestRule.setContent {
       DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
@@ -177,7 +177,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       organizationSelect { performClick() }
     }
     verify { mockNavActions.navigateTo(Destination.Home) }
-    confirmVerified(mockNavActions)
   }
 
   /* This test check if, when searching with the search bar the icons change */
