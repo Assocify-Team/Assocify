@@ -116,7 +116,7 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
       .get()
       .addOnSuccessListener {
         val users =
-          it.documents.map { document -> document.toObject(Association::class.java)!! }.map{ association -> association.members }.flatten().filter { user -> filter(user) }
+          it.documents.map { document -> document.toObject(Association::class.java)!! }.map{ association -> association.getMembers() }.flatten().filter { user -> filter(user) }
         onSuccess(users)
       }
       .addOnFailureListener { onFailure(it) }
@@ -134,7 +134,7 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
     getFilteredUsers(assocId,
       onSuccess,
       onFailure
-    ) { user -> user.role == Role("pending") }
+    ) { user -> user.getRole() == Role("pending") }
   }
 
   /**
@@ -149,7 +149,7 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
     getFilteredUsers(assocId,
       onSuccess,
       onFailure
-    ) { user -> user.role != Role("pending") }
+    ) { user -> user.getRole() != Role("pending") }
   }
 
   /**
@@ -166,31 +166,5 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
       onFailure
     ) { true }
   }
-
-  /**
-   *
-   */
-  fun acceptNewUser(assocId: String, user: User, role: String, onFailure: (Exception) -> Unit){
-    getAssociation(assocId,
-      {ass ->
-
-      },
-      onFailure)
-  }
-
-  /**
-   *
-   */
-  fun askAssociationAccess(assocId: String, user: User, onFailure: (Exception) -> Unit){
-    getAssociation(assocId,
-      {ass ->
-        val waitingUser = User(uid = user.uid, name = user.name, role = Role("pending"))
-      val newAss = Association(uid = ass.uid, creationDate = ass.creationDate, name = ass.name, description = ass.description, events = ass.events, members = ass.members + waitingUser, status = ass.status)
-      addAssociation(newAss, onFailure = onFailure)
-      }
-    , onFailure)
-  }
-
-
 
 }
