@@ -1,6 +1,8 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.model.entities.User
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -81,4 +83,114 @@ class AssociationAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener(onFailure)
   }
+
+  /**
+   * Gets all associations from the database that match the filter
+   *
+   * @param onSuccess called on success with the list of associations
+   * @param onFailure called on failure
+   * @param filter the filter to apply to the associations
+   * @return a list of all associations that match the filter
+   */
+  fun getFilteredAssociations(onSuccess: (List<Association>) -> Unit, onFailure: (Exception) -> Unit, filter: (Association) -> Boolean){
+    db.collection(collectionName)
+      .get()
+      .addOnSuccessListener {
+        val associations =
+          it.documents.map { document -> document.toObject(Association::class.java)!! }.filter { associations -> filter(associations) }
+        onSuccess(associations)
+      }
+      .addOnFailureListener { onFailure(it) }
+  }
+
+  /**
+   * Gets all users from the association that follow the filter
+   *
+   * @param assocId the id of the association
+   * @param onSuccess called on success with the list of users
+   * @param onFailure called on failure
+   * @param filter the filter to apply to the users
+   */
+  private fun getFilteredUsers(assocId: String,onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit, filter: (User) -> Boolean) {
+    db.collection(collectionName)
+      .get()
+      .addOnSuccessListener {
+        val users =
+          it.documents.map { document -> document.toObject(Association::class.java)!! }.map{ association -> association.members }.flatten().filter { user -> filter(user) }
+        onSuccess(users)
+      }
+      .addOnFailureListener { onFailure(it) }
+  }
+
+  /**
+   * Gets all pending users from the given association
+   *
+   * @param assocId the id of the association
+   * @param onSuccess called on success with the list of users
+   * @param onFailure called on failure
+   * @return a list of all pending users
+   */
+  fun getPendingUsers(assocId: String, onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
+    getFilteredUsers(assocId,
+      onSuccess,
+      onFailure
+    ) { user -> user.role == Role("pending") }
+  }
+
+  /**
+   * Gets all accepted users from the given association
+   *
+   * @param assocId the id of the association
+   * @param onSuccess called on success with the list of users
+   * @param onFailure called on failure
+   * @return a list of all accepted users
+   */
+  fun getAcceptedUsers(assocId: String, onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
+    getFilteredUsers(assocId,
+      onSuccess,
+      onFailure
+    ) { user -> user.role != Role("pending") }
+  }
+
+  /**
+   * Gets all users from the  given association
+   *
+   * @param assocId the id of the association
+   * @param onSuccess called on success with the list of users
+   * @param onFailure called on failure
+   * @return a list of all users
+   */
+  fun getAllUsers(assocId: String, onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit){
+    getFilteredUsers(assocId,
+      onSuccess,
+      onFailure
+    ) { true }
+  }
+
+  /**
+   *
+   */
+  fun acceptNewUser(assocId: String, user: User, role: String, onFailure: (Exception) -> Unit){
+    getAssociation(assocId,
+      {ass ->
+
+      },
+      onFailure)
+  }
+
+  /**
+   *
+   */
+  fun askAssociationAccess(assocId: String, user: User, onFailure: (Exception) -> Unit){
+    getAssociation(assocId,
+      {ass ->
+        val waitingUser = User(uid = user.uid, name = user.name, role = Role("pending"))
+      val newAss = Association(uid = ass.uid, creationDate = ass.creationDate, name = ass.name, description = ass.description, events = ass.events, members = ass.members + waitingUser, status = ass.status)
+      addAssociation(newAss, onFailure = onFailure)
+      }
+    , onFailure)
+  }
+
+
+
 }
