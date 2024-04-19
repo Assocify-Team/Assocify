@@ -20,7 +20,6 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssoc.DisplayOrganization
 import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
-import com.google.firebase.Firebase
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -81,9 +80,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockUserAPI: UserAPI
 
-  @RelaxedMockK lateinit var mockCurrentUser: CurrentUser
-
-  @RelaxedMockK lateinit var mockFirebase: Firebase
   val testAssociation =
       Association(
           "testAssociation",
