@@ -5,6 +5,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
@@ -142,7 +143,6 @@ class ReceiptViewModel {
   fun setImage(uri: Uri?) {
     if (uri == null) return
     _uiState.value = _uiState.value.copy(receiptImageURI = uri)
-    /*TODO: Implement image selection / capture and saving*/
   }
 
   fun signalCameraPermissionDenied(accepted: Boolean) {
@@ -156,6 +156,14 @@ class ReceiptViewModel {
     setTitle(_uiState.value.title)
     setAmount(_uiState.value.amount)
     setDate(DateUtil.toDate(_uiState.value.date))
+
+    if (_uiState.value.receiptImageURI == null) {
+      CoroutineScope(Dispatchers.Main).launch {
+        _uiState.value.snackbarHostState.showSnackbar(
+            message = "Receipt image is required", duration = SnackbarDuration.Short)
+      }
+      return
+    }
 
     if (_uiState.value.titleError != null ||
         _uiState.value.amountError != null ||
@@ -173,7 +181,7 @@ class ReceiptViewModel {
             date = date,
             incoming = _uiState.value.incoming,
             phase = Phase.Unapproved,
-            photo = null)
+            photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
 
     receiptApi.uploadReceipt(
         receipt,
