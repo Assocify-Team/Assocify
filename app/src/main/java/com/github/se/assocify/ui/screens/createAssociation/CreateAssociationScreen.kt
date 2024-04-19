@@ -144,7 +144,7 @@ fun CreateAssociationScreen(
                       navigationActions.navigateToMainTab(Destination.Home)
                     },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
-                    enabled = viewmodel.canSaveAsso()) {
+                    enabled = state.savable) {
                       Text("Create")
                     }
               }
@@ -178,10 +178,11 @@ fun CreateAssociationScreen(
                                 headlineContent = { Text(role.name.uppercase()) },
                                 trailingContent = {
                                   RadioButton(
+                                      modifier = Modifier.testTag("role-${role.name}"),
                                       selected = state.editMember!!.hasRole(role.name),
                                       onClick = { viewmodel.modifyMemberRole(role.name) })
                                 },
-                                modifier = Modifier.testTag("role-${role.name.uppercase()}"))
+                                modifier = Modifier.testTag("roleitem-${role.name}"))
                           }
 
                       Row(

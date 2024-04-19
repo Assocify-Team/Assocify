@@ -6,7 +6,6 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -24,7 +23,9 @@ class CreateAssociationViewmodel(
    * Sets the name of the association : can be any string
    */
   fun setName(name: String) {
+    // TODO check if name is valid (sprint 5)
     _uiState.value = _uiState.value.copy(name = name)
+    updateSavable()
   }
 
   /*
@@ -52,6 +53,7 @@ class CreateAssociationViewmodel(
           sortMembers(_uiState.value.members.filter { user -> user.uid != it.uid } + it)
       _uiState.value =
           _uiState.value.copy(members = memberList, openEdit = false, editMember = null)
+      updateSavable()
     }
   }
 
@@ -62,6 +64,7 @@ class CreateAssociationViewmodel(
     _uiState.value =
         _uiState.value.copy(
             openEdit = false, editMember = null, members = _uiState.value.members - member)
+    updateSavable()
   }
 
   /*
@@ -140,12 +143,15 @@ class CreateAssociationViewmodel(
   }
 
   /*
-   * Checks if the association can be saved : the current user is a member, all members have a role and the name of the association is not blank
+   * Updates the savable state of the association
    */
-  fun canSaveAsso(): Boolean {
-    return (_uiState.value.members.any { user -> user.uid == CurrentUser.userUid }) &&
-        _uiState.value.members.all { it.getRole().getRoleType() != Role.RoleType.PENDING } &&
-        _uiState.value.name.isNotBlank()
+  private fun updateSavable() {
+    _uiState.value =
+        _uiState.value.copy(
+            savable =
+                (_uiState.value.members.any { user -> user.uid == CurrentUser.userUid }) &&
+                    (_uiState.value.members.all { it.getRole().isAnActiveRole() }) &&
+                    _uiState.value.name.isNotBlank())
   }
 
   /*
@@ -168,11 +174,15 @@ class CreateAssociationViewmodel(
 
 data class CreateAssoUIState(
     val name: String = "",
-    val members: List<User> = listOf(),
-    val openEdit: Boolean = false,
-    val editMember: User? = null,
-    val searchMember: String = "",
-    val searchMemberList: List<User> = listOf(),
-    val memberError: String? = null,
+    val members: List<User> = listOf(), // list of the members of the association
+    val openEdit: Boolean = false, // whether the edit member dialog is open
+    val editMember: User? = null, // the member being edited (in the dialog)
+    val searchMember: String = "", // the name of the member being searched
+    val searchMemberList: List<User> = listOf(), // the list of members found in the search
+    val memberError: String? = null, // error message when no member is found
+    val savable: Boolean =
+        (members.any { user -> user.uid == CurrentUser.userUid }) &&
+            (members.all { it.getRole().isAnActiveRole() }) &&
+            name.isNotBlank() // whether the association can be saved
     // there should be a logo val but not implemented yet
 )

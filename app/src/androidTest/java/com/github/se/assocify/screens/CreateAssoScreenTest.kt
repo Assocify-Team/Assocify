@@ -1,7 +1,6 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -13,7 +12,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
@@ -49,9 +47,8 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           User("10", "seb", Role("")))
 
   private val mockNavActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true) {
-    every { getNewId() } answers { "1" }
-  }
+  private val mockAssocAPI =
+      mockk<AssociationAPI>(relaxUnitFun = true) { every { getNewId() } answers { "1" } }
   private val mockUserAPI =
       mockk<UserAPI> {
         every { getAllUsers(any(), any()) } answers
