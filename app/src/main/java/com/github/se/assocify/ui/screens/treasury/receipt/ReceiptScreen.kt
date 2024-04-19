@@ -86,34 +86,25 @@ fun ReceiptScreen(
       }) { paddingValues ->
         Column(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
+                Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
-                  modifier = Modifier
-                      .testTag("titleField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = receiptState.title,
                   onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") },
                   isError = receiptState.titleError != null,
                   supportingText = { receiptState.titleError?.let { Text(it) } })
               OutlinedTextField(
-                  modifier = Modifier
-                      .testTag("descriptionField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("descriptionField").fillMaxWidth(),
                   value = receiptState.description,
                   onValueChange = { viewModel.setDescription(it) },
                   label = { Text("Description") },
                   minLines = 3,
                   supportingText = {})
               OutlinedTextField(
-                  modifier = Modifier
-                      .testTag("amountField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("amountField").fillMaxWidth(),
                   value = receiptState.amount,
                   onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
@@ -122,9 +113,7 @@ fun ReceiptScreen(
                   isError = receiptState.amountError != null,
                   supportingText = { receiptState.amountError?.let { Text(it) } })
               DatePickerWithDialog(
-                  modifier = Modifier
-                      .testTag("dateField")
-                      .fillMaxWidth(),
+                  modifier = Modifier.testTag("dateField").fillMaxWidth(),
                   value = receiptState.date,
                   onDateSelect = { viewModel.setDate(it) },
                   label = { Text("Date") },
@@ -132,11 +121,10 @@ fun ReceiptScreen(
                   supportingText = { receiptState.dateError?.let { Text(it) } })
               Card(
                   modifier =
-                  Modifier
-                      .testTag("imageCard")
-                      .fillMaxWidth()
-                      .aspectRatio(1f)
-                      .padding(top = 15.dp, bottom = 5.dp)) {
+                      Modifier.testTag("imageCard")
+                          .fillMaxWidth()
+                          .aspectRatio(1f)
+                          .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
                       if (receiptState.receiptImageURI != null) {
                         AsyncImage(
@@ -152,10 +140,9 @@ fun ReceiptScreen(
                       }
                       FilledIconButton(
                           modifier =
-                          Modifier
-                              .testTag("editImageButton")
-                              .align(Alignment.BottomEnd)
-                              .padding(10.dp),
+                              Modifier.testTag("editImageButton")
+                                  .align(Alignment.BottomEnd)
+                                  .padding(10.dp),
                           onClick = { viewModel.showBottomSheet() },
                       ) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
@@ -187,15 +174,11 @@ fun ReceiptScreen(
 
               Column {
                 Button(
-                    modifier = Modifier
-                        .testTag("saveButton")
-                        .fillMaxWidth(),
+                    modifier = Modifier.testTag("saveButton").fillMaxWidth(),
                     onClick = { viewModel.saveReceipt() },
                     content = { Text("Save") })
                 OutlinedButton(
-                    modifier = Modifier
-                        .testTag("deleteButton")
-                        .fillMaxWidth(),
+                    modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
                     onClick = { viewModel.deleteReceipt() },
                     content = {
                       Text(
@@ -214,12 +197,10 @@ fun ReceiptScreen(
               Spacer(modifier = Modifier.weight(1.0f))
             }
 
-      PhotoSelectionSheet(
-          visible = receiptState.showBottomSheet,
-          hideSheet = { viewModel.hideBottomSheet() },
-          setImageUri = { viewModel.setImage(it) },
-          signalCameraPermissionDenied = { viewModel.signalCameraPermissionDenied() }
-      )
-      
+        PhotoSelectionSheet(
+            visible = receiptState.showBottomSheet,
+            hideSheet = { viewModel.hideBottomSheet() },
+            setImageUri = { viewModel.setImage(it) },
+            signalCameraPermissionDenied = { viewModel.signalCameraPermissionDenied() })
       }
 }

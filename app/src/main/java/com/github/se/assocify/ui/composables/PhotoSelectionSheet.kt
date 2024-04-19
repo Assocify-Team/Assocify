@@ -41,79 +41,76 @@ fun PhotoSelectionSheet(
     setImageUri: (Uri?) -> Unit,
     signalCameraPermissionDenied: () -> Unit
 ) {
-    val context = LocalContext.current
-    val tempUri = remember { mutableStateOf<Uri?>(null) }
-    fun getTempUri(): Uri? {
-        val file =
-            File.createTempFile(
-                "image_" + System.currentTimeMillis().toString(), ".jpg", context.externalCacheDir)
+  val context = LocalContext.current
+  val tempUri = remember { mutableStateOf<Uri?>(null) }
+  fun getTempUri(): Uri? {
+    val file =
+        File.createTempFile(
+            "image_" + System.currentTimeMillis().toString(), ".jpg", context.externalCacheDir)
 
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file)
-    }
+    return FileProvider.getUriForFile(
+        Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file)
+  }
 
-    val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            setImageUri(tempUri.value)
+  val cameraLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+        setImageUri(tempUri.value)
+      }
+
+  val imagePicker =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.PickVisualMedia(),
+          onResult = { imageUri -> setImageUri(imageUri) })
+
+  val permissionLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) {
+          tempUri.value = getTempUri()
+          cameraLauncher.launch(tempUri.value)
+        } else {
+          signalCameraPermissionDenied()
         }
+      }
 
-    val imagePicker =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.PickVisualMedia(),
-            onResult = { imageUri -> setImageUri(imageUri) })
-
-    val permissionLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-            if (it) {
-                tempUri.value = getTempUri()
-                cameraLauncher.launch(tempUri.value)
-            } else {
-                signalCameraPermissionDenied()
-            }
-        }
-
-    if (visible) {
-        ModalBottomSheet(onDismissRequest = { hideSheet() }) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 60.dp),
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                    text = "Choose option",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center)
-                ListItem(
-                    modifier =
+  if (visible) {
+    ModalBottomSheet(onDismissRequest = { hideSheet() }) {
+      Column(
+          modifier = Modifier.fillMaxWidth().padding(bottom = 60.dp),
+          horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                text = "Choose option",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center)
+            ListItem(
+                modifier =
                     Modifier.clickable {
-                        hideSheet()
-                        val permissionCheckResult =
-                            ContextCompat.checkSelfPermission(
-                                context, Manifest.permission.CAMERA)
-                        if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                            tempUri.value = getTempUri()
-                            cameraLauncher.launch(tempUri.value)
-                        } else {
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
+                      hideSheet()
+                      val permissionCheckResult =
+                          ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                      if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                        tempUri.value = getTempUri()
+                        cameraLauncher.launch(tempUri.value)
+                      } else {
+                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                      }
                     },
-                    headlineContent = {
-                        Text(text = "Take photo", style = MaterialTheme.typography.titleMedium)
-                    },
-                    leadingContent = { Icon(Icons.Default.Camera, "Camera icon") })
-                ListItem(
-                    modifier =
+                headlineContent = {
+                  Text(text = "Take photo", style = MaterialTheme.typography.titleMedium)
+                },
+                leadingContent = { Icon(Icons.Default.Camera, "Camera icon") })
+            ListItem(
+                modifier =
                     Modifier.clickable {
-                        hideSheet()
-                        imagePicker.launch(
-                            PickVisualMediaRequest(
-                                ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
+                      hideSheet()
+                      imagePicker.launch(
+                          PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     },
-                    headlineContent = {
-                        Text(text = "Select image", style = MaterialTheme.typography.titleMedium)
-                    },
-                    leadingContent = { Icon(Icons.Default.Image, "Image icon") })
-            }
-        }
+                headlineContent = {
+                  Text(text = "Select image", style = MaterialTheme.typography.titleMedium)
+                },
+                leadingContent = { Icon(Icons.Default.Image, "Image icon") })
+          }
     }
+  }
 }
