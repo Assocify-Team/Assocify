@@ -69,6 +69,7 @@ fun EventScreen(
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
         FloatingActionButton(
+            modifier = Modifier.testTag("floatingButtonEvent"),
             onClick = {
               /*TODO: adapt the action button depending on the current screen and modify it's navigations */ }) {
               Icon(imageVector = Icons.Default.Add, contentDescription = null)
