@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.selectAssoc
+package com.github.se.assocify.ui.screens.selectAssociation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

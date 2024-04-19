@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.createAsso
+package com.github.se.assocify.ui.screens.createAssociation
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -51,9 +53,11 @@ import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAssoScreen(
+fun CreateAssociationScreen(
     navigationActions: NavigationActions,
-    viewmodel: CreateAssoViewmodel = CreateAssoViewmodel()
+    assoAPI: AssociationAPI,
+    userAPI: UserAPI,
+    viewmodel: CreateAssociationViewmodel = CreateAssociationViewmodel(assoAPI, userAPI)
 ) {
 
   val state by viewmodel.uiState.collectAsState()
@@ -137,10 +141,10 @@ fun CreateAssoScreen(
                 Button(
                     onClick = {
                       viewmodel.saveAsso()
-                      navigationActions.navigateTo(Destination.Home)
+                      navigationActions.navigateToMainTab(Destination.Home)
                     },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
-                    enabled = viewmodel.canSaveAsso()) {
+                    enabled = state.savable) {
                       Text("Create")
                     }
               }
@@ -150,28 +154,23 @@ fun CreateAssoScreen(
         if (state.openEdit) {
           Dialog(onDismissRequest = { viewmodel.cancelModifyMember() }) {
             ElevatedCard {
-              // temporary UI to see if dialog opens
               Column(
                   modifier = Modifier.padding(16.dp).fillMaxWidth(),
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
-                        searchValue =
-                            state.searchMember, // ce qui est tapé dans barre -> vide quand y a un
-                        // user
-                        userList = state.searchMemberList, // ce qui apparait dans la liste
-                        user = state.editMember, // ce qui est sélectionné -> null quand tu cherche
-                        onUserSearch = { viewmodel.searchMember(it) }, // on value change
-                        onUserSelect = {
-                          viewmodel.selectMember(it)
-                        }, // quand tu click qur user de dropdown
-                        onUserDismiss = { viewmodel.dismissMemberSearch() }, // click sur croix
-                        expanded = state.searchMemberList.isNotEmpty(), // dropdown ouvert ou pas
+                        searchValue = state.searchMember,
+                        userList = state.searchMemberList,
+                        user = state.editMember,
+                        onUserSearch = { viewmodel.searchMember(it) },
+                        onUserSelect = { viewmodel.selectMember(it) },
+                        onUserDismiss = { viewmodel.dismissMemberSearch() },
+                        expanded = state.searchMemberList.isNotEmpty(),
                         label = { Text("Name") },
-                        isError = viewmodel.searchError(),
+                        isError = (state.memberError != null),
                         supportingText = state.memberError?.let { { Text(it) } })
                     if (state.editMember != null) {
-                      // maybe can't select role before selecting member ?
+                      // can't select role before selecting member
                       Role.RoleType.entries
                           .filter { role -> role != Role.RoleType.PENDING }
                           .forEach { role ->
@@ -179,10 +178,11 @@ fun CreateAssoScreen(
                                 headlineContent = { Text(role.name.uppercase()) },
                                 trailingContent = {
                                   RadioButton(
+                                      modifier = Modifier.testTag("role-${role.name}"),
                                       selected = state.editMember!!.hasRole(role.name),
                                       onClick = { viewmodel.modifyMemberRole(role.name) })
                                 },
-                                modifier = Modifier.testTag("role-${role.name.uppercase()}"))
+                                modifier = Modifier.testTag("roleitem-${role.name}"))
                           }
 
                       Row(

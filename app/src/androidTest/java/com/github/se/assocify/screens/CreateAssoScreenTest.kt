@@ -1,9 +1,13 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -12,14 +16,13 @@ import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.createAsso.CreateAssoScreen
-import com.github.se.assocify.ui.screens.createAsso.CreateAssoViewmodel
+import com.github.se.assocify.ui.screens.createAssociation.CreateAssociationScreen
+import com.github.se.assocify.ui.screens.createAssociation.CreateAssociationViewmodel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.junit4.MockKRule
+import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
@@ -30,20 +33,7 @@ import org.junit.runner.RunWith
 class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockAssocAPI: AssociationAPI
-
-  // Relaxed mocks methods have a default implementation returning values
-  @RelaxedMockK lateinit var mockUserAPI: UserAPI
-
-  @RelaxedMockK lateinit var mockCurrentUser: CurrentUser
-
-  @get:Rule val mockkRule = MockKRule(this)
-
-  val bigList =
+  private val bigList =
       listOf(
           User("1", "jean", Role("")),
           User("2", "roger", Role("")),
@@ -56,18 +46,26 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           User("9", "bill", Role("")),
           User("10", "seb", Role("")))
 
-  val bigView = CreateAssoViewmodel()
+  private val mockNavActions = mockk<NavigationActions>(relaxUnitFun = true)
+  private val mockAssocAPI =
+      mockk<AssociationAPI>(relaxUnitFun = true) { every { getNewId() } answers { "1" } }
+  private val mockUserAPI =
+      mockk<UserAPI> {
+        every { getAllUsers(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<User>) -> Unit>()
+              onSuccessCallback(bigList)
+            }
+      }
 
-  val smallView = CreateAssoViewmodel()
+  val bigView = CreateAssociationViewmodel(mockAssocAPI, mockUserAPI)
 
   @Before
-  fun setupLogin() {
-    every { mockUserAPI.getAllUsers(any(), any()) } answers
-        {
-          val onSuccessCallback = arg<(List<User>) -> Unit>(0)
-          onSuccessCallback(bigList)
-        }
-    composeTestRule.setContent { CreateAssoScreen(mockNavActions, bigView) }
+  fun setup() {
+    CurrentUser.userUid = "1"
+    composeTestRule.setContent {
+      CreateAssociationScreen(mockNavActions, mockAssocAPI, mockUserAPI, bigView)
+    }
   }
 
   @Test
@@ -82,7 +80,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     }
   }
 
-  /*
   @Test
   fun testAddMember() {
     with(composeTestRule) {
@@ -131,18 +128,40 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("addMember").performClick()
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       onNodeWithTag("userDropdownItem-1").performClick() // jean
+      onNodeWithTag("role-PRESIDENCE").assertIsDisplayed()
+      onNodeWithTag("role-PRESIDENCE").performClick()
+      assert(bigView.uiState.value.editMember!!.hasRole("PRESIDENCE"))
+      onNodeWithTag("addMemberButton").performClick()
+      onNodeWithTag("create").assertHasClickAction()
+      onNodeWithTag("create").assertIsEnabled()
+      onNodeWithTag("create").performClick()
+      verify { mockAssocAPI.addAssociation(any(), any(), any()) }
+    }
+  }
+
+  @Test
+  fun testCantCreateAsso() {
+    with(composeTestRule) {
+      onNodeWithTag("name").performTextInput("assoName")
+      onNodeWithTag("create").assertIsNotEnabled()
+      onNodeWithTag("addMember").performClick()
+      onNodeWithTag("memberSearchField").performClick().performTextInput("j")
+      onNodeWithTag("userDropdownItem-1").performClick() // jean
+      onNodeWithTag("addMemberButton").performClick()
+      onNodeWithTag("create").assertIsNotEnabled()
+      onNodeWithTag("editMember-jean").performClick()
       onNodeWithTag("role-PRESIDENCE").performClick()
       onNodeWithTag("addMemberButton").performClick()
-
       onNodeWithTag("create").performClick()
-      // check that the asso is created
+      verify { mockAssocAPI.addAssociation(any(), any(), any()) }
     }
-  }*/
+  }
 
   fun testCreateButton() {
     with(composeTestRule) {
       onNodeWithTag("create").performClick()
-      verify { mockNavActions.navigateTo(Destination.Home) }
+      verify { bigView.saveAsso() }
+      verify { mockNavActions.navigateToMainTab(Destination.Home) }
     }
   }
 

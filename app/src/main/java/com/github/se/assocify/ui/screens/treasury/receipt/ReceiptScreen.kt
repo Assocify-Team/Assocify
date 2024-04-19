@@ -77,7 +77,7 @@ fun ReceiptScreen(
                   }
             })
       },
-      contentWindowInsets = WindowInsets(50.dp, 20.dp, 50.dp, 0.dp),
+      contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
       snackbarHost = {
         SnackbarHost(
             hostState = receiptState.snackbarHostState,

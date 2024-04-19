@@ -1,46 +1,28 @@
 package com.github.se.assocify.model.entities
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+/**
+ * Data class representing an event of an association
+ *
+ * @param uid unique identifier of the event
+ * @param name name of the event
+ * @param description description of the event
+ * @param startDate start date of the event
+ * @param endDate end date of the event
+ * @param organizers list of users who are organizing the event
+ * @param staffers list of users who are staffing the event
+ * @param tasks list of tasks that need to be completed for the event
+ */
 data class Event(
-    val uid: String = "",
-    private val name: String = "",
-    private val description: String = "",
-    private val startDate: String,
-    private val endDate: String,
-    private val organizers: List<User>,
-    private val staffers: List<User>
-) {
-  constructor() : this("", "", "", "", "", listOf(), listOf())
-
-  override fun equals(other: Any?): Boolean {
-    if (other?.javaClass != this.javaClass) {
-      return false
-    }
-    if (this === other) return true
-    other as Event
-    return uid == other.uid
-  }
-
-  override fun hashCode(): Int {
-    return startDate.hashCode()
-  }
-
-  override fun toString(): String {
-    return "Event(startDate='$startDate', endDate='$endDate', organizers=$organizers, staffers=$staffers)"
-  }
-
-  fun getStartDate(): String {
-    return startDate
-  }
-
-  fun getEndDate(): String {
-    return endDate
-  }
-
-  fun getOrganizers(): List<User> {
-    return organizers
-  }
-
-  fun getStaffers(): List<User> {
-    return staffers
-  }
-}
+    val uid: String = "testUid",
+    val name: String = "testName",
+    val description: String = "description",
+    val startDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+    val endDate: String =
+        LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+    val organizers: List<User> = emptyList(),
+    val staffers: List<User> = emptyList(),
+    val tasks: List<Task> = emptyList(),
+)

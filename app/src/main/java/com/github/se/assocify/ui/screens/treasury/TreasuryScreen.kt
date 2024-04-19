@@ -1,8 +1,8 @@
 package com.github.se.assocify.ui.screens.treasury
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,7 +47,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -57,10 +56,12 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
+import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 import kotlinx.coroutines.launch
 
 // Index of each tag for navigation
-enum class PageIndex(val index: Int) {
+enum class TreasuryPageIndex(val index: Int) {
   RECEIPT(0),
   BUDGET(1),
   BALANCE(2);
@@ -71,12 +72,11 @@ enum class PageIndex(val index: Int) {
 }
 
 /** Treasury Screen composable */
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    viewModel: ReceiptListViewModel = ReceiptListViewModel()
+    viewModel: ReceiptListViewModel = ReceiptListViewModel(navActions)
 ) {
   val viewmodelState by viewModel.uiState.collectAsState()
 
@@ -94,13 +94,13 @@ fun TreasuryScreen(
             modifier = Modifier.testTag("createReceipt"),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
-            onClick = { navActions.navigateTo(Destination.Receipt) },
+            onClick = { navActions.navigateTo(Destination.NewReceipt) },
         ) {
           Icon(Icons.Outlined.Add, "Create")
         }
       }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-          val pagerState = rememberPagerState(pageCount = { PageIndex.NUMBER_OF_PAGES })
+          val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
           // Tabs
@@ -121,28 +121,28 @@ fun TreasuryScreen(
                                 shape = RoundedCornerShape(8.dp)))
               }) {
                 TreasuryTab(
-                    selected = pagerState.currentPage == PageIndex.RECEIPT.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.RECEIPT.index,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PageIndex.RECEIPT.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.RECEIPT.index)
                       }
                     },
                     text = "Receipts",
                     modifier = Modifier.testTag("myReceiptsTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == PageIndex.BUDGET.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BUDGET.index,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PageIndex.BUDGET.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BUDGET.index)
                       }
                     },
                     text = "Budget",
                     modifier = Modifier.testTag("budgetTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == PageIndex.BALANCE.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BALANCE.index,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PageIndex.BALANCE.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BALANCE.index)
                       }
                     },
                     text = "Balance",
@@ -152,9 +152,9 @@ fun TreasuryScreen(
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
-              PageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
-              PageIndex.BUDGET.index -> BudgetPage()
-              PageIndex.BALANCE.index -> BalancePage()
+              TreasuryPageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
+              TreasuryPageIndex.BUDGET.index -> BudgetPage()
+              TreasuryPageIndex.BALANCE.index -> BalancePage()
             }
           }
         }
@@ -179,7 +179,7 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
         // Header for the user receipts
         item {
           Text(
-              text = "My created receipts",
+              text = "My Receipts",
               style = MaterialTheme.typography.titleMedium,
               modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp))
           HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
@@ -189,7 +189,7 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
           // First list of receipts
           viewmodelState.userReceipts.forEach { receipt ->
             item {
-              ReceiptItem(receipt)
+              ReceiptItem(receipt, viewModel)
               HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
             }
           }
@@ -209,7 +209,7 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
           // Header for the global receipts
           item {
             Text(
-                text = "All receipts",
+                text = "All Receipts",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp))
             HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
@@ -217,7 +217,7 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
           // Second list of receipts
           viewmodelState.allReceipts.forEach { receipt ->
             item {
-              ReceiptItem(receipt)
+              ReceiptItem(receipt, viewModel)
               HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
             }
           }
@@ -341,70 +341,66 @@ fun TreasuryTopBar(
 
 /** Receipt item from the list in My Receipts page */
 @Composable
-private fun ReceiptItem(receipt: Receipt) {
-  Box(modifier = Modifier.fillMaxWidth().padding(6.dp).height(70.dp).testTag("receiptItemBox")) {
-    Column(modifier = Modifier.padding(start = 20.dp)) {
-      Text(
-          text = receipt.date.toString(),
-          modifier = Modifier.padding(top = 6.dp).testTag("receiptDateText"),
-          style =
-              TextStyle(
-                  fontSize = 12.sp,
-                  lineHeight = 16.sp,
-                  color = Color(0xFF505050),
-                  letterSpacing = 0.5.sp,
-              ))
-      Text(
-          text = receipt.title,
-          modifier = Modifier.testTag("receiptNameText"),
-          style =
-              TextStyle(
-                  fontSize = 16.sp,
-                  lineHeight = 24.sp,
-                  color = Color(0xFF000000),
-                  letterSpacing = 0.sp,
-              ))
-      Text(
-          text = receipt.description,
-          modifier = Modifier.testTag("receiptDescriptionText"),
-          style =
-              TextStyle(
-                  fontSize = 14.sp,
-                  lineHeight = 24.sp,
-                  color = Color(0xFF505050),
-                  letterSpacing = 0.sp,
-              ))
-    }
-
-    Row(
-        modifier =
-            Modifier.align(Alignment.TopEnd)
-                .padding(end = 16.dp, top = 8.dp)
-                .testTag("receiptPriceAndIconRow"),
-        verticalAlignment = Alignment.CenterVertically) {
+private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
+  Box(
+      modifier =
+          Modifier.fillMaxWidth().padding(6.dp).height(70.dp).testTag("receiptItemBox").clickable {
+            viewModel.onReceiptClick(receipt)
+          }) {
+        Column(modifier = Modifier.padding(start = 20.dp)) {
           Text(
-              text = (receipt.cents / 100.0).toString() + ".-",
-              modifier = Modifier.testTag("receiptPriceText"),
+              text = DateUtil.toString(receipt.date),
+              modifier = Modifier.padding(top = 6.dp).testTag("receiptDateText"),
               style =
                   TextStyle(
-                      fontSize = 14.sp,
+                      fontSize = 12.sp,
+                      lineHeight = 16.sp,
+                      color = MaterialTheme.colorScheme.secondary,
+                      letterSpacing = 0.5.sp,
+                  ))
+          Text(
+              text = receipt.title,
+              modifier = Modifier.testTag("receiptNameText"),
+              style =
+                  TextStyle(
+                      fontSize = 16.sp,
                       lineHeight = 24.sp,
-                      color = Color(0xFF505050),
                       letterSpacing = 0.sp,
                   ))
-          Spacer(modifier = Modifier.width(8.dp))
-          Icon(
-              modifier = Modifier.size(20.dp).testTag("shoppingCartIcon"),
-              imageVector = Icons.Filled.ShoppingCart,
-              contentDescription = "Arrow icon",
-          )
+          Text(
+              text = receipt.description,
+              modifier = Modifier.testTag("receiptDescriptionText"),
+              style =
+                  TextStyle(
+                      fontSize = 12.sp,
+                      lineHeight = 24.sp,
+                      color = MaterialTheme.colorScheme.secondary,
+                      letterSpacing = 0.sp,
+                  ))
         }
-  }
-}
 
-/**
- * Android Studio preview
- *
- * @Preview
- * @Composable private fun PreviewCardsScreen() { MyReceiptPage() }
- */
+        Row(
+            modifier =
+                Modifier.align(Alignment.TopEnd)
+                    .padding(end = 16.dp, top = 8.dp)
+                    .testTag("receiptPriceAndIconRow"),
+            verticalAlignment = Alignment.CenterVertically) {
+              Text(
+                  text = PriceUtil.fromCents(receipt.cents),
+                  modifier = Modifier.testTag("receiptPriceText"),
+                  style =
+                      TextStyle(
+                          fontSize = 14.sp,
+                          lineHeight = 24.sp,
+                          color = MaterialTheme.colorScheme.secondary,
+                          letterSpacing = 0.sp,
+                      ))
+              Spacer(modifier = Modifier.width(8.dp))
+              Icon(
+                  modifier = Modifier.size(20.dp).testTag("shoppingCartIcon"),
+                  imageVector = Icons.Filled.ShoppingCart,
+                  contentDescription = "Arrow icon",
+              )
+            }
+      }
+}

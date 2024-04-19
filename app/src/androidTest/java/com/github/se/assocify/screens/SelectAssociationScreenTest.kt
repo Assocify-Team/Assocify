@@ -18,8 +18,7 @@ import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.selectAssoc.DisplayOrganization
-import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
+import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociation
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
