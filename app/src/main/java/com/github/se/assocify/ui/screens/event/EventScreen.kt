@@ -108,17 +108,13 @@ fun EventScreen(
                   coroutineRoute.launch {
                     pagerState.animateScrollToPage(EventPageIndex.TASKS.index)
                   }
-                }
-            )
+                })
             Tab(
                 text = { Text("Map") },
                 selected = currentTab == EventPageIndex.MAP,
                 onClick = {
-                  coroutineRoute.launch {
-                    pagerState.animateScrollToPage(EventPageIndex.MAP.index)
-                  }
-                }
-            )
+                  coroutineRoute.launch { pagerState.animateScrollToPage(EventPageIndex.MAP.index) }
+                })
             Tab(
                 text = { Text("Schedule") },
                 selected = currentTab == EventPageIndex.SCHEDULE,
@@ -126,8 +122,7 @@ fun EventScreen(
                   coroutineRoute.launch {
                     pagerState.animateScrollToPage(EventPageIndex.SCHEDULE.index)
                   }
-              }
-            )
+                })
           }
           val t1 = Task("uid1", "task 1", "the task 1", true)
           val t2 = Task("uid2", "task 2", "the task 2", false)
