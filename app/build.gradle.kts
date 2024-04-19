@@ -61,9 +61,6 @@ android {
 
     }
 
-
-
-
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -170,6 +167,7 @@ dependencies {
 
     // Junit & Testing
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -194,14 +192,6 @@ dependencies {
     val mockitoVersion = "5.11.0"
     androidTestImplementation("org.mockito:mockito-android:$mockitoVersion")
 
-    // Mockk
-
-    testImplementation("io.mockk:mockk:1.13.7")
-    testImplementation("io.mockk:mockk-android:1.13.7")
-    testImplementation("io.mockk:mockk-agent:1.13.7")
-    androidTestImplementation("io.mockk:mockk-android:1.13.7")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
-
     //Supabase
     val supabaseVersion = "2.2.3"
     val ktorVersion = "2.3.10"
@@ -211,7 +201,9 @@ dependencies {
     implementation ("io.ktor:ktor-client-android:$ktorVersion")
     implementation ("io.ktor:ktor-client-core:$ktorVersion")
     implementation ("io.ktor:ktor-utils:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
 
+    // Mockk
     val mockkVersion = "1.13.10"
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.mockk:mockk-android:$mockkVersion")

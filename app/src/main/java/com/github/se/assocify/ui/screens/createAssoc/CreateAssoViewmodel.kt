@@ -3,6 +3,7 @@ package com.github.se.assocify.ui.screens.createAsso
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -11,7 +12,6 @@ import com.github.se.assocify.model.entities.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -19,7 +19,7 @@ class CreateAssoViewmodel() : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
 
-  private val assoAPI = AssociationAPI(db = Firebase.firestore)
+  private val assoAPI = AssociationAPI(db = SupabaseClient.supabaseClient)
   private val userAPI = UserAPI(db = Firebase.firestore)
   val currUser = CurrentUser.userUid
 
@@ -193,11 +193,14 @@ class CreateAssoViewmodel() : ViewModel() {
    * Saves the association in the database
    */
   fun saveAsso() {
-    // create asso today
-    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    // TODO: add members to association
     val asso =
         Association(
-            assoAPI.getNewId(), _uiState.value.name, "", date, "", _uiState.value.members, listOf())
+            0,
+            _uiState.value.name,
+            "",
+            LocalDate.now(),
+        )
     assoAPI.addAssociation(
         asso,
         onSuccess = { /* navigate to home page with the new association as the current asso */},

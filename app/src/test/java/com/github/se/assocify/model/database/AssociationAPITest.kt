@@ -1,17 +1,21 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.Association
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
@@ -21,95 +25,119 @@ import org.junit.Test
 class AssociationAPITest {
   @get:Rule val mockkRule = MockKRule(this)
 
-  @MockK private lateinit var db: FirebaseFirestore
-
-  @MockK private lateinit var documentSnapshot: DocumentSnapshot
-  @MockK private lateinit var documentReference: DocumentReference
-  @MockK private lateinit var collectionReference: CollectionReference
-
-  @MockK private lateinit var query: QuerySnapshot
-
-  private val testAssociation =
-      Association(
-          "testId", "testName", "testDescription", "testDate", "testStatus", listOf(), listOf())
+  private var error = false
+  private var response = ""
 
   private lateinit var assoAPI: AssociationAPI
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
-    every { documentSnapshot.exists() } returns true
-    every { documentSnapshot.toObject(Association::class.java) } returns testAssociation
-    every { db.collection("associations").document("testId") } returns documentReference
-    every { db.collection("associations") } returns collectionReference
-    every { collectionReference.document("testId") } returns documentReference
-    every { query.documents } returns listOf(documentSnapshot)
-
-    assoAPI = AssociationAPI(db)
+    Dispatchers.setMain(UnconfinedTestDispatcher())
+    assoAPI =
+        AssociationAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+              httpEngine = MockEngine {
+                if (!error) {
+                  respond(response)
+                } else {
+                  respondBadRequest()
+                }
+              }
+            })
   }
 
   @Test
   fun testGetAssociation() {
-    every { documentReference.get() } returns APITestUtils.mockSuccessfulTask(documentSnapshot)
+    val onSuccess: (Association) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<(Association) -> Unit>(relaxed = true)
-    assoAPI.getAssociation(testAssociation.uid, successMock, { fail("Should not fail") })
+    error = false
+    response =
+        """
+      {
+        "uid": 1,
+        "name": "Test",
+        "description": "Test",
+        "creation_date": "2022-01-01"
+      }
+    """
+            .trimIndent()
 
-    verify(timeout = 100) { successMock.invoke(testAssociation) }
+    assoAPI.getAssociation(1, onSuccess, onFailure)
 
-    every { documentReference.get() } returns APITestUtils.mockFailingTask()
+    verify(timeout = 100) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
 
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-    assoAPI.getAssociation(testAssociation.uid, { fail("Should not succeed") }, failureMock)
+    // Test failure
+    error = true
+    assoAPI.getAssociation(1, { fail("should not succeed") }, onFailure)
 
-    verify(timeout = 100) { failureMock.invoke(any()) }
+    verify(timeout = 100) { onFailure(any()) }
   }
 
   @Test
   fun testGetAllAssociations() {
-    every { collectionReference.get() } returns APITestUtils.mockSuccessfulTask(query)
+    val onSuccess: (List<Association>) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<(List<Association>) -> Unit>(relaxed = true)
-    assoAPI.getAssociations(successMock, { fail("Should not fail") })
+    error = false
+    response =
+        """
+      [{
+        "uid": 2,
+        "name": "Test",
+        "description": "Test",
+        "creation_date": "2022-01-01"
+      }, {
+        "uid": 3,
+        "name": "Test2",
+        "description": "Test2",
+        "creation_date": "2022-01-02"
+      }]
+    """
+            .trimIndent()
 
-    verify(timeout = 100) { successMock.invoke(listOf(testAssociation)) }
+    assoAPI.getAssociations(onSuccess, onFailure)
 
-    every { collectionReference.get() } returns APITestUtils.mockFailingTask()
-
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-    assoAPI.getAssociations({ fail("Should not succeed") }, failureMock)
-
-    verify(timeout = 100) { failureMock.invoke(any()) }
+    verify(timeout = 100) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
   fun testAddAssociation() {
-    every { documentReference.set(testAssociation) } returns APITestUtils.mockSuccessfulTask()
+    val onSuccess: (Long) -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<() -> Unit>(relaxed = true)
-    assoAPI.addAssociation(testAssociation, successMock, { fail("Should not fail") })
+    error = false
+    response =
+        """
+      {
+        "uid": 1,
+        "name": "Test",
+        "description": "Test",
+        "creation_date": "2022-01-01"
+      }
+    """
+            .trimIndent()
 
-    verify(timeout = 100) { successMock.invoke() }
+    assoAPI.addAssociation(
+        Association(1, "Test", "Test", LocalDate.now()), onSuccess, { fail("Should not fail") })
 
-    every { documentReference.set(testAssociation) } returns APITestUtils.mockFailingTask()
-
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-    assoAPI.addAssociation(testAssociation, { fail("Should not succeed") }, failureMock)
-
-    verify(timeout = 100) { failureMock.invoke(any()) }
+    verify(timeout = 1000) { onSuccess(any()) }
   }
 
   @Test
   fun testDeleteAssociation() {
-    every { documentReference.delete() } returns APITestUtils.mockSuccessfulTask()
+    assoAPI =
+        AssociationAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+            })
+    val onSuccess: () -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<() -> Unit>(relaxed = true)
-    assoAPI.deleteAssociation(testAssociation.uid, successMock, { fail("Should not fail") })
+    assoAPI.deleteAssociation(1, onSuccess, { fail("Should not fail") })
 
-    verify(timeout = 100) { successMock.invoke() }
-
-    every { documentReference.delete() } returns APITestUtils.mockFailingTask()
-
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-    assoAPI.deleteAssociation(testAssociation.uid, { fail("Should not succeed") }, failureMock)
+    verify(timeout = 1000) { onSuccess() }
   }
 }
