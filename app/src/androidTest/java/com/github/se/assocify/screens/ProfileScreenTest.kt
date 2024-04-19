@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.ProfileScreen
@@ -39,12 +40,12 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("profileRole").assertIsDisplayed()
       onNodeWithTag("editProfile").assertIsDisplayed()
       onNodeWithTag("associationDropdown").assertIsDisplayed()
-      onNodeWithTag("Theme").assertIsDisplayed()
-      onNodeWithTag("Privacy").assertIsDisplayed()
-      onNodeWithTag("Notifications").assertIsDisplayed()
-      onNodeWithTag("manageMembers").assertIsDisplayed()
-      onNodeWithTag("manageRoles").assertIsDisplayed()
-      onNodeWithTag("logoutButton").assertIsDisplayed()
+      onNodeWithTag("Theme").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("manageMembers").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("manageRoles").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
     }
   }
 
