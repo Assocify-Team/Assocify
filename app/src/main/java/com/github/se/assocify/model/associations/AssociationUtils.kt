@@ -16,7 +16,9 @@ class AssociationRequest(private val db: AssociationAPI) {
       {ass ->
         val matchingUsers = ass.getMembers().filter { listUser -> user.uid == listUser.uid  }
         if(matchingUsers.size != 1){
-
+          val newUser = User(user.uid, user.getName(), role)
+          val newAss = Association(uid = ass.uid, creationDate = ass.getCreationDate(), name = ass.getName(), description = ass.getDescription(), events = ass.getEvents(), members = ass.getMembers().filter { listUser -> listUser.uid == user.uid } + newUser, status = ass.getStatus())
+          db.addAssociation(newAss, onFailure = onFailure)
         }
       },
       onFailure)
