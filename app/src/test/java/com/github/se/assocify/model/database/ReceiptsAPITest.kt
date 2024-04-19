@@ -20,12 +20,12 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
-import java.time.LocalDate
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
 
 @MockKExtension.ConfirmVerification
 class ReceiptsAPITest {
@@ -40,6 +40,8 @@ class ReceiptsAPITest {
   @MockK lateinit var collectionReference: CollectionReference
 
   private lateinit var api: ReceiptAPI
+
+  val uriMock = mockk<Uri>()
 
   private val successfulReceipt =
       Receipt(
@@ -61,10 +63,11 @@ class ReceiptsAPITest {
           phase = Phase.Approved,
           title = "title",
           description = "notes",
-          photo = null)
+          photo = MaybeRemotePhoto.LocalFile(uriMock))
 
   @Before
   fun setUp() {
+    mockkStatic(Uri::class)
 
     every { storage.getReference("uid/receipts") }.returns(storageReference)
     every { firestore.collection("aid/receipts/uid/list") }.returns(collectionReference)
