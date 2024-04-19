@@ -1,10 +1,12 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
+import android.util.Log
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -19,7 +21,8 @@ import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
 import java.time.LocalDate
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,31 +39,29 @@ class ReceiptsAPITest {
 
   @MockK lateinit var collectionReference: CollectionReference
 
-  private lateinit var api: ReceiptsAPI
+  private lateinit var api: ReceiptAPI
 
   private val successfulReceipt =
       Receipt(
-          "successful_rid",
-          "payer",
-          LocalDate.EPOCH,
-          false,
-          100,
-          Phase.Approved,
-          "title",
-          "notes",
-          MaybeRemotePhoto.Remote("path"))
+          uid = "successful_rid",
+          date = LocalDate.EPOCH,
+          incoming = false,
+          cents = 100,
+          phase = Phase.Approved,
+          title = "title",
+          description = "notes",
+          photo = MaybeRemotePhoto.Remote("path"))
 
   private val failingReceipt =
       Receipt(
-          "failing_rid",
-          "payer",
-          LocalDate.EPOCH,
-          false,
-          100,
-          Phase.Approved,
-          "title",
-          "notes",
-          MaybeRemotePhoto.LocalFile("path"))
+          uid = "failing_rid",
+          date = LocalDate.EPOCH,
+          incoming = false,
+          cents = 100,
+          phase = Phase.Approved,
+          title = "title",
+          description = "notes",
+          photo = MaybeRemotePhoto.LocalFile("path"))
 
   @Before
   fun setUp() {
@@ -77,8 +78,11 @@ class ReceiptsAPITest {
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
 
-    api =
-        spyk<ReceiptsAPI>(ReceiptsAPI("uid", "aid", storage, firestore), recordPrivateCalls = true)
+    // Temporary workaround
+    mockkStatic(Log::class)
+    every { Log.w(any(), any<String>()) }.returns(0)
+
+    api = spyk<ReceiptAPI>(ReceiptAPI("uid", "aid", storage, firestore), recordPrivateCalls = true)
 
     every { api["parseReceiptList"](any<QuerySnapshot>()) } returns
         listOf(successfulReceipt, failingReceipt)
@@ -124,6 +128,47 @@ class ReceiptsAPITest {
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getUserReceipts({ fail("Should not succeed") }, failureMock)
+
+    verify { failureMock.invoke(any()) }
+  }
+
+  @Test
+  fun getReceipt() {
+    // Horribly cursed hack to avoid having to mock a call to toObject with a private type
+    val documentReference = mockk<DocumentReference> { every { id } returns "successful_rid" }
+
+    val documentSnapshot =
+        spyk<DocumentSnapshot>(
+            objToCopy = mockk(),
+        )
+    every { documentSnapshot.reference } returns documentReference
+    every { documentSnapshot.getData(any()) } answers
+        {
+          mapOf(
+              "payer" to "payer",
+              "date" to "1970-01-01",
+              "incoming" to false,
+              "cents" to 100,
+              "phase" to 1,
+              "title" to "title",
+              "description" to "notes",
+              "photo" to "path",
+          )
+        }
+
+    every { collectionReference.document("successful_rid").get() } returns
+        APITestUtils.mockSuccessfulTask(documentSnapshot)
+
+    val successMock = mockk<(Receipt) -> Unit>(relaxed = true)
+    api.getReceipt("successful_rid", successMock, { fail("Should not fail") })
+
+    verify { successMock.invoke(successfulReceipt) }
+
+    every { collectionReference.document("failing_rid").get() } returns
+        APITestUtils.mockFailingTask()
+
+    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
+    api.getReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
 
     verify { failureMock.invoke(any()) }
   }
@@ -185,5 +230,24 @@ class ReceiptsAPITest {
     api.getAllReceipts({ fail("Should not succeed") }, failureMock)
 
     verify { failureMock.invoke(null, any()) }
+  }
+
+  @Test
+  fun deleteReceipt() {
+    every { collectionReference.document("successful_rid").delete() }
+        .returns(APITestUtils.mockSuccessfulTask())
+
+    val successMock = mockk<() -> Unit>(relaxed = true)
+    api.deleteReceipt("successful_rid", successMock, { fail("Should not fail") })
+
+    verify { successMock.invoke() }
+
+    every { collectionReference.document("failing_rid").delete() }
+        .returns(APITestUtils.mockFailingTask())
+
+    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
+    api.deleteReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
+
+    verify { failureMock.invoke(any()) }
   }
 }
