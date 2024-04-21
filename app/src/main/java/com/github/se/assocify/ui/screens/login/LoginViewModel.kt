@@ -18,7 +18,7 @@ class LoginViewModel(private val userAPI: UserAPI, private val navActions: Navig
   /** Updates the userId of the UI state */
   fun updateUser() {
     CurrentUser.userUid = getCurrentUser()!!.uid
-    CurrentUser.associationUid = ""
+    CurrentUser.associationUid = "associationUid"
     userAPI.getAllUsers(
         { users: List<User> ->
           val user = users.find { it.uid == getCurrentUser()!!.uid }
