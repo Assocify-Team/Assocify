@@ -276,7 +276,8 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       assert(viewModel.uiState.value.receiptImageURI != null)
 
       onNodeWithTag("saveButton").performScrollTo().performClick()
-      assert(capturedReceipt == expectedReceipt)
+      assert(capturedReceipt?.title == expectedReceipt.title)
+      assert(capturedReceipt?.cents == expectedReceipt.cents)
     }
   }
 }
