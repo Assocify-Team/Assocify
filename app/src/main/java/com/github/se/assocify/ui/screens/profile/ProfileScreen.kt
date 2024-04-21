@@ -94,12 +94,7 @@ fun ProfileScreen(navActions: NavigationActions) {
 
                 // profile picture
                 Image(
-                    painter =
-                        painterResource(
-                            id =
-                                R.drawable
-                                    .profile_tab_icon), // Replace R.drawable.profile_picture with
-                                                        // your image resource
+                    painter = painterResource(id = R.drawable.profile_tab_icon),
                     contentDescription = null,
                     modifier =
                         Modifier.size(56.dp)
