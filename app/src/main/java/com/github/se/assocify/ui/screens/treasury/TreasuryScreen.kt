@@ -56,6 +56,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
+import com.github.se.assocify.ui.screens.treasury.accounting.Budget
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import kotlinx.coroutines.launch
@@ -226,7 +227,10 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
 }
 
 /** Budget UI page */
-@Composable private fun BudgetPage() {}
+@Composable
+private fun BudgetPage() {
+  Budget()
+}
 
 /** Balance UI page */
 @Composable private fun BalancePage() {}
