@@ -257,7 +257,9 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testUser"
-    composeTestRule.setContent { ReceiptScreen(receiptUid = "testReceipt", navActions = navActions, viewModel = viewModel) }
+    composeTestRule.setContent {
+      ReceiptScreen(receiptUid = "testReceipt", navActions = navActions, viewModel = viewModel)
+    }
   }
 
   @Test
