@@ -222,7 +222,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   private var expectedReceipt =
       Receipt(
           uid = "testReceipt",
-          title = "Test Title",
+          title = "Edited Receipt",
           description = "",
           cents = 10000,
           date = DateUtil.toDate("01/01/2021")!!,
