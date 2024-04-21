@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -34,6 +35,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -47,6 +52,10 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navActions: NavigationActions) {
+  val listAsso = listOf("Association1", "Association2", "Association3")
+  var expanded by remember { mutableStateOf(false) }
+  var selectedText by remember { mutableStateOf(listAsso[0]) }
+
   Scaffold(
       modifier = Modifier.testTag("profileScreen"),
       bottomBar = {
@@ -69,7 +78,8 @@ fun ProfileScreen(navActions: NavigationActions) {
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp),
   ) { innerPadding ->
     Column(
-        modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
+        modifier =
+            Modifier.padding(innerPadding).verticalScroll(rememberScrollState()).fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
           Row(
               modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -93,33 +103,29 @@ fun ProfileScreen(navActions: NavigationActions) {
               }
 
           ExposedDropdownMenuBox(
-              expanded = false /*expanded*/,
-              onExpandedChange = {
-                /*expanded = !expanded*/
-              },
-              modifier = Modifier.fillMaxWidth().testTag("associationDropdown")) {
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded },
+              modifier =
+                  Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally)) {
                 TextField(
-                    value = "oui" /*selectedText*/,
+                    value = selectedText,
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = {
-                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = false /*expanded*/)
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
-                    modifier = Modifier.menuAnchor().fillMaxWidth())
+                    modifier = Modifier.menuAnchor())
 
-                ExposedDropdownMenu(
-                    expanded = false /*expanded*/,
-                    onDismissRequest = { /*expanded = false*/}) { /*
-                                                                  coffeeDrinks.forEach { item ->
-                                                                      DropdownMenuItem(
-                                                                          text = { Text(text = item) },
-                                                                          onClick = {
-                                                                              selectedText = item
-                                                                              expanded = false
-                                                                              Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
-                                                                          }
-                                                                      )
-                                                                  }*/}
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                  listAsso.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item) },
+                        onClick = {
+                          selectedText = item
+                          expanded = false
+                        })
+                  }
+                }
               }
 
           Text(text = "Settings")
