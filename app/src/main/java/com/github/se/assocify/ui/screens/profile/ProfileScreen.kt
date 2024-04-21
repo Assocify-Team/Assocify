@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -67,7 +69,7 @@ fun ProfileScreen(navActions: NavigationActions) {
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp),
   ) { innerPadding ->
     Column(
-        modifier = Modifier.padding(innerPadding),
+        modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
           Row(
               modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -122,7 +124,7 @@ fun ProfileScreen(navActions: NavigationActions) {
 
           Text(text = "Settings")
 
-          Column {
+          Column(modifier = Modifier.fillMaxWidth().testTag("settingsList")) {
             ListItem(
                 leadingContent = {
                   Icon(
@@ -173,7 +175,7 @@ fun ProfileScreen(navActions: NavigationActions) {
 
           Text(text = "Manage ${"Association"}")
 
-          Column {
+          Column(modifier = Modifier.fillMaxWidth().testTag("manageAssociationList")) {
             ListItem(
                 leadingContent = {
                   Icon(imageVector = Icons.Default.People, contentDescription = "manage roles icon")
