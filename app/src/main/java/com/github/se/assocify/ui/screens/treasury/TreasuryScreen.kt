@@ -234,8 +234,9 @@ private fun BudgetPage() {
 }
 
 /** Balance UI page */
-@Composable private fun BalancePage() {
-    Balance()
+@Composable
+private fun BalancePage() {
+  Balance()
 }
 
 /**
