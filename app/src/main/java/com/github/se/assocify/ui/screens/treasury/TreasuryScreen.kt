@@ -56,6 +56,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
+import com.github.se.assocify.ui.screens.treasury.accounting.Balance
 import com.github.se.assocify.ui.screens.treasury.accounting.Budget
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
@@ -233,7 +234,9 @@ private fun BudgetPage() {
 }
 
 /** Balance UI page */
-@Composable private fun BalancePage() {}
+@Composable private fun BalancePage() {
+    Balance()
+}
 
 /**
  * ------------------------------------------------- * Elements *
