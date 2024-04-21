@@ -217,6 +217,8 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
+  private var testUri = Uri.parse("content://test")
+
   private var expectedReceipt =
       Receipt(
           uid = "testReceipt",
@@ -268,6 +270,10 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       onNodeWithTag("titleField").assertTextContains("Edited Receipt")
       onNodeWithTag("amountField").assertTextContains("100.00")
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
+
+      viewModel.setImage(testUri)
+      assert(viewModel.uiState.value.receiptImageURI != null)
+
       onNodeWithTag("saveButton").performScrollTo().performClick()
       assert(capturedReceipt == expectedReceipt)
     }
