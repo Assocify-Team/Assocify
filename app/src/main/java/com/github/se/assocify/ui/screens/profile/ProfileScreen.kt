@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,7 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
@@ -41,9 +44,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.R
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -87,13 +93,26 @@ fun ProfileScreen(navActions: NavigationActions) {
               horizontalArrangement = Arrangement.SpaceBetween) {
 
                 // profile picture
-                Text(text = "Profile Picture", modifier = Modifier.testTag("profilePicture"))
+                Image(
+                    painter =
+                        painterResource(
+                            id =
+                                R.drawable
+                                    .profile_tab_icon), // Replace R.drawable.profile_picture with
+                                                        // your image resource
+                    contentDescription = null,
+                    modifier =
+                        Modifier.size(56.dp)
+                            .clip(CircleShape) // Clip the image to a circle shape
+                            .testTag("profilePicture"))
 
+                // personal information (depends on current association)
                 Column {
                   Text("Name", modifier = Modifier.testTag("profileName"))
                   Text("Role", modifier = Modifier.testTag("profileRole"))
                 }
 
+                // edit profile button
                 IconButton(
                     onClick = { /*TODO modify profile infos */},
                     modifier = Modifier.testTag("editProfile")) {
@@ -102,6 +121,7 @@ fun ProfileScreen(navActions: NavigationActions) {
                     }
               }
 
+          // Change_association dropdown
           ExposedDropdownMenuBox(
               expanded = expanded,
               onExpandedChange = { expanded = !expanded },
@@ -179,7 +199,7 @@ fun ProfileScreen(navActions: NavigationActions) {
                 modifier = Modifier.testTag("Notifications"))
           }
 
-          Text(text = "Manage ${"Association"}")
+          Text(text = "Manage ${selectedText}")
 
           Column(modifier = Modifier.fillMaxWidth().testTag("manageAssociationList")) {
             ListItem(
