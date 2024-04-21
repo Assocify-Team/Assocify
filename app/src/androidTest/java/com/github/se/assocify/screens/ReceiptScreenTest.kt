@@ -246,7 +246,6 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
         every { getUserReceipts(any(), any()) } answers
             {
               firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
-              navActions.back()
             }
         every { getNewId() } answers { "testReceipt" }
       }
@@ -258,7 +257,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testUser"
-    composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel = viewModel) }
+    composeTestRule.setContent { ReceiptScreen(receiptUid = "testReceipt", navActions = navActions, viewModel = viewModel) }
   }
 
   @Test
