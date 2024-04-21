@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.selectAssoc
+package com.github.se.assocify.ui.screens.selectAssociation
 
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser

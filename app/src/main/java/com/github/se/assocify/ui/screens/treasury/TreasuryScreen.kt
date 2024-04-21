@@ -62,7 +62,7 @@ import com.github.se.assocify.ui.util.PriceUtil
 import kotlinx.coroutines.launch
 
 // Index of each tag for navigation
-enum class PageIndex(val index: Int) {
+enum class TreasuryPageIndex(val index: Int) {
   RECEIPT(0),
   BUDGET(1),
   BALANCE(2);
@@ -101,7 +101,7 @@ fun TreasuryScreen(
         }
       }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-          val pagerState = rememberPagerState(pageCount = { PageIndex.NUMBER_OF_PAGES })
+          val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
           // Tabs
@@ -122,28 +122,28 @@ fun TreasuryScreen(
                                 shape = RoundedCornerShape(8.dp)))
               }) {
                 TreasuryTab(
-                    selected = pagerState.currentPage == PageIndex.RECEIPT.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.RECEIPT.index,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PageIndex.RECEIPT.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.RECEIPT.index)
                       }
                     },
                     text = "Receipts",
                     modifier = Modifier.testTag("myReceiptsTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == PageIndex.BUDGET.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BUDGET.index,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PageIndex.BUDGET.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BUDGET.index)
                       }
                     },
                     text = "Budget",
                     modifier = Modifier.testTag("budgetTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == PageIndex.BALANCE.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BALANCE.index,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(PageIndex.BALANCE.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BALANCE.index)
                       }
                     },
                     text = "Balance",
@@ -153,9 +153,9 @@ fun TreasuryScreen(
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
-              PageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
-              PageIndex.BUDGET.index -> BudgetPage()
-              PageIndex.BALANCE.index -> BalancePage()
+              TreasuryPageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
+              TreasuryPageIndex.BUDGET.index -> BudgetPage()
+              TreasuryPageIndex.BALANCE.index -> BalancePage()
             }
           }
         }

@@ -1,9 +1,8 @@
-package com.github.se.assocify.ui.screens.selectAssoc
+package com.github.se.assocify.ui.screens.selectAssociation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,14 +10,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -33,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -55,6 +58,7 @@ fun SelectAssociation(
   val model = SelectAssociationViewModel(associationAPI, userAPI)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
+
   Scaffold(
       modifier = Modifier.testTag("SelectAssociationScreen"),
       topBar = {
@@ -113,7 +117,7 @@ fun SelectAssociation(
                             ass.getName().take(min).lowercase() ==
                                 state.value.searchQuery.take(min).lowercase()
                           }
-                      filteredAssos.map { ass -> DisplayOrganization(ass) }
+                      filteredAssos.map { ass -> DisplayOrganization(ass, navActions) }
                     } else {
                       state.value.associations
                     }
@@ -142,7 +146,7 @@ fun SelectAssociation(
                 item { Text(text = "There is no organization to display.") }
               } else {
                 itemsIndexed(registeredAssociation) { index, organization ->
-                  DisplayOrganization(organization)
+                  DisplayOrganization(organization, navActions)
                   // Add a Divider for each organization except the last one
                   if (index < registeredAssociation.size - 1) {
                     HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))
@@ -159,18 +163,34 @@ fun SelectAssociation(
  * @param organization the name of the organization
  */
 @Composable
-fun DisplayOrganization(organization: Association) {
-  Row(
-      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("DisplayOrganizationScreen"),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Organization Icon",
-            modifier = Modifier.testTag("OrganizationIcon"))
+fun DisplayOrganization(organization: Association, navActions: NavigationActions) {
+  ListItem(
+      headlineContent = {
         Text(
             text = organization.getName(),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.testTag("OrganizationName"))
-      }
+      },
+      leadingContent = {
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Organization Icon",
+            modifier = Modifier.testTag("OrganizationIcon"))
+      },
+      trailingContent = {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = "Select Icon",
+            modifier =
+                Modifier.testTag("SelectIcon").clickable {
+                  CurrentUser.associationUid = organization.uid
+                  navActions.navigateTo(Destination.Home)
+                })
+      },
+      modifier =
+          Modifier.clickable {
+                CurrentUser.associationUid = organization.uid
+                navActions.navigateTo(Destination.Home)
+              }
+              .testTag("DisplayOrganizationScreen"))
 }
