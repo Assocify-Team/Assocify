@@ -63,10 +63,10 @@ import com.github.se.assocify.ui.util.PriceUtil
 import kotlinx.coroutines.launch
 
 // Index of each tag for navigation
-enum class TreasuryPageIndex(val index: Int) {
-  RECEIPT(0),
-  BUDGET(1),
-  BALANCE(2);
+enum class TreasuryPageIndex {
+  RECEIPT,
+  BUDGET,
+  BALANCE;
 
   companion object {
     val NUMBER_OF_PAGES: Int = entries.size
@@ -97,7 +97,7 @@ fun TreasuryScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
             onClick = {
-              if (pagerState.currentPage == TreasuryPageIndex.RECEIPT.index) {
+              if (pagerState.currentPage == TreasuryPageIndex.RECEIPT.ordinal) {
                 navActions.navigateTo(Destination.NewReceipt)
               }
             }) {
@@ -125,28 +125,28 @@ fun TreasuryScreen(
                                 shape = RoundedCornerShape(8.dp)))
               }) {
                 TreasuryTab(
-                    selected = pagerState.currentPage == TreasuryPageIndex.RECEIPT.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.RECEIPT.ordinal,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(TreasuryPageIndex.RECEIPT.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.RECEIPT.ordinal)
                       }
                     },
                     text = "Receipts",
                     modifier = Modifier.testTag("myReceiptsTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == TreasuryPageIndex.BUDGET.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BUDGET.ordinal,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(TreasuryPageIndex.BUDGET.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BUDGET.ordinal)
                       }
                     },
                     text = "Budget",
                     modifier = Modifier.testTag("budgetTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == TreasuryPageIndex.BALANCE.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BALANCE.ordinal,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(TreasuryPageIndex.BALANCE.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BALANCE.ordinal)
                       }
                     },
                     text = "Balance",
@@ -156,9 +156,9 @@ fun TreasuryScreen(
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
-              TreasuryPageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
-              TreasuryPageIndex.BUDGET.index -> BudgetPage()
-              TreasuryPageIndex.BALANCE.index -> BalancePage()
+              TreasuryPageIndex.RECEIPT.ordinal -> MyReceiptPage(viewModel)
+              TreasuryPageIndex.BUDGET.ordinal -> BudgetPage()
+              TreasuryPageIndex.BALANCE.ordinal -> BalancePage()
             }
           }
         }
