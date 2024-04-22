@@ -48,15 +48,11 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   @Test
   fun takePhoto() {
-    with(composeTestRule) {
-      onNodeWithText("Take photo").assertIsDisplayed().performClick()
-    }
+    with(composeTestRule) { onNodeWithText("Take photo").assertIsDisplayed().performClick() }
   }
 
   @Test
   fun selectImage() {
-    with(composeTestRule) {
-      onNodeWithText("Select image").assertIsDisplayed().performClick()
-    }
+    with(composeTestRule) { onNodeWithText("Select image").assertIsDisplayed().performClick() }
   }
 }
