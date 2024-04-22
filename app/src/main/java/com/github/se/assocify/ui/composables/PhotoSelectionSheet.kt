@@ -87,14 +87,14 @@ fun PhotoSelectionSheet(
           modifier = Modifier.fillMaxWidth().padding(bottom = 60.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp).testTag("photoSelectionSheet"),
+                modifier =
+                    Modifier.padding(start = 16.dp, end = 16.dp).testTag("photoSelectionSheet"),
                 text = "Choose option",
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center)
             ListItem(
                 modifier =
-                    Modifier.testTag("takePhotoOption")
-                        .clickable {
+                    Modifier.testTag("takePhotoOption").clickable {
                       hideSheet()
                       val permissionCheckResult =
                           ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
@@ -111,8 +111,7 @@ fun PhotoSelectionSheet(
                 leadingContent = { Icon(Icons.Default.Camera, "Camera icon") })
             ListItem(
                 modifier =
-                    Modifier.testTag("selectImageOption")
-                        .clickable {
+                    Modifier.testTag("selectImageOption").clickable {
                       hideSheet()
                       imagePicker.launch(
                           PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
