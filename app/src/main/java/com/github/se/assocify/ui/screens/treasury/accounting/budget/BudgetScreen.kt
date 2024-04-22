@@ -1,6 +1,7 @@
-package com.github.se.assocify.ui.screens.treasury.accounting
+package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
 import androidx.compose.runtime.Composable
+import com.github.se.assocify.ui.screens.treasury.accounting.Accounting
 
 /** The accounting screen displaying the budget screen of the association */
 @Composable
