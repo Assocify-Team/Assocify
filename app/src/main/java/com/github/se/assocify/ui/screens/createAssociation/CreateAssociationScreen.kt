@@ -110,16 +110,16 @@ fun CreateAssociationScreen(
                     ListItem(
                         modifier =
                             Modifier.clip(RoundedCornerShape(10.dp))
-                                .testTag("MemberListItem-${member.getName()}"),
-                        headlineContent = { Text(member.getName()) },
-                        overlineContent = { Text(member.getRole().name) },
+                                .testTag("MemberListItem-${member.name}"),
+                        headlineContent = { Text(member.name) },
+                        overlineContent = { Text(member.role.name) },
                         leadingContent = {
                           Icon(Icons.Default.Person, contentDescription = "Person")
                         },
                         trailingContent = {
                           IconButton(
                               onClick = { viewmodel.modifyMember(member) },
-                              modifier = Modifier.testTag("editMember-${member.getName()}")) {
+                              modifier = Modifier.testTag("editMember-${member.name}")) {
                                 Icon(Icons.Default.Edit, contentDescription = "Edit")
                               }
                         },

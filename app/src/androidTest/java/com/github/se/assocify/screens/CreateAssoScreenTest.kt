@@ -93,13 +93,13 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("userDropdownItem-7").assertIsDisplayed()
       onNodeWithTag("userDropdownItem-8").assertIsDisplayed()
       onNodeWithTag("userDropdownItem-3").performClick() // jacques
-      assert(bigView.uiState.value.editMember?.getName() == "jacques")
+      assert(bigView.uiState.value.editMember?.name == "jacques")
       assert(bigView.uiState.value.editMember!!.hasRole(""))
       onNodeWithTag("addMemberButton").assertIsDisplayed()
       onNodeWithTag("deleteMember").assertIsDisplayed()
       onNodeWithTag("addMemberButton").performClick()
       assert(bigView.uiState.value.members.size == 1)
-      assert(bigView.uiState.value.members[0].getName() == "jacques")
+      assert(bigView.uiState.value.members[0].name == "jacques")
       onNodeWithTag("MemberListItem-jacques").assertIsDisplayed()
     }
   }
@@ -113,7 +113,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("addMemberButton").performClick()
       onNodeWithTag("MemberListItem-jacques").assertIsDisplayed()
       onNodeWithTag("editMember-jacques").performClick()
-      assert(bigView.uiState.value.editMember?.getName() == "jacques")
+      assert(bigView.uiState.value.editMember?.name == "jacques")
       onNodeWithTag("deleteMember").assertIsDisplayed()
       onNodeWithTag("deleteMember").performClick()
       assert(bigView.uiState.value.members.isEmpty())

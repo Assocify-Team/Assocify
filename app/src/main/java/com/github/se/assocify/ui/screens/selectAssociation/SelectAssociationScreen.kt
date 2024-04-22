@@ -68,7 +68,7 @@ fun SelectAssociation(
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
                   modifier = Modifier.testTag("HelloText"),
-                  text = "Hello " + state.value.user.getName() + " !!",
+                  text = "Hello " + state.value.user.name + " !!",
                   style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
