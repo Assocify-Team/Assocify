@@ -6,5 +6,5 @@ import androidx.compose.runtime.setValue
 
 @Composable
 fun Budget() {
-  Accounting()
+  Accounting("budget")
 }

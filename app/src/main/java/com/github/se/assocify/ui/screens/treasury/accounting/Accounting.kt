@@ -16,6 +16,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +26,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 
+/**
+ * The accounting screen displaying the budget or the balance of the association
+ * @param page: The page to display (either "budget" or "balance")
+ */
 @Composable
-fun Accounting() {
+fun Accounting(page: String) {
   val yearList =
       listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
   val categoryList = listOf("Global", "Category", "Commissions", "Events", "Projects", "Other")
@@ -62,9 +68,9 @@ fun Accounting() {
         categoryMapping[selectedCategory]?.contains(category) == true
       }
 
-  LazyColumn(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+  LazyColumn(modifier = Modifier.fillMaxWidth().padding(8.dp).testTag("accountingScreen")) {
     item {
-      Row {
+      Row (Modifier.testTag("filterRow")) {
         DropdownFilterChip(selectedYear, yearList) { selectedYear = it }
         DropdownFilterChip(selectedCategory, categoryList) { selectedCategory = it }
       }
@@ -82,6 +88,11 @@ fun Accounting() {
   }
 }
 
+/**
+ * A line displaying the total amount of the budget
+ * @param totalAmount: The total amount of the budget
+ */
+
 @Composable
 fun TotalLine(totalAmount: Int) {
   ListItem(
@@ -94,9 +105,18 @@ fun TotalLine(totalAmount: Int) {
       trailingContent = {
         Text(
             text = "$totalAmount",
-            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold))
-      })
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+      },
+      colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+  )
 }
+
+/**
+ * A dropdown filter chip with a list of options
+ * @param selectedOption1: The default selected option
+ * @param options: The list of options
+ * @param onOptionSelected: The callback when an option is selected
+ */
 
 @Composable
 fun DropdownFilterChip(
@@ -133,6 +153,9 @@ fun DropdownFilterChip(
   }
 }
 
+/**
+ * A line displaying a budget category and its amount
+ */
 @Composable
 fun DisplayLine(category: String, amount: String) {
   ListItem(
