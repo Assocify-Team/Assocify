@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -86,13 +87,14 @@ fun PhotoSelectionSheet(
           modifier = Modifier.fillMaxWidth().padding(bottom = 60.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp).testTag("photoSelectionSheet"),
                 text = "Choose option",
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center)
             ListItem(
                 modifier =
-                    Modifier.clickable {
+                    Modifier.testTag("takePhotoOption")
+                        .clickable {
                       hideSheet()
                       val permissionCheckResult =
                           ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
@@ -109,7 +111,8 @@ fun PhotoSelectionSheet(
                 leadingContent = { Icon(Icons.Default.Camera, "Camera icon") })
             ListItem(
                 modifier =
-                    Modifier.clickable {
+                    Modifier.testTag("selectImageOption")
+                        .clickable {
                       hideSheet()
                       imagePicker.launch(
                           PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))

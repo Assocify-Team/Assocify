@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
@@ -56,7 +57,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
         every { uploadReceipt(any(), any(), any(), any()) } answers
             {
               capturedReceipt = firstArg<Receipt>()
-              println("capturedReceiptRightNow: $capturedReceipt")
               navActions.back()
             }
         every { getNewId() } returns "testReceipt"
@@ -176,10 +176,13 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       assert(viewModel.uiState.value.amountError == null)
       assert(viewModel.uiState.value.dateError == null)
 
+      onNodeWithTag("saveButton").performScrollTo().performClick()
+      onNodeWithText("Receipt image is required", true).assertIsDisplayed()
+
       viewModel.setImage(testUri)
       assert(viewModel.uiState.value.receiptImageURI != null)
 
-      onNodeWithTag("saveButton").performScrollTo().performClick()
+      viewModel.saveReceipt()
       verify { receiptAPI.uploadReceipt(any(), any(), any(), any()) }
       assert(capturedReceipt == expectedReceipt)
     }
@@ -209,6 +212,24 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("datePickerDialogCancel").performClick()
       onNodeWithTag("datePickerDialog").assertDoesNotExist()
       onNodeWithTag("dateField").assertTextContains("Date cannot be empty")
+    }
+  }
+
+  @Test
+  fun cameraPermission() {
+    with(composeTestRule) {
+      viewModel.signalCameraPermissionDenied()
+      onNodeWithText("Camera permission denied", true).assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun photoSheet() {
+    with(composeTestRule) {
+      onNodeWithTag("editImageButton").performClick()
+      onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
+      viewModel.hideBottomSheet()
+      onNodeWithTag("photoSelectionSheet").assertDoesNotExist()
     }
   }
 }
