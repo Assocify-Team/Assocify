@@ -50,7 +50,7 @@ fun Accounting(
 
   val filteredBudgetLines =
       budgetLines.filter { (category, _) ->
-          categoryMapping[selectedCategory]?.contains(category)!!
+        categoryMapping[selectedCategory]?.contains(category)!!
       }
 
   LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("AccountingScreen")) {
