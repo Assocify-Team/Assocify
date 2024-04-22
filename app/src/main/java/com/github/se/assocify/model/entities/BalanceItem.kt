@@ -5,7 +5,7 @@ data class BalanceItem(
     val nameItem: String,
     val amount: Int,
     val description: String,
-    val category: AccountingSubCategory, //Game*
+    val category: AccountingSubCategory, //Game*, Pôle logistique...
     val date: String,
     val receipt: Receipt?,
     val assignee: User?, // User who is assigned to pay this item or to receive it
