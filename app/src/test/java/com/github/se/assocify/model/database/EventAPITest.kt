@@ -52,7 +52,7 @@ class EventAPITest {
     }
 
     @Test
-    fun testGetAssociation() {
+    fun testGetEvent() {
         val onSuccess: (Event) -> Unit = mockk(relaxed = true)
         val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
@@ -60,7 +60,7 @@ class EventAPITest {
     }
 
     @Test
-    fun testGetAllAssociations() {
+    fun testGetAllEvent() {
         val onSuccess: (List<Event>) -> Unit = mockk(relaxed = true)
         val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
@@ -68,19 +68,26 @@ class EventAPITest {
     }
 
     @Test
-    fun testAddAssociation() {
+    fun testAddEvent() {
         val onSuccess: (Long) -> Unit = mockk(relaxed = true)
 
     }
 
     @Test
-    fun testDeleteAssociation() {
+    suspend fun testDeleteEvent() {
         eventAPI =
             EventAPI(
                 createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
                     install(Postgrest)
                 })
         val onSuccess: () -> Unit = mockk(relaxed = true)
+
+        eventAPI.deleteEvent(1, onSuccess) { fail("Should not fail") }
+
+        verify(timeout = 1000) { onSuccess() }
+
+        verify(timeout = 100) {  }
+
 
 
 
