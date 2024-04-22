@@ -55,6 +55,13 @@ import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
 
+/**
+ * Profile screen that displays the user's information, a way to change your current association and
+ * settings : personal settings (theme, privacy/security, notifications) which lead to other pages
+ * and association's settings (if admin).
+ *
+ * @param navActions: NavigationActions object that contains the navigation actions.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navActions: NavigationActions) {
@@ -194,6 +201,7 @@ fun ProfileScreen(navActions: NavigationActions) {
                 modifier = Modifier.testTag("Notifications"))
           }
 
+          // The below part is association dependent, only available if you're an admin !
           Text(text = "Manage ${selectedText}")
 
           Column(modifier = Modifier.fillMaxWidth().testTag("manageAssociationList")) {
