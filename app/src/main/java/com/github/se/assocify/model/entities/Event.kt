@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.entities
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 /**
  * Data class representing an event of an association
@@ -11,18 +10,13 @@ import java.time.format.DateTimeFormatter
  * @param description description of the event
  * @param startDate start date of the event
  * @param endDate end date of the event
- * @param organizers list of users who are organizing the event
- * @param staffers list of users who are staffing the event
- * @param tasks list of tasks that need to be completed for the event
  */
 data class Event(
-    val uid: String = "testUid",
-    val name: String = "testName",
-    val description: String = "description",
-    val startDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    val endDate: String =
-        LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    val organizers: List<User> = emptyList(),
-    val staffers: List<User> = emptyList(),
-    val tasks: List<Task> = emptyList(),
+    val uid: String,
+    val name: String,
+    val description: String,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val guestsOrArtists: List<String>,
+    val location: String
 )
