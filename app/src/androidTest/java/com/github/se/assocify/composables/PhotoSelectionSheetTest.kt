@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -42,6 +43,20 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithText("Take photo").assertIsDisplayed()
       onNodeWithText("Select image").assertIsDisplayed()
       onNodeWithText("Choose option").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun takePhoto() {
+    with(composeTestRule) {
+      onNodeWithText("Take photo").assertIsDisplayed().performClick()
+    }
+  }
+
+  @Test
+  fun selectImage() {
+    with(composeTestRule) {
+      onNodeWithText("Select image").assertIsDisplayed().performClick()
     }
   }
 }
