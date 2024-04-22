@@ -32,8 +32,7 @@ class CreateAssociationViewmodel(
    * Utility function : Sorts the members by role then name
    */
   private fun sortMembers(memberList: List<User>): List<User> {
-    return memberList.sortedWith(
-        compareBy({ it.getRole().getRoleType().ordinal }, { it.getName() }))
+    return memberList.sortedWith(compareBy({ it.role.getRoleType().ordinal }, { it.name }))
   }
 
   /*
@@ -98,7 +97,7 @@ class CreateAssociationViewmodel(
                             .filterNot { user ->
                               _uiState.value.members.any { us -> us.uid == user.uid }
                             }
-                            .filter { it.getName().lowercase().contains(searchMember.lowercase()) })
+                            .filter { it.name.lowercase().contains(searchMember.lowercase()) })
             if (_uiState.value.searchMemberList.isEmpty()) {
               _uiState.value = _uiState.value.copy(memberError = "No users found")
             } else {
@@ -150,7 +149,7 @@ class CreateAssociationViewmodel(
         _uiState.value.copy(
             savable =
                 (_uiState.value.members.any { user -> user.uid == CurrentUser.userUid }) &&
-                    (_uiState.value.members.all { it.getRole().isAnActiveRole() }) &&
+                    (_uiState.value.members.all { it.role.isAnActiveRole() }) &&
                     _uiState.value.name.isNotBlank())
   }
 
@@ -182,7 +181,7 @@ data class CreateAssoUIState(
     val memberError: String? = null, // error message when no member is found
     val savable: Boolean =
         (members.any { user -> user.uid == CurrentUser.userUid }) &&
-            (members.all { it.getRole().isAnActiveRole() }) &&
+            (members.all { it.role.isAnActiveRole() }) &&
             name.isNotBlank() // whether the association can be saved
     // there should be a logo val but not implemented yet
 )
