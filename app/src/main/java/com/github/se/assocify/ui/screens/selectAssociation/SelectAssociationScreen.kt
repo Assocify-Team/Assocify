@@ -13,7 +13,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -68,7 +67,7 @@ fun SelectAssociation(
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               Text(
                   modifier = Modifier.testTag("HelloText"),
-                  text = "Hello " + state.value.user.getName() + " !!",
+                  text = "Hello " + state.value.user.name + " !!",
                   style = MaterialTheme.typography.headlineSmall)
               SearchBar(
                   modifier = Modifier.testTag("SearchOrganization"),
