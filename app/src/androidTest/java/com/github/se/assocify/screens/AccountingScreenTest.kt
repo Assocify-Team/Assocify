@@ -19,7 +19,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-  val listYear = listOf("2023", "2022", "2021")
+
   val options = listOf("Global", "Category", "Commissions", "Events", "Projects", "Other")
   val budgetLines =
       listOf(
@@ -43,7 +43,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     composeTestRule.setContent {
-      Accounting("Budget", listYear, options, budgetLines, categoryMapping)
+      Accounting("Budget", options, budgetLines, categoryMapping)
       // Accounting("Balance", listYear, options, budgetLines, categoryMapping)
     }
   }

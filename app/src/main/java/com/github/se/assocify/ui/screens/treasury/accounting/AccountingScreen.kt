@@ -39,11 +39,12 @@ import androidx.compose.ui.window.PopupProperties
 @Composable
 fun Accounting(
     page: String,
-    yearList: List<String>,
     categoryList: List<String>,
     budgetLines: List<Pair<String, String>>,
     categoryMapping: Map<String, List<String>>
 ) { // TODO: fetch all these list from viewmodel
+  val yearList =
+      listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
   var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedCategory by remember { mutableStateOf(categoryList.first()) }
 
