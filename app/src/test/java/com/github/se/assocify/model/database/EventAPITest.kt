@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
-import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -69,12 +68,19 @@ class EventAPITest {
 
     @Test
     fun testAddEvent() {
-        val onSuccess: (Long) -> Unit = mockk(relaxed = true)
+        val onSuccess: () -> Unit = mockk(relaxed = true)
+        error = false
+        eventAPI.addEvent(
+            Event(1, "Test", "Test", LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 1), listOf("Test"), "Test")
+            , onSuccess
+        ) { fail("Should not fail") }
+
+        verify(timeout = 1000) { onSuccess() }
 
     }
 
     @Test
-    suspend fun testDeleteEvent() {
+    fun testDeleteEvent() {
         eventAPI =
             EventAPI(
                 createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -85,10 +91,6 @@ class EventAPITest {
         eventAPI.deleteEvent(1, onSuccess) { fail("Should not fail") }
 
         verify(timeout = 1000) { onSuccess() }
-
-        verify(timeout = 100) {  }
-
-
 
 
     }

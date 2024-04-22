@@ -1,7 +1,8 @@
 package com.github.se.assocify.model.entities
 
-import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
+import java.time.LocalDate
+
 /**
  * @param uid unique identifier of the event
  * @param name name of the event
@@ -11,13 +12,13 @@ import kotlinx.serialization.Serializable
  * @param guestsOrArtists guests or artists of the event
  * @param location location of the event
 */
-@Serializable
+
 data class Event(
-    val uid: String,
-    private val name: String,
-    private val description: String,
-    private val startDate: LocalDate,
-    private val endDate: LocalDate,
-    private val guestsOrArtists: List<String>,
-    private val location: String
+    val uid: Int,
+    val name: String,
+    val description: String,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val guestsOrArtists: List<String>,
+    val location: String
     )

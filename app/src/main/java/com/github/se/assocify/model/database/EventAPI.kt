@@ -21,7 +21,7 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success (by default does nothing)
      * @param onFailure called on failure
      */
-    suspend fun createEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    fun addEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
                 postgrest.from(collectionName).insert(event)
@@ -38,7 +38,7 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success with the list of events
      * @param onFailure called on failure
      */
-    suspend fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
                 val events = postgrest.from(collectionName).select().decodeList<Event>()
@@ -56,7 +56,7 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success with the event
      * @param onFailure called on failure
      */
-    suspend fun getEvent(id: Int, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getEvent(id: Int, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
                 val event = postgrest.from(collectionName).select(columns = Columns.ALL) {
@@ -78,7 +78,7 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success with the updated event (by default does nothing)
      * @param onFailure called on failure
      */
-    suspend fun updateEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    fun updateEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
                 val updatedEvent = postgrest.from(collectionName)
@@ -101,10 +101,10 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success (by default does nothing)
      * @param onFailure called on failure
      */
-    suspend fun deleteEvent(id: Int, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    fun deleteEvent(id: Int, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
-                val isSuccess = postgrest.from(collectionName).delete {
+                postgrest.from(collectionName).delete {
                     filter {
                         Event::uid eq id
                     }
