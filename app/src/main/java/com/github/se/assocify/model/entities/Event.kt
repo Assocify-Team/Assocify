@@ -10,6 +10,8 @@ import java.time.LocalDate
  * @param description description of the event
  * @param startDate start date of the event
  * @param endDate end date of the event
+ * @param guestsOrArtists list of guests or artists that will be present at the event
+ * @param location location where the event will take place
  */
 data class Event(
     val uid: String,
