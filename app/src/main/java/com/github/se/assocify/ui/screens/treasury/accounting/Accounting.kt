@@ -33,33 +33,17 @@ import androidx.compose.ui.window.PopupProperties
 
 /**
  * The accounting screen displaying the budget or the balance of the association
+ *
  * @param page: The page to display (either "budget" or "balance")
  */
 @Composable
-fun Accounting(page: String) {
-  val yearList =
-      listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
-  val categoryList = listOf("Global", "Category", "Commissions", "Events", "Projects", "Other")
-  // TODO: change this when budget entity and api are implemented
-  val budgetLines =
-      listOf(
-          "Logistic Category" to "1000",
-          "Communication Category" to "2000",
-          "Game*" to "3000",
-          "ICBD" to "4000",
-          "Balelec" to "5000",
-      )
-
-  val categoryMapping =
-      mapOf(
-          "Global" to
-              listOf("Logistic Category", "Communication Category", "Game*", "ICBD", "Balelec"),
-          "Category" to listOf("Logistic Category", "Communication Category"),
-          "Commissions" to listOf("Game*"),
-          "Events" to listOf("ICBD", "Balelec"),
-          "Projects" to listOf(),
-          "Other" to listOf())
-
+fun Accounting(
+    page: String,
+    yearList: List<String>,
+    categoryList: List<String>,
+    budgetLines: List<Pair<String, String>>,
+    categoryMapping: Map<String, List<String>>
+) { // TODO: fetch all these list from viewmodel
   var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedCategory by remember { mutableStateOf(categoryList.first()) }
 
@@ -68,16 +52,18 @@ fun Accounting(page: String) {
         categoryMapping[selectedCategory]?.contains(category) == true
       }
 
-  LazyColumn(modifier = Modifier.fillMaxWidth().padding(8.dp).testTag("accountingScreen")) {
+  LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("AccountingScreen")) {
     item {
-      Row (Modifier.testTag("filterRow")) {
-        DropdownFilterChip(selectedYear, yearList) { selectedYear = it }
-        DropdownFilterChip(selectedCategory, categoryList) { selectedCategory = it }
+      Row(Modifier.testTag("filterRow")) {
+        DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
+        DropdownFilterChip(selectedCategory, categoryList, "categoryFilterChip") {
+          selectedCategory = it
+        }
       }
     }
 
     items(filteredBudgetLines) { (category, amount) ->
-      DisplayLine(category, amount)
+      DisplayLine(category, amount, "displayLine$category")
       HorizontalDivider(Modifier.fillMaxWidth().padding(vertical = 8.dp))
     }
 
@@ -90,13 +76,13 @@ fun Accounting(page: String) {
 
 /**
  * A line displaying the total amount of the budget
+ *
  * @param totalAmount: The total amount of the budget
  */
-
 @Composable
 fun TotalLine(totalAmount: Int) {
   ListItem(
-      modifier = Modifier.fillMaxWidth().background(Color.LightGray),
+      modifier = Modifier.fillMaxWidth().background(Color.LightGray).testTag("totalLine"),
       headlineContent = {
         Text(
             text = "Total",
@@ -107,39 +93,42 @@ fun TotalLine(totalAmount: Int) {
             text = "$totalAmount",
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
-      colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-  )
+      colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
 }
 
 /**
  * A dropdown filter chip with a list of options
+ *
  * @param selectedOption1: The default selected option
  * @param options: The list of options
+ * @param testTag: The test tag of the dropdown filter chip
  * @param onOptionSelected: The callback when an option is selected
  */
-
 @Composable
 fun DropdownFilterChip(
     selectedOption1: String,
     options: List<String>,
+    testTag: String,
     onOptionSelected: (String) -> Unit
 ) {
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf(selectedOption1) }
 
-  Box(modifier = Modifier.padding(8.dp)) {
+  Box(modifier = Modifier.padding(8.dp).testTag(testTag)) {
     FilterChip(
         selected = false,
         onClick = { expanded = !expanded },
         label = { Text(selectedOption) },
         trailingIcon = {
           Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-        })
+        },
+        modifier = Modifier.testTag("filterChip"))
 
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
-        properties = PopupProperties(focusable = true)) {
+        properties = PopupProperties(focusable = true),
+        modifier = Modifier.testTag("dropdownMenu")) {
           options.forEach { option ->
             DropdownMenuItem(
                 text = { Text(option) },
@@ -153,13 +142,14 @@ fun DropdownFilterChip(
   }
 }
 
-/**
- * A line displaying a budget category and its amount
- */
+/** A line displaying a budget category and its amount */
 @Composable
-fun DisplayLine(category: String, amount: String) {
+fun DisplayLine(category: String, amount: String, testTag: String) {
   ListItem(
       headlineContent = { Text(category) },
       trailingContent = { Text(amount) },
-      modifier = Modifier.clickable { /*TODO: open screen of the selected budget category*/})
+      modifier =
+          Modifier.clickable { /*TODO: open screen of the selected budget category*/}
+              .testTag(testTag),
+  )
 }

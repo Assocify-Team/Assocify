@@ -81,7 +81,7 @@ fun TreasuryScreen(
     viewModel: ReceiptListViewModel = ReceiptListViewModel(navActions)
 ) {
   val viewmodelState by viewModel.uiState.collectAsState()
-    val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
+  val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}, viewModel) },
@@ -97,13 +97,12 @@ fun TreasuryScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
             onClick = {
-                if (pagerState.currentPage == TreasuryPageIndex.RECEIPT.index) {
-                    navActions.navigateTo(Destination.NewReceipt)
-                }
+              if (pagerState.currentPage == TreasuryPageIndex.RECEIPT.index) {
+                navActions.navigateTo(Destination.NewReceipt)
+              }
+            }) {
+              Icon(Icons.Outlined.Add, "Create")
             }
-        ) {
-          Icon(Icons.Outlined.Add, "Create")
-        }
       }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
           val coroutineRoute = rememberCoroutineScope()
