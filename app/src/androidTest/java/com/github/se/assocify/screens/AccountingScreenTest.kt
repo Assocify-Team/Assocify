@@ -9,10 +9,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.Accounting
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -21,28 +25,22 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-
-  val categoryList =
-      listOf(
-          AccountingCategory("Global"),
-          AccountingCategory("Pole"),
-          AccountingCategory("Events"),
-          AccountingCategory("Commission"),
-          AccountingCategory("Fees"))
+    @get:Rule val mockkRule = MockKRule(this)
+    @RelaxedMockK lateinit var mockNavActions: NavigationActions
   val list =
       listOf(
-          AccountingSubCategory("Administration Pole", AccountingCategory("Pole"), 2000),
-          AccountingSubCategory("Presidency Pole", AccountingCategory("Pole"), -400),
-          AccountingSubCategory("Balelec", AccountingCategory("Events"), 1000),
-          AccountingSubCategory("Champachelor", AccountingCategory("Events"), 5000),
-          AccountingSubCategory("OGJ", AccountingCategory("Commission"), 6000),
-          AccountingSubCategory("Communication Fees", AccountingCategory("Fees"), 3000))
+          AccountingSubCategory("1", "Administration Pole", AccountingCategory("Pole"), 2000),
+          AccountingSubCategory("2", "Presidency Pole", AccountingCategory("Pole"), -400),
+          AccountingSubCategory("3", "Balelec", AccountingCategory("Events"), 1000),
+          AccountingSubCategory("4", "Champachelor", AccountingCategory("Events"), 5000),
+          AccountingSubCategory("5", "OGJ", AccountingCategory("Commission"), 6000),
+          AccountingSubCategory("6", "Communication Fees", AccountingCategory("Fees"), 3000))
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    composeTestRule.setContent { Accounting("Budget", list) }
+    composeTestRule.setContent { Accounting(AccountingPage.BUDGET, list, mockNavActions) }
   }
 
   /** Tests if the nodes are displayed */

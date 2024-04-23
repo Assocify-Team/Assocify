@@ -3,6 +3,7 @@ package com.github.se.assocify.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.github.se.assocify.R
+import com.github.se.assocify.model.entities.AccountingSubCategory
 
 sealed class Destination(
     val route: String,
@@ -30,6 +31,8 @@ sealed class Destination(
   data object NewReceipt : Destination("treasury/receipt")
 
   data class EditReceipt(val receiptUid: String) : Destination("treasury/receipt/$receiptUid")
+
+    data class BudgetDetailed(val subCategoryUid: String) : Destination("treasury/budget/$subCategoryUid")
 }
 
 val MAIN_TABS_LIST =

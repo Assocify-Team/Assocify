@@ -157,8 +157,8 @@ fun TreasuryScreen(
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.RECEIPT.ordinal -> MyReceiptPage(viewModel)
-              TreasuryPageIndex.BUDGET.ordinal -> BudgetPage()
-              TreasuryPageIndex.BALANCE.ordinal -> BalancePage()
+              TreasuryPageIndex.BUDGET.ordinal -> BudgetPage(navActions)
+              TreasuryPageIndex.BALANCE.ordinal -> BalancePage(navActions)
             }
           }
         }
@@ -231,14 +231,14 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
 
 /** Budget UI page */
 @Composable
-private fun BudgetPage() {
-  Budget()
+private fun BudgetPage(navigationActions: NavigationActions) {
+  Budget(navigationActions)
 }
 
 /** Balance UI page */
 @Composable
-private fun BalancePage() {
-  Balance()
+private fun BalancePage(navigationActions: NavigationActions) {
+  Balance(navigationActions)
 }
 
 /**

@@ -32,6 +32,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
+
+/** Represents the page to display in the accounting screen */
+
+enum class AccountingPage {
+    BUDGET,
+    BALANCE
+}
 
 /**
  * The accounting screen displaying the budget or the balance of the association
@@ -41,8 +51,9 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
  */
 @Composable
 fun Accounting(
-    page: String,
-    subCategoryList: List<AccountingSubCategory>
+    page: AccountingPage,
+    subCategoryList: List<AccountingSubCategory>,
+    navigationActions: NavigationActions
 ) { // TODO: fetch all these list from viewmodel
   val yearList =
       listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
@@ -73,7 +84,7 @@ fun Accounting(
     }
 
     items(filteredSubCategoryList) {
-      DisplayLine(it.name, it.amount, "displayLine${it.name}")
+      DisplayLine(it, "displayLine${it.name}", page, navigationActions)
       HorizontalDivider(Modifier.fillMaxWidth().padding(vertical = 8.dp))
     }
 
@@ -92,7 +103,7 @@ fun Accounting(
 @Composable
 fun TotalLine(totalAmount: Int) {
   ListItem(
-      modifier = Modifier.fillMaxWidth().background(Color.LightGray).testTag("totalLine"),
+      modifier = Modifier.fillMaxWidth().testTag("totalLine"),
       headlineContent = {
         Text(
             text = "Total",
@@ -154,12 +165,18 @@ fun DropdownFilterChip(
 
 /** A line displaying a budget category and its amount */
 @Composable
-fun DisplayLine(category: String, amount: Int, testTag: String) {
+fun DisplayLine(category: AccountingSubCategory, testTag: String, page: AccountingPage, navigationActions: NavigationActions) {
   ListItem(
-      headlineContent = { Text(category) },
-      trailingContent = { Text("$amount") },
+      headlineContent = { Text(category.name) },
+      trailingContent = { Text("${category.amount}") },
       modifier =
-          Modifier.clickable { /*TODO: open screen of the selected budget category*/}
+          Modifier.clickable {
+              /*TODO: open screen of the selected budget category*/
+                if(page == AccountingPage.BUDGET) {
+                    navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
+                } else {
+                    //go to balance detailed screen
+                } }
               .testTag(testTag),
   )
 }
