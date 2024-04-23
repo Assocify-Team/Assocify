@@ -169,6 +169,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
     // Espresso
     val espressoVersion = "3.5.1"
     androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")

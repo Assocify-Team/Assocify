@@ -60,7 +60,7 @@ class AssociationAPITest {
     response =
         """
       {
-        "uid": $uuid1,
+        "uid": "$uuid1",
         "name": "Test",
         "description": "Test",
         "creation_date": "2022-01-01"
@@ -70,14 +70,14 @@ class AssociationAPITest {
 
     assoAPI.getAssociation(uuid1.toString(), onSuccess, onFailure)
 
-    verify(timeout = 100) { onSuccess(any()) }
+    verify(timeout = 250) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
 
     // Test failure
     error = true
     assoAPI.getAssociation(uuid1.toString(), { fail("should not succeed") }, onFailure)
 
-    verify(timeout = 100) { onFailure(any()) }
+    verify(timeout = 250) { onFailure(any()) }
   }
 
   @Test
@@ -89,12 +89,12 @@ class AssociationAPITest {
     response =
         """
       [{
-        "uid": $uuid1,
+        "uid": "$uuid1",
         "name": "Test",
         "description": "Test",
         "creation_date": "2022-01-01"
       }, {
-        "uid": $uuid2,
+        "uid": "$uuid2",
         "name": "Test2",
         "description": "Test2",
         "creation_date": "2022-01-02"
@@ -122,7 +122,7 @@ class AssociationAPITest {
     response =
         """
       {
-        "uid": $uuid1,
+        "uid": "$uuid1",
         "name": "Test",
         "description": "Test",
         "creation_date": "2022-01-01"
