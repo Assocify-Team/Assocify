@@ -30,6 +30,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import com.github.se.assocify.model.entities.AccountingCategory
+import com.github.se.assocify.model.entities.AccountingSubCategory
 
 /**
  * The accounting screen displaying the budget or the balance of the association
@@ -38,38 +40,53 @@ import androidx.compose.ui.window.PopupProperties
  */
 @Composable
 fun Accounting(
-    page: String,
-    categoryList: List<String>,
-    budgetLines: List<Pair<String, String>>,
-    categoryMapping: Map<String, List<String>>
+    page: String
 ) { // TODO: fetch all these list from viewmodel
   val yearList =
       listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
-  var selectedYear by remember { mutableStateOf(yearList.first()) }
-  var selectedCategory by remember { mutableStateOf(categoryList.first()) }
+    val categoryList =
+        listOf(
+            AccountingCategory("Global"),
+            AccountingCategory("Pole"),
+            AccountingCategory("Event"),
+            AccountingCategory("Commission"),
+            AccountingCategory("Fees")
+        )
+    val subCategoryList =
+        listOf(
+            AccountingSubCategory("Logistic Pole", AccountingCategory("Pole"), 1000),
+            AccountingSubCategory("Communication Pole", AccountingCategory("Pole"), -500),
+            AccountingSubCategory("ICBD", AccountingCategory("Event"), 2000),
+            AccountingSubCategory("SDF", AccountingCategory("Event"), 10000),
+            AccountingSubCategory("Game*", AccountingCategory("Commission"), 5000),
+            AccountingSubCategory("Financial Fees", AccountingCategory("Fees"), 6000)
+        )
 
-  val filteredBudgetLines =
-      budgetLines.filter { (category, _) ->
-        categoryMapping[selectedCategory]?.contains(category)!!
-      }
+    var selectedYear by remember { mutableStateOf(yearList.first()) }
+    var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
+    val filteredSubCategoryList =
+      if(selectedCategory == "Global") //display everything under the global category
+        subCategoryList
+      else
+        subCategoryList.filter { it.category.name == selectedCategory }
 
-  LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("AccountingScreen")) {
+    LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("AccountingScreen")) {
     item {
       Row(Modifier.testTag("filterRow")) {
         DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
-        DropdownFilterChip(selectedCategory, categoryList, "categoryFilterChip") {
+        DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
           selectedCategory = it
         }
       }
     }
 
-    items(filteredBudgetLines) { (category, amount) ->
-      DisplayLine(category, amount, "displayLine$category")
+    items(filteredSubCategoryList) {
+      DisplayLine(it.name, it.amount, "displayLine$it.category")
       HorizontalDivider(Modifier.fillMaxWidth().padding(vertical = 8.dp))
     }
 
     item {
-      val totalAmount = filteredBudgetLines.sumOf { it.second.toInt() }
+      val totalAmount = filteredSubCategoryList.sumOf { it.amount }
       TotalLine(totalAmount = totalAmount)
     }
   }
@@ -145,10 +162,10 @@ fun DropdownFilterChip(
 
 /** A line displaying a budget category and its amount */
 @Composable
-fun DisplayLine(category: String, amount: String, testTag: String) {
+fun DisplayLine(category: String, amount: Int, testTag: String) {
   ListItem(
       headlineContent = { Text(category) },
-      trailingContent = { Text(amount) },
+      trailingContent = { Text("$amount") },
       modifier =
           Modifier.clickable { /*TODO: open screen of the selected budget category*/}
               .testTag(testTag),
