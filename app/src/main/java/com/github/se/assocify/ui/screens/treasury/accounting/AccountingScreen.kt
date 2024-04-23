@@ -37,13 +37,16 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
  * The accounting screen displaying the budget or the balance of the association
  *
  * @param page: The page to display (either "budget" or "balance")
+ * @param subCategoryList: The list of subcategories to display
  */
 @Composable
 fun Accounting(
-    page: String
+    page: String,
+    subCategoryList: List<AccountingSubCategory>
 ) { // TODO: fetch all these list from viewmodel
   val yearList =
       listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
+
     val categoryList =
         listOf(
             AccountingCategory("Global"),
@@ -51,15 +54,6 @@ fun Accounting(
             AccountingCategory("Event"),
             AccountingCategory("Commission"),
             AccountingCategory("Fees")
-        )
-    val subCategoryList =
-        listOf(
-            AccountingSubCategory("Logistic Pole", AccountingCategory("Pole"), 1000),
-            AccountingSubCategory("Communication Pole", AccountingCategory("Pole"), -500),
-            AccountingSubCategory("ICBD", AccountingCategory("Event"), 2000),
-            AccountingSubCategory("SDF", AccountingCategory("Event"), 10000),
-            AccountingSubCategory("Game*", AccountingCategory("Commission"), 5000),
-            AccountingSubCategory("Financial Fees", AccountingCategory("Fees"), 6000)
         )
 
     var selectedYear by remember { mutableStateOf(yearList.first()) }
@@ -81,7 +75,7 @@ fun Accounting(
     }
 
     items(filteredSubCategoryList) {
-      DisplayLine(it.name, it.amount, "displayLine$it.category")
+      DisplayLine(it.name, it.amount, "displayLine${it.category}")
       HorizontalDivider(Modifier.fillMaxWidth().padding(vertical = 8.dp))
     }
 

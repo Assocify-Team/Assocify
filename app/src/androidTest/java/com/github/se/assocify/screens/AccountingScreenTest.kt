@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.AccountingCategory
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.ui.screens.treasury.accounting.Accounting
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -20,31 +22,30 @@ import org.junit.runner.RunWith
 class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  val options = listOf("Global", "Category", "Commissions", "Events", "Projects", "Other")
-  val budgetLines =
-      listOf(
-          "Logistic Category" to "1000",
-          "Communication Category" to "2000",
-          "Game*" to "3000",
-          "ICBD" to "4000",
-          "Balelec" to "5000",
-      )
-  val categoryMapping =
-      mapOf(
-          "Global" to
-              listOf("Logistic Category", "Communication Category", "Game*", "ICBD", "Balelec"),
-          "Category" to listOf("Logistic Category", "Communication Category"),
-          "Commissions" to listOf("Game*"),
-          "Events" to listOf("ICBD", "Balelec"),
-      )
+    val categoryList =
+        listOf(
+            AccountingCategory("Global"),
+            AccountingCategory("Pole"),
+            AccountingCategory("Event"),
+            AccountingCategory("Commission"),
+            AccountingCategory("Fees")
+        )
+    val list =
+        listOf(
+            AccountingSubCategory("Administration Pole", AccountingCategory("Pole"), 2000),
+            AccountingSubCategory("Presidency Pole", AccountingCategory("Pole"), -400),
+            AccountingSubCategory("Balelec", AccountingCategory("Event"), 1000),
+            AccountingSubCategory("Champachelor", AccountingCategory("Event"), 5000),
+            AccountingSubCategory("OGJ", AccountingCategory("Commission"), 6000),
+            AccountingSubCategory("Communication Fees", AccountingCategory("Fees"), 3000)
+        )
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     composeTestRule.setContent {
-      Accounting("Budget", options, budgetLines, categoryMapping)
-      // Accounting("Balance", listYear, options, budgetLines, categoryMapping)
+      Accounting("Budget", list)
     }
   }
 
@@ -58,7 +59,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("totalLine").assertIsDisplayed()
       onNodeWithTag("yearFilterChip").assertIsDisplayed()
       onNodeWithTag("categoryFilterChip").assertIsDisplayed()
-      budgetLines.forEach { onNodeWithTag("displayLine${it.first}").assertIsDisplayed() }
+      list.forEach { onNodeWithTag("displayLine${it.category}").assertIsDisplayed() }
     }
   }
 
@@ -72,7 +73,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
       // Assert that only the budget lines under "Events" category are shown
       onNodeWithText("ICBD").assertIsDisplayed()
-      onNodeWithText("Balelec").assertIsDisplayed()
+      onNodeWithText("SDF").assertIsDisplayed()
 
       // Assert that budget lines not under "Events" are not shown
       onNodeWithText("Logistic Category").assertDoesNotExist()
