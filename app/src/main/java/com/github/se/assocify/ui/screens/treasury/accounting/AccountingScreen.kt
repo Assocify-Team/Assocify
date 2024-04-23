@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,13 +32,11 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
 
 /** Represents the page to display in the accounting screen */
-
 enum class AccountingPage {
-    BUDGET,
-    BALANCE
+  BUDGET,
+  BALANCE
 }
 
 /**
@@ -165,18 +161,24 @@ fun DropdownFilterChip(
 
 /** A line displaying a budget category and its amount */
 @Composable
-fun DisplayLine(category: AccountingSubCategory, testTag: String, page: AccountingPage, navigationActions: NavigationActions) {
+fun DisplayLine(
+    category: AccountingSubCategory,
+    testTag: String,
+    page: AccountingPage,
+    navigationActions: NavigationActions
+) {
   ListItem(
       headlineContent = { Text(category.name) },
       trailingContent = { Text("${category.amount}") },
       modifier =
           Modifier.clickable {
-              /*TODO: open screen of the selected budget category*/
-                if(page == AccountingPage.BUDGET) {
-                    navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
+                /*TODO: open screen of the selected budget category*/
+                if (page == AccountingPage.BUDGET) {
+                  navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
                 } else {
-                    //go to balance detailed screen
-                } }
+                  // go to balance detailed screen
+                }
+              }
               .testTag(testTag),
   )
 }

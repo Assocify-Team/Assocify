@@ -25,8 +25,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-    @get:Rule val mockkRule = MockKRule(this)
-    @RelaxedMockK lateinit var mockNavActions: NavigationActions
+  @get:Rule val mockkRule = MockKRule(this)
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
   val list =
       listOf(
           AccountingSubCategory("1", "Administration Pole", AccountingCategory("Pole"), 2000),
