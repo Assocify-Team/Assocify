@@ -3,12 +3,17 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Association
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import io.ktor.client.HttpClient
+import io.ktor.client.request.patch
+import io.ktor.client.statement.HttpResponse
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.net.HttpURLConnection
+import java.util.UUID
 
 /**
  * API for interacting with the associations in the database
@@ -26,7 +31,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    * @return the association with the given id
    */
-  fun getAssociation(id: Long, onSuccess: (Association) -> Unit, onFailure: (Exception) -> Unit) {
+  fun getAssociation(id: String, onSuccess: (Association) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
         val assoc =
@@ -63,7 +68,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   /**
-   * Adds an association to the database. The UID is discarded, as it is automatically generated.
+   * Adds an association to the database.
    *
    * @param association the association to add.
    * @param onSuccess called on success on success with the UID of the new association
@@ -71,22 +76,21 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    */
   fun addAssociation(
       association: Association,
-      onSuccess: (Long) -> Unit = {},
+      onSuccess: () -> Unit = {},
       onFailure: (Exception) -> Unit
   ) {
     scope.launch {
       try {
-        val newUid =
-            db.from("association")
-                .insert(
-                    SupabaseAssociation(
-                        null,
-                        association.name,
-                        association.description,
-                        association.creationDate.toString()))
-                .decodeAs<SupabaseAssociation>()
-                .uid!!
-        onSuccess(newUid)
+        db.from("association")
+            .insert(
+                SupabaseAssociation(
+                    association.uid,
+                    association.name,
+                    association.description,
+                    association.creationDate.toString()
+                )
+            )
+        onSuccess()
       } catch (e: Exception) {
         onFailure(e)
       }
@@ -94,12 +98,27 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   fun editAssociation(
-      uid: Long,
+      uid: String,
       name: String,
       description: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
-  ) {}
+  ) {
+    scope.launch {
+      try {
+         db.from("association")
+            .update( {
+                SupabaseAssociation::name setTo name
+                SupabaseAssociation::description setTo description
+            }) {
+                filter { SupabaseAssociation::uid eq uid }
+            }
+        onSuccess()
+      } catch (e: Exception) {
+        onFailure(e)
+      }
+    }
+  }
 
   /**
    * Deletes an association from the database
@@ -108,7 +127,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onSuccess called on success (by default does nothing)
    * @param onFailure called on failure
    */
-  fun deleteAssociation(id: Long, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+  fun deleteAssociation(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
         db.from("association").delete { filter { SupabaseAssociation::uid eq id } }
@@ -121,7 +140,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   private data class SupabaseAssociation(
-      val uid: Long? = null,
+      val uid: String? = null,
       val name: String,
       val description: String,
       @SerialName("creation_date") val creationDate: String,

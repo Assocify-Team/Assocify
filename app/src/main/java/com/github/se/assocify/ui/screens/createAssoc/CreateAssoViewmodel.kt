@@ -14,6 +14,7 @@ import com.google.firebase.firestore.firestore
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.UUID
 
 class CreateAssoViewmodel() : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
@@ -196,7 +197,7 @@ class CreateAssoViewmodel() : ViewModel() {
     // TODO: add members to association
     val asso =
         Association(
-            0,
+            UUID.randomUUID().toString(),
             _uiState.value.name,
             "",
             LocalDate.now(),
