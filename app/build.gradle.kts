@@ -38,6 +38,7 @@ android {
         }
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties["SUPABASE_ANON_KEY"]}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties["SUPABASE_URL"]}\"")
+
     }
 
     val keystorePropertiesFile = rootProject.file("keystore.properties")
