@@ -11,6 +11,7 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -19,47 +20,44 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDateTime
-
 
 @MockKExtension.ConfirmVerification
 class EventAPITest {
 
-    @get:Rule
-    val mockkRule = MockKRule(this)
+  @get:Rule val mockkRule = MockKRule(this)
 
-    private var error = false
-    private var response = ""
+  private var error = false
+  private var response = ""
 
+  private lateinit var eventAPI: EventAPI
 
-    private lateinit var eventAPI: EventAPI
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Before
+  fun setup() {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Before
-    fun setup() {
+    Dispatchers.setMain(UnconfinedTestDispatcher())
+    eventAPI =
+        EventAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+              httpEngine = MockEngine {
+                if (!error) {
+                  respond(response)
+                } else {
+                  respondBadRequest()
+                }
+              }
+            })
+  }
 
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-        eventAPI =
-            EventAPI(
-                createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-                    install(Postgrest)
-                    httpEngine = MockEngine {
-                        if (!error) {
-                            respond(response)
-                        } else {
-                            respondBadRequest()
-                        }
-                    }
-                })
-    }
+  @Test
+  fun testGetEvent() {
+    val onSuccess: (Event) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
 
-    @Test
-    fun testGetEvent() {
-        val onSuccess: (Event) -> Unit = mockk(relaxed = true)
-        val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-        error = false
-
-        response = """
+    response =
+        """
             {
                 "uid": "1",
                 "name": "Test Event",
@@ -69,27 +67,26 @@ class EventAPITest {
                 "guestsOrArtists": "Test Guest",
                 "location": "Test Location"
             }
-        """.trimIndent()
+        """
+            .trimIndent()
 
+    eventAPI.getEvent("1", onSuccess, onFailure)
+    verify(timeout = 100) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
 
+    error = true
+    eventAPI.getEvent("1", onSuccess, onFailure)
+    verify(timeout = 100) { onFailure(any()) }
+  }
 
-        eventAPI.getEvent("1", onSuccess, onFailure)
-        verify(timeout = 100) { onSuccess(any()) }
-        verify(exactly = 0) { onFailure(any()) }
+  @Test
+  fun testGetAllEvent() {
+    val onSuccess: (List<Event>) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
 
-        error = true
-        eventAPI.getEvent("1", onSuccess, onFailure)
-        verify(timeout = 100) { onFailure(any()) }
-
-    }
-
-    @Test
-    fun testGetAllEvent() {
-        val onSuccess: (List<Event>) -> Unit = mockk(relaxed = true)
-        val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-        error = false
-
-        response = """
+    response =
+        """
             [
                 {
                     "uid": "1",
@@ -110,25 +107,25 @@ class EventAPITest {
                 }
                 
             ]
-        """.trimIndent()
+        """
+            .trimIndent()
 
-        eventAPI.getEvents(onSuccess, onFailure)
-        verify(timeout = 100) { onSuccess(any()) }
-        verify(exactly = 0) { onFailure(any()) }
+    eventAPI.getEvents(onSuccess, onFailure)
+    verify(timeout = 100) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
+  }
 
-    }
+  @Test
+  fun testAddEvent() {
+    error = false
 
-    @Test
-    fun testAddEvent() {
-        error = false
+    val onSuccess: (String) -> Unit = mockk(relaxed = true)
+    val currentTime = LocalDateTime.now()
 
-        val onSuccess: (String) -> Unit = mockk(relaxed = true)
-        val currentTime = LocalDateTime.now()
-
-
-        val uid = "1"
-        // need to define the response as the object serialized to make the test pass
-        response = """
+    val uid = "1"
+    // need to define the response as the object serialized to make the test pass
+    response =
+        """
             {
                 "uid": "$uid",
                 "name": "Test Event",
@@ -138,54 +135,52 @@ class EventAPITest {
                 "guestsOrArtists": "Test Guest",
                 "location": "Test Location"
             }
-        """.trimIndent()
+        """
+            .trimIndent()
 
+    eventAPI.addEvent(
+        Event(
+            uid = uid,
+            name = "Test Event",
+            description = "Test Description",
+            startDate = currentTime,
+            endDate = currentTime,
+            guestsOrArtists = "Test Guest",
+            location = "Test Location"),
+        onSuccess) {
+          fail("should not fail")
+        }
+    verify(timeout = 1000) { onSuccess(any()) }
+  }
 
-        eventAPI.addEvent(
-            Event(
-                uid = uid,
-                name = "Test Event",
-                description = "Test Description",
-                startDate = currentTime,
-                endDate = currentTime,
-                guestsOrArtists = "Test Guest",
-                location = "Test Location"
-            ),
-            onSuccess
-        ) { fail("should not fail") }
-        verify(timeout = 1000) { onSuccess(any())  }
+  @Test
+  fun testDeleteEvent() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    error = false
+    eventAPI.deleteEvent("1", onSuccess) { fail("Should not fail") }
+    verify(timeout = 1000) { onSuccess() }
+  }
 
-    }
+  @Test
+  fun testUpdateEvent() {
 
-    @Test
-    fun testDeleteEvent() {
-        val onSuccess: () -> Unit = mockk(relaxed = true)
-        error = false
-        eventAPI.deleteEvent("1", onSuccess) { fail("Should not fail") }
-        verify(timeout = 1000) { onSuccess() }
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    error = false
+    val currentTime = LocalDateTime.now()
 
-    }
+    eventAPI.updateEvent(
+        Event(
+            uid = "1",
+            name = "Test Event",
+            description = "Test Description",
+            startDate = currentTime,
+            endDate = currentTime,
+            guestsOrArtists = "Test Guest",
+            location = "Test Location"),
+        onSuccess) {
+          fail("Should not fail")
+        }
 
-    @Test
-    fun testUpdateEvent(){
-
-        val onSuccess: () -> Unit = mockk(relaxed = true)
-        error = false
-        val currentTime = LocalDateTime.now()
-
-        eventAPI.updateEvent(
-            Event(
-                uid = "1",
-                name = "Test Event",
-                description = "Test Description",
-                startDate = currentTime,
-                endDate = currentTime,
-                guestsOrArtists = "Test Guest",
-                location = "Test Location"
-            ),
-            onSuccess
-        ) { fail("Should not fail") }
-
-        verify(timeout = 1000) { onSuccess() }
-    }
+    verify(timeout = 1000) { onSuccess() }
+  }
 }
