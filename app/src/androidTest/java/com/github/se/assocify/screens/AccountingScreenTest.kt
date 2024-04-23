@@ -22,31 +22,27 @@ import org.junit.runner.RunWith
 class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-    val categoryList =
-        listOf(
-            AccountingCategory("Global"),
-            AccountingCategory("Pole"),
-            AccountingCategory("Event"),
-            AccountingCategory("Commission"),
-            AccountingCategory("Fees")
-        )
-    val list =
-        listOf(
-            AccountingSubCategory("Administration Pole", AccountingCategory("Pole"), 2000),
-            AccountingSubCategory("Presidency Pole", AccountingCategory("Pole"), -400),
-            AccountingSubCategory("Balelec", AccountingCategory("Event"), 1000),
-            AccountingSubCategory("Champachelor", AccountingCategory("Event"), 5000),
-            AccountingSubCategory("OGJ", AccountingCategory("Commission"), 6000),
-            AccountingSubCategory("Communication Fees", AccountingCategory("Fees"), 3000)
-        )
+  val categoryList =
+      listOf(
+          AccountingCategory("Global"),
+          AccountingCategory("Pole"),
+          AccountingCategory("Events"),
+          AccountingCategory("Commission"),
+          AccountingCategory("Fees"))
+  val list =
+      listOf(
+          AccountingSubCategory("Administration Pole", AccountingCategory("Pole"), 2000),
+          AccountingSubCategory("Presidency Pole", AccountingCategory("Pole"), -400),
+          AccountingSubCategory("Balelec", AccountingCategory("Events"), 1000),
+          AccountingSubCategory("Champachelor", AccountingCategory("Events"), 5000),
+          AccountingSubCategory("OGJ", AccountingCategory("Commission"), 6000),
+          AccountingSubCategory("Communication Fees", AccountingCategory("Fees"), 3000))
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    composeTestRule.setContent {
-      Accounting("Budget", list)
-    }
+    composeTestRule.setContent { Accounting("Budget", list) }
   }
 
   /** Tests if the nodes are displayed */
@@ -59,7 +55,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("totalLine").assertIsDisplayed()
       onNodeWithTag("yearFilterChip").assertIsDisplayed()
       onNodeWithTag("categoryFilterChip").assertIsDisplayed()
-      list.forEach { onNodeWithTag("displayLine${it.category}").assertIsDisplayed() }
+      list.forEach { onNodeWithTag("displayLine${it.name}").assertIsDisplayed() }
     }
   }
 
@@ -72,8 +68,8 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithText("Events").performClick()
 
       // Assert that only the budget lines under "Events" category are shown
-      onNodeWithText("ICBD").assertIsDisplayed()
-      onNodeWithText("SDF").assertIsDisplayed()
+      onNodeWithText("Balelec").assertIsDisplayed()
+      onNodeWithText("Champachelor").assertIsDisplayed()
 
       // Assert that budget lines not under "Events" are not shown
       onNodeWithText("Logistic Category").assertDoesNotExist()
@@ -81,7 +77,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithText("Game*").assertDoesNotExist()
 
       // Verify the total is recalculated correctly
-      val expectedTotal = 9000 // Sum of amounts for "ICBD" and "Balelec"
+      val expectedTotal = 6000 // Sum of amounts for "Champachelor" and "Balelec"
       onNodeWithText("$expectedTotal").assertIsDisplayed()
     }
   }

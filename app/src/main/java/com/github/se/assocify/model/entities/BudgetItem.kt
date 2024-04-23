@@ -1,8 +1,8 @@
 package com.github.se.assocify.model.entities
 
 /**
- * Represents an item in the budget sheet
- * For example some sweater in the category Logistics Pole
+ * Represents an item in the budget sheet For example some sweater in the category Logistics Pole
+ *
  * @param uid unique identifier of the item
  * @param nameItem name of the item (for example: sweater)
  * @param amount amount of the item

@@ -47,24 +47,22 @@ fun Accounting(
   val yearList =
       listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
 
-    val categoryList =
-        listOf(
-            AccountingCategory("Global"),
-            AccountingCategory("Pole"),
-            AccountingCategory("Event"),
-            AccountingCategory("Commission"),
-            AccountingCategory("Fees")
-        )
+  val categoryList =
+      listOf(
+          AccountingCategory("Global"),
+          AccountingCategory("Pole"),
+          AccountingCategory("Events"),
+          AccountingCategory("Commission"),
+          AccountingCategory("Fees"))
 
-    var selectedYear by remember { mutableStateOf(yearList.first()) }
-    var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
-    val filteredSubCategoryList =
-      if(selectedCategory == "Global") //display everything under the global category
-        subCategoryList
-      else
-        subCategoryList.filter { it.category.name == selectedCategory }
+  var selectedYear by remember { mutableStateOf(yearList.first()) }
+  var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
+  val filteredSubCategoryList =
+      if (selectedCategory == "Global") // display everything under the global category
+       subCategoryList
+      else subCategoryList.filter { it.category.name == selectedCategory }
 
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("AccountingScreen")) {
+  LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("AccountingScreen")) {
     item {
       Row(Modifier.testTag("filterRow")) {
         DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
@@ -75,7 +73,7 @@ fun Accounting(
     }
 
     items(filteredSubCategoryList) {
-      DisplayLine(it.name, it.amount, "displayLine${it.category}")
+      DisplayLine(it.name, it.amount, "displayLine${it.name}")
       HorizontalDivider(Modifier.fillMaxWidth().padding(vertical = 8.dp))
     }
 
