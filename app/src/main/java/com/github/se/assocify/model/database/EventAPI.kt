@@ -7,12 +7,14 @@ import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
 
     private val scope = CoroutineScope(Dispatchers.Main)
     private val postgrest = db.postgrest
-    private val collectionName = "events"
+    private val collectionName = "event"
+
 
     /**
      * Creates an event in the database
@@ -21,11 +23,11 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success (by default does nothing)
      * @param onFailure called on failure
      */
-    fun addEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    fun addEvent(event: Event, onSuccess: (String) -> Unit = {}, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
-                postgrest.from(collectionName).insert(event)
-                onSuccess()
+                val resp = postgrest.from(collectionName).insert(event).decodeAs<Event>().uid
+                onSuccess(resp)
             } catch (e: Exception) {
                 onFailure(e)
             }
@@ -56,7 +58,7 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success with the event
      * @param onFailure called on failure
      */
-    fun getEvent(id: Int, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getEvent(id: String, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
                 val event = postgrest.from(collectionName).select(columns = Columns.ALL) {
@@ -101,7 +103,7 @@ class EventAPI(private val db : SupabaseClient) : SupabaseApi() {
      * @param onSuccess called on success (by default does nothing)
      * @param onFailure called on failure
      */
-    fun deleteEvent(id: Int, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    fun deleteEvent(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
         scope.launch {
             try {
                 postgrest.from(collectionName).delete {
