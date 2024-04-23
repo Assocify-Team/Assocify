@@ -17,8 +17,6 @@ android {
     namespace = "com.github.se.assocify"
     compileSdk = 34
 
-
-
     defaultConfig {
         applicationId = "com.github.se.assocify"
         minSdk = 29
@@ -39,26 +37,25 @@ android {
         }
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties["SUPABASE_ANON_KEY"]}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties["SUPABASE_URL"]}\"")
+    }
 
-        val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
 
-        // Initialize a new Properties() object called keystoreProperties.
-        val keystoreProperties = Properties()
+    // Initialize a new Properties() object called keystoreProperties.
+    val keystoreProperties = Properties()
 
-        // Load your keystore.properties file into the keystoreProperties object.
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    // Load your keystore.properties file into the keystoreProperties object.
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-        signingConfigs {
-            create("release") {
-                // You need to specify either an absolute path or include the
-                // keystore file in the same directory as the build.gradle file.
-                storeFile = file("../keystore.jks")
-                storePassword = keystoreProperties["storePassword"] as String
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-            }
+    signingConfigs {
+        create("release") {
+            // You need to specify either an absolute path or include the
+            // keystore file in the same directory as the build.gradle file.
+            storeFile = file("../keystore.jks")
+            storePassword = keystoreProperties["storePassword"] as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
         }
-
     }
 
     buildTypes {
@@ -167,7 +164,6 @@ dependencies {
 
     // Junit & Testing
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -195,12 +191,12 @@ dependencies {
     //Supabase
     val supabaseVersion = "2.2.3"
     val ktorVersion = "2.3.10"
-    implementation ("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
-    implementation( "io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
-    implementation ("io.github.jan-tennert.supabase:gotrue-kt:$supabaseVersion")
-    implementation ("io.ktor:ktor-client-android:$ktorVersion")
-    implementation ("io.ktor:ktor-client-core:$ktorVersion")
-    implementation ("io.ktor:ktor-utils:$ktorVersion")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
+    implementation("io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:$supabaseVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-utils:$ktorVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
 
     // Mockk
@@ -229,14 +225,14 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         "**/*Test*.*",
         "android/**/*.*",
     )
-    val debugTree = fileTree("${project.layout.buildDirectory}/tmp/kotlin-classes/debug") {
+    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
         exclude(fileFilter)
     }
     val mainSrc = "${project.projectDir}/src/main/java"
 
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree(project.layout.buildDirectory) {
+    executionData.setFrom(fileTree(project.buildDir) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
