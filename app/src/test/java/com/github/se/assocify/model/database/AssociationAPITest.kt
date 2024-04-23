@@ -68,14 +68,14 @@ class AssociationAPITest {
     """
             .trimIndent()
 
-    assoAPI.getAssociation("AAA", onSuccess, onFailure)
+    assoAPI.getAssociation(uuid1.toString(), onSuccess, onFailure)
 
     verify(timeout = 100) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
 
     // Test failure
     error = true
-    assoAPI.getAssociation("AAA", { fail("should not succeed") }, onFailure)
+    assoAPI.getAssociation(uuid1.toString(), { fail("should not succeed") }, onFailure)
 
     verify(timeout = 100) { onFailure(any()) }
   }
@@ -106,16 +106,17 @@ class AssociationAPITest {
 
     verify(timeout = 100) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
+
+    // Test failure
+    error = true
+    assoAPI.getAssociations({ fail("should not succeed") }, onFailure)
+
+    verify(timeout = 100) { onFailure(any()) }
   }
 
   @Test
   fun testAddAssociation() {
     val onSuccess: () -> Unit = mockk(relaxed = true)
-    assoAPI =
-        AssociationAPI(
-            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-              install(Postgrest)
-            })
 
     error = false
     response =
@@ -134,21 +135,35 @@ class AssociationAPITest {
         onSuccess,
         { fail("Should not fail") })
 
-    verify(timeout = 1000) { onSuccess() }
+    verify(timeout = 250) { onSuccess() }
+
+    // Test failure
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+
+    error = true
+    assoAPI.addAssociation(
+        Association(uuid1.toString(), "Test", "Test", LocalDate.now()),
+        { fail("Should not succeed") },
+        { fail("Should not fail") })
+
+    verify(timeout = 250) { onFailure(any()) }
   }
 
   @Test
   fun testEditAssociation() {
-    assoAPI =
-        AssociationAPI(
-            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-              install(Postgrest)
-            })
     val onSuccess: () -> Unit = mockk(relaxed = true)
 
-    assoAPI.editAssociation(uuid1.toString(), "TestN", "NewTestD", onSuccess, { println(it) })
+    assoAPI.editAssociation(
+        uuid1.toString(), "TestN", "NewTestD", onSuccess, { fail("Should not fail") })
 
-    verify(timeout = 1000) { onSuccess() }
+    verify(timeout = 250) { onSuccess() }
+
+    // Test failure
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+
+    assoAPI.editAssociation(
+        uuid1.toString(), "TestN", "NewTestD", { fail("Should not succeed") }, onFailure)
+    verify(timeout = 250) { onFailure(any()) }
   }
 
   @Test
@@ -160,8 +175,15 @@ class AssociationAPITest {
             })
     val onSuccess: () -> Unit = mockk(relaxed = true)
 
-    assoAPI.deleteAssociation("AAA", onSuccess, { fail("Should not fail") })
+    assoAPI.deleteAssociation(uuid1.toString(), onSuccess, { fail("Should not fail") })
 
-    verify(timeout = 1000) { onSuccess() }
+    verify(timeout = 250) { onSuccess() }
+
+    // Test failure
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+
+    assoAPI.deleteAssociation(uuid1.toString(), { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 250) { onFailure(any()) }
   }
 }

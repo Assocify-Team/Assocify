@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 /**
  * API for interacting with the associations in the database
  *
- * @property db the Firestore database
+ * @property db the Supabase client
  */
 class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   private val scope = CoroutineScope(Dispatchers.Main)
