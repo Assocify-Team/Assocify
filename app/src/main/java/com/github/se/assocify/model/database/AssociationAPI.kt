@@ -3,17 +3,12 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Association
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import io.ktor.client.HttpClient
-import io.ktor.client.request.patch
-import io.ktor.client.statement.HttpResponse
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.net.HttpURLConnection
-import java.util.UUID
 
 /**
  * API for interacting with the associations in the database
@@ -87,9 +82,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
                     association.uid,
                     association.name,
                     association.description,
-                    association.creationDate.toString()
-                )
-            )
+                    association.creationDate.toString()))
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
@@ -106,13 +99,12 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   ) {
     scope.launch {
       try {
-         db.from("association")
-            .update( {
-                SupabaseAssociation::name setTo name
-                SupabaseAssociation::description setTo description
-            }) {
-                filter { SupabaseAssociation::uid eq uid }
-            }
+        db.from("association").update({
+          SupabaseAssociation::name setTo name
+          SupabaseAssociation::description setTo description
+        }) {
+          filter { SupabaseAssociation::uid eq uid }
+        }
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)

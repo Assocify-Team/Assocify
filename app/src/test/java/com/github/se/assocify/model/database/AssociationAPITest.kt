@@ -4,19 +4,15 @@ import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.Association
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.HttpClientEngineBase
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
-import io.ktor.client.request.patch
-import io.ktor.client.statement.HttpResponse
-import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
+import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -25,7 +21,6 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 
 @MockKExtension.ConfirmVerification
 class AssociationAPITest {
@@ -117,10 +112,10 @@ class AssociationAPITest {
   fun testAddAssociation() {
     val onSuccess: () -> Unit = mockk(relaxed = true)
     assoAPI =
-      AssociationAPI(
-          createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+        AssociationAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
-          })
+            })
 
     error = false
     response =
@@ -135,26 +130,26 @@ class AssociationAPITest {
             .trimIndent()
 
     assoAPI.addAssociation(
-        Association(uuid1.toString(), "Test", "Test", LocalDate.now()), onSuccess, {
-            fail("Should not fail")
-        })
+        Association(uuid1.toString(), "Test", "Test", LocalDate.now()),
+        onSuccess,
+        { fail("Should not fail") })
 
     verify(timeout = 1000) { onSuccess() }
   }
 
-    @Test
-    fun testEditAssociation() {
-        assoAPI =
-            AssociationAPI(
-                createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-                    install(Postgrest)
-                })
-        val onSuccess: () -> Unit = mockk(relaxed = true)
+  @Test
+  fun testEditAssociation() {
+    assoAPI =
+        AssociationAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+            })
+    val onSuccess: () -> Unit = mockk(relaxed = true)
 
-        assoAPI.editAssociation(uuid1.toString(), "TestN", "NewTestD", onSuccess, { println(it) })
+    assoAPI.editAssociation(uuid1.toString(), "TestN", "NewTestD", onSuccess, { println(it) })
 
-        verify(timeout = 1000) { onSuccess() }
-    }
+    verify(timeout = 1000) { onSuccess() }
+  }
 
   @Test
   fun testDeleteAssociation() {

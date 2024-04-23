@@ -12,9 +12,9 @@ import com.github.se.assocify.model.entities.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import java.time.LocalDate
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.UUID
 
 class CreateAssoViewmodel() : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
