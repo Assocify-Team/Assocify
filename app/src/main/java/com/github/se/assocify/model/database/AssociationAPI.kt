@@ -1,18 +1,17 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import com.github.se.assocify.model.entities.Role
-import com.github.se.assocify.model.entities.User
-import com.google.firebase.firestore.FirebaseFirestore
-import io.github.jan.supabase.postgrest.query.Columns
 
 /**
  * API for interacting with the associations in the database
@@ -183,7 +182,10 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   ) {
     scope.launch {
       try {
-        val us = db.from("association").select(Columns.raw("users(uuid, name, description)")).decodeList<SupabaseUser>()
+        val us =
+            db.from("association")
+                .select(Columns.raw("users(uuid, name, description)"))
+                .decodeList<SupabaseUser>()
         onSuccess(us.map { it.toUser() })
       } catch (e: Exception) {
         onFailure(e)
