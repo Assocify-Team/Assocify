@@ -46,7 +46,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
           description = "",
           cents = 10000,
           date = DateUtil.toDate("01/01/2021")!!,
-          incoming = false,
           status = Status.Unapproved,
           photo = MaybeRemotePhoto.LocalFile(testUri),
       )
@@ -59,7 +58,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
               capturedReceipt = firstArg<Receipt>()
               navActions.back()
             }
-        every { getNewId() } returns "testReceipt"
         every { deleteReceipt(any(), any(), any()) } answers {}
       }
   private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptAPI)
@@ -247,7 +245,6 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           description = "",
           cents = 10000,
           date = DateUtil.toDate("01/01/2021")!!,
-          incoming = false,
           status = Status.Unapproved,
           photo = null,
       )
@@ -268,7 +265,6 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
             {
               firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
             }
-        every { getNewId() } answers { "testReceipt" }
       }
   private val viewModel =
       ReceiptViewModel(

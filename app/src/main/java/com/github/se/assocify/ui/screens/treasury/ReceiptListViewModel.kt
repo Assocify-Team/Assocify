@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.screens.treasury
 
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Receipt
@@ -9,7 +10,6 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -21,19 +21,14 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class ReceiptListViewModel(
     private val navActions: NavigationActions,
-    private val receiptsDatabase: ReceiptAPI =
-        ReceiptAPI(
-            userId = CurrentUser.userUid!!,
-            basePath = "associations/" + CurrentUser.associationUid!!,
-            storage = Firebase.storage,
-            db = Firebase.firestore)
+    private val receiptsDatabase: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState>
 
   // User entity and it's API
-  private val userAPI = UserAPI(receiptsDatabase.db)
+  private val userAPI = UserAPI(Firebase.firestore)
   private var user: User? = null
 
   init {
@@ -69,14 +64,14 @@ class ReceiptListViewModel(
     // TODO Note : not done because permissions & database will change
     // TODO Note : on sprint 4.
     receiptsDatabase.getAllReceipts(
-        onReceiptsFetched = { receipts ->
+        onSuccess = { receipts ->
           _uiState.value =
               ReceiptUIState(
                   userReceipts = _uiState.value.userReceipts,
                   allReceipts = receipts,
                   searchQuery = _uiState.value.searchQuery)
         },
-        onError = { error, exception ->
+        onError = { _ ->
           // TODO on sprint 4 with error API
         })
   }
