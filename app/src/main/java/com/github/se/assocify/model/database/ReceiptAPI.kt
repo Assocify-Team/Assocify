@@ -3,7 +3,7 @@ package com.github.se.assocify.model.database
 import android.net.Uri
 import androidx.annotation.Keep
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Phase
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.Receipt
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.FirebaseFirestore
@@ -142,7 +142,7 @@ class ReceiptAPI(
         from.date.toString(),
         from.incoming,
         from.cents,
-        from.phase.ordinal,
+        from.status.ordinal,
         from.title,
         from.description,
         from.uid)
@@ -153,7 +153,7 @@ class ReceiptAPI(
             date = LocalDate.parse(this.date),
             incoming = this.incoming,
             cents = this.cents,
-            phase = Phase.entries[this.phase],
+            status = Status.entries[this.phase],
             title = this.title,
             description = this.description,
             photo = MaybeRemotePhoto.Remote(photo),

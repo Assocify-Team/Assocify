@@ -27,7 +27,7 @@ data class BalanceItem(
     val date: LocalDate,
     val receipt: Receipt?,
     val assignee: String,
-    val status: Phase
+    val status: Status
 )
 
 /**
