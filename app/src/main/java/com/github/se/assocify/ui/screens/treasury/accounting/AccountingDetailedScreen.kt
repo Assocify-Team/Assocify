@@ -71,7 +71,7 @@ fun AccountingDetailedScreen(
           100,
           true,
           Status.Unapproved,
-          MaybeRemotePhoto.LocalFile("lol"))
+          MaybeRemotePhoto.Remote("path"))
   val budgetItems =
       listOf(
           BudgetItem(
