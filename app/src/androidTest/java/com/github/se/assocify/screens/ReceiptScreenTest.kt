@@ -226,7 +226,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun photoSheet() {
     with(composeTestRule) {
-      onNodeWithTag("editImageButton").performClick()
+      onNodeWithTag("editImageButton").performScrollTo().performClick()
       onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
       viewModel.hideBottomSheet()
       onNodeWithTag("photoSelectionSheet").assertDoesNotExist()

@@ -122,7 +122,7 @@ fun AccountingDetailedScreen(
   var selectedStatus by remember { mutableStateOf(statusList.first()) }
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
   val filteredBalanceList =
-      if (selectedStatus == "Status") // display everything under the status category
+      if (selectedStatus == statusList.first()) // display everything under the status category
        balanceItems
       else balanceItems.filter { it.status.toString() == selectedStatus }
 
