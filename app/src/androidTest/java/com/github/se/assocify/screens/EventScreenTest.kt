@@ -37,14 +37,14 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @Before
   fun testSetup() {
 
-    /*
+    
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
           onSuccessCallback(emptyList())
         }
 
-     */
+
 
     every { mockNavActions.navigateToMainTab(any()) } answers { tabSelected = true }
   }
