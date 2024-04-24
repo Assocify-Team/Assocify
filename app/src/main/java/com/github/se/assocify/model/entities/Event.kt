@@ -1,28 +1,26 @@
 package com.github.se.assocify.model.entities
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.github.se.assocify.model.serializer.DateTimeSerializer
+import java.time.LocalDateTime
+import java.util.UUID
+import kotlinx.serialization.Serializable
 
 /**
- * Data class representing an event of an association
- *
  * @param uid unique identifier of the event
  * @param name name of the event
  * @param description description of the event
  * @param startDate start date of the event
  * @param endDate end date of the event
- * @param organizers list of users who are organizing the event
- * @param staffers list of users who are staffing the event
- * @param tasks list of tasks that need to be completed for the event
+ * @param guestsOrArtists guests or artists of the event
+ * @param location location of the event
  */
+@Serializable
 data class Event(
-    val uid: String = "testUid",
-    val name: String = "testName",
-    val description: String = "description",
-    val startDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    val endDate: String =
-        LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    val organizers: List<User> = emptyList(),
-    val staffers: List<User> = emptyList(),
-    val tasks: List<Task> = emptyList(),
+    val uid: String = UUID.randomUUID().toString(),
+    val name: String,
+    val description: String,
+    @Serializable(with = DateTimeSerializer::class) val startDate: LocalDateTime,
+    @Serializable(with = DateTimeSerializer::class) val endDate: LocalDateTime,
+    val guestsOrArtists: String,
+    val location: String
 )
