@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.EventScreen
+import com.github.se.assocify.ui.screens.event.EventScreenViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -28,7 +29,9 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @Before
   fun testSetup() {
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    composeTestRule.setContent { EventScreen(navActions = navActions) }
+    composeTestRule.setContent {
+      EventScreen(navActions = navActions, viewModel = EventScreenViewModel())
+    }
   }
 
   @Test

@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.event
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -40,9 +40,8 @@ import com.github.se.assocify.ui.screens.event.map.EventMapScreen
 import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-
+import kotlinx.coroutines.launch
 
 /**
  * An event screen that displays the tasks, map, and schedule of an event.
@@ -53,10 +52,7 @@ import java.time.LocalDateTime
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun EventScreen(
-    navActions: NavigationActions,
-    viewModel: EventScreenViewModel
-) {
+fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
@@ -74,18 +70,11 @@ fun EventScreen(
             selectedTab = Destination.Event)
       },
       topBar = {
-        CenterAlignedTopAppBar(
-            title = { Text(text = "Event") },
-            navigationIcon = {
-              IconButton(onClick = { /*TODO: navigate to the profile page*/}) {
-                Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
-              }
-            },
-            actions = {
-              IconButton(onClick = { /*TODO: apply the string filtering of the tasks*/}) {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
-              }
-            })
+        if (state.value.searching) {
+          EventSearchTopBar(navActions, viewModel)
+        } else {
+          EventTitleTopBar(navActions, viewModel)
+        }
       }) {
         Column(modifier = Modifier.padding(it)) {
           val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
@@ -153,6 +142,35 @@ fun EventTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Mod
       modifier = modifier)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewModel) {
+  CenterAlignedTopAppBar(
+      title = { Text(text = "Event") },
+      navigationIcon = {
+        IconButton(onClick = { navActions.navigateToMainTab(Destination.Profile) }) {
+          Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
+        }
+      },
+      actions = {
+        IconButton(onClick = { viewModel.modifySearchingState(true) }) {
+          Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+        }
+      })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EventSearchTopBar(navActions: NavigationActions, viewModel: EventScreenViewModel) {
+  val state = viewModel.uiState.collectAsState()
+  SearchBar(
+      query = state.value.searchQuery,
+      onQueryChange = { viewModel.modifySearchQuery(it) },
+      onSearch = { viewModel.modifySearchingState(false) },
+      active = false,
+      onActiveChange = {}) {}
+}
+
 /**
  * Filter bar of the event screen.
  *
@@ -171,31 +189,37 @@ fun EventFilterBar(events: List<Event>) {
   }
 }
 
-
 /** Preview of the event screen. */
 @Preview
 @Composable
 fun EventScreenPreview() {
   val t1 = Task("uid", "the task 1", "a short description", true)
   val event1 =
-    Event(
-      "1",
-      "Event 3",
-      "Event 1 description",
-      LocalDateTime.now(), LocalDateTime.now(), "pula", "albero dove")
+      Event(
+          "1",
+          "Event 3",
+          "Event 1 description",
+          LocalDateTime.now(),
+          LocalDateTime.now(),
+          "pula",
+          "albero dove")
   val event2 =
       Event(
           "1",
           "Event 3",
           "Event 1 description",
-        LocalDateTime.now(), LocalDateTime.now(), "pula", "albero dove")
+          LocalDateTime.now(),
+          LocalDateTime.now(),
+          "pula",
+          "albero dove")
   val event3 =
-    Event(
-      "1",
-      "Event 3",
-      "Event 1 description",
-      LocalDateTime.now(), LocalDateTime.now(), "pula", "albero dove")
+      Event(
+          "1",
+          "Event 3",
+          "Event 1 description",
+          LocalDateTime.now(),
+          LocalDateTime.now(),
+          "pula",
+          "albero dove")
   EventScreen(NavigationActions(rememberNavController()), EventScreenViewModel())
-
 }
-
