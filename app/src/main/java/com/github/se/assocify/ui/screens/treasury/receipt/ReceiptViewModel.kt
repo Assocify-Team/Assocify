@@ -3,8 +3,8 @@ package com.github.se.assocify.ui.screens.treasury.receipt
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
-import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil

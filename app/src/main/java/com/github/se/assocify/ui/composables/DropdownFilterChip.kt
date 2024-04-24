@@ -34,33 +34,33 @@ fun DropdownFilterChip(
     testTag: String,
     onOptionSelected: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption1 by remember { mutableStateOf(selectedOption) }
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOption1 by remember { mutableStateOf(selectedOption) }
 
-    Box(modifier = Modifier.padding(8.dp).testTag(testTag)) {
-        FilterChip(
-            selected = false,
-            onClick = { expanded = !expanded },
-            label = { Text(selectedOption1) },
-            trailingIcon = {
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-            },
-            modifier = Modifier.testTag("filterChip"))
+  Box(modifier = Modifier.padding(8.dp).testTag(testTag)) {
+    FilterChip(
+        selected = false,
+        onClick = { expanded = !expanded },
+        label = { Text(selectedOption1) },
+        trailingIcon = {
+          Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+        },
+        modifier = Modifier.testTag("filterChip"))
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            properties = PopupProperties(focusable = true),
-            modifier = Modifier.testTag("dropdownMenu")) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        selectedOption1 = option
-                        expanded = false
-                    })
-            }
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        properties = PopupProperties(focusable = true),
+        modifier = Modifier.testTag("dropdownMenu")) {
+          options.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(option) },
+                onClick = {
+                  onOptionSelected(option)
+                  selectedOption1 = option
+                  expanded = false
+                })
+          }
         }
-    }
+  }
 }

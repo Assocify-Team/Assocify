@@ -3,8 +3,8 @@ package com.github.se.assocify.model.database
 import android.net.Uri
 import androidx.annotation.Keep
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.Status
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot

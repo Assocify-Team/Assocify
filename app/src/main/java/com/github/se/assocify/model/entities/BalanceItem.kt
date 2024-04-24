@@ -2,7 +2,6 @@ package com.github.se.assocify.model.entities
 
 import java.time.LocalDate
 
-
 /**
  * Represents an item in the balance sheet. For example some sweater in the category Logistics Pole
  *

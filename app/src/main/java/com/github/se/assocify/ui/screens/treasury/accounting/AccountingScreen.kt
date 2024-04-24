@@ -1,19 +1,12 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -27,10 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
-import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
@@ -65,11 +56,11 @@ fun Accounting(
           AccountingCategory("Commission"),
           AccountingCategory("Fees"))
 
-    val tvaList: List<String> = listOf("TTC", "HT")
+  val tvaList: List<String> = listOf("TTC", "HT")
 
   var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
-    var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
   val filteredSubCategoryList =
       if (selectedCategory == "Global") // display everything under the global category
@@ -83,10 +74,8 @@ fun Accounting(
         DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
           selectedCategory = it
         }
-          //TODO: change amount given TVA
-          DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") {
-              selectedTVA = it
-          }
+        // TODO: change amount given TVA
+        DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
       }
     }
 
@@ -124,13 +113,14 @@ fun TotalLine(totalAmount: Int) {
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
 }
 
-
-/** A line displaying a budget category and its amount
+/**
+ * A line displaying a budget category and its amount
+ *
  * @param category: The budget category
  * @param testTag: The test tag of the line
  * @param page: The page to which the line belongs
  * @param navigationActions: The navigation actions to navigate to the detailed screen
- *  */
+ */
 @Composable
 fun DisplayLine(
     category: AccountingSubCategory,
@@ -143,11 +133,12 @@ fun DisplayLine(
       trailingContent = { Text("${category.amount}") },
       modifier =
           Modifier.clickable {
-            if (page == AccountingPage.BUDGET) {
-              navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
-            } else {
-                navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
-            }
-          }.testTag(testTag),
+                if (page == AccountingPage.BUDGET) {
+                  navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
+                } else {
+                  navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
+                }
+              }
+              .testTag(testTag),
   )
 }
