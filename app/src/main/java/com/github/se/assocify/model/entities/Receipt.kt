@@ -15,11 +15,11 @@ data class Receipt(
     val date: LocalDate,
     val cents: Int,
     val incoming: Boolean,
-    val phase: Phase,
+    val status: Status,
     val photo: MaybeRemotePhoto?,
 )
 
-enum class Phase {
+enum class Status {
   Unapproved,
   Approved,
   PaidBack,
