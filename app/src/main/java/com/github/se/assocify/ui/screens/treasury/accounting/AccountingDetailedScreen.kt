@@ -99,17 +99,6 @@ fun AccountingDetailedScreen(page: AccountingPage, subCategoryUid: String, navig
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
     }
 
-    val testTagScreen = when (page) {
-        AccountingPage.BUDGET -> "BudgetDetailedScreen"
-        AccountingPage.BALANCE -> "BalanceDetailedScreen"
-    }
-
-    val testTagAdd = when (page) {
-        AccountingPage.BUDGET -> "createNewBudgetItem"
-        AccountingPage.BALANCE -> "createNewBalanceItem"
-    }
-
-
 
     Scaffold(
         topBar = {
@@ -126,10 +115,10 @@ fun AccountingDetailedScreen(page: AccountingPage, subCategoryUid: String, navig
         contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .testTag(testTagScreen),
+            .testTag("AccountingDetailedScreen"),
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier.testTag(testTagAdd),
+                modifier = Modifier.testTag("createNewItem"),
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.primary,
                 onClick = { /*TODO: create new item*/}) {
@@ -150,7 +139,7 @@ fun AccountingDetailedScreen(page: AccountingPage, subCategoryUid: String, navig
                             "yearListTag"
                         ) { selectedYear = it }
                         if(page == AccountingPage.BALANCE) {
-                            DropdownFilterChip(statusList.first(), statusList, "phaseListTag") {
+                            DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                                 selectedStatus = it
                             }
                         }
@@ -174,7 +163,7 @@ fun AccountingDetailedScreen(page: AccountingPage, subCategoryUid: String, navig
                     }
                 }
 
-                item { TotalItems(totalAmount, page.toString()) }
+                item { TotalItems(totalAmount) }
             }
         })
 }
@@ -186,11 +175,11 @@ fun AccountingDetailedScreen(page: AccountingPage, subCategoryUid: String, navig
  * @param page: The page to which the total amount belongs
  */
 @Composable
-fun TotalItems(totalAmount: Int, page: String) {
+fun TotalItems(totalAmount: Int) {
     ListItem(
         modifier = Modifier
             .fillMaxWidth()
-            .testTag("totalItems$page"),
+            .testTag("totalItems"),
         headlineContent = {
             Text(
                 text = "Total",
