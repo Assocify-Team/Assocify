@@ -34,10 +34,10 @@ enum class Status {
 
   fun getIcon(): ImageVector {
     return when (this) {
-      Status.Pending -> Icons.Filled.CircleNotifications
-      Status.Approved -> Icons.Filled.AccessTimeFilled
-      Status.Reimbursed -> Icons.Filled.CheckCircle
-      Status.Archived -> Icons.Filled.Circle
+      Pending -> Icons.Filled.CircleNotifications
+      Approved -> Icons.Filled.AccessTimeFilled
+      Reimbursed -> Icons.Filled.CheckCircle
+      Archived -> Icons.Filled.Circle
     }
   }
 }

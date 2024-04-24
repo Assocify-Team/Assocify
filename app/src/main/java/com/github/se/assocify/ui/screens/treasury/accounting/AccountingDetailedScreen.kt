@@ -70,7 +70,7 @@ fun AccountingDetailedScreen(
           LocalDate.now(),
           100,
           true,
-          Status.Unapproved,
+          Status.Pending,
           MaybeRemotePhoto.Remote("path"))
   val budgetItems =
       listOf(
@@ -90,7 +90,7 @@ fun AccountingDetailedScreen(
               LocalDate.of(2024, 4, 14),
               receipt,
               "François Théron",
-              Status.Unapproved),
+              Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
@@ -112,11 +112,10 @@ fun AccountingDetailedScreen(
               LocalDate.of(2024, 1, 14),
               receipt,
               "Sidonie Bouthors",
-              Status.PaidBack))
+              Status.Reimbursed))
 
   val yearList = listOf("2023", "2022", "2021")
-  val statusList: List<String> =
-      listOf("Status", *enumValues<Status>().map { it.name }.toTypedArray())
+  val statusList: List<String> = listOf("All Status") + Status.entries.map{ it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
   var selectedYear by remember { mutableStateOf(yearList.first()) }
