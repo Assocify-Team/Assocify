@@ -39,16 +39,6 @@ import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
 import kotlinx.coroutines.launch
 
-// Index of each tag for navigation
-enum class EventPageIndex(val index: Int) {
-  TASKS(0),
-  MAP(1),
-  SCHEDULE(2);
-
-  companion object {
-    val NUMBER_OF_PAGES: Int = entries.size
-  }
-}
 
 /**
  * An event screen that displays the tasks, map, and schedule of an event.
