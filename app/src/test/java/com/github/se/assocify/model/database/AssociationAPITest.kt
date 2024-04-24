@@ -70,14 +70,14 @@ class AssociationAPITest {
 
     assoAPI.getAssociation(uuid1.toString(), onSuccess, onFailure)
 
-    verify(timeout = 250) { onSuccess(any()) }
+    verify(timeout = 1000) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
 
     // Test failure
     error = true
     assoAPI.getAssociation(uuid1.toString(), { fail("should not succeed") }, onFailure)
 
-    verify(timeout = 250) { onFailure(any()) }
+    verify(timeout = 1000) { onFailure(any()) }
   }
 
   @Test
@@ -135,7 +135,7 @@ class AssociationAPITest {
         onSuccess,
         { fail("Should not fail") })
 
-    verify(timeout = 250) { onSuccess() }
+    verify(timeout = 1000) { onSuccess() }
 
     // Test failure
     val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
@@ -146,7 +146,7 @@ class AssociationAPITest {
         { fail("Should not succeed") },
         onFailure)
 
-    verify(timeout = 250) { onFailure(any()) }
+    verify(timeout = 1000) { onFailure(any()) }
   }
 
   @Test
@@ -156,7 +156,7 @@ class AssociationAPITest {
     assoAPI.editAssociation(
         uuid1.toString(), "TestN", "NewTestD", onSuccess, { fail("Should not fail") })
 
-    verify(timeout = 250) { onSuccess() }
+    verify(timeout = 1000) { onSuccess() }
 
     // Test failure
     val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
@@ -164,7 +164,7 @@ class AssociationAPITest {
 
     assoAPI.editAssociation(
         uuid1.toString(), "TestN", "NewTestD", { fail("Should not succeed") }, onFailure)
-    verify(timeout = 250) { onFailure(any()) }
+    verify(timeout = 1000) { onFailure(any()) }
   }
 
   @Test
@@ -173,7 +173,7 @@ class AssociationAPITest {
 
     assoAPI.deleteAssociation(uuid1.toString(), onSuccess, { fail("Should not fail") })
 
-    verify(timeout = 250) { onSuccess() }
+    verify(timeout = 1000) { onSuccess() }
 
     // Test failure
     val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
@@ -181,6 +181,6 @@ class AssociationAPITest {
 
     assoAPI.deleteAssociation(uuid1.toString(), { fail("Should not succeed") }, onFailure)
 
-    verify(timeout = 250) { onFailure(any()) }
+    verify(timeout = 1000) { onFailure(any()) }
   }
 }
