@@ -9,6 +9,6 @@ fun NavGraphBuilder.eventGraph(navigationActions: NavigationActions) {
   composable(
       route = Destination.Event.route,
   ) {
-    EventScreen(navigationActions)
+    EventScreen(navigationActions, EventScreenViewModel())
   }
 }

@@ -23,10 +23,13 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.Destination
@@ -38,6 +41,7 @@ import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 
 /**
@@ -48,13 +52,12 @@ import kotlinx.coroutines.launch
  * @param currentTab Current tab to display.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun EventScreen(
     navActions: NavigationActions,
-    event: List<Event> = emptyList(),
-    currentTab: EventPageIndex = EventPageIndex.TASKS
+    viewModel: EventScreenViewModel
 ) {
+  val state = viewModel.uiState.collectAsState()
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
@@ -88,8 +91,8 @@ fun EventScreen(
           val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
-          EventFilterBar(events = event)
-          TabRow(selectedTabIndex = currentTab.index) {
+          EventFilterBar(events = state.value.events)
+          TabRow(selectedTabIndex = pagerState.currentPage) {
             EventTab(
                 text = "Tasks",
                 modifier = Modifier.testTag("tasksTab"),
@@ -168,42 +171,31 @@ fun EventFilterBar(events: List<Event>) {
   }
 }
 
-/*
+
 /** Preview of the event screen. */
 @Preview
 @Composable
 fun EventScreenPreview() {
   val t1 = Task("uid", "the task 1", "a short description", true)
   val event1 =
-      Event(
-          "1",
-          "Event 1",
-          "Event 1 description",
-          "2022-08-01",
-          "2023-01-02",
-          emptyList(),
-          emptyList(),
-          emptyList())
+    Event(
+      "1",
+      "Event 3",
+      "Event 1 description",
+      LocalDateTime.now(), LocalDateTime.now(), "pula", "albero dove")
   val event2 =
       Event(
           "1",
           "Event 3",
           "Event 1 description",
-          "2022-01-01",
-          "2022-02-02",
-          emptyList(),
-          emptyList(),
-          emptyList())
+        LocalDateTime.now(), LocalDateTime.now(), "pula", "albero dove")
   val event3 =
-      Event(
-          "3",
-          "Event 3",
-          "Event 1 description",
-          "2022-15-01",
-          "2022-20-02",
-          emptyList(),
-          emptyList(),
-          emptyList())
-  EventScreen(NavigationActions(rememberNavController()), event = listOf(event1, event2, event3))
+    Event(
+      "1",
+      "Event 3",
+      "Event 1 description",
+      LocalDateTime.now(), LocalDateTime.now(), "pula", "albero dove")
+  EventScreen(NavigationActions(rememberNavController()), EventScreenViewModel())
+
 }
-*/
+
