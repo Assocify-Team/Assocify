@@ -169,11 +169,6 @@ class AssociationAPITest {
 
   @Test
   fun testDeleteAssociation() {
-    assoAPI =
-        AssociationAPI(
-            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-              install(Postgrest)
-            })
     val onSuccess: () -> Unit = mockk(relaxed = true)
 
     assoAPI.deleteAssociation(uuid1.toString(), onSuccess, { fail("Should not fail") })
