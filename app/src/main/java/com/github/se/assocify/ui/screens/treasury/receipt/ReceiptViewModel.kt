@@ -1,8 +1,11 @@
 package com.github.se.assocify.ui.screens.treasury.receipt
 
+import android.net.Uri
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
@@ -129,8 +132,24 @@ class ReceiptViewModel {
     _uiState.value = _uiState.value.copy(incoming = incoming)
   }
 
-  fun setImage() {
-    /*TODO: Implement image selection / capture and saving*/
+  fun showBottomSheet() {
+    _uiState.value = _uiState.value.copy(showBottomSheet = true)
+  }
+
+  fun hideBottomSheet() {
+    _uiState.value = _uiState.value.copy(showBottomSheet = false)
+  }
+
+  fun setImage(uri: Uri?) {
+    if (uri == null) return
+    _uiState.value = _uiState.value.copy(receiptImageURI = uri)
+  }
+
+  fun signalCameraPermissionDenied() {
+    CoroutineScope(Dispatchers.Main).launch {
+      _uiState.value.snackbarHostState.showSnackbar(
+          message = "Camera permission denied", duration = SnackbarDuration.Short)
+    }
   }
 
   fun saveReceipt() {
@@ -143,6 +162,15 @@ class ReceiptViewModel {
         _uiState.value.dateError != null) {
       return
     }
+
+    if (_uiState.value.receiptImageURI == null) {
+      CoroutineScope(Dispatchers.Main).launch {
+        _uiState.value.snackbarHostState.showSnackbar(
+            message = "Receipt image is required", duration = SnackbarDuration.Short)
+      }
+      return
+    }
+
     val date = DateUtil.toDate(_uiState.value.date) ?: return
 
     val receipt =
@@ -154,7 +182,7 @@ class ReceiptViewModel {
             date = date,
             incoming = _uiState.value.incoming,
             status = Status.Unapproved,
-            photo = null)
+            photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
 
     receiptApi.uploadReceipt(
         receipt,
@@ -209,5 +237,7 @@ data class ReceiptState(
     val titleError: String? = null,
     val amountError: String? = null,
     val dateError: String? = null,
-    val snackbarHostState: SnackbarHostState = SnackbarHostState()
+    val snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    val showBottomSheet: Boolean = false,
+    val receiptImageURI: Uri? = null
 )
