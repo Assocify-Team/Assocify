@@ -21,11 +21,11 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class BalanceDetailedScreenTest :
@@ -44,7 +44,7 @@ class BalanceDetailedScreenTest :
           LocalDate.now(),
           100,
           true,
-          Status.Unapproved,
+          Status.Pending,
           MaybeRemotePhoto.Remote("path"))
   val balanceItems =
       listOf(
@@ -58,7 +58,7 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2024, 4, 14),
               receipt,
               "François Théron",
-              Status.Unapproved),
+              Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
@@ -80,7 +80,7 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2024, 1, 14),
               receipt,
               "Sidonie Bouthors",
-              Status.PaidBack))
+              Status.Reimbursed))
 
   @Before
   fun setup() {
