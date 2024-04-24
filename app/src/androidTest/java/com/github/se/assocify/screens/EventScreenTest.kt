@@ -32,7 +32,9 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   fun testSetup() {
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
     composeTestRule.setContent {
-      EventScreen(navActions = navActions, viewModel = EventScreenViewModel(EventAPI(SupabaseClient.supabaseClient)))
+      EventScreen(
+          navActions = navActions,
+          viewModel = EventScreenViewModel(EventAPI(SupabaseClient.supabaseClient)))
     }
   }
 
