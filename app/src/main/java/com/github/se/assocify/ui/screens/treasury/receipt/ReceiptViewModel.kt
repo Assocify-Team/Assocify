@@ -6,7 +6,7 @@ import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Phase
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
@@ -181,7 +181,7 @@ class ReceiptViewModel {
             cents = PriceUtil.toCents(_uiState.value.amount),
             date = date,
             incoming = _uiState.value.incoming,
-            phase = Phase.Unapproved,
+            status = Status.Unapproved,
             photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
 
     receiptApi.uploadReceipt(
