@@ -115,7 +115,7 @@ fun AccountingDetailedScreen(
               Status.Reimbursed))
 
   val yearList = listOf("2023", "2022", "2021")
-  val statusList: List<String> = listOf("All Status") + Status.entries.map{ it.name }
+  val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
   var selectedYear by remember { mutableStateOf(yearList.first()) }
