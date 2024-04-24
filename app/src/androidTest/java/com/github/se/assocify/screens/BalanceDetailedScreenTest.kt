@@ -45,7 +45,7 @@ class BalanceDetailedScreenTest :
           100,
           true,
           Status.Unapproved,
-          MaybeRemotePhoto.LocalFile("lol"))
+          MaybeRemotePhoto.Remote("path"))
   val balanceItems =
       listOf(
           BalanceItem(
