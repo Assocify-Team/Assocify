@@ -2,13 +2,14 @@ package com.github.se.assocify.ui.screens.event
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -159,6 +160,7 @@ fun EventTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Mod
 @Composable
 fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewModel) {
   CenterAlignedTopAppBar(
+      modifier = Modifier.testTag("topBar"),
       title = { Text(text = "Event") },
       navigationIcon = {
         IconButton(onClick = { navActions.navigateToMainTab(Destination.Profile) }) {
@@ -177,7 +179,7 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 fun EventSearchTopBar(navActions: NavigationActions, viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
   SearchBar(
-      modifier = Modifier.padding(8.dp),
+      modifier = Modifier.padding(8.dp).testTag("searchBar"),
       query = state.value.searchQuery,
       onQueryChange = { viewModel.modifySearchQuery(it) },
       onSearch = { viewModel.modifySearchingState(false) },
@@ -188,14 +190,22 @@ fun EventSearchTopBar(navActions: NavigationActions, viewModel: EventScreenViewM
 
 @Composable
 fun EventFilterBar(viewModel: EventScreenViewModel) {
-  Row() {
-    val state = viewModel.uiState.collectAsState()
-    state.value.events.forEach {
-      FilterChip(
-          modifier = Modifier.testTag(it.name).padding(8.dp),
-          label = { Text(it.name) },
-          selected = viewModel.isEventSelected(it),
-          onClick = { viewModel.setEventSelection(it, !viewModel.isEventSelected(it)) })
+
+  LazyRow() {
+    item {
+      val state = viewModel.uiState.collectAsState()
+      state.value.events.forEach {
+        FilterChip(
+            modifier = Modifier.testTag(it.name).padding(8.dp),
+            label = { Text(it.name) },
+            leadingIcon = {
+              if (viewModel.isEventSelected(it)) {
+                Icon(imageVector = Icons.Default.Check, contentDescription = "Selected")
+              }
+            },
+            selected = viewModel.isEventSelected(it),
+            onClick = { viewModel.setEventSelection(it, !viewModel.isEventSelected(it)) })
+      }
     }
   }
 }

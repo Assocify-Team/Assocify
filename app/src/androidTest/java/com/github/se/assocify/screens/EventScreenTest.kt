@@ -17,7 +17,6 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import io.mockk.mockk
 import java.time.LocalDateTime
 import org.junit.Before
 import org.junit.Rule
@@ -31,29 +30,34 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   @RelaxedMockK lateinit var mockEventAPI: EventAPI
 
-  private val navActions = mockk<NavigationActions>()
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+
   private var tabSelected = false
 
   @Before
   fun testSetup() {
 
+    /*
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
           onSuccessCallback(emptyList())
         }
 
-    every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    composeTestRule.setContent { EventScreen(navActions, EventScreenViewModel(mockEventAPI)) }
+     */
+
+    every { mockNavActions.navigateToMainTab(any()) } answers { tabSelected = true }
   }
 
   @Test
   fun display() {
+    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
     with(composeTestRule) { onNodeWithTag("eventScreen").assertIsDisplayed() }
   }
 
   @Test
   fun navigate() {
+    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
     with(composeTestRule) {
       onNodeWithTag("mainNavBarItem/treasury").performClick()
       assert(tabSelected)
@@ -62,6 +66,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   @Test
   fun testTabSwitching() {
+    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
     with(composeTestRule) {
       onNodeWithTag("tasksTab").assertIsDisplayed()
       onNodeWithTag("tasksTab").performClick()
@@ -78,14 +83,14 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   }
 
   @Test
-  fun testMultipleAssoc() {
+  fun testFilterChipShowAssoc() {
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
           val events =
               listOf(
                   Event(
                       "1",
-                      "testEvent1",
+                      "filterChipTestEvent1",
                       "a",
                       LocalDateTime.now(),
                       LocalDateTime.now(),
@@ -93,7 +98,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                       "home"),
                   Event(
                       "2",
-                      "testEvent2",
+                      "filterChipTestEvent2",
                       "a",
                       LocalDateTime.now(),
                       LocalDateTime.now(),
@@ -101,21 +106,68 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                       "home"),
                   Event(
                       "3",
-                      "testEvent3",
+                      "filterChipTestEvent3",
                       "a",
                       LocalDateTime.now(),
                       LocalDateTime.now(),
                       "me",
                       "home"))
-          val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
+          val onSuccessCallback = firstArg<(List<Event>) -> Unit>()
           onSuccessCallback(events)
-          with(composeTestRule) {
-            onNodeWithTag("testEvent1").assertIsDisplayed()
-
-            onNodeWithTag("testEvent2").assertIsDisplayed()
-
-            onNodeWithTag("testEvent3").assertIsDisplayed()
-          }
         }
+    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
+    with(composeTestRule) {
+      onNodeWithTag("filterChipTestEvent1").assertIsDisplayed()
+
+      onNodeWithTag("filterChipTestEvent2").assertIsDisplayed()
+
+      onNodeWithTag("filterChipTestEvent3").assertIsDisplayed()
+    }
   }
+  /*
+   @Test
+   fun searchBarSearchesWell() {
+     every { mockEventAPI.getEvents(any(), any()) } answers
+         {
+           val events =
+               listOf(
+                   Event(
+                       "1",
+                     "filterChipTestEvent1",
+                       "a",
+                       LocalDateTime.now(),
+                       LocalDateTime.now(),
+                       "me",
+                       "home"),
+                   Event(
+                       "2",
+                     "filterChipTestEvent2",
+                       "a",
+                       LocalDateTime.now(),
+                       LocalDateTime.now(),
+                       "me",
+                       "home"),
+                   Event(
+                       "3",
+                     "filterChipTestEvent3",
+                       "a",
+                       LocalDateTime.now(),
+                       LocalDateTime.now(),
+                       "me",
+                       "home"))
+           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
+           onSuccessCallback(events)
+           with(composeTestRule) {
+             onNodeWithTag("filterChipTestEvent1").assertIsDisplayed()
+
+             onNodeWithTag("filterChipTestEvent2").assertIsDisplayed()
+
+             onNodeWithTag("filterChipTestEvent3").assertIsDisplayed()
+           }
+         }
+
+   }
+
+  */
+
 }
