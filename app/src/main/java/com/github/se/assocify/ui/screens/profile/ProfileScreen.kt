@@ -50,10 +50,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.R
+import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
+import com.github.se.assocify.ui.screens.createAssociation.CreateAssociationViewmodel
 
 /**
  * Profile screen that displays the user's information, a way to change your current association and
@@ -64,10 +68,16 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navActions: NavigationActions) {
+fun ProfileScreen(navActions: NavigationActions,
+                  assoAPI: AssociationAPI,
+                  userAPI: UserAPI,
+                  viewmodel: ProfileViewModel = ProfileViewModel(assoAPI, userAPI)
+) {
   val listAsso = listOf("Association1", "Association2", "Association3")
   var expanded by remember { mutableStateOf(false) }
-  var selectedText by remember { mutableStateOf(listAsso[0]) }
+    var selectedText by remember { mutableStateOf(listAsso[0]) }
+    var currAsso = assoAPI.getAssociation(CurrentUser.associationUid!!, {selectedText = it.name}, {})
+
 
   Scaffold(
       modifier = Modifier.testTag("profileScreen"),
@@ -202,7 +212,7 @@ fun ProfileScreen(navActions: NavigationActions) {
           }
 
           // The below part is association dependent, only available if you're an admin !
-          Text(text = "Manage ${selectedText}")
+          Text(text = "Manage $selectedText")
 
           Column(modifier = Modifier.fillMaxWidth().testTag("manageAssociationList")) {
             ListItem(

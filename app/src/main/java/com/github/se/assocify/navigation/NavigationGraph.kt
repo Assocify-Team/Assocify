@@ -21,7 +21,7 @@ fun NavGraphBuilder.mainNavGraph(
   treasuryGraph(navActions)
   eventGraph(navActions)
   chatGraph(navActions)
-  profileGraph(navActions)
+  profileGraph(navActions, userAPI, associationAPI)
   loginGraph(navActions, userAPI, associationAPI)
   selectAssociationGraph(navActions, userAPI, associationAPI)
   createAssociationGraph(navActions, userAPI, associationAPI)
