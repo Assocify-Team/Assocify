@@ -156,16 +156,14 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit,
       filter: (Association) -> Boolean
   ) {
-    db.collection(collectionName)
-        .get()
-        .addOnSuccessListener {
-          val associations =
-              it.documents
-                  .map { document -> document.toObject(Association::class.java)!! }
-                  .filter { associations -> filter(associations) }
-          onSuccess(associations)
-        }
-        .addOnFailureListener { onFailure(it) }
+    scope.launch {
+      try {
+        val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
+        onSuccess(assoc.map { it.toAssociation() }.filter { filter(it) })
+      } catch (e: Exception) {
+        onFailure(e)
+      }
+    }
   }
 
   /**
@@ -182,15 +180,17 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit,
       filter: (User) -> Boolean
   ) {
-    db.collection(collectionName)
-        .document(assocId)
-        .get()
-        .addOnSuccessListener {
-          val doc =
-              it.toObject(Association::class.java)!!.getMembers().filter { user -> filter(user) }
-          onSuccess(doc)
-        }
-        .addOnFailureListener { onFailure(it) }
+    /*
+    scope.launch {
+      try {
+        val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
+        onSuccess(assoc.map { it.toAssociation() })
+      } catch (e: Exception) {
+        onFailure(e)
+      }
+    }
+
+     */
   }
 
   /**
@@ -206,7 +206,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<User>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    getFilteredUsers(assocId, onSuccess, onFailure) { user -> user.getRole() == Role("pending") }
+    getFilteredUsers(assocId, onSuccess, onFailure) { user -> user.role == Role("pending") }
   }
 
   /**
@@ -222,7 +222,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<User>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    getFilteredUsers(assocId, onSuccess, onFailure) { user -> user.getRole() != Role("pending") }
+    getFilteredUsers(assocId, onSuccess, onFailure) { user -> user.role != Role("pending") }
   }
 
   /**
