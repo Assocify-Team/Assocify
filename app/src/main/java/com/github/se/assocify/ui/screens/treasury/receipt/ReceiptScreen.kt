@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -41,12 +42,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.R
+import coil.compose.AsyncImage
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
+import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,18 +126,24 @@ fun ReceiptScreen(
                           .aspectRatio(1f)
                           .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                      Image(
-                          modifier = Modifier.align(Alignment.Center),
-                          painter =
-                              painterResource(
-                                  id = R.drawable.fake_receipt), /*TODO: Implement image loading*/
-                          contentDescription = "Receipt")
+                      if (receiptState.receiptImageURI != null) {
+                        AsyncImage(
+                            model = receiptState.receiptImageURI,
+                            modifier = Modifier.align(Alignment.Center),
+                            contentDescription = "receipt image",
+                        )
+                      } else {
+                        Image(
+                            modifier = Modifier.align(Alignment.Center),
+                            imageVector = Icons.Outlined.ReceiptLong,
+                            contentDescription = "receipt icon")
+                      }
                       FilledIconButton(
                           modifier =
                               Modifier.testTag("editImageButton")
                                   .align(Alignment.BottomEnd)
                                   .padding(10.dp),
-                          onClick = { viewModel.setImage() },
+                          onClick = { viewModel.showBottomSheet() },
                       ) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
                       }
@@ -189,5 +196,11 @@ fun ReceiptScreen(
 
               Spacer(modifier = Modifier.weight(1.0f))
             }
+
+        PhotoSelectionSheet(
+            visible = receiptState.showBottomSheet,
+            hideSheet = { viewModel.hideBottomSheet() },
+            setImageUri = { viewModel.setImage(it) },
+            signalCameraPermissionDenied = { viewModel.signalCameraPermissionDenied() })
       }
 }

@@ -41,6 +41,8 @@ class ReceiptsAPITest {
 
   private lateinit var api: ReceiptAPI
 
+  val uriMock = mockk<Uri>()
+
   private val successfulReceipt =
       Receipt(
           uid = "successful_rid",
@@ -61,10 +63,11 @@ class ReceiptsAPITest {
           status = Status.Approved,
           title = "title",
           description = "notes",
-          photo = MaybeRemotePhoto.LocalFile("path"))
+          photo = MaybeRemotePhoto.LocalFile(uriMock))
 
   @Before
   fun setUp() {
+    mockkStatic(Uri::class)
 
     every { storage.getReference("uid/receipts") }.returns(storageReference)
     every { firestore.collection("aid/receipts/uid/list") }.returns(collectionReference)
