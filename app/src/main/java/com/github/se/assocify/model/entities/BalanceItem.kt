@@ -1,5 +1,8 @@
 package com.github.se.assocify.model.entities
 
+import java.time.LocalDate
+
+
 /**
  * Represents an item in the balance sheet. For example some sweater in the category Logistics Pole
  *
@@ -11,7 +14,7 @@ package com.github.se.assocify.model.entities
  * @param category category of the item (for example: Logistics Pole)
  * @param date date of payment of the item
  * @param receipt receipt of the item
- * @param assignee user who is assigned to pay this item or to receive it
+ * @param assignee entity to which the item is assigned (payer or receiver)
  * @param status status of the item (for example: paid, not paid)
  */
 data class BalanceItem(
@@ -21,9 +24,9 @@ data class BalanceItem(
     val tva: TVA,
     val description: String,
     val category: AccountingSubCategory,
-    val date: String,
+    val date: LocalDate,
     val receipt: Receipt?,
-    val assignee: User?,
+    val assignee: String,
     val status: Phase
 )
 
