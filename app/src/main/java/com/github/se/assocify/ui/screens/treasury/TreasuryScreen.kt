@@ -20,10 +20,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CircleNotifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -53,7 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.Receipt
-import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -357,19 +353,16 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
   ListItem(
       modifier = Modifier.clickable { viewModel.onReceiptClick(receipt) },
       headlineContent = {
-        Text(
-            text = receipt.title,
-            modifier = Modifier.testTag("receiptNameText"))
+        Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
       },
       overlineContent = {
-        Text(
-            text = DateUtil.toString(receipt.date),
-            modifier = Modifier.testTag("receiptDateText"))
+        Text(modifier = Modifier.testTag("receiptDateText"), text = DateUtil.toString(receipt.date))
       },
       supportingContent = {
         Text(
+            modifier = Modifier.testTag("receiptDescriptionText"),
             text = receipt.description,
-            modifier = Modifier.testTag("receiptDescriptionText"))
+            maxLines = 1)
       },
       trailingContent = {
         Row(
@@ -382,13 +375,7 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
               Spacer(modifier = Modifier.width(8.dp))
               Icon(
                   modifier = Modifier.testTag("statusIcon").size(30.dp),
-                  imageVector =
-                      when (receipt.status) {
-                        Status.Unapproved -> Icons.Filled.CircleNotifications
-                        Status.Approved -> Icons.Filled.AccessTimeFilled
-                        Status.PaidBack -> Icons.Filled.CheckCircle
-                        Status.Archived -> Icons.Filled.CheckCircle
-                      },
+                  imageVector = receipt.status.getIcon(),
                   contentDescription = "status icon")
             }
       },
