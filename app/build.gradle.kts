@@ -169,6 +169,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
     // Espresso
     val espressoVersion = "3.5.1"
     androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
@@ -197,6 +199,8 @@ dependencies {
     implementation("io.ktor:ktor-client-android:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-utils:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
+    androidTestImplementation("io.ktor:ktor-client-mock:$ktorVersion")
 
     // Mockk
     val mockkVersion = "1.13.10"

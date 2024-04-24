@@ -112,8 +112,8 @@ fun SelectAssociation(
                     if (state.value.searchState) {
                       val filteredAssos =
                           state.value.associations.filter { ass ->
-                            val min = min(ass.getName().length, state.value.searchQuery.length)
-                            ass.getName().take(min).lowercase() ==
+                            val min = min(ass.name.length, state.value.searchQuery.length)
+                            ass.name.take(min).lowercase() ==
                                 state.value.searchQuery.take(min).lowercase()
                           }
                       filteredAssos.map { ass -> DisplayOrganization(ass, navActions) }
@@ -166,7 +166,7 @@ fun DisplayOrganization(organization: Association, navActions: NavigationActions
   ListItem(
       headlineContent = {
         Text(
-            text = organization.getName(),
+            text = organization.name,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.testTag("OrganizationName"))
       },
