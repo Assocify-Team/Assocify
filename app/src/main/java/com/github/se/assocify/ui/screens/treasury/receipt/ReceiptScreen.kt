@@ -18,10 +18,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -187,7 +187,7 @@ fun ReceiptScreen(
                       } else {
                         Image(
                             modifier = Modifier.align(Alignment.Center).size(100.dp),
-                            imageVector = Icons.Outlined.ReceiptLong,
+                            imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
                             contentDescription = "receipt icon")
                       }
                       FilledIconButton(
