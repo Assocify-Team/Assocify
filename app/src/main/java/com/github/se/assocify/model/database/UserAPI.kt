@@ -1,7 +1,12 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.time.LocalDate
 
 /**
  * API for interacting with the users in the database
@@ -74,4 +79,13 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener(onFailure)
   }
+}
+
+@Serializable
+data class SupabaseUser(
+  val uid: String? = null,
+  val name: String,
+  @SerialName("email") val email: String,
+) {
+  fun toUser() = User(uid!!, name, Role("pending"))
 }

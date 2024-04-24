@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.google.firebase.firestore.FirebaseFirestore
+import io.github.jan.supabase.postgrest.query.Columns
 
 /**
  * API for interacting with the associations in the database
@@ -180,17 +181,14 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit,
       filter: (User) -> Boolean
   ) {
-    /*
     scope.launch {
       try {
-        val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
-        onSuccess(assoc.map { it.toAssociation() })
+        val us = db.from("association").select(Columns.raw("users(uuid, name, description)")).decodeList<SupabaseUser>()
+        onSuccess(us.map { it.toUser() })
       } catch (e: Exception) {
         onFailure(e)
       }
     }
-
-     */
   }
 
   /**
