@@ -144,7 +144,7 @@ class AssociationAPITest {
     assoAPI.addAssociation(
         Association(uuid1.toString(), "Test", "Test", LocalDate.now()),
         { fail("Should not succeed") },
-        { fail("Should not fail") })
+        onFailure)
 
     verify(timeout = 250) { onFailure(any()) }
   }
@@ -160,6 +160,7 @@ class AssociationAPITest {
 
     // Test failure
     val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
 
     assoAPI.editAssociation(
         uuid1.toString(), "TestN", "NewTestD", { fail("Should not succeed") }, onFailure)
@@ -181,6 +182,7 @@ class AssociationAPITest {
 
     // Test failure
     val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
 
     assoAPI.deleteAssociation(uuid1.toString(), { fail("Should not succeed") }, onFailure)
 
