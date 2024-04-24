@@ -3,7 +3,6 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,10 +58,7 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getEvent(id: String, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val event =
-            postgrest.from(collectionName).select(columns = Columns.ALL) {
-              filter { Event::uid eq id }
-            }
+        val event = postgrest.from(collectionName).select { filter { Event::uid eq id } }
         onSuccess(event.decodeAs())
       } catch (e: Exception) {
         onFailure(e)
@@ -80,8 +76,7 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun updateEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val updatedEvent =
-            postgrest.from(collectionName).update(event) { filter { Event::uid eq event.uid } }
+        postgrest.from(collectionName).update(event) { filter { Event::uid eq event.uid } }
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
