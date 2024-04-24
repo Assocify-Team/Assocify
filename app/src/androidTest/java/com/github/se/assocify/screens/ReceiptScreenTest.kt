@@ -12,7 +12,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
-import com.github.se.assocify.model.entities.Phase
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
@@ -42,7 +42,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
           cents = 10000,
           date = DateUtil.toDate("01/01/2021")!!,
           incoming = false,
-          phase = Phase.Unapproved,
+          status = Status.Unapproved,
           photo = null,
       )
 
@@ -219,7 +219,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
               cents = 10000,
               date = DateUtil.toDate("01/01/2021")!!,
               incoming = false,
-              phase = Phase.Unapproved,
+              status = Status.Unapproved,
               photo = null,
           ))
 
@@ -231,7 +231,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           cents = 10000,
           date = DateUtil.toDate("01/01/2021")!!,
           incoming = false,
-          phase = Phase.Unapproved,
+          status = Status.Unapproved,
           photo = null,
       )
   private var capturedReceipt: Receipt? = null

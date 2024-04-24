@@ -30,8 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.DropdownFilterChip
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -44,6 +46,7 @@ enum class AccountingPage {
  *
  * @param page: The page to display (either "budget" or "balance")
  * @param subCategoryList: The list of subcategories to display
+ * @param navigationActions: The navigation actions
  */
 @Composable
 fun Accounting(
@@ -62,26 +65,34 @@ fun Accounting(
           AccountingCategory("Commission"),
           AccountingCategory("Fees"))
 
+    val tvaList: List<String> = listOf("TTC", "HT")
+
   var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
+    var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+
   val filteredSubCategoryList =
       if (selectedCategory == "Global") // display everything under the global category
        subCategoryList
       else subCategoryList.filter { it.category.name == selectedCategory }
 
-  LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("AccountingScreen")) {
+  LazyColumn(modifier = Modifier.fillMaxWidth().padding(25.dp).testTag("AccountingScreen")) {
     item {
       Row(Modifier.testTag("filterRow")) {
         DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
         DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
           selectedCategory = it
         }
+          //TODO: change amount given TVA
+          DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") {
+              selectedTVA = it
+          }
       }
     }
 
     items(filteredSubCategoryList) {
       DisplayLine(it, "displayLine${it.name}", page, navigationActions)
-      HorizontalDivider(Modifier.fillMaxWidth().padding(vertical = 8.dp))
+      HorizontalDivider(Modifier.fillMaxWidth())
     }
 
     item {
@@ -113,53 +124,13 @@ fun TotalLine(totalAmount: Int) {
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
 }
 
-/**
- * A dropdown filter chip with a list of options
- *
- * @param selectedOption1: The default selected option
- * @param options: The list of options
- * @param testTag: The test tag of the dropdown filter chip
- * @param onOptionSelected: The callback when an option is selected
- */
-@Composable
-fun DropdownFilterChip(
-    selectedOption1: String,
-    options: List<String>,
-    testTag: String,
-    onOptionSelected: (String) -> Unit
-) {
-  var expanded by remember { mutableStateOf(false) }
-  var selectedOption by remember { mutableStateOf(selectedOption1) }
 
-  Box(modifier = Modifier.padding(8.dp).testTag(testTag)) {
-    FilterChip(
-        selected = false,
-        onClick = { expanded = !expanded },
-        label = { Text(selectedOption) },
-        trailingIcon = {
-          Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-        },
-        modifier = Modifier.testTag("filterChip"))
-
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        properties = PopupProperties(focusable = true),
-        modifier = Modifier.testTag("dropdownMenu")) {
-          options.forEach { option ->
-            DropdownMenuItem(
-                text = { Text(option) },
-                onClick = {
-                  onOptionSelected(option)
-                  selectedOption = option
-                  expanded = false
-                })
-          }
-        }
-  }
-}
-
-/** A line displaying a budget category and its amount */
+/** A line displaying a budget category and its amount
+ * @param category: The budget category
+ * @param testTag: The test tag of the line
+ * @param page: The page to which the line belongs
+ * @param navigationActions: The navigation actions to navigate to the detailed screen
+ *  */
 @Composable
 fun DisplayLine(
     category: AccountingSubCategory,
@@ -172,13 +143,11 @@ fun DisplayLine(
       trailingContent = { Text("${category.amount}") },
       modifier =
           Modifier.clickable {
-                /*TODO: open screen of the selected budget category*/
-                if (page == AccountingPage.BUDGET) {
-                  navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
-                } else {
-                  // go to balance detailed screen
-                }
-              }
-              .testTag(testTag),
+            if (page == AccountingPage.BUDGET) {
+              navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
+            } else {
+                navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
+            }
+          }.testTag(testTag),
   )
 }
