@@ -1,17 +1,31 @@
 package com.github.se.assocify.ui.screens.event
 
 import androidx.lifecycle.ViewModel
+import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.entities.Event
-import com.google.android.gms.tasks.Tasks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class EventScreenViewModel : ViewModel() {
+class EventScreenViewModel(private var db: EventAPI) : ViewModel() {
   private val _uiState: MutableStateFlow<EventScreenState> = MutableStateFlow(EventScreenState())
   val uiState: StateFlow<EventScreenState>
 
   init {
     uiState = _uiState
+    updateEventsFromDb()
+  }
+
+  private fun updateEventsFromDb() {
+    db.getEvents(
+        { events ->
+          updateFilteredEvents(events)
+          _uiState.value = _uiState.value.copy(events = events)
+        },
+        {})
+  }
+
+  private fun updateFilteredEvents(events: List<Event>) {
+    _uiState.value = _uiState.value.copy(selectedEvents = events.filter { isEventSelected(it) })
   }
 
   fun modifySearchingState(searching: Boolean) {
@@ -20,6 +34,24 @@ class EventScreenViewModel : ViewModel() {
 
   fun modifySearchQuery(query: String) {
     _uiState.value = _uiState.value.copy(searchQuery = query)
+  }
+
+  fun switchTab(tab: EventPageIndex) {
+    _uiState.value = _uiState.value.copy(currentTab = tab)
+  }
+
+  fun setEventSelection(event: Event, selected: Boolean) {
+    val selectedEvents =
+        if (selected) {
+          _uiState.value.selectedEvents + event
+        } else {
+          _uiState.value.selectedEvents - event
+        }
+    _uiState.value = _uiState.value.copy(selectedEvents = selectedEvents)
+  }
+
+  fun isEventSelected(event: Event): Boolean {
+    return _uiState.value.selectedEvents.contains(event)
   }
 }
 
@@ -38,6 +70,6 @@ data class EventScreenState(
     val searchQuery: String = "",
     val searching: Boolean = false,
     val events: List<Event> = emptyList(),
-    val tasks: List<Tasks> = emptyList(),
+    val selectedEvents: List<Event> = emptyList(),
     val currentTab: EventPageIndex = EventPageIndex.TASKS
 )

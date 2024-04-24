@@ -27,9 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.Destination
@@ -40,7 +38,6 @@ import com.github.se.assocify.ui.screens.event.map.EventMapScreen
 import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
-import java.time.LocalDateTime
 import kotlinx.coroutines.launch
 
 /**
@@ -50,7 +47,7 @@ import kotlinx.coroutines.launch
  * @param event List of events to display.
  * @param currentTab Current tab to display.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
@@ -59,7 +56,18 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
       floatingActionButton = {
         FloatingActionButton(
             onClick = {
-              /*TODO: adapt the action button depending on the current screen and modify it's navigations */ }) {
+              when (state.value.currentTab) {
+                EventPageIndex.TASKS -> {
+                  /*TODO: implement for tasks screen*/
+                }
+                EventPageIndex.MAP -> {
+                  /*TODO: implement for map screen*/
+                }
+                EventPageIndex.SCHEDULE -> {
+                  /*TODO: implement for schedule screen*/
+                }
+              }
+            }) {
               Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
       },
@@ -80,7 +88,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
           val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
-          EventFilterBar(events = state.value.events)
+          EventFilterBar(viewModel)
           TabRow(selectedTabIndex = pagerState.currentPage) {
             EventTab(
                 text = "Tasks",
@@ -89,6 +97,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
                 onClick = {
                   coroutineRoute.launch {
                     pagerState.animateScrollToPage(EventPageIndex.TASKS.index)
+                    viewModel.switchTab(EventPageIndex.TASKS)
                   }
                 })
             EventTab(
@@ -96,7 +105,10 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
                 modifier = Modifier.testTag("mapTab"),
                 selected = pagerState.currentPage == EventPageIndex.MAP.index,
                 onClick = {
-                  coroutineRoute.launch { pagerState.animateScrollToPage(EventPageIndex.MAP.index) }
+                  coroutineRoute.launch {
+                    pagerState.animateScrollToPage(EventPageIndex.MAP.index)
+                    viewModel.switchTab(EventPageIndex.MAP)
+                  }
                 })
             EventTab(
                 text = "Schedule",
@@ -105,6 +117,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
                 onClick = {
                   coroutineRoute.launch {
                     pagerState.animateScrollToPage(EventPageIndex.SCHEDULE.index)
+                    viewModel.switchTab(EventPageIndex.SCHEDULE)
                   }
                 })
           }
@@ -164,62 +177,25 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 fun EventSearchTopBar(navActions: NavigationActions, viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
   SearchBar(
+      modifier = Modifier.padding(8.dp),
       query = state.value.searchQuery,
       onQueryChange = { viewModel.modifySearchQuery(it) },
       onSearch = { viewModel.modifySearchingState(false) },
       active = false,
-      onActiveChange = {}) {}
+      onActiveChange = {},
+      trailingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Search") }) {}
 }
 
-/**
- * Filter bar of the event screen.
- *
- * @param events List of events to filter.
- */
 @Composable
-fun EventFilterBar(events: List<Event>) {
+fun EventFilterBar(viewModel: EventScreenViewModel) {
   Row() {
-    events.forEach {
+    val state = viewModel.uiState.collectAsState()
+    state.value.events.forEach {
       FilterChip(
           label = { Text(it.name) },
-          selected = true,
-          onClick = { /*TODO: apply the filtering of the tasks of the chip*/},
+          selected = viewModel.isEventSelected(it),
+          onClick = { viewModel.setEventSelection(it, !viewModel.isEventSelected(it)) },
           modifier = Modifier.padding(8.dp))
     }
   }
-}
-
-/** Preview of the event screen. */
-@Preview
-@Composable
-fun EventScreenPreview() {
-  val t1 = Task("uid", "the task 1", "a short description", true)
-  val event1 =
-      Event(
-          "1",
-          "Event 3",
-          "Event 1 description",
-          LocalDateTime.now(),
-          LocalDateTime.now(),
-          "pula",
-          "albero dove")
-  val event2 =
-      Event(
-          "1",
-          "Event 3",
-          "Event 1 description",
-          LocalDateTime.now(),
-          LocalDateTime.now(),
-          "pula",
-          "albero dove")
-  val event3 =
-      Event(
-          "1",
-          "Event 3",
-          "Event 1 description",
-          LocalDateTime.now(),
-          LocalDateTime.now(),
-          "pula",
-          "albero dove")
-  EventScreen(NavigationActions(rememberNavController()), EventScreenViewModel())
 }
