@@ -7,9 +7,10 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
-fun NavGraphBuilder.profileGraph(navigationActions: NavigationActions,
-                                 userAPI: UserAPI,
-                                 associationAPI: AssociationAPI
+fun NavGraphBuilder.profileGraph(
+    navigationActions: NavigationActions,
+    userAPI: UserAPI,
+    associationAPI: AssociationAPI
 ) {
   composable(
       route = Destination.Profile.route,

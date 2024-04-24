@@ -57,7 +57,6 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
-import com.github.se.assocify.ui.screens.createAssociation.CreateAssociationViewmodel
 
 /**
  * Profile screen that displays the user's information, a way to change your current association and
@@ -68,16 +67,17 @@ import com.github.se.assocify.ui.screens.createAssociation.CreateAssociationView
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navActions: NavigationActions,
-                  assoAPI: AssociationAPI,
-                  userAPI: UserAPI,
-                  viewmodel: ProfileViewModel = ProfileViewModel(assoAPI, userAPI)
+fun ProfileScreen(
+    navActions: NavigationActions,
+    assoAPI: AssociationAPI,
+    userAPI: UserAPI,
+    viewmodel: ProfileViewModel = ProfileViewModel(assoAPI, userAPI)
 ) {
   val listAsso = listOf("Association1", "Association2", "Association3")
   var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(listAsso[0]) }
-    var currAsso = assoAPI.getAssociation(CurrentUser.associationUid!!, {selectedText = it.name}, {})
-
+  var selectedText by remember { mutableStateOf(listAsso[0]) }
+  var currAsso =
+      assoAPI.getAssociation(CurrentUser.associationUid!!, { selectedText = it.name }, {})
 
   Scaffold(
       modifier = Modifier.testTag("profileScreen"),
