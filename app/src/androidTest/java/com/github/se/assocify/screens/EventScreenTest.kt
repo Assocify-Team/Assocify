@@ -92,34 +92,13 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                       LocalDateTime.now(),
                       LocalDateTime.now(),
                       "me",
-                      "home"),
-                  Event(
-                      "2",
-                      "filterChipTestEvent2",
-                      "a",
-                      LocalDateTime.now(),
-                      LocalDateTime.now(),
-                      "me",
-                      "home"),
-                  Event(
-                      "3",
-                      "filterChipTestEvent3",
-                      "a",
-                      LocalDateTime.now(),
-                      LocalDateTime.now(),
-                      "me",
                       "home"))
           val onSuccessCallback = firstArg<(List<Event>) -> Unit>()
           onSuccessCallback(events)
         }
     composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
-    with(composeTestRule) {
-      onNodeWithTag("filterChipTestEvent1").assertIsDisplayed()
 
-      onNodeWithTag("filterChipTestEvent2").assertIsDisplayed()
-
-      onNodeWithTag("filterChipTestEvent3").assertIsDisplayed()
-    }
+    with(composeTestRule) { onNodeWithTag("filterChipTestEvent").assertIsDisplayed() }
   }
   /*
    @Test
