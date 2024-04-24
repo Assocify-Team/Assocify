@@ -200,6 +200,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-utils:$ktorVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
+    androidTestImplementation("io.ktor:ktor-client-mock:$ktorVersion")
 
     // Mockk
     val mockkVersion = "1.13.10"
