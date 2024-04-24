@@ -1,6 +1,5 @@
 package com.github.se.assocify.model.database
 
-import android.net.Uri
 import androidx.annotation.Keep
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Phase
@@ -43,7 +42,7 @@ class ReceiptAPI(
       is MaybeRemotePhoto.LocalFile -> {
         storageReference
             .child(receipt.uid)
-            .putFile(Uri.parse(receipt.photo.filePath))
+            .putFile(receipt.photo.uri)
             .addOnSuccessListener { onPhotoUploadSuccess(true) }
             .addOnFailureListener { onFailure(false, it) }
       }

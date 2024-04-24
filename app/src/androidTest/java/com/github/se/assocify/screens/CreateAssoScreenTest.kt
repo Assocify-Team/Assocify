@@ -47,8 +47,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           User("10", "seb", Role("")))
 
   private val mockNavActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val mockAssocAPI =
-      mockk<AssociationAPI>(relaxUnitFun = true) { every { getNewId() } answers { "1" } }
+  private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true)
   private val mockUserAPI =
       mockk<UserAPI> {
         every { getAllUsers(any(), any()) } answers
