@@ -6,7 +6,9 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -16,7 +18,8 @@ import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.selectAssoc.SelectAssociation
+import com.github.se.assocify.ui.screens.selectAssociation.DisplayOrganization
+import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociation
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -27,6 +30,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.verify
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,7 +50,6 @@ class SelectAssociationScreenTest(semanticsProvider: SemanticsNodeInteractionsPr
   val createOrgaButton: KNode = child { hasTestTag("CreateNewOrganizationButton") }
   val searchOrgaButton: KNode = onNode { hasTestTag("SOB") }
   val arrowBackButton: KNode = onNode { hasTestTag("ArrowBackButton") }
-  val helloText: KNode = onNode { hasTestTag("HelloText") }
 }
 
 /**
@@ -58,8 +61,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
     ComposeScreen<DisplayOrganizationScreenTest>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("DisplayOrganizationScreen") }) {
-  val organizationName: KNode = child { hasTestTag("OrganizationName") }
-  val organizationIcon: KNode = child { hasTestTag("OrganizationIcon") }
+  val organizationSelect: KNode = child { hasTestTag("SelectIcon") }
 }
 
 /** This class represents the SelectAssociationScreen */
@@ -68,29 +70,19 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @get:Rule val composeTestRule = createComposeRule()
   @get:Rule val mockkRule = MockKRule(this)
 
-  val registeredAssociation = listOf("CLIC", "GAME*")
-
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockAssocAPI: AssociationAPI
 
   // Relaxed mocks methods have a default implementation returning values
   @RelaxedMockK lateinit var mockUserAPI: UserAPI
 
-  @RelaxedMockK lateinit var mockCurrentUser: CurrentUser
-
   val testAssociation =
-      Association(
-          "testAssociation",
-          "an association to test the viewModel",
-          "a",
-          "b",
-          "c",
-          emptyList(),
-          emptyList())
+      Association("testAssociation", "an association to test the viewModel", "a", LocalDate.EPOCH)
 
   @Before
   fun setup() {
-    val exception = Exception("the test does not work")
+    CurrentUser.userUid = "adfslkj"
+    CurrentUser.associationUid = "testAssocId"
     every { mockAssocAPI.getAssociations(any(), any()) } answers
         {
           val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
@@ -139,7 +131,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     // Check if the organizations are displayed
     val organizations = listOf(testAssociation)
     organizations.forEach { organization ->
-      composeTestRule.onNodeWithText(organization.getName()).assertIsDisplayed()
+      composeTestRule.onNodeWithText(organization.name).assertIsDisplayed()
     }
   }
 
@@ -158,14 +150,34 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     composeTestRule.onNodeWithText("There is no organization to display.").assertIsDisplayed()
   }
 
-  /** This test checks if the organization name and icon are displayed */
+  /**
+   * This test checks if the navigation to the home screen is triggered when selecting an
+   * organization
+   */
   @Test
-  fun testDisplayOrganization() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
-    ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
-      organizationName { assertIsDisplayed() }
-      organizationIcon { assertIsDisplayed() }
+  fun testNavigateToHomeWithSelectButton() {
+    composeTestRule.setContent {
+      DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
     }
+    ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
+      organizationSelect {
+        assertIsDisplayed()
+        performClick()
+      }
+    }
+    verify(timeout = 250) { mockNavActions.navigateTo(Destination.Home) }
+  }
+
+  /**
+   * This test checks if the navigation to the home screen is triggered when selecting an
+   * organization
+   */
+  @Test
+  fun testNavigateToHomeByClickingOnAssoc() {
+    composeTestRule.setContent {
+      DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
+    }
+    composeTestRule.onNodeWithTag("DisplayOrganizationScreen").performClick()
   }
 
   /* This test check if, when searching with the search bar the icons change */
