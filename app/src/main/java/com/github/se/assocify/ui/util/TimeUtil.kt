@@ -22,7 +22,7 @@ object TimeUtil {
   /**
    * Converts a string to a time. If the string is empty or represents a null time, it returns null.
    */
-  fun toDate(time: String): LocalTime? {
+  fun toTime(time: String): LocalTime? {
     if (time.isEmpty() || time == NULL_TIME_STRING) {
       return null
     }

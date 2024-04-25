@@ -158,7 +158,9 @@ fun TimePickerWithDialog(
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(
                     modifier = Modifier.testTag("timePickerDialogCancel"),
-                    onClick = { showDialog = false }) { Text("Cancel") }
+                    onClick = { showDialog = false }) {
+                      Text("Cancel")
+                    }
                 TextButton(
                     modifier = Modifier.testTag("timePickerDialogOK"),
                     onClick = {
