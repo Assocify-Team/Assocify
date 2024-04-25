@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import com.github.se.assocify.model.entities.Task
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
