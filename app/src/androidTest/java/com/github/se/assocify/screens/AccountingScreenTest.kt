@@ -87,7 +87,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   fun testsIfFilterRowIsScrollable() {
     with(composeTestRule) {
       onNodeWithTag("filterRow").assertIsDisplayed()
-      onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
+      onNodeWithTag("filterRow").performTouchInput { swipeLeft() }
     }
   }
 }
