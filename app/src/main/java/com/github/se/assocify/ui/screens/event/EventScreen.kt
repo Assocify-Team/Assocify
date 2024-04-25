@@ -45,7 +45,6 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
-import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
 import kotlinx.coroutines.launch
 
 /**
