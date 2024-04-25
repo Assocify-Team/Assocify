@@ -8,6 +8,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.github.se.assocify.model.entities.Task
 
@@ -17,9 +18,10 @@ import com.github.se.assocify.model.entities.Task
  * @param tasks List of tasks to be displayed.
  */
 @Composable
-fun EventTaskScreen(tasks: List<Task>) {
+fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel) {
+  val state = eventTaskViewModel.uiState.collectAsState()
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
-    tasks.forEach {
+    state.value.tasks.forEach {
       item {
         ListItem(
             modifier = Modifier.clickable { /*TODO: navigate to the task details screen*/},
