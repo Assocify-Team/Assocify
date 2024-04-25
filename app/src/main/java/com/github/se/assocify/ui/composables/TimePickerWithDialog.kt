@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -98,7 +99,8 @@ fun TimePickerWithDialog(
           shape = MaterialTheme.shapes.extraLarge,
           tonalElevation = 6.dp,
           modifier =
-              Modifier.width(IntrinsicSize.Min)
+              Modifier.testTag("timePickerDialog")
+                  .width(IntrinsicSize.Min)
                   .height(IntrinsicSize.Min)
                   .background(
                       shape = MaterialTheme.shapes.extraLarge,
@@ -154,8 +156,11 @@ fun TimePickerWithDialog(
               }
               Row(modifier = Modifier.height(40.dp).fillMaxWidth()) {
                 Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
                 TextButton(
+                    modifier = Modifier.testTag("timePickerDialogCancel"),
+                    onClick = { showDialog = false }) { Text("Cancel") }
+                TextButton(
+                    modifier = Modifier.testTag("timePickerDialogOK"),
                     onClick = {
                       onTimeSelect(selectedTime)
                       showDialog = false

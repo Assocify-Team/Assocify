@@ -3,6 +3,7 @@ package com.github.se.assocify.screens
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
@@ -45,6 +46,26 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
       onNodeWithTag("locationField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("deleteButton").performScrollTo().assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun datePicker() {
+    with(composeTestRule) {
+      onNodeWithTag("dateField").performClick()
+      onNodeWithTag("datePickerDialog").assertIsDisplayed()
+      onNodeWithTag("datePickerDialogCancel").performClick()
+      onNodeWithTag("datePickerDialog").assertDoesNotExist()
+    }
+  }
+
+  @Test
+  fun timePicker() {
+    with(composeTestRule) {
+      onNodeWithTag("timeField").performClick()
+      onNodeWithTag("timePickerDialog").assertIsDisplayed()
+      onNodeWithTag("timePickerDialogCancel").performClick()
+      onNodeWithTag("timePickerDialog").assertDoesNotExist()
     }
   }
 }
