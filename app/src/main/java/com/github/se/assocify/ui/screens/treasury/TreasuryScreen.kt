@@ -46,8 +46,8 @@ import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.treasury.accounting.FilterBar
-import com.github.se.assocify.ui.screens.treasury.accounting.balance.Balance
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.Budget
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import kotlinx.coroutines.launch
@@ -155,8 +155,8 @@ fun TreasuryScreen(
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.RECEIPT.ordinal -> ReceiptListScreen(receiptListViewModel)
-              TreasuryPageIndex.BUDGET.ordinal -> Budget(navActions)
-              TreasuryPageIndex.BALANCE.ordinal -> Balance(navActions)
+              TreasuryPageIndex.BUDGET.ordinal -> BudgetScreen(navActions)
+              TreasuryPageIndex.BALANCE.ordinal -> BalanceScreen(navActions)
             }
           }
         }

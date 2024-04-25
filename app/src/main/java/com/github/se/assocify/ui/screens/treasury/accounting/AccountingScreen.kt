@@ -40,7 +40,7 @@ enum class AccountingPage {
  * @param navigationActions: The navigation actions
  */
 @Composable
-fun Accounting(
+fun AccountingScreen(
     page: AccountingPage,
     subCategoryList: List<AccountingSubCategory>,
     navigationActions: NavigationActions
