@@ -7,7 +7,6 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.entities.Event
@@ -113,17 +112,15 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   @Test
   fun searchBarSearchesWell() {
-    every { mockEventAPI.getEvents(any(), any()) } answers
-        {
-          with(composeTestRule) {
-            onNodeWithTag("eventAccountIcon").assertIsDisplayed()
-            onNodeWithTag("eventSearchIcon").assertIsDisplayed()
-            onNodeWithTag("eventSearchButton").performClick()
-            onNodeWithTag("eventAccountIcon").assertIsNotDisplayed()
-            onNodeWithTag("eventSearchIcon").assertIsNotDisplayed()
-            onNodeWithTag("searchBar").assertIsDisplayed()
-            onNodeWithTag("searchBar").performTextClearance()
-          }
-        }
+    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
+    with(composeTestRule) {
+      onNodeWithTag("searchBar").assertIsNotDisplayed()
+      onNodeWithTag("eventAccountIcon").assertIsDisplayed()
+      onNodeWithTag("eventSearchButton").assertIsDisplayed()
+      onNodeWithTag("eventSearchButton").performClick()
+      onNodeWithTag("eventAccountIcon").assertIsNotDisplayed()
+      onNodeWithTag("eventSearchIcon").assertIsNotDisplayed()
+      onNodeWithTag("searchBar").assertIsDisplayed()
+    }
   }
 }

@@ -163,21 +163,17 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
       modifier = Modifier.testTag("topBar"),
       title = { Text(text = "Event") },
       navigationIcon = {
-        IconButton(onClick = { navActions.navigateToMainTab(Destination.Profile) }) {
-          Icon(
-              modifier = Modifier.testTag("eventAccountIcon"),
-              imageVector = Icons.Filled.AccountCircle,
-              contentDescription = "Account")
-        }
+        IconButton(
+            modifier = Modifier.testTag("eventAccountIcon"),
+            onClick = { navActions.navigateToMainTab(Destination.Profile) }) {
+              Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
+            }
       },
       actions = {
         IconButton(
             modifier = Modifier.testTag("eventSearchButton"),
             onClick = { viewModel.modifySearchingState(true) }) {
-              Icon(
-                  modifier = Modifier.testTag("eventSearchIcon"),
-                  imageVector = Icons.Filled.Search,
-                  contentDescription = "Search")
+              Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
             }
       })
 }
