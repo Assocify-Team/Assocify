@@ -118,11 +118,11 @@ fun TaskScreen(
             OutlinedButton(
                 modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
                 onClick = { /*viewModel.deleteReceipt()*/},
-                content = { Text("Delete"/*if (taskState.isNewTask) {
+                content = { Text("Delete" /*if (taskState.isNewTask) {
                       "Cancel"
                     } else {
                       "Delete"
-                    }*/ ) },
+                    }*/) },
                 colors =
                     ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error),
