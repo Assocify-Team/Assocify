@@ -1,12 +1,14 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -23,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -133,6 +136,10 @@ fun AccountingDetailedScreen(
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
       }
 
+  // For scrollable filter row
+  val state = rememberScrollState()
+  LaunchedEffect(Unit) { state.animateScrollTo(100) }
+
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
@@ -161,7 +168,7 @@ fun AccountingDetailedScreen(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
           item {
-            Row(Modifier.testTag("filterRowDetailed")) {
+            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(state)) {
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") { selectedYear = it }
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {

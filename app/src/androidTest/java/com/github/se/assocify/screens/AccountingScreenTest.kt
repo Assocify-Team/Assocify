@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
@@ -77,6 +78,15 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       // Verify the total is recalculated correctly
       val expectedTotal = 6000 // Sum of amounts for "Champachelor" and "Balelec"
       onNodeWithText("$expectedTotal").assertIsDisplayed()
+    }
+  }
+
+  /** Tests if filter row is scrollable */
+  @Test
+  fun testsIfFilterRowIsScrollable() {
+    with(composeTestRule) {
+      onNodeWithTag("filterRow").assertIsDisplayed()
+      onNodeWithTag("filterRow").performScrollTo()
     }
   }
 }
