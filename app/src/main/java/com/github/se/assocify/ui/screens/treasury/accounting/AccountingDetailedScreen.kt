@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -136,10 +135,6 @@ fun AccountingDetailedScreen(
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
       }
 
-  // For scrollable filter row
-  val state = rememberScrollState()
-  LaunchedEffect(Unit) { state.animateScrollTo(100) }
-
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
@@ -168,7 +163,7 @@ fun AccountingDetailedScreen(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
           item {
-            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(state)) {
+            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") { selectedYear = it }
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {

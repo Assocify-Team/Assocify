@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -140,9 +139,7 @@ class BalanceDetailedScreenTest :
   fun testsIfFilterRowIsScrollable() {
     with(composeTestRule) {
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
-        onNodeWithTag("filterRowDetailed").performTouchInput {
-            swipeLeft()
-        }
+      onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
     }
   }
 }

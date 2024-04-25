@@ -14,7 +14,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,13 +69,9 @@ fun Accounting(
        subCategoryList
       else subCategoryList.filter { it.category.name == selectedCategory }
 
-  // For scrollable row
-  val state = rememberScrollState()
-  LaunchedEffect(Unit) { state.animateScrollTo(100) }
-
   LazyColumn(modifier = Modifier.fillMaxWidth().padding(25.dp).testTag("AccountingScreen")) {
     item {
-      Row(Modifier.testTag("filterRow").horizontalScroll(state)) {
+      Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
         DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
         DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
           selectedCategory = it
