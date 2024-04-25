@@ -30,6 +30,12 @@ sealed class Destination(
   data object NewReceipt : Destination("treasury/receipt")
 
   data class EditReceipt(val receiptUid: String) : Destination("treasury/receipt/$receiptUid")
+
+  data class BudgetDetailed(val subCategoryUid: String) :
+      Destination("treasury/budget/$subCategoryUid")
+
+  data class BalanceDetailed(val subCategoryUid: String) :
+      Destination("treasury/balance/$subCategoryUid")
 }
 
 val MAIN_TABS_LIST =

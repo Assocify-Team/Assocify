@@ -8,6 +8,7 @@ plugins {
     id("org.sonarqube") version "4.4.1.3373"
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 
     // Supabase
     kotlin("plugin.serialization") version "1.9.23"
@@ -37,6 +38,7 @@ android {
         }
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties["SUPABASE_ANON_KEY"]}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties["SUPABASE_URL"]}\"")
+
     }
 
     val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -256,3 +258,19 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
     }
 }
+
+secrets {
+    // Optionally specify a different file name containing your secrets.
+    // The plugin defaults to "local.properties"
+    propertiesFileName = "secrets.properties"
+
+    // A properties file containing default secret values. This file can be
+    // checked in version control.
+    defaultPropertiesFileName = "local.defaults.properties"
+
+    // Configure which keys should be ignored by the plugin by providing regular expressions.
+    // "sdk.dir" is ignored by default.
+    ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
+    ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
+}
+

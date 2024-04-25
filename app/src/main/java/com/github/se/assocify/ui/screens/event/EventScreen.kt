@@ -1,14 +1,21 @@
 package com.github.se.assocify.ui.screens.event
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -26,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -37,7 +45,6 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.event.map.EventMapScreen
 import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
-import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
 import kotlinx.coroutines.launch
 
 /**
@@ -55,6 +62,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
         FloatingActionButton(
+            modifier = Modifier.testTag("floatingButtonEvent"),
             onClick = {
               when (state.value.currentTab) {
                 EventPageIndex.TASKS -> {
@@ -84,52 +92,61 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
           EventTitleTopBar(navActions, viewModel)
         }
       }) {
-        Column(modifier = Modifier.padding(it)) {
-          val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
-          val coroutineRoute = rememberCoroutineScope()
+        if (state.value.error) {
+          Column(
+              modifier = Modifier.padding(it).fillMaxSize(),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center) {
+                Text("Error loading events")
+              }
+        } else {
+          Column(modifier = Modifier.padding(it).fillMaxHeight()) {
+            val pagerState = rememberPagerState(pageCount = { EventPageIndex.NUMBER_OF_PAGES })
+            val coroutineRoute = rememberCoroutineScope()
 
-          EventFilterBar(viewModel)
-          TabRow(selectedTabIndex = pagerState.currentPage) {
-            EventTab(
-                text = "Tasks",
-                modifier = Modifier.testTag("tasksTab"),
-                selected = pagerState.currentPage == EventPageIndex.TASKS.index,
-                onClick = {
-                  coroutineRoute.launch {
-                    pagerState.animateScrollToPage(EventPageIndex.TASKS.index)
-                    viewModel.switchTab(EventPageIndex.TASKS)
-                  }
-                })
-            EventTab(
-                text = "Map",
-                modifier = Modifier.testTag("mapTab"),
-                selected = pagerState.currentPage == EventPageIndex.MAP.index,
-                onClick = {
-                  coroutineRoute.launch {
-                    pagerState.animateScrollToPage(EventPageIndex.MAP.index)
-                    viewModel.switchTab(EventPageIndex.MAP)
-                  }
-                })
-            EventTab(
-                text = "Schedule",
-                modifier = Modifier.testTag("scheduleTab"),
-                selected = pagerState.currentPage == EventPageIndex.SCHEDULE.index,
-                onClick = {
-                  coroutineRoute.launch {
-                    pagerState.animateScrollToPage(EventPageIndex.SCHEDULE.index)
-                    viewModel.switchTab(EventPageIndex.SCHEDULE)
-                  }
-                })
-          }
-          val t1 = Task("uid1", "task 1", "the task 1", true)
-          val t2 = Task("uid2", "task 2", "the task 2", false)
-          val t3 = Task("uid3", "task 3", "the task 3", true)
-          val testTasks = listOf(t1, t2, t3)
-          HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
-            when (page) {
-              TreasuryPageIndex.RECEIPT.ordinal -> EventTaskScreen(testTasks)
-              TreasuryPageIndex.BUDGET.ordinal -> EventMapScreen()
-              TreasuryPageIndex.BALANCE.ordinal -> EventScheduleScreen()
+            EventFilterBar(viewModel)
+            TabRow(selectedTabIndex = pagerState.currentPage) {
+              EventTab(
+                  text = "Tasks",
+                  modifier = Modifier.testTag("tasksTab"),
+                  selected = pagerState.currentPage == EventPageIndex.TASKS.index,
+                  onClick = {
+                    coroutineRoute.launch {
+                      pagerState.animateScrollToPage(EventPageIndex.TASKS.index)
+                      viewModel.switchTab(EventPageIndex.TASKS)
+                    }
+                  })
+              EventTab(
+                  text = "Map",
+                  modifier = Modifier.testTag("mapTab"),
+                  selected = pagerState.currentPage == EventPageIndex.MAP.index,
+                  onClick = {
+                    coroutineRoute.launch {
+                      pagerState.animateScrollToPage(EventPageIndex.MAP.index)
+                      viewModel.switchTab(EventPageIndex.MAP)
+                    }
+                  })
+              EventTab(
+                  text = "Schedule",
+                  modifier = Modifier.testTag("scheduleTab"),
+                  selected = pagerState.currentPage == EventPageIndex.SCHEDULE.index,
+                  onClick = {
+                    coroutineRoute.launch {
+                      pagerState.animateScrollToPage(EventPageIndex.SCHEDULE.index)
+                      viewModel.switchTab(EventPageIndex.SCHEDULE)
+                    }
+                  })
+            }
+            val t1 = Task("uid1", "task 1", "the task 1", true)
+            val t2 = Task("uid2", "task 2", "the task 2", false)
+            val t3 = Task("uid3", "task 3", "the task 3", true)
+            val testTasks = listOf(t1, t2, t3)
+            HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
+              when (page) {
+                EventPageIndex.TASKS.index -> EventTaskScreen(testTasks)
+                EventPageIndex.MAP.index -> EventMapScreen()
+                EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
+              }
             }
           }
         }
@@ -182,13 +199,37 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 fun EventSearchTopBar(viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
   SearchBar(
-      modifier = Modifier.padding(8.dp).testTag("searchBar"),
+      modifier = Modifier.padding(8.dp).testTag("searchBar").fillMaxWidth(),
       query = state.value.searchQuery,
       onQueryChange = { viewModel.modifySearchQuery(it) },
       onSearch = { viewModel.modifySearchingState(false) },
       active = false,
       onActiveChange = {},
-      trailingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Search") }) {}
+      leadingIcon = {
+        Icon(
+            modifier = Modifier.clickable { viewModel.modifySearchingState(false) },
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Dismiss")
+      },
+      trailingIcon = {
+        Icon(
+            modifier =
+                Modifier.clickable {
+                  when (state.value.currentTab) {
+                    EventPageIndex.TASKS -> {
+                      /*TODO: implement for tasks screen*/
+                    }
+                    EventPageIndex.MAP -> {
+                      /*TODO: implement for map screen*/
+                    }
+                    EventPageIndex.SCHEDULE -> {
+                      /*TODO: implement for schedule screen*/
+                    }
+                  }
+                },
+            imageVector = Icons.Filled.Search,
+            contentDescription = "Search")
+      }) {}
 }
 
 @Composable

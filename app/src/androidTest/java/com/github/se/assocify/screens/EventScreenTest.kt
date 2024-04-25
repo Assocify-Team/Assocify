@@ -33,7 +33,6 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @RelaxedMockK lateinit var mockEventAPI: EventAPI
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
   private var tabSelected = false
 
   @Before

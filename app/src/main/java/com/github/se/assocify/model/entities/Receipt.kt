@@ -1,6 +1,12 @@
 package com.github.se.assocify.model.entities
 
 import android.net.Uri
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTimeFilled
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.CircleNotifications
+import androidx.compose.ui.graphics.vector.ImageVector
 import java.time.LocalDate
 
 sealed class MaybeRemotePhoto {
@@ -16,13 +22,22 @@ data class Receipt(
     val date: LocalDate,
     val cents: Int,
     val incoming: Boolean,
-    val phase: Phase,
+    val status: Status,
     val photo: MaybeRemotePhoto?,
 )
 
-enum class Phase {
-  Unapproved,
+enum class Status {
+  Pending,
   Approved,
-  PaidBack,
-  Archived,
+  Reimbursed,
+  Archived;
+
+  fun getIcon(): ImageVector {
+    return when (this) {
+      Pending -> Icons.Filled.CircleNotifications
+      Approved -> Icons.Filled.AccessTimeFilled
+      Reimbursed -> Icons.Filled.CheckCircle
+      Archived -> Icons.Filled.Circle
+    }
+  }
 }
