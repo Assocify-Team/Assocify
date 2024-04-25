@@ -1,7 +1,9 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -26,10 +28,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-  private val uid = "1"
 
   private val navActions = mockk<NavigationActions>(/*relaxUnitFun = true*/ )
   private var tabSelected = false
+
+  private val uid = "1"
   private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true)
   private val mockUserAPI =
       mockk<UserAPI> {
@@ -61,6 +64,20 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("manageMembers").performScrollTo().assertIsDisplayed()
       onNodeWithTag("manageRoles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("associationDropdown").performScrollTo().performClick()
+      onAllNodesWithTag("associationDropdownItem").assertCountEquals(3) // depends on listAsso
+    }
+  }
+
+  // test if profile picture well displayed
+
+  // test if you can change name
+  @Test
+  fun changeName() {
+    with(composeTestRule) {
+      onNodeWithTag("editProfile").performClick()
+      onNodeWithTag("editName").assertIsDisplayed()
+      onNodeWithTag("confirmModifyButton").assertIsDisplayed()
     }
   }
 

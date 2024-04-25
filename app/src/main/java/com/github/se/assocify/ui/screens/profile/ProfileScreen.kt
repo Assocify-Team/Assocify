@@ -86,9 +86,6 @@ fun ProfileScreen(
   val listAsso = listOf("Association1", "Association2", "Association3")
   var expanded by remember { mutableStateOf(false) }
   var selectedText by remember { mutableStateOf(listAsso[0]) }
-  //  var currAsso =
-  //      assoAPI.getAssociation(CurrentUser.associationUid!!, { selectedText = it.name }, {})
-  //
 
   val state by viewmodel.uiState.collectAsState()
 
@@ -187,24 +184,22 @@ fun ProfileScreen(
                           contentDescription = "Association Logo")
                     })
 
-                ExposedDropdownMenu(
-                    modifier = Modifier,
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }) {
-                      listAsso.forEach { item ->
-                        DropdownMenuItem(
-                            text = { Text(text = item) },
-                            onClick = {
-                              selectedText = item
-                              expanded = false
-                            },
-                            leadingIcon = {
-                              Icon(
-                                  imageVector = Icons.Default.People, // todo
-                                  contentDescription = "Association Logo")
-                            })
-                      }
-                    }
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                  listAsso.forEach { item -> // todo get asso from DB
+                    DropdownMenuItem(
+                        text = { Text(text = item) },
+                        onClick = {
+                          selectedText = item
+                          expanded = false
+                        },
+                        leadingIcon = {
+                          Icon(
+                              imageVector = Icons.Default.People, // todo
+                              contentDescription = "Association Logo")
+                        },
+                        modifier = Modifier.testTag("associationDropdownItem"))
+                  }
+                }
               }
 
           Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
@@ -328,7 +323,8 @@ fun ProfileScreen(
                 OutlinedTextField(
                     value = state.modifyingName,
                     onValueChange = { viewmodel.modifyName(it) },
-                    label = { Text("Edit your name") })
+                    label = { Text("Edit your name") },
+                    modifier = Modifier.fillMaxWidth().testTag("editName"))
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(4.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)) {
