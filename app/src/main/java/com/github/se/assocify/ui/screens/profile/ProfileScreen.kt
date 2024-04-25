@@ -124,7 +124,7 @@ fun ProfileScreen(
 
                 // profile picture
 
-                if (state.receiptImageURI != null) {
+                if (state.profileImageURI != null) {
                   AsyncImage(
                       modifier =
                           Modifier.size(80.dp)
@@ -132,7 +132,7 @@ fun ProfileScreen(
                               .aspectRatio(1f)
                               .clickable { viewmodel.showBottomSheet() }
                               .testTag("profilePicture"),
-                      model = state.receiptImageURI,
+                      model = state.profileImageURI,
                       contentDescription = "profile picture",
                       contentScale = ContentScale.Crop)
                 } else {
@@ -347,7 +347,7 @@ fun ProfileScreen(
     }
 
     PhotoSelectionSheet(
-        visible = state.showBottomSheet,
+        visible = state.showPicOptions,
         hideSheet = { viewmodel.hideBottomSheet() },
         setImageUri = { viewmodel.setImage(it) },
         signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })

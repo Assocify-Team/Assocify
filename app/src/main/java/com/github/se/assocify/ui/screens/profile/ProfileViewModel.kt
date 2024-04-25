@@ -50,16 +50,16 @@ class ProfileViewModel(private val assoAPI: AssociationAPI, private val userAPI:
   }
 
   fun showBottomSheet() {
-    _uiState.value = _uiState.value.copy(showBottomSheet = true)
+    _uiState.value = _uiState.value.copy(showPicOptions = true)
   }
 
   fun hideBottomSheet() {
-    _uiState.value = _uiState.value.copy(showBottomSheet = false)
+    _uiState.value = _uiState.value.copy(showPicOptions = false)
   }
 
   fun setImage(uri: Uri?) {
     if (uri == null) return
-    _uiState.value = _uiState.value.copy(receiptImageURI = uri)
+    _uiState.value = _uiState.value.copy(profileImageURI = uri)
   }
 
   fun signalCameraPermissionDenied() {
@@ -75,6 +75,6 @@ data class ProfileUIState(
     val modifyingName: String = myName,
     val openEdit: Boolean = false,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
-    val showBottomSheet: Boolean = false,
-    val receiptImageURI: Uri? = null
+    val showPicOptions: Boolean = false,
+    val profileImageURI: Uri? = null
 )
