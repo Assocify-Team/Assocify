@@ -44,7 +44,7 @@ class BalanceDetailedScreenTest :
           LocalDate.now(),
           100,
           true,
-          Status.Unapproved,
+          Status.Pending,
           MaybeRemotePhoto.Remote("path"))
   val balanceItems =
       listOf(
@@ -58,7 +58,7 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2024, 4, 14),
               receipt,
               "François Théron",
-              Status.Unapproved),
+              Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
@@ -80,7 +80,7 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2024, 1, 14),
               receipt,
               "Sidonie Bouthors",
-              Status.PaidBack))
+              Status.Reimbursed))
 
   @Before
   fun setup() {
@@ -122,7 +122,7 @@ class BalanceDetailedScreenTest :
     with(composeTestRule) {
       // Initially, select the "Status" filter to change its value to "Unapproved"
       onNodeWithTag("statusListTag").performClick()
-      onNodeWithText("Unapproved").performClick()
+      onNodeWithText("Pending").performClick()
 
       // Assert that only the budget lines under "Unapproved" status are shown
       onNodeWithText("pair of scissors").assertIsDisplayed()
