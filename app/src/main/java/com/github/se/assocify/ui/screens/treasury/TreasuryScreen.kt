@@ -105,16 +105,12 @@ fun TreasuryScreen(
               Icon(Icons.Outlined.Add, "Create")
             }
       }) { innerPadding ->
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
+        Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
           val coroutineRoute = rememberCoroutineScope()
 
           // Tabs
           TabRow(
-              modifier = Modifier
-                  .height(48.dp)
-                  .testTag("tabRows"),
+              modifier = Modifier.height(48.dp).testTag("tabRows"),
               selectedTabIndex = pagerState.currentPage,
               containerColor = MaterialTheme.colorScheme.background,
               contentColor = MaterialTheme.colorScheme.primary,
@@ -122,14 +118,12 @@ fun TreasuryScreen(
               indicator = { tabPositions ->
                 Box(
                     modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                        .size(width = 10.dp, height = 3.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(8.dp)
-                        ))
+                        Modifier.fillMaxSize()
+                            .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                            .size(width = 10.dp, height = 3.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(8.dp)))
               }) {
                 TreasuryTab(
                     selected = pagerState.currentPage == TreasuryPageIndex.RECEIPT.ordinal,
@@ -160,11 +154,11 @@ fun TreasuryScreen(
                     modifier = Modifier.testTag("balanceTab"))
               }
 
-            when (pagerState.currentPage) {
-                TreasuryPageIndex.RECEIPT.ordinal -> null
-                TreasuryPageIndex.BUDGET.ordinal -> FilterBar()
-                TreasuryPageIndex.BALANCE.ordinal -> FilterBar()
-            }
+          when (pagerState.currentPage) {
+            TreasuryPageIndex.RECEIPT.ordinal -> null
+            TreasuryPageIndex.BUDGET.ordinal -> FilterBar()
+            TreasuryPageIndex.BALANCE.ordinal -> FilterBar()
+          }
 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
@@ -198,9 +192,7 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
           Text(
               text = "My Receipts",
               style = MaterialTheme.typography.titleMedium,
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(horizontal = 20.dp, vertical = 16.dp))
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp))
           HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
         }
 
@@ -230,9 +222,7 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
             Text(
                 text = "All Receipts",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp))
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp))
             HorizontalDivider(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
           }
           // Second list of receipts
@@ -329,9 +319,7 @@ fun TreasuryTopBar(
                           contentDescription = "Back arrow")
                     }
               },
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .testTag("receiptSearch"))
+              modifier = Modifier.fillMaxWidth().testTag("receiptSearch"))
         }
       },
       navigationIcon = {
@@ -374,20 +362,13 @@ fun TreasuryTopBar(
 private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
   Box(
       modifier =
-      Modifier
-          .fillMaxWidth()
-          .padding(6.dp)
-          .height(70.dp)
-          .testTag("receiptItemBox")
-          .clickable {
-              viewModel.onReceiptClick(receipt)
+          Modifier.fillMaxWidth().padding(6.dp).height(70.dp).testTag("receiptItemBox").clickable {
+            viewModel.onReceiptClick(receipt)
           }) {
         Column(modifier = Modifier.padding(start = 20.dp)) {
           Text(
               text = DateUtil.toString(receipt.date),
-              modifier = Modifier
-                  .padding(top = 6.dp)
-                  .testTag("receiptDateText"),
+              modifier = Modifier.padding(top = 6.dp).testTag("receiptDateText"),
               style =
                   TextStyle(
                       fontSize = 12.sp,
@@ -418,10 +399,9 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
 
         Row(
             modifier =
-            Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = 16.dp, top = 8.dp)
-                .testTag("receiptPriceAndIconRow"),
+                Modifier.align(Alignment.TopEnd)
+                    .padding(end = 16.dp, top = 8.dp)
+                    .testTag("receiptPriceAndIconRow"),
             verticalAlignment = Alignment.CenterVertically) {
               Text(
                   text = PriceUtil.fromCents(receipt.cents),
@@ -435,9 +415,7 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
                       ))
               Spacer(modifier = Modifier.width(8.dp))
               Icon(
-                  modifier = Modifier
-                      .size(20.dp)
-                      .testTag("shoppingCartIcon"),
+                  modifier = Modifier.size(20.dp).testTag("shoppingCartIcon"),
                   imageVector = Icons.Filled.ShoppingCart,
                   contentDescription = "Arrow icon",
               )

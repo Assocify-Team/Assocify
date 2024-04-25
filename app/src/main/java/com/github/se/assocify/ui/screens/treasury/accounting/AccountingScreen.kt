@@ -69,48 +69,50 @@ fun Accounting(
        subCategoryList
       else subCategoryList.filter { it.category.name == selectedCategory }
 
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(horizontal = 25.dp).testTag("AccountingScreen")) {
+  LazyColumn(
+      modifier = Modifier.fillMaxWidth().padding(horizontal = 25.dp).testTag("AccountingScreen")) {
+        items(filteredSubCategoryList) {
+          DisplayLine(it, "displayLine${it.name}", page, navigationActions)
+          HorizontalDivider(Modifier.fillMaxWidth())
+        }
 
-
-    items(filteredSubCategoryList) {
-      DisplayLine(it, "displayLine${it.name}", page, navigationActions)
-      HorizontalDivider(Modifier.fillMaxWidth())
-    }
-
-    item {
-      val totalAmount = filteredSubCategoryList.sumOf { it.amount }
-      TotalLine(totalAmount = totalAmount)
-    }
-  }
+        item {
+          val totalAmount = filteredSubCategoryList.sumOf { it.amount }
+          TotalLine(totalAmount = totalAmount)
+        }
+      }
 }
 
 @Composable
-fun FilterBar(){
-    val yearList =
-        listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
+fun FilterBar() {
+  val yearList =
+      listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
 
-    val categoryList =
-        listOf(
-            AccountingCategory("Global"),
-            AccountingCategory("Pole"),
-            AccountingCategory("Events"),
-            AccountingCategory("Commission"),
-            AccountingCategory("Fees"))
+  val categoryList =
+      listOf(
+          AccountingCategory("Global"),
+          AccountingCategory("Pole"),
+          AccountingCategory("Events"),
+          AccountingCategory("Commission"),
+          AccountingCategory("Fees"))
 
-    val tvaList: List<String> = listOf("TTC", "HT")
+  val tvaList: List<String> = listOf("TTC", "HT")
 
-    var selectedYear by remember { mutableStateOf(yearList.first()) }
-    var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
-    var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+  var selectedYear by remember { mutableStateOf(yearList.first()) }
+  var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
+  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
-    Row(Modifier.padding(horizontal = 20.dp).testTag("filterRow").horizontalScroll(rememberScrollState())) {
+  Row(
+      Modifier.padding(horizontal = 20.dp)
+          .testTag("filterRow")
+          .horizontalScroll(rememberScrollState())) {
         DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
         DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
-            selectedCategory = it
+          selectedCategory = it
         }
         // TODO: change amount given TVA
         DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
-    }
+      }
 }
 
 /**
