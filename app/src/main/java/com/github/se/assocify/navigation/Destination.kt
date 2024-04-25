@@ -28,7 +28,6 @@ sealed class Destination(
   data object CreateAsso : Destination("login/createAsso")
 
   data object NewReceipt : Destination("treasury/receipt")
-
   data class EditReceipt(val receiptUid: String) : Destination("treasury/receipt/$receiptUid")
 
   data class BudgetDetailed(val subCategoryUid: String) :
@@ -36,6 +35,9 @@ sealed class Destination(
 
   data class BalanceDetailed(val subCategoryUid: String) :
       Destination("treasury/balance/$subCategoryUid")
+
+  data object NewTask : Destination("event/task")
+  data class EditTask(val taskUid: String) : Destination("event/task/$taskUid")
 }
 
 val MAIN_TABS_LIST =

@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.event.tasktab.tab
+package com.github.se.assocify.ui.screens.event.tasktab.task
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -58,8 +58,10 @@ fun TaskScreen(
                 snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
         }*/ ) { paddingValues ->
     Column(
-        modifier =
-            Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
+        modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
           OutlinedTextField(
