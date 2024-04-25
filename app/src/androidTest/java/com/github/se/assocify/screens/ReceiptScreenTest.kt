@@ -68,7 +68,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
-    CurrentUser.associationUid = "testUser"
+    CurrentUser.associationUid = "testAssociation"
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel = viewModel) }
   }
 
