@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,11 +74,15 @@ fun ProfileScreen(
     userAPI: UserAPI,
     viewmodel: ProfileViewModel = ProfileViewModel(assoAPI, userAPI)
 ) {
+    // for 'change association' part
   val listAsso = listOf("Association1", "Association2", "Association3")
   var expanded by remember { mutableStateOf(false) }
   var selectedText by remember { mutableStateOf(listAsso[0]) }
   var currAsso =
       assoAPI.getAssociation(CurrentUser.associationUid!!, { selectedText = it.name }, {})
+    //
+
+    val state by viewmodel.uiState.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("profileScreen"),
@@ -120,7 +125,7 @@ fun ProfileScreen(
 
                 // personal information (depends on current association)
                 Column {
-                  Text("Name", modifier = Modifier.testTag("profileName"))
+                  Text(state.myName, modifier = Modifier.testTag("profileName"))
                   Text("Role", modifier = Modifier.testTag("profileRole"))
                 }
 
