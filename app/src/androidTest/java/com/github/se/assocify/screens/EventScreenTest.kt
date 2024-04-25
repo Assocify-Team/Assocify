@@ -60,4 +60,20 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("scheduleTab").assertIsSelected()
     }
   }
+
+  @Test
+  fun testFloatingActionButton() {
+    with(composeTestRule) {
+      onNodeWithTag("floatingButtonEvent").assertIsDisplayed()
+      onNodeWithTag("floatingButtonEvent").performClick()
+    }
+  }
+
+  @Test
+  fun testGoogleMap() {
+    with(composeTestRule) {
+      onNodeWithTag("mapTab").performClick()
+      onNodeWithTag("GoogleMap").assertIsDisplayed()
+    }
+  }
 }
