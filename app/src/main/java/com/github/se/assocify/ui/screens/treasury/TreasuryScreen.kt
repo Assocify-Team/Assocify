@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +29,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -48,9 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
@@ -352,65 +350,34 @@ fun TreasuryTopBar(
 /** Receipt item from the list in My Receipts page */
 @Composable
 private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
-  Box(
-      modifier =
-          Modifier.fillMaxWidth().padding(6.dp).height(70.dp).testTag("receiptItemBox").clickable {
-            viewModel.onReceiptClick(receipt)
-          }) {
-        Column(modifier = Modifier.padding(start = 20.dp)) {
-          Text(
-              text = DateUtil.toString(receipt.date),
-              modifier = Modifier.padding(top = 6.dp).testTag("receiptDateText"),
-              style =
-                  TextStyle(
-                      fontSize = 12.sp,
-                      lineHeight = 16.sp,
-                      color = MaterialTheme.colorScheme.secondary,
-                      letterSpacing = 0.5.sp,
-                  ))
-          Text(
-              text = receipt.title,
-              modifier = Modifier.testTag("receiptNameText"),
-              style =
-                  TextStyle(
-                      fontSize = 16.sp,
-                      lineHeight = 24.sp,
-                      letterSpacing = 0.sp,
-                  ))
-          Text(
-              text = receipt.description,
-              modifier = Modifier.testTag("receiptDescriptionText"),
-              style =
-                  TextStyle(
-                      fontSize = 12.sp,
-                      lineHeight = 24.sp,
-                      color = MaterialTheme.colorScheme.secondary,
-                      letterSpacing = 0.sp,
-                  ))
-        }
-
+  ListItem(
+      modifier = Modifier.clickable { viewModel.onReceiptClick(receipt) },
+      headlineContent = {
+        Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
+      },
+      overlineContent = {
+        Text(modifier = Modifier.testTag("receiptDateText"), text = DateUtil.toString(receipt.date))
+      },
+      supportingContent = {
+        Text(
+            modifier = Modifier.testTag("receiptDescriptionText"),
+            text = receipt.description,
+            maxLines = 1)
+      },
+      trailingContent = {
         Row(
-            modifier =
-                Modifier.align(Alignment.TopEnd)
-                    .padding(end = 16.dp, top = 8.dp)
-                    .testTag("receiptPriceAndIconRow"),
-            verticalAlignment = Alignment.CenterVertically) {
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.testTag("receiptPriceAndIconRow")) {
               Text(
                   text = PriceUtil.fromCents(receipt.cents),
                   modifier = Modifier.testTag("receiptPriceText"),
-                  style =
-                      TextStyle(
-                          fontSize = 14.sp,
-                          lineHeight = 24.sp,
-                          color = MaterialTheme.colorScheme.secondary,
-                          letterSpacing = 0.sp,
-                      ))
+                  style = MaterialTheme.typography.bodyMedium)
               Spacer(modifier = Modifier.width(8.dp))
               Icon(
-                  modifier = Modifier.size(20.dp).testTag("shoppingCartIcon"),
-                  imageVector = Icons.Filled.ShoppingCart,
-                  contentDescription = "Arrow icon",
-              )
+                  modifier = Modifier.testTag("statusIcon").size(30.dp),
+                  imageVector = receipt.status.getIcon(),
+                  contentDescription = "status icon")
             }
-      }
+      },
+  )
 }

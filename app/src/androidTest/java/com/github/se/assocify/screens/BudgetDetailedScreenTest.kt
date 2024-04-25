@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTouchInput
+import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
@@ -62,12 +64,20 @@ class BudgetDetailedScreenTest :
   /** Tests if the total amount correspond to the sum of the items */
   @Test
   fun testTotalAmount() {
-    // Test the accounting screen
     with(composeTestRule) {
       onNodeWithTag("totalItems").assertIsDisplayed()
       var total = 0
       budgetItems.forEach { total += it.amount }
       onNodeWithText(total.toString())
+    }
+  }
+
+  /** Tests if filter row is scrollable */
+  @Test
+  fun testsIfFilterRowIsScrollable() {
+    with(composeTestRule) {
+      onNodeWithTag("filterRowDetailed").assertIsDisplayed()
+      onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
     }
   }
 }
