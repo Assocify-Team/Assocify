@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.event.task
+package com.github.se.assocify.ui.screens.event.tasktab
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth

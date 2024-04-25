@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.event.map
+package com.github.se.assocify.ui.screens.event.maptab
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

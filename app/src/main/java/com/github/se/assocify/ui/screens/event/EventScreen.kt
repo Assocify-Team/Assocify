@@ -33,9 +33,9 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
-import com.github.se.assocify.ui.screens.event.map.EventMapScreen
-import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
-import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
+import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
+import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
+import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
 import kotlinx.coroutines.launch
 
