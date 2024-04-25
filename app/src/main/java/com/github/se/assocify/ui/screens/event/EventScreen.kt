@@ -171,12 +171,14 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
         }
       },
       actions = {
-        IconButton(onClick = { viewModel.modifySearchingState(true) }) {
-          Icon(
-              modifier = Modifier.testTag("eventSearchIcon"),
-              imageVector = Icons.Filled.Search,
-              contentDescription = "Search")
-        }
+        IconButton(
+            modifier = Modifier.testTag("eventSearchButton"),
+            onClick = { viewModel.modifySearchingState(true) }) {
+              Icon(
+                  modifier = Modifier.testTag("eventSearchIcon"),
+                  imageVector = Icons.Filled.Search,
+                  contentDescription = "Search")
+            }
       })
 }
 

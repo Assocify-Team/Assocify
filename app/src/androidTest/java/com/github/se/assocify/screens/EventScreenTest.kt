@@ -117,9 +117,9 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
           with(composeTestRule) {
             onNodeWithTag("eventAccountIcon").assertIsDisplayed()
             onNodeWithTag("eventSearchIcon").assertIsDisplayed()
-            onNodeWithTag("eventSearchIcon").performClick()
+            onNodeWithTag("eventSearchButton").performClick()
             onNodeWithTag("eventAccountIcon").assertIsNotDisplayed()
-            onNodeWithTag("eventSearchIcon").assertIsDisplayed()
+            onNodeWithTag("eventSearchIcon").assertIsNotDisplayed()
           }
         }
   }
