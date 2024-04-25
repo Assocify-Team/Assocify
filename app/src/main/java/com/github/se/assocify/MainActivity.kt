@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.github.se.assocify.ui.screens.event.map.EventMapScreen
 import com.github.se.assocify.ui.theme.AssocifyTheme
 
 class MainActivity : ComponentActivity() {
