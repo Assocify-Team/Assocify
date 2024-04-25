@@ -13,6 +13,7 @@ import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +62,7 @@ class ReceiptViewModel {
                   _uiState.value.copy(
                       title = receipt.title,
                       description = receipt.description,
-                      amount = PriceUtil.fromCents(receipt.cents),
+                      amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
                       date = DateUtil.toString(receipt.date),
                       incoming = receipt.cents >= 0)
             }
