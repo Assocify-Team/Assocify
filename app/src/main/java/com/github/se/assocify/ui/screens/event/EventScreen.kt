@@ -29,7 +29,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
@@ -80,7 +79,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
       },
       topBar = {
         if (state.value.searching) {
-          EventSearchTopBar(navActions, viewModel)
+          EventSearchTopBar(viewModel)
         } else {
           EventTitleTopBar(navActions, viewModel)
         }
@@ -180,7 +179,7 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventSearchTopBar(navActions: NavigationActions, viewModel: EventScreenViewModel) {
+fun EventSearchTopBar(viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
   SearchBar(
       modifier = Modifier.padding(8.dp).testTag("searchBar"),
