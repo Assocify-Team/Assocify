@@ -137,7 +137,10 @@ fun ProfileScreen(
                       contentScale = ContentScale.Crop)
                 } else {
                   Image(
-                      modifier = Modifier.size(80.dp).clickable { viewmodel.showBottomSheet() },
+                      modifier =
+                          Modifier.testTag("default profile icon").size(80.dp).clickable {
+                            viewmodel.showBottomSheet()
+                          },
                       imageVector = Icons.Outlined.AccountCircle,
                       contentDescription = "default profile icon")
                 }
