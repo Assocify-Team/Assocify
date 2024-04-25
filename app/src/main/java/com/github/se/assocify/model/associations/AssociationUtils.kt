@@ -3,6 +3,7 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 
+/*
 class AssociationRequest(private val db: AssociationAPI) {
   /**
    * Accept a new user into an association
@@ -13,26 +14,16 @@ class AssociationRequest(private val db: AssociationAPI) {
    * @param onFailure called on failure
    */
   fun acceptNewUser(assocId: String, user: User, role: Role, onFailure: (Exception) -> Unit) {
-    db.getAssociation(
+    db.getAllUsers(
         assocId,
-        { ass ->
-          val matchingUsers = ass.getMembers().filter { listUser -> user.uid == listUser.uid }
-          if (matchingUsers.size != 1) {
-            val newUser = User(user.uid, user.getName(), role)
-            val newAss =
-                Association(
-                    uid = ass.uid,
-                    creationDate = ass.getCreationDate(),
-                    name = ass.getName(),
-                    description = ass.getDescription(),
-                    events = ass.getEvents(),
-                    members =
-                        ass.getMembers().filter { listUser -> listUser.uid == user.uid } + newUser,
-                    status = ass.getStatus())
-            db.addAssociation(newAss, onFailure = onFailure)
-          }
-        },
-        onFailure)
+        { usList ->
+          usList.filter { us -> us.uid == user.uid }
+              .forEach { us ->
+                val newUser = User(uid = us.uid, name = us.name, role = role)
+                db.updateUser(assocId, newUser, onFailure)
+              }
+          }, onFailure)
+        }
   }
 
   /**
@@ -61,3 +52,5 @@ class AssociationRequest(private val db: AssociationAPI) {
         onFailure)
   }
 }
+
+ */
