@@ -56,15 +56,17 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.Balance
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.Budget
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import kotlinx.coroutines.launch
 
 // Index of each tag for navigation
-enum class TreasuryPageIndex(val index: Int) {
-  RECEIPT(0),
-  BUDGET(1),
-  BALANCE(2);
+enum class TreasuryPageIndex {
+  RECEIPT,
+  BUDGET,
+  BALANCE;
 
   companion object {
     val NUMBER_OF_PAGES: Int = entries.size
@@ -79,7 +81,7 @@ fun TreasuryScreen(
     viewModel: ReceiptListViewModel = ReceiptListViewModel(navActions)
 ) {
   val viewmodelState by viewModel.uiState.collectAsState()
-
+  val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = { TreasuryTopBar({}, {}, viewModel) },
@@ -94,13 +96,15 @@ fun TreasuryScreen(
             modifier = Modifier.testTag("createReceipt"),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
-            onClick = { navActions.navigateTo(Destination.NewReceipt) },
-        ) {
-          Icon(Icons.Outlined.Add, "Create")
-        }
+            onClick = {
+              if (pagerState.currentPage == TreasuryPageIndex.RECEIPT.ordinal) {
+                navActions.navigateTo(Destination.NewReceipt)
+              }
+            }) {
+              Icon(Icons.Outlined.Add, "Create")
+            }
       }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-          val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
           // Tabs
@@ -121,28 +125,28 @@ fun TreasuryScreen(
                                 shape = RoundedCornerShape(8.dp)))
               }) {
                 TreasuryTab(
-                    selected = pagerState.currentPage == TreasuryPageIndex.RECEIPT.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.RECEIPT.ordinal,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(TreasuryPageIndex.RECEIPT.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.RECEIPT.ordinal)
                       }
                     },
                     text = "Receipts",
                     modifier = Modifier.testTag("myReceiptsTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == TreasuryPageIndex.BUDGET.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BUDGET.ordinal,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(TreasuryPageIndex.BUDGET.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BUDGET.ordinal)
                       }
                     },
                     text = "Budget",
                     modifier = Modifier.testTag("budgetTab"))
                 TreasuryTab(
-                    selected = pagerState.currentPage == TreasuryPageIndex.BALANCE.index,
+                    selected = pagerState.currentPage == TreasuryPageIndex.BALANCE.ordinal,
                     onClick = {
                       coroutineRoute.launch {
-                        pagerState.animateScrollToPage(TreasuryPageIndex.BALANCE.index)
+                        pagerState.animateScrollToPage(TreasuryPageIndex.BALANCE.ordinal)
                       }
                     },
                     text = "Balance",
@@ -152,9 +156,9 @@ fun TreasuryScreen(
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
-              TreasuryPageIndex.RECEIPT.index -> MyReceiptPage(viewModel)
-              TreasuryPageIndex.BUDGET.index -> BudgetPage()
-              TreasuryPageIndex.BALANCE.index -> BalancePage()
+              TreasuryPageIndex.RECEIPT.ordinal -> MyReceiptPage(viewModel)
+              TreasuryPageIndex.BUDGET.ordinal -> BudgetPage(navActions)
+              TreasuryPageIndex.BALANCE.ordinal -> BalancePage(navActions)
             }
           }
         }
@@ -226,10 +230,16 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
 }
 
 /** Budget UI page */
-@Composable private fun BudgetPage() {}
+@Composable
+private fun BudgetPage(navigationActions: NavigationActions) {
+  Budget(navigationActions)
+}
 
 /** Balance UI page */
-@Composable private fun BalancePage() {}
+@Composable
+private fun BalancePage(navigationActions: NavigationActions) {
+  Balance(navigationActions)
+}
 
 /**
  * ------------------------------------------------- * Elements *

@@ -1,9 +1,10 @@
 package com.github.se.assocify.model.entities
 
+import android.net.Uri
 import java.time.LocalDate
 
 sealed class MaybeRemotePhoto {
-  data class LocalFile(val filePath: String) : MaybeRemotePhoto()
+  data class LocalFile(val uri: Uri) : MaybeRemotePhoto()
 
   data class Remote(val path: String) : MaybeRemotePhoto()
 }
@@ -15,11 +16,11 @@ data class Receipt(
     val date: LocalDate,
     val cents: Int,
     val incoming: Boolean,
-    val phase: Phase,
+    val status: Status,
     val photo: MaybeRemotePhoto?,
 )
 
-enum class Phase {
+enum class Status {
   Unapproved,
   Approved,
   PaidBack,
