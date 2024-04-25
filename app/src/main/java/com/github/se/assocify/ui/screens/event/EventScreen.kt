@@ -1,14 +1,19 @@
 package com.github.se.assocify.ui.screens.event
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -85,7 +90,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
           EventTitleTopBar(navActions, viewModel)
         }
       }) {
-        Column(modifier = Modifier.padding(it)) {
+        Column(modifier = Modifier.padding(it).fillMaxHeight()) {
           val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
@@ -183,13 +188,37 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 fun EventSearchTopBar(viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
   SearchBar(
-      modifier = Modifier.padding(8.dp).testTag("searchBar"),
+      modifier = Modifier.padding(8.dp).testTag("searchBar").fillMaxWidth(),
       query = state.value.searchQuery,
       onQueryChange = { viewModel.modifySearchQuery(it) },
       onSearch = { viewModel.modifySearchingState(false) },
       active = false,
       onActiveChange = {},
-      trailingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Search") }) {}
+      leadingIcon = {
+        Icon(
+            modifier = Modifier.clickable { viewModel.modifySearchingState(false) },
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Dismiss")
+      },
+      trailingIcon = {
+        Icon(
+            modifier =
+                Modifier.clickable {
+                  when (state.value.currentTab) {
+                    EventPageIndex.TASKS -> {
+                      /*TODO: implement for tasks screen*/
+                    }
+                    EventPageIndex.MAP -> {
+                      /*TODO: implement for map screen*/
+                    }
+                    EventPageIndex.SCHEDULE -> {
+                      /*TODO: implement for schedule screen*/
+                    }
+                  }
+                },
+            imageVector = Icons.Filled.Search,
+            contentDescription = "Search")
+      }) {}
 }
 
 @Composable
