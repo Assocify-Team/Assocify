@@ -202,7 +202,7 @@ fun EventFilterBar(viewModel: EventScreenViewModel) {
       val state = viewModel.uiState.collectAsState()
       state.value.events.forEach {
         FilterChip(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp).testTag("filterChipTestEvent"),
             label = { Text(modifier = Modifier.testTag("filterChipText"), text = it.name) },
             leadingIcon = {
               Icon(
