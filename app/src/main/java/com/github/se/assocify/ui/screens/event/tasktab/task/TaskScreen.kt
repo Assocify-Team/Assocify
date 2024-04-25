@@ -58,10 +58,8 @@ fun TaskScreen(
                 snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
         }*/ ) { paddingValues ->
     Column(
-        modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
+        modifier =
+            Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
           OutlinedTextField(

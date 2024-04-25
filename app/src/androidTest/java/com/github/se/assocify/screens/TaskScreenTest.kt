@@ -19,32 +19,31 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
+  private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
 
-    @Before
-    fun testSetup() {
-        CurrentUser.userUid = "testUser"
-        CurrentUser.associationUid = "testAssociation"
-        composeTestRule.setContent { TaskScreen(navActions = navActions) }
+  @Before
+  fun testSetup() {
+    CurrentUser.userUid = "testUser"
+    CurrentUser.associationUid = "testAssociation"
+    composeTestRule.setContent { TaskScreen(navActions = navActions) }
+  }
+
+  @Test
+  fun display() {
+    with(composeTestRule) {
+      onNodeWithTag("taskScreen").assertIsDisplayed()
+      onNodeWithTag("taskScreenTitle").assertIsDisplayed()
+      onNodeWithTag("backButton").assertIsDisplayed()
+      onNodeWithTag("titleField").assertIsDisplayed()
+      onNodeWithTag("descriptionField").assertIsDisplayed()
+      onNodeWithTag("categoryField").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("staffNumberField").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("timeField").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("deleteButton").performScrollTo().assertIsDisplayed()
     }
-
-    @Test
-    fun display() {
-        with(composeTestRule) {
-            onNodeWithTag("taskScreen").assertIsDisplayed()
-            onNodeWithTag("taskScreenTitle").assertIsDisplayed()
-            onNodeWithTag("backButton").assertIsDisplayed()
-            onNodeWithTag("titleField").assertIsDisplayed()
-            onNodeWithTag("descriptionField").assertIsDisplayed()
-            onNodeWithTag("categoryField").performScrollTo().assertIsDisplayed()
-            onNodeWithTag("staffNumberField").performScrollTo().assertIsDisplayed()
-            onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
-            onNodeWithTag("timeField").performScrollTo().assertIsDisplayed()
-            onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed()
-            onNodeWithTag("deleteButton").performScrollTo().assertIsDisplayed()
-        }
-    }
+  }
 }

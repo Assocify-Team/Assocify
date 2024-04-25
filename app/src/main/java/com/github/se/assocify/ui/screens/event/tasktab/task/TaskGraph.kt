@@ -6,10 +6,10 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.taskGraph(navigationActions: NavigationActions) {
-    composable(route = Destination.NewTask.route) { TaskScreen(navActions = navigationActions) }
-    composable(Destination.EditTask("{taskUid}").route) { backStackEntry ->
-        backStackEntry.arguments?.getString("taskUid")?.let {
-            TaskScreen(navActions = navigationActions)
-        }
+  composable(route = Destination.NewTask.route) { TaskScreen(navActions = navigationActions) }
+  composable(Destination.EditTask("{taskUid}").route) { backStackEntry ->
+    backStackEntry.arguments?.getString("taskUid")?.let {
+      TaskScreen(navActions = navigationActions)
     }
+  }
 }
