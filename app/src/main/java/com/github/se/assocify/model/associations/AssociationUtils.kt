@@ -1,8 +1,3 @@
-import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.model.entities.Role
-import com.github.se.assocify.model.entities.User
-
 /*
 class AssociationRequest(private val db: AssociationAPI) {
   /**
