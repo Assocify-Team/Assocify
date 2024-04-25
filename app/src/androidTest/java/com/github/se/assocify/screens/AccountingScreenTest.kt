@@ -43,7 +43,8 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     CurrentUser.associationUid = "associationId"
     composeTestRule.setContent {
       FilterBar()
-      AccountingScreen(AccountingPage.BUDGET, list, mockNavActions) }
+      AccountingScreen(AccountingPage.BUDGET, list, mockNavActions)
+    }
   }
 
   /** Tests if the nodes are displayed */
@@ -60,28 +61,24 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     }
   }
 
-  /** Tests if the lines are filtered according to the category
-  @Test
-  fun testCategoryFiltering() {
-    with(composeTestRule) {
-      // Initially, select the "Category" filter to change its value to "Events"
-      onNodeWithTag("categoryFilterChip").performClick()
-      onNodeWithText("Events").performClick()
-
-      // Assert that only the budget lines under "Events" category are shown
-      onNodeWithText("Balelec").assertIsDisplayed()
-      onNodeWithText("Champachelor").assertIsDisplayed()
-
-      // Assert that budget lines not under "Events" are not shown
-      onNodeWithText("Logistic Category").assertDoesNotExist()
-      onNodeWithText("Communication Category").assertDoesNotExist()
-      onNodeWithText("Game*").assertDoesNotExist()
-
-      // Verify the total is recalculated correctly
-      val expectedTotal = 6000 // Sum of amounts for "Champachelor" and "Balelec"
-      onNodeWithText("$expectedTotal").assertIsDisplayed()
-    }
-  }*/
+  /**
+   * Tests if the lines are filtered according to the category
+   *
+   * @Test fun testCategoryFiltering() { with(composeTestRule) { // Initially, select the "Category"
+   *   filter to change its value to "Events" onNodeWithTag("categoryFilterChip").performClick()
+   *   onNodeWithText("Events").performClick()
+   *
+   * // Assert that only the budget lines under "Events" category are shown
+   * onNodeWithText("Balelec").assertIsDisplayed()
+   * onNodeWithText("Champachelor").assertIsDisplayed()
+   *
+   * // Assert that budget lines not under "Events" are not shown onNodeWithText("Logistic
+   * Category").assertDoesNotExist() onNodeWithText("Communication Category").assertDoesNotExist()
+   * onNodeWithText("Game*").assertDoesNotExist()
+   *
+   * // Verify the total is recalculated correctly val expectedTotal = 6000 // Sum of amounts for
+   * "Champachelor" and "Balelec" onNodeWithText("$expectedTotal").assertIsDisplayed() } }
+   */
 
   /** Tests if filter row is scrollable */
   @Test
