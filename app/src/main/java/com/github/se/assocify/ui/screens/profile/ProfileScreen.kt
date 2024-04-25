@@ -78,9 +78,7 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 @Composable
 fun ProfileScreen(
     navActions: NavigationActions,
-    assoAPI: AssociationAPI,
-    userAPI: UserAPI,
-    viewmodel: ProfileViewModel = ProfileViewModel(assoAPI, userAPI)
+    viewmodel: ProfileViewModel
 ) {
   // for 'change association' part
   val listAsso = listOf("Association1", "Association2", "Association3")

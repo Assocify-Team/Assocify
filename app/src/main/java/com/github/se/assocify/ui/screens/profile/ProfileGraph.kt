@@ -15,6 +15,6 @@ fun NavGraphBuilder.profileGraph(
   composable(
       route = Destination.Profile.route,
   ) {
-    ProfileScreen(navigationActions, associationAPI, userAPI)
+    ProfileScreen(navigationActions, ProfileViewModel(associationAPI, userAPI))
   }
 }
