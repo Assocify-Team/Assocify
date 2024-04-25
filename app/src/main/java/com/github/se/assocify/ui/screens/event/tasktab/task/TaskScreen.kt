@@ -103,6 +103,13 @@ fun TaskScreen(
               onTimeSelect = { /*viewModel.setTime(it)*/},
               label = { Text("Time") },
               supportingText = { /*taskState.timeError?.let { Text(it) }*/})
+          OutlinedTextField(
+              modifier = Modifier.testTag("locationField").fillMaxWidth(),
+              value = "" /*taskState.staffNumber*/,
+              onValueChange = { /*viewModel.setStaffNumber(it)*/},
+              label = { Text("Location") },
+              // isError = taskState.staffNumberError != null,
+              supportingText = { /*taskState.amountError?.let { Text(it) }*/})
           Column {
             Button(
                 modifier = Modifier.testTag("saveButton").fillMaxWidth(),
