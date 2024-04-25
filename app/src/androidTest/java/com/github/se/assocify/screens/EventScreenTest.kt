@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.entities.Event
@@ -120,6 +121,8 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
             onNodeWithTag("eventSearchButton").performClick()
             onNodeWithTag("eventAccountIcon").assertIsNotDisplayed()
             onNodeWithTag("eventSearchIcon").assertIsNotDisplayed()
+            onNodeWithTag("searchBar").assertIsDisplayed()
+            onNodeWithTag("searchBar").performTextClearance()
           }
         }
   }
