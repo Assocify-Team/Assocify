@@ -47,7 +47,7 @@ class ReceiptsAPITest {
           uid = "00000000-ABCD-0000-0000-000000000000",
           date = LocalDate.EPOCH,
           cents = -100,
-          status = Status.Approved,
+          status = Status.Unapproved,
           title = "title",
           description = "notes",
           photo = MaybeRemotePhoto.Remote("00000000-ABCD-0000-0000-000000000000"))
@@ -61,6 +61,45 @@ class ReceiptsAPITest {
           title = "title",
           description = "notes",
           photo = MaybeRemotePhoto.LocalFile(uriMock))
+
+  private val remoteJson =
+      """
+      {
+        "uid": "${remoteReceipt.uid}",
+        "date": "1970-01-01",
+        "cents": -100,
+        "receipt_status": {
+            "status": "unapproved"
+        },
+        "title": "title",
+        "description": "notes",
+        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
+      }
+    """
+          .trimIndent()
+
+  private val localJson =
+      """
+      {
+        "uid": "${localReceipt.uid}",
+        "date": "1970-01-01",
+        "cents": -100,
+        "receipt_status": {
+            "status": "approved"
+        },
+        "title": "title",
+        "description": "notes",
+        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
+      }
+    """
+          .trimIndent()
+
+  private val receivedList =
+      listOf(remoteReceipt, localReceipt.copy(photo = MaybeRemotePhoto.Remote(localReceipt.uid)))
+
+  private val receivedListJson = "[$remoteJson, $localJson]"
 
   @OptIn(SupabaseInternal::class, ExperimentalCoroutinesApi::class)
   @Before
@@ -120,43 +159,11 @@ class ReceiptsAPITest {
   fun getUserReceipts() {
     val successMock = mockk<(List<Receipt>) -> Unit>(relaxed = true)
 
-    response =
-        """
-      [{
-        "uid": "${remoteReceipt.uid}",
-        "date": "1970-01-01",
-        "cents": -100,
-        "status": "Approved",
-        "title": "title",
-        "description": "notes",
-        "photo": "${remoteReceipt.uid}",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
-        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
-      }, {
-        "uid": "${localReceipt.uid}",
-        "date": "1970-01-01",
-        "cents": -100,
-        "status": "Approved",
-        "title": "title",
-        "description": "notes",
-        "photo": "${localReceipt.uid}",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
-        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
-      }]"""
-            .trimIndent()
+    response = receivedListJson
 
-    api.getUserReceipts(
-        {
-          println(it)
-          successMock(it)
-        },
-        { fail("Should not fail, failed with $it") })
+    api.getUserReceipts(successMock, { fail("Should not fail, failed with $it") })
 
-    verify(timeout = 1000) {
-      successMock(
-          listOf(
-              remoteReceipt, localReceipt.copy(photo = MaybeRemotePhoto.Remote(localReceipt.uid))))
-    }
+    verify(timeout = 1000) { successMock(receivedList) }
 
     error = true
 
@@ -170,20 +177,7 @@ class ReceiptsAPITest {
   fun getReceipt() {
     val successMock = mockk<(Receipt) -> Unit>(relaxed = true)
 
-    response =
-        """
-      {
-        "uid": "${remoteReceipt.uid}",
-        "date": "1970-01-01",
-        "cents": -100,
-        "status": "Approved",
-        "title": "title",
-        "description": "notes",
-        "photo": "${remoteReceipt.uid}",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
-        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
-      }"""
-            .trimIndent()
+    response = remoteJson
 
     api.getReceipt("successful_rid", successMock, { fail("Should not fail, failed with $it") })
 
@@ -201,38 +195,11 @@ class ReceiptsAPITest {
   fun getAllReceipts() {
     val successMock = mockk<(List<Receipt>) -> Unit>(relaxed = true)
 
-    response =
-        """
-      [{
-        "uid": "${remoteReceipt.uid}",
-        "date": "1970-01-01",
-        "cents": -100,
-        "status": "Approved",
-        "title": "title",
-        "description": "notes",
-        "photo": "${remoteReceipt.uid}",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
-        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
-      }, {
-        "uid": "${localReceipt.uid}",
-        "date": "1970-01-01",
-        "cents": -100,
-        "status": "Approved",
-        "title": "title",
-        "description": "notes",
-        "photo": "${localReceipt.uid}",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
-        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
-      }]"""
-            .trimIndent()
+    response = receivedListJson
 
     api.getAllReceipts(successMock, { fail("Should not fail, failed with $it") })
 
-    verify(timeout = 1000) {
-      successMock(
-          listOf(
-              remoteReceipt, localReceipt.copy(photo = MaybeRemotePhoto.Remote(localReceipt.uid))))
-    }
+    verify(timeout = 1000) { successMock(receivedList) }
 
     error = true
 

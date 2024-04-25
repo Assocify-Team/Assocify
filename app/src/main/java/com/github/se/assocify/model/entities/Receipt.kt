@@ -2,6 +2,7 @@ package com.github.se.assocify.model.entities
 
 import android.net.Uri
 import java.time.LocalDate
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 sealed class MaybeRemotePhoto {
@@ -22,8 +23,8 @@ data class Receipt(
 
 @Serializable
 enum class Status {
-  Unapproved,
-  Approved,
-  PaidBack,
-  Archived,
+  @SerialName("unapproved") Unapproved,
+  @SerialName("approved") Approved,
+  @SerialName("paid_back") PaidBack,
+  @SerialName("archived") Archived,
 }

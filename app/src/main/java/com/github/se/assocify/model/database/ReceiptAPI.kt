@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonPrimitive
 
 class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
-  private val bucket = db.storage["receipts"]
+  private val bucket = db.storage["receipt"]
   private val scope = CoroutineScope(Dispatchers.Main)
 
   /**
@@ -98,8 +98,8 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
           """
                     .trimIndent())
         onSuccess(
-            db.from("receipts")
-                .select { filter { SupabaseReceipt::uid eq CurrentUser.userUid } }
+            db.from("receipt")
+                .select(columns) { filter { SupabaseReceipt::uid eq CurrentUser.userUid } }
                 .decodeList<SupabaseReceipt>()
                 .map { it.toReceipt() })
       } catch (e: Exception) {
@@ -119,7 +119,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
     scope.launch {
       try {
         val receipt =
-            db.from("receipts")
+            db.from("receipt")
                 .select { filter { SupabaseReceipt::uid eq id } }
                 .decodeAs<SupabaseReceipt>()
                 .toReceipt()
@@ -139,7 +139,29 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
     scope.launch {
       try {
-        onSuccess(db.from("receipts").select().decodeList<SupabaseReceipt>().map { it.toReceipt() })
+        val columns =
+            Columns.raw(
+                """
+              uid,
+              title,
+              description,
+              date,
+              cents,
+              user_id,
+              association_id,
+              receipt_status (
+                status
+              )
+          """
+                    .trimIndent()
+                    .filter { it != '\n' })
+        val select = db.from("receipt").select(columns)
+        println(select.data)
+        onSuccess(
+            select.decodeList<SupabaseReceipt>().map {
+              println(it)
+              it.toReceipt()
+            })
       } catch (e: Exception) {
         onError(e)
       }
@@ -156,7 +178,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        db.from("receipts").delete { filter { SupabaseReceipt::uid eq id } }
+        db.from("receipt").delete { filter { SupabaseReceipt::uid eq id } }
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
@@ -170,10 +192,10 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
       val date: String,
       val cents: Int,
       val title: String,
-      val status: Status? = null,
       val description: String,
       @SerialName("user_id") val userId: String,
-      @SerialName("association_id") val associationId: String
+      @SerialName("association_id") val associationId: String,
+      val receipt_status: ReceiptStatus? = null,
   ) {
     companion object {
       fun fromReceipt(receipt: Receipt) =
@@ -182,21 +204,21 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
               date = receipt.date.toString(),
               cents = receipt.cents,
               title = receipt.title,
-              status = null,
               description = receipt.description,
               userId = CurrentUser.userUid!!,
               associationId = CurrentUser.associationUid!!)
     }
 
-    fun toReceipt() =
+    fun toReceipt(): Receipt =
         Receipt(
             uid = this.uid,
             date = LocalDate.parse(this.date),
             cents = this.cents,
-            status = this.status!!,
             title = this.title,
             description = this.description,
-            photo = MaybeRemotePhoto.Remote(this.uid),
-        )
+            status = this.receipt_status!!.status,
+            photo = MaybeRemotePhoto.Remote(this.uid))
   }
+
+  @Serializable private data class ReceiptStatus(val status: Status)
 }
