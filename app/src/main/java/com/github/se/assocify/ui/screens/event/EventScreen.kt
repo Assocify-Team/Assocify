@@ -133,9 +133,9 @@ fun EventScreen(
           val testTasks = listOf(t1, t2, t3)
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
-              TreasuryPageIndex.RECEIPT.index -> EventTaskScreen(testTasks)
-              TreasuryPageIndex.BUDGET.index -> EventMapScreen()
-              TreasuryPageIndex.BALANCE.index -> EventScheduleScreen()
+              TreasuryPageIndex.RECEIPT.ordinal -> EventTaskScreen(testTasks)
+              TreasuryPageIndex.BUDGET.ordinal -> EventMapScreen()
+              TreasuryPageIndex.BALANCE.ordinal -> EventScheduleScreen()
             }
           }
         }

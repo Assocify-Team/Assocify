@@ -22,6 +22,21 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.User
 
+/**
+ * A Composable that displays a search text field with dropdown menu for user selection.
+ *
+ * @param modifier The modifier to be applied to the composable.
+ * @param searchValue The current search text value.
+ * @param userList The list of users to be displayed in the dropdown menu.
+ * @param user The selected user, if any.
+ * @param onUserSearch Callback function invoked when the search text changes.
+ * @param onUserSelect Callback function invoked when a user is selected from the dropdown menu.
+ * @param onUserDismiss Callback function invoked when the selected user is dismissed.
+ * @param expanded Whether the dropdown menu is expanded or not.
+ * @param label The label to be displayed above the text field, if any.
+ * @param isError Whether the text field is in an error state.
+ * @param supportingText Additional supporting text to be displayed below the text field, if any.
+ */
 @Composable
 fun UserSearchTextField(
     modifier: Modifier = Modifier,
@@ -36,7 +51,7 @@ fun UserSearchTextField(
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
 ) {
-  val value = if (user != null) user.getName() else searchValue
+  val value = if (user != null) user.name else searchValue
   var textfieldSize by remember { mutableIntStateOf(0) }
   Column {
     OutlinedTextField(
@@ -64,7 +79,7 @@ fun UserSearchTextField(
           userList.forEach { user ->
             DropdownMenuItem(
                 modifier = Modifier.testTag("userDropdownItem-${user.uid}"),
-                text = { Text(user.getName()) },
+                text = { Text(user.name) },
                 onClick = { onUserSelect(user) })
           }
         }
