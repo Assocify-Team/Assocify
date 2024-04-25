@@ -1,6 +1,7 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -98,52 +99,27 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
         }
     composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
 
-    with(composeTestRule) { onNodeWithTag("filterChipTestEvent").assertIsDisplayed() }
+    with(composeTestRule) {
+      onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
+      // onNodeWithTag("filterChipText").assertIsDisplayed()
+      // onNodeWithTag("filterChipIcon").assertIsNotDisplayed()
+      // onNodeWithTag("filterChipTestEvent").performClick()
+      // onNodeWithTag("filterChipIcon").assertIsDisplayed()
+
+    }
   }
-  /*
-   @Test
-   fun searchBarSearchesWell() {
-     every { mockEventAPI.getEvents(any(), any()) } answers
-         {
-           val events =
-               listOf(
-                   Event(
-                       "1",
-                     "filterChipTestEvent1",
-                       "a",
-                       LocalDateTime.now(),
-                       LocalDateTime.now(),
-                       "me",
-                       "home"),
-                   Event(
-                       "2",
-                     "filterChipTestEvent2",
-                       "a",
-                       LocalDateTime.now(),
-                       LocalDateTime.now(),
-                       "me",
-                       "home"),
-                   Event(
-                       "3",
-                     "filterChipTestEvent3",
-                       "a",
-                       LocalDateTime.now(),
-                       LocalDateTime.now(),
-                       "me",
-                       "home"))
-           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
-           onSuccessCallback(events)
-           with(composeTestRule) {
-             onNodeWithTag("filterChipTestEvent1").assertIsDisplayed()
 
-             onNodeWithTag("filterChipTestEvent2").assertIsDisplayed()
-
-             onNodeWithTag("filterChipTestEvent3").assertIsDisplayed()
-           }
-         }
-
-   }
-
-  */
-
+  @Test
+  fun searchBarSearchesWell() {
+    every { mockEventAPI.getEvents(any(), any()) } answers
+        {
+          with(composeTestRule) {
+            onNodeWithTag("eventAccountIcon").assertIsDisplayed()
+            onNodeWithTag("eventSearchIcon").assertIsDisplayed()
+            onNodeWithTag("eventSearchIcon").performClick()
+            onNodeWithTag("eventAccountIcon").assertIsNotDisplayed()
+            onNodeWithTag("eventSearchIcon").assertIsDisplayed()
+          }
+        }
+  }
 }

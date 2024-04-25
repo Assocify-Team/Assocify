@@ -164,12 +164,18 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
       title = { Text(text = "Event") },
       navigationIcon = {
         IconButton(onClick = { navActions.navigateToMainTab(Destination.Profile) }) {
-          Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
+          Icon(
+              modifier = Modifier.testTag("eventAccountIcon"),
+              imageVector = Icons.Filled.AccountCircle,
+              contentDescription = "Account")
         }
       },
       actions = {
         IconButton(onClick = { viewModel.modifySearchingState(true) }) {
-          Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+          Icon(
+              modifier = Modifier.testTag("eventSearchIcon"),
+              imageVector = Icons.Filled.Search,
+              contentDescription = "Search")
         }
       })
 }
@@ -196,12 +202,13 @@ fun EventFilterBar(viewModel: EventScreenViewModel) {
       val state = viewModel.uiState.collectAsState()
       state.value.events.forEach {
         FilterChip(
-            modifier = Modifier.testTag("filterChipTestEvent").padding(8.dp),
-            label = { Text(it.name) },
+            modifier = Modifier.padding(8.dp),
+            label = { Text(modifier = Modifier.testTag("filterChipText"), text = it.name) },
             leadingIcon = {
-              if (viewModel.isEventSelected(it)) {
-                Icon(imageVector = Icons.Default.Check, contentDescription = "Selected")
-              }
+              Icon(
+                  modifier = Modifier.testTag("filterChipIcon").padding(8.dp),
+                  imageVector = Icons.Default.Check,
+                  contentDescription = "Selected")
             },
             selected = viewModel.isEventSelected(it),
             onClick = { viewModel.setEventSelection(it, !viewModel.isEventSelected(it)) })
