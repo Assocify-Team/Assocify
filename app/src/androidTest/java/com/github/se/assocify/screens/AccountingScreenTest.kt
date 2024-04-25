@@ -6,6 +6,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTouchInput
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
@@ -86,7 +89,9 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   fun testsIfFilterRowIsScrollable() {
     with(composeTestRule) {
       onNodeWithTag("filterRow").assertIsDisplayed()
-      onNodeWithTag("filterRow").performScrollTo()
+      onNodeWithTag("filterRowDetailed").performTouchInput {
+        swipeLeft()
+      }
     }
   }
 }
