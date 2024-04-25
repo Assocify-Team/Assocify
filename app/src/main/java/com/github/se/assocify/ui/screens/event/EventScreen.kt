@@ -55,6 +55,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
         FloatingActionButton(
+            modifier = Modifier.testTag("floatingButtonEvent"),
             onClick = {
               when (state.value.currentTab) {
                 EventPageIndex.TASKS -> {

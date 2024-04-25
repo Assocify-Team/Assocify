@@ -7,10 +7,16 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.AccountingCategory
+import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.Accounting
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,33 +25,22 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-
-  val options = listOf("Global", "Category", "Commissions", "Events", "Projects", "Other")
-  val budgetLines =
+  @get:Rule val mockkRule = MockKRule(this)
+  @RelaxedMockK lateinit var mockNavActions: NavigationActions
+  val list =
       listOf(
-          "Logistic Category" to "1000",
-          "Communication Category" to "2000",
-          "Game*" to "3000",
-          "ICBD" to "4000",
-          "Balelec" to "5000",
-      )
-  val categoryMapping =
-      mapOf(
-          "Global" to
-              listOf("Logistic Category", "Communication Category", "Game*", "ICBD", "Balelec"),
-          "Category" to listOf("Logistic Category", "Communication Category"),
-          "Commissions" to listOf("Game*"),
-          "Events" to listOf("ICBD", "Balelec"),
-      )
+          AccountingSubCategory("1", "Administration Pole", AccountingCategory("Pole"), 2000),
+          AccountingSubCategory("2", "Presidency Pole", AccountingCategory("Pole"), -400),
+          AccountingSubCategory("3", "Balelec", AccountingCategory("Events"), 1000),
+          AccountingSubCategory("4", "Champachelor", AccountingCategory("Events"), 5000),
+          AccountingSubCategory("5", "OGJ", AccountingCategory("Commission"), 6000),
+          AccountingSubCategory("6", "Communication Fees", AccountingCategory("Fees"), 3000))
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    composeTestRule.setContent {
-      Accounting("Budget", options, budgetLines, categoryMapping)
-      // Accounting("Balance", listYear, options, budgetLines, categoryMapping)
-    }
+    composeTestRule.setContent { Accounting(AccountingPage.BUDGET, list, mockNavActions) }
   }
 
   /** Tests if the nodes are displayed */
@@ -58,7 +53,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("totalLine").assertIsDisplayed()
       onNodeWithTag("yearFilterChip").assertIsDisplayed()
       onNodeWithTag("categoryFilterChip").assertIsDisplayed()
-      budgetLines.forEach { onNodeWithTag("displayLine${it.first}").assertIsDisplayed() }
+      list.forEach { onNodeWithTag("displayLine${it.name}").assertIsDisplayed() }
     }
   }
 
@@ -71,8 +66,8 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithText("Events").performClick()
 
       // Assert that only the budget lines under "Events" category are shown
-      onNodeWithText("ICBD").assertIsDisplayed()
       onNodeWithText("Balelec").assertIsDisplayed()
+      onNodeWithText("Champachelor").assertIsDisplayed()
 
       // Assert that budget lines not under "Events" are not shown
       onNodeWithText("Logistic Category").assertDoesNotExist()
@@ -80,7 +75,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithText("Game*").assertDoesNotExist()
 
       // Verify the total is recalculated correctly
-      val expectedTotal = 9000 // Sum of amounts for "ICBD" and "Balelec"
+      val expectedTotal = 6000 // Sum of amounts for "Champachelor" and "Balelec"
       onNodeWithText("$expectedTotal").assertIsDisplayed()
     }
   }

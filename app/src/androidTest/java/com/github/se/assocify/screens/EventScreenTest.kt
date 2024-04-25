@@ -19,11 +19,11 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import java.time.LocalDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -32,8 +32,8 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   @RelaxedMockK lateinit var mockEventAPI: EventAPI
 
-  @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
+  @RelaxedMockK
+  lateinit var mockNavActions: NavigationActions
   private var tabSelected = false
 
   @Before

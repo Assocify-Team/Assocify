@@ -56,8 +56,8 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
-import com.github.se.assocify.ui.screens.treasury.accounting.Balance
-import com.github.se.assocify.ui.screens.treasury.accounting.Budget
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.Balance
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.Budget
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import kotlinx.coroutines.launch
@@ -157,8 +157,8 @@ fun TreasuryScreen(
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.RECEIPT.ordinal -> MyReceiptPage(viewModel)
-              TreasuryPageIndex.BUDGET.ordinal -> BudgetPage()
-              TreasuryPageIndex.BALANCE.ordinal -> BalancePage()
+              TreasuryPageIndex.BUDGET.ordinal -> BudgetPage(navActions)
+              TreasuryPageIndex.BALANCE.ordinal -> BalancePage(navActions)
             }
           }
         }
@@ -231,14 +231,14 @@ private fun MyReceiptPage(viewModel: ReceiptListViewModel) {
 
 /** Budget UI page */
 @Composable
-private fun BudgetPage() {
-  Budget()
+private fun BudgetPage(navigationActions: NavigationActions) {
+  Budget(navigationActions)
 }
 
 /** Balance UI page */
 @Composable
-private fun BalancePage() {
-  Balance()
+private fun BalancePage(navigationActions: NavigationActions) {
+  Balance(navigationActions)
 }
 
 /**
