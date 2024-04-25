@@ -5,6 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
@@ -129,6 +131,15 @@ class BalanceDetailedScreenTest :
 
       // Assert that budget lines not under "Unapproved" are not shown
       onNodeWithText("sweaters").assertDoesNotExist()
+    }
+  }
+
+  /** Tests if filter row is scrollable */
+  @Test
+  fun testsIfFilterRowIsScrollable() {
+    with(composeTestRule) {
+      onNodeWithTag("filterRowDetailed").assertIsDisplayed()
+      onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
     }
   }
 }
