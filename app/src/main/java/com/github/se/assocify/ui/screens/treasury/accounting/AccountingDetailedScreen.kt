@@ -69,7 +69,6 @@ fun AccountingDetailedScreen(
           "url",
           LocalDate.now(),
           100,
-          true,
           Status.Unapproved,
           MaybeRemotePhoto.Remote("path"))
   val budgetItems =
