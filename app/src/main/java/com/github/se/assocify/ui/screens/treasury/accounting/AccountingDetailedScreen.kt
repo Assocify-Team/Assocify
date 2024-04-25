@@ -1,12 +1,14 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -69,7 +71,7 @@ fun AccountingDetailedScreen(
           "url",
           LocalDate.now(),
           100,
-          Status.Unapproved,
+          Status.Pending,
           MaybeRemotePhoto.Remote("path"))
   val budgetItems =
       listOf(
@@ -89,7 +91,7 @@ fun AccountingDetailedScreen(
               LocalDate.of(2024, 4, 14),
               receipt,
               "François Théron",
-              Status.Unapproved),
+              Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
@@ -111,18 +113,17 @@ fun AccountingDetailedScreen(
               LocalDate.of(2024, 1, 14),
               receipt,
               "Sidonie Bouthors",
-              Status.PaidBack))
+              Status.Reimbursed))
 
   val yearList = listOf("2023", "2022", "2021")
-  val statusList: List<String> =
-      listOf("Status", *enumValues<Status>().map { it.name }.toTypedArray())
+  val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
   var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedStatus by remember { mutableStateOf(statusList.first()) }
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
   val filteredBalanceList =
-      if (selectedStatus == "Status") // display everything under the status category
+      if (selectedStatus == statusList.first()) // display everything under the status category
        balanceItems
       else balanceItems.filter { it.status.toString() == selectedStatus }
 
@@ -160,7 +161,7 @@ fun AccountingDetailedScreen(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
           item {
-            Row(Modifier.testTag("filterRowDetailed")) {
+            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") { selectedYear = it }
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {

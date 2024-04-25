@@ -60,6 +60,7 @@ class ReceiptViewModel {
             if (receipt.uid == receiptUid) {
               _uiState.value =
                   _uiState.value.copy(
+                      status = receipt.status,
                       title = receipt.title,
                       description = receipt.description,
                       amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
@@ -69,6 +70,10 @@ class ReceiptViewModel {
           }
         },
         onError = {})
+  }
+
+  fun setStatus(status: Status) {
+    _uiState.value = _uiState.value.copy(status = status)
   }
 
   fun setTitle(title: String) {
@@ -170,7 +175,7 @@ class ReceiptViewModel {
             cents =
                 PriceUtil.toCents(_uiState.value.amount) * (if (_uiState.value.incoming) 1 else -1),
             date = date,
-            status = Status.Unapproved,
+            status = _uiState.value.status,
             photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
 
     receiptApi.uploadReceipt(
@@ -217,6 +222,7 @@ class ReceiptViewModel {
 
 data class ReceiptState(
     val isNewReceipt: Boolean,
+    val status: Status = Status.Pending,
     val pageTitle: String,
     val title: String = "",
     val description: String = "",

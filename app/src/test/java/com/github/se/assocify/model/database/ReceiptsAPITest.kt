@@ -47,7 +47,7 @@ class ReceiptsAPITest {
           uid = "00000000-ABCD-0000-0000-000000000000",
           date = LocalDate.EPOCH,
           cents = -100,
-          status = Status.Unapproved,
+          status = Status.Pending,
           title = "title",
           description = "notes",
           photo = MaybeRemotePhoto.Remote("00000000-ABCD-0000-0000-000000000000"))

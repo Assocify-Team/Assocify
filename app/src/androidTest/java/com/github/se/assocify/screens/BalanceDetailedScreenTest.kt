@@ -5,6 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
@@ -43,7 +45,7 @@ class BalanceDetailedScreenTest :
           "url",
           LocalDate.now(),
           100,
-          Status.Unapproved,
+          Status.Pending,
           MaybeRemotePhoto.Remote("path"))
   val balanceItems =
       listOf(
@@ -57,7 +59,7 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2024, 4, 14),
               receipt,
               "François Théron",
-              Status.Unapproved),
+              Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
@@ -79,7 +81,7 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2024, 1, 14),
               receipt,
               "Sidonie Bouthors",
-              Status.PaidBack))
+              Status.Reimbursed))
 
   @Before
   fun setup() {
@@ -121,13 +123,22 @@ class BalanceDetailedScreenTest :
     with(composeTestRule) {
       // Initially, select the "Status" filter to change its value to "Unapproved"
       onNodeWithTag("statusListTag").performClick()
-      onNodeWithText("Unapproved").performClick()
+      onNodeWithText("Pending").performClick()
 
       // Assert that only the budget lines under "Unapproved" status are shown
       onNodeWithText("pair of scissors").assertIsDisplayed()
 
       // Assert that budget lines not under "Unapproved" are not shown
       onNodeWithText("sweaters").assertDoesNotExist()
+    }
+  }
+
+  /** Tests if filter row is scrollable */
+  @Test
+  fun testsIfFilterRowIsScrollable() {
+    with(composeTestRule) {
+      onNodeWithTag("filterRowDetailed").assertIsDisplayed()
+      onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
     }
   }
 }

@@ -1,8 +1,8 @@
 package com.github.se.assocify.screens
 
 import android.net.Uri
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -49,7 +49,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
           description = "",
           cents = -10000,
           date = DateUtil.toDate("01/01/2021")!!,
-          status = Status.Unapproved,
+          status = Status.Pending,
           photo = MaybeRemotePhoto.LocalFile(testUri),
       )
 
@@ -85,6 +85,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("backButton").assertIsDisplayed()
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("titleField").assertIsDisplayed()
+      onNodeWithTag("statusDropdownChip").assertIsDisplayed()
       onNodeWithTag("descriptionField").assertIsDisplayed()
       onNodeWithTag("amountField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
@@ -232,10 +233,24 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun photoSheet() {
     with(composeTestRule) {
-      onNodeWithTag("editImageButton").performClick()
+      onNodeWithTag("editImageButton").performScrollTo().performClick()
       onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
       viewModel.hideBottomSheet()
       onNodeWithTag("photoSelectionSheet").assertDoesNotExist()
+    }
+  }
+
+  @Test
+  fun status() {
+    with(composeTestRule) {
+      onNodeWithTag("statusChip").assertTextContains("Pending")
+      onNodeWithTag("statusChip").performScrollTo().performClick()
+      onNodeWithText("Approved", true).assertIsDisplayed()
+      onNodeWithText("Reimbursed", true).assertIsDisplayed()
+      onNodeWithText("Reimbursed", true).performClick()
+      onNodeWithTag("statusChip").assertTextContains("Reimbursed")
+      onNodeWithText("Approved", true).assertIsNotDisplayed()
+      onNodeWithText("Pending", true).assertIsNotDisplayed()
     }
   }
 }
@@ -253,7 +268,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           description = "",
           cents = -10000,
           date = DateUtil.toDate("01/01/2021")!!,
-          status = Status.Unapproved,
+          status = Status.Pending,
           photo = null,
       )
 
