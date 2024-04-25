@@ -88,34 +88,40 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
 /** Receipt item from the list in Receipts page */
 @Composable
 private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
-    ListItem(
-        modifier = Modifier.clickable { viewModel.onReceiptClick(receipt) },
-        headlineContent = {
-            Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
-        },
-        overlineContent = {
-            Text(modifier = Modifier.testTag("receiptDateText"), text = DateUtil.toString(receipt.date))
-        },
-        supportingContent = {
-            Text(
-                modifier = Modifier.testTag("receiptDescriptionText"),
-                text = receipt.description,
-                maxLines = 1,)
-        },
-        trailingContent = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.testTag("receiptPriceAndIconRow")) {
-                Text(
-                    text = PriceUtil.fromCents(receipt.cents),
-                    modifier = Modifier.testTag("receiptPriceText"),
-                    style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    modifier = Modifier.testTag("statusIcon").size(30.dp),
-                    imageVector = receipt.status.getIcon(),
-                    contentDescription = "status icon")
+  ListItem(
+      modifier = Modifier.clickable { viewModel.onReceiptClick(receipt) }.fillMaxWidth(),
+      headlineContent = {
+        Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
+      },
+      overlineContent = {
+        Text(modifier = Modifier.testTag("receiptDateText"), text = DateUtil.toString(receipt.date))
+      },
+      supportingContent = {
+        Text(
+            modifier = Modifier.testTag("receiptDescriptionText"),
+            text =
+                if (receipt.description.isEmpty()) {
+                  "-"
+                } else {
+                  receipt.description
+                },
+            maxLines = 1,
+        )
+      },
+      trailingContent = {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.testTag("receiptPriceAndIconRow")) {
+              Text(
+                  text = PriceUtil.fromCents(receipt.cents),
+                  modifier = Modifier.testTag("receiptPriceText"),
+                  style = MaterialTheme.typography.bodyMedium)
+              Spacer(modifier = Modifier.width(8.dp))
+              Icon(
+                  modifier = Modifier.testTag("statusIcon").size(30.dp),
+                  imageVector = receipt.status.getIcon(),
+                  contentDescription = "status icon")
             }
-        },
-    )
+      },
+  )
 }

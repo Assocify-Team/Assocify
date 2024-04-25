@@ -95,8 +95,7 @@ fun TreasuryScreen(
               Icon(Icons.Outlined.Add, "Create")
             }
       },
-      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)
-  ) { innerPadding ->
+      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
           val coroutineRoute = rememberCoroutineScope()
 

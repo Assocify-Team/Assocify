@@ -67,18 +67,17 @@ fun Accounting(
        subCategoryList
       else subCategoryList.filter { it.category.name == selectedCategory }
 
-  LazyColumn(
-      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
-        items(filteredSubCategoryList) {
-          DisplayLine(it, "displayLine${it.name}", page, navigationActions)
-          HorizontalDivider(Modifier.fillMaxWidth())
-        }
+  LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
+    items(filteredSubCategoryList) {
+      DisplayLine(it, "displayLine${it.name}", page, navigationActions)
+      HorizontalDivider(Modifier.fillMaxWidth())
+    }
 
-        item {
-          val totalAmount = filteredSubCategoryList.sumOf { it.amount }
-          TotalLine(totalAmount = totalAmount)
-        }
-      }
+    item {
+      val totalAmount = filteredSubCategoryList.sumOf { it.amount }
+      TotalLine(totalAmount = totalAmount)
+    }
+  }
 }
 
 @Composable
@@ -100,16 +99,14 @@ fun FilterBar() {
   var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
-  Row(
-      Modifier.testTag("filterRow")
-          .horizontalScroll(rememberScrollState())) {
-        DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
-        DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
-          selectedCategory = it
-        }
-        // TODO: change amount given TVA
-        DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
-      }
+  Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
+    DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
+    DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
+      selectedCategory = it
+    }
+    // TODO: change amount given TVA
+    DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
+  }
 }
 
 /**
