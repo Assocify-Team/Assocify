@@ -45,7 +45,6 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.event.map.EventMapScreen
 import com.github.se.assocify.ui.screens.event.schedule.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.task.EventTaskScreen
-import com.github.se.assocify.ui.screens.treasury.TreasuryPageIndex
 import kotlinx.coroutines.launch
 
 /**
@@ -144,9 +143,9 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
             val testTasks = listOf(t1, t2, t3)
             HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
               when (page) {
-                TreasuryPageIndex.RECEIPT.ordinal -> EventTaskScreen(testTasks)
-                TreasuryPageIndex.BUDGET.ordinal -> EventMapScreen()
-                TreasuryPageIndex.BALANCE.ordinal -> EventScheduleScreen()
+                EventPageIndex.TASKS.index -> EventTaskScreen(testTasks)
+                EventPageIndex.MAP.index -> EventMapScreen()
+                EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
               }
             }
           }
