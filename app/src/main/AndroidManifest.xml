@@ -20,6 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Assocify"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -39,9 +42,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCX2tj9ShxxJES6UIB9mbgiuFWQ-CsiiOI" />
     </application>
 
 </manifest>
