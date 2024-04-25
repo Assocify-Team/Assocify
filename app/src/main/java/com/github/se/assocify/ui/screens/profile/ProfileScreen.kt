@@ -3,7 +3,6 @@ package com.github.se.assocify.ui.screens.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Arrangement.Start
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,10 +11,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
@@ -48,7 +47,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,14 +54,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
@@ -91,8 +86,8 @@ fun ProfileScreen(
   val listAsso = listOf("Association1", "Association2", "Association3")
   var expanded by remember { mutableStateOf(false) }
   var selectedText by remember { mutableStateOf(listAsso[0]) }
-  var currAsso =
-      assoAPI.getAssociation(CurrentUser.associationUid!!, { selectedText = it.name }, {})
+  //  var currAsso =
+  //      assoAPI.getAssociation(CurrentUser.associationUid!!, { selectedText = it.name }, {})
   //
 
   val state by viewmodel.uiState.collectAsState()
@@ -174,9 +169,7 @@ fun ProfileScreen(
               expanded = expanded,
               onExpandedChange = { expanded = !expanded },
               modifier =
-                  Modifier
-                      .testTag("associationDropdown")
-                      .align(Alignment.CenterHorizontally)) {
+                  Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally)) {
                 OutlinedTextField(
                     value = selectedText,
                     onValueChange = {},
@@ -193,109 +186,120 @@ fun ProfileScreen(
 
                 ExposedDropdownMenu(
                     modifier = Modifier,
-                    expanded = expanded, onDismissRequest = { expanded = false }) {
-                  listAsso.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(text = item) },
-                        onClick = {
-                          selectedText = item
-                          expanded = false
-                        },
-                        leadingIcon = {
-                          Icon(
-                              imageVector = Icons.Default.People, // todo
-                              contentDescription = "Association Logo")
-                        })
-                  }
-                }
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }) {
+                      listAsso.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(text = item) },
+                            onClick = {
+                              selectedText = item
+                              expanded = false
+                            },
+                            leadingIcon = {
+                              Icon(
+                                  imageVector = Icons.Default.People, // todo
+                                  contentDescription = "Association Logo")
+                            })
+                      }
+                    }
               }
 
-          Text(text = "Settings")
+          Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
 
-          Column(modifier = Modifier.fillMaxWidth().testTag("settingsList")) {
-            ListItem(
-                leadingContent = {
-                  Icon(
-                      imageVector = Icons.Default.LightMode,
-                      contentDescription = "manage roles icon")
-                },
-                headlineContent = { Text(text = "Theme") },
-                trailingContent = {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                      contentDescription = "Go to theme settings")
-                },
-                colors =
-                    ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer),
-                modifier = Modifier.testTag("Theme"))
-            ListItem(
-                leadingContent = {
-                  Icon(imageVector = Icons.Default.Lock, contentDescription = "manage roles icon")
-                },
-                headlineContent = { Text(text = "Privacy/Security") },
-                trailingContent = {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                      contentDescription = "Go to privacy/security settings")
-                },
-                colors =
-                    ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer),
-                modifier = Modifier.testTag("Privacy"))
-            ListItem(
-                leadingContent = {
-                  Icon(
-                      imageVector = Icons.Default.Notifications,
-                      contentDescription = "manage roles icon")
-                },
-                headlineContent = { Text(text = "Notifications") },
-                trailingContent = {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                      contentDescription = "Go to notification settings")
-                },
-                colors =
-                    ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer),
-                modifier = Modifier.testTag("Notifications"))
-          }
+          Column(
+              modifier =
+                  Modifier.fillMaxWidth().testTag("settingsList").clip(RoundedCornerShape(12.dp))) {
+                ListItem(
+                    leadingContent = {
+                      Icon(
+                          imageVector = Icons.Default.LightMode,
+                          contentDescription = "manage roles icon")
+                    },
+                    headlineContent = { Text(text = "Theme") },
+                    trailingContent = {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                          contentDescription = "Go to theme settings")
+                    },
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier.testTag("Theme"))
+                ListItem(
+                    leadingContent = {
+                      Icon(
+                          imageVector = Icons.Default.Lock,
+                          contentDescription = "manage roles icon")
+                    },
+                    headlineContent = { Text(text = "Privacy/Security") },
+                    trailingContent = {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                          contentDescription = "Go to privacy/security settings")
+                    },
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier.testTag("Privacy"))
+                ListItem(
+                    leadingContent = {
+                      Icon(
+                          imageVector = Icons.Default.Notifications,
+                          contentDescription = "manage roles icon")
+                    },
+                    headlineContent = { Text(text = "Notifications") },
+                    trailingContent = {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                          contentDescription = "Go to notification settings")
+                    },
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier.testTag("Notifications"))
+              }
 
           // The below part is association dependent, only available if you're an admin !
-          Text(text = "Manage $selectedText")
+          Text(text = "Manage $selectedText", style = MaterialTheme.typography.titleMedium)
 
-          Column(modifier = Modifier.fillMaxWidth().testTag("manageAssociationList")) {
-            ListItem(
-                leadingContent = {
-                  Icon(imageVector = Icons.Default.People, contentDescription = "manage roles icon")
-                },
-                headlineContent = { Text(text = "Members") },
-                trailingContent = {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                      contentDescription = "Go to members settings")
-                },
-                colors =
-                    ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer),
-                modifier = Modifier.testTag("manageMembers"))
-            ListItem(
-                leadingContent = {
-                  Icon(
-                      imageVector = Icons.Default.ManageAccounts,
-                      contentDescription = "manage roles icon")
-                },
-                headlineContent = { Text(text = "Roles") },
-                trailingContent = {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                      contentDescription = "Go to roles settings")
-                },
-                colors =
-                    ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer),
-                modifier = Modifier.testTag("manageRoles"))
-          }
+          Column(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .testTag("manageAssociationList")
+                      .clip(RoundedCornerShape(12.dp))) {
+                ListItem(
+                    leadingContent = {
+                      Icon(
+                          imageVector = Icons.Default.People,
+                          contentDescription = "manage roles icon")
+                    },
+                    headlineContent = { Text(text = "Members") },
+                    trailingContent = {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                          contentDescription = "Go to members settings")
+                    },
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier.testTag("manageMembers"))
+                ListItem(
+                    leadingContent = {
+                      Icon(
+                          imageVector = Icons.Default.ManageAccounts,
+                          contentDescription = "manage roles icon")
+                    },
+                    headlineContent = { Text(text = "Roles") },
+                    trailingContent = {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                          contentDescription = "Go to roles settings")
+                    },
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier.testTag("manageRoles"))
+              }
 
           TextButton(
               onClick = { /*TODO*/},
