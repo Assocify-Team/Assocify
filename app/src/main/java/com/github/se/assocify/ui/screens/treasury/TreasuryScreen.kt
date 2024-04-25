@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -94,7 +94,9 @@ fun TreasuryScreen(
             }) {
               Icon(Icons.Outlined.Add, "Create")
             }
-      }) { innerPadding ->
+      },
+      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)
+  ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
           val coroutineRoute = rememberCoroutineScope()
 
@@ -269,39 +271,4 @@ fun TreasuryTopBar(
       colors =
           TopAppBarDefaults.mediumTopAppBarColors(
               containerColor = MaterialTheme.colorScheme.surface))
-}
-
-/** Receipt item from the list in My Receipts page */
-@Composable
-private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
-  ListItem(
-      modifier = Modifier.clickable { viewModel.onReceiptClick(receipt) },
-      headlineContent = {
-        Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
-      },
-      overlineContent = {
-        Text(modifier = Modifier.testTag("receiptDateText"), text = DateUtil.toString(receipt.date))
-      },
-      supportingContent = {
-        Text(
-            modifier = Modifier.testTag("receiptDescriptionText"),
-            text = receipt.description,
-            maxLines = 1)
-      },
-      trailingContent = {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.testTag("receiptPriceAndIconRow")) {
-              Text(
-                  text = PriceUtil.fromCents(receipt.cents),
-                  modifier = Modifier.testTag("receiptPriceText"),
-                  style = MaterialTheme.typography.bodyMedium)
-              Spacer(modifier = Modifier.width(8.dp))
-              Icon(
-                  modifier = Modifier.testTag("statusIcon").size(30.dp),
-                  imageVector = receipt.status.getIcon(),
-                  contentDescription = "status icon")
-            }
-      },
-  )
 }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -21,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
@@ -70,7 +68,7 @@ fun Accounting(
       else subCategoryList.filter { it.category.name == selectedCategory }
 
   LazyColumn(
-      modifier = Modifier.fillMaxWidth().padding(horizontal = 25.dp).testTag("AccountingScreen")) {
+      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
         items(filteredSubCategoryList) {
           DisplayLine(it, "displayLine${it.name}", page, navigationActions)
           HorizontalDivider(Modifier.fillMaxWidth())
@@ -103,8 +101,7 @@ fun FilterBar() {
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
   Row(
-      Modifier.padding(horizontal = 20.dp)
-          .testTag("filterRow")
+      Modifier.testTag("filterRow")
           .horizontalScroll(rememberScrollState())) {
         DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
         DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
