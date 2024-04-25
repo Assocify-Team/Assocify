@@ -2,6 +2,7 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -100,12 +101,12 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
     composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
 
     with(composeTestRule) {
-      onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
-      // onNodeWithTag("filterChipText").assertIsDisplayed()
-      // onNodeWithTag("filterChipIcon").assertIsNotDisplayed()
-      // onNodeWithTag("filterChipTestEvent").performClick()
-      // onNodeWithTag("filterChipIcon").assertIsDisplayed()
-
+      val chip = onNodeWithTag("filterChipTestEvent")
+      chip.assertIsDisplayed()
+      chip.assertIsNotSelected()
+      chip.performClick()
+      chip.assertIsDisplayed()
+      chip.assertIsSelected()
     }
   }
 

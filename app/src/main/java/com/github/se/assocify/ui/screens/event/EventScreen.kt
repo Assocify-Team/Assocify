@@ -203,12 +203,14 @@ fun EventFilterBar(viewModel: EventScreenViewModel) {
       state.value.events.forEach {
         FilterChip(
             modifier = Modifier.padding(8.dp).testTag("filterChipTestEvent"),
-            label = { Text(modifier = Modifier.testTag("filterChipText"), text = it.name) },
+            label = { Text(text = it.name) },
             leadingIcon = {
-              Icon(
-                  modifier = Modifier.testTag("filterChipIcon").padding(8.dp),
-                  imageVector = Icons.Default.Check,
-                  contentDescription = "Selected")
+              if (viewModel.isEventSelected(it)) {
+                Icon(
+                    modifier = Modifier.padding(8.dp),
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Selected")
+              }
             },
             selected = viewModel.isEventSelected(it),
             onClick = { viewModel.setEventSelection(it, !viewModel.isEventSelected(it)) })
