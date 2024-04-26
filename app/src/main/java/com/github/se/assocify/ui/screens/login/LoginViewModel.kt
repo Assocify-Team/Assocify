@@ -23,7 +23,12 @@ class LoginViewModel(private val userAPI: UserAPI, private val navActions: Navig
         { users: List<User> ->
           val user = users.find { it.uid == getCurrentUser()!!.uid }
           if (user == null) {
-            addUser(User(getCurrentUser()!!.uid, getCurrentUser()!!.displayName!!, Role()))
+            addUser(
+                User(
+                    getCurrentUser()!!.uid,
+                    getCurrentUser()!!.displayName!!,
+                    getCurrentUser()!!.email,
+                    Role()))
           }
           navActions.onLogin(user != null)
         },

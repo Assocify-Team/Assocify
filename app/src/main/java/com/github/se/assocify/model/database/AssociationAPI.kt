@@ -174,7 +174,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       try {
         val us =
             db.from("association")
-                .select(Columns.raw("users(uuid, name, description)"))
+                .select(Columns.raw("users(uuid, name, email)"))
                 .decodeList<SupabaseUser>()
         onSuccess(us.map { it.toUser() })
       } catch (e: Exception) {

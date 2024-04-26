@@ -1,6 +1,6 @@
 package com.github.se.assocify.model.entities
 
-data class User(val uid: String, val name: String, val description: String, val role: Role) {
+data class User(val uid: String, val name: String, val email: String?, val role: Role) {
   constructor() : this("", "", "", Role("pending"))
 
   fun hasRole(role: String): Boolean {
@@ -9,9 +9,9 @@ data class User(val uid: String, val name: String, val description: String, val 
 
   fun toggleRole(role: String): User {
     return if (hasRole(role)) {
-      User(uid, name, description, Role("pending"))
+      User(uid, name, email, Role("pending"))
     } else {
-      User(uid, name, description, Role(role))
+      User(uid, name, email, Role(role))
     }
   }
 }
