@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -66,7 +65,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
             onClick = {
               when (state.value.currentTab) {
                 EventPageIndex.TASKS -> {
-                  /*TODO: implement for tasks screen*/
+                  navActions.navigateTo(Destination.NewTask)
                 }
                 EventPageIndex.MAP -> {
                   /*TODO: implement for map screen*/
@@ -143,7 +142,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
             val testTasks = listOf(t1, t2, t3)
             HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
               when (page) {
-                EventPageIndex.TASKS.index -> EventTaskScreen(testTasks)
+                EventPageIndex.TASKS.index -> EventTaskScreen(navActions, testTasks)
                 EventPageIndex.MAP.index -> EventMapScreen()
                 EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
               }

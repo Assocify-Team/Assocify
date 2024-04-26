@@ -10,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.se.assocify.model.entities.Task
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
@@ -17,12 +19,12 @@ import com.github.se.assocify.model.entities.Task
  * @param tasks List of tasks to be displayed.
  */
 @Composable
-fun EventTaskScreen(tasks: List<Task>) {
+fun EventTaskScreen(navActions: NavigationActions, tasks: List<Task>) {
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
     tasks.forEach {
       item {
         ListItem(
-            modifier = Modifier.clickable { /*TODO: navigate to the task details screen*/},
+            modifier = Modifier.clickable { navActions.navigateTo(Destination.EditTask(it.uid)) },
             headlineContent = { Text(it.name) },
             supportingContent = { Text(it.category) },
             trailingContent = {
