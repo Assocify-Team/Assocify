@@ -298,6 +298,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
           }
         }
 
+        // open bottom sheet to select a (profile) picture
         PhotoSelectionSheet(
             visible = state.showPicOptions,
             hideSheet = { viewmodel.controlBottomSheet(false) },
