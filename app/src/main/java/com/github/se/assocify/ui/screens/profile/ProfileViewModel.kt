@@ -1,8 +1,15 @@
 package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.ManageAccounts
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -78,3 +85,29 @@ data class ProfileUIState(
     val showPicOptions: Boolean = false,
     val profileImageURI: Uri? = null
 )
+
+enum class MySettings {
+  Theme,
+  Privacy,
+  Notifications;
+
+  fun getIcon(): ImageVector {
+    return when (this) {
+      Theme -> Icons.Default.LightMode
+      Privacy -> Icons.Default.Lock
+      Notifications -> Icons.Default.Notifications
+    }
+  }
+}
+
+enum class AssociationSettings {
+  Members,
+  Roles;
+
+  fun getIcon(): ImageVector {
+    return when (this) {
+      Members -> Icons.Default.People
+      Roles -> Icons.Default.ManageAccounts
+    }
+  }
+}

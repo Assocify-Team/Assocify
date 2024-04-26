@@ -29,7 +29,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
@@ -70,8 +69,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Theme").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("manageMembers").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("manageRoles").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Members").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
       onAllNodesWithTag("associationDropdownItem").assertCountEquals(3) // depends on listAsso

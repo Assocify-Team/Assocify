@@ -21,10 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ButtonDefaults
@@ -71,6 +67,7 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
  * and association's settings (if admin).
  *
  * @param navActions: NavigationActions object that contains the navigation actions.
+ * @param viewmodel: ProfileViewModel object that contains the logic of the profile screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,7 +110,6 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
               horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)) {
 
                 // profile picture
-
                 if (state.profileImageURI != null) {
                   AsyncImage(
                       modifier =
@@ -135,7 +131,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                       contentDescription = "default profile icon")
                 }
 
-                // personal information (depends on current association)
+                // personal information : name and role (depends on current association)
                 Column(modifier = Modifier.testTag("profileInfos").weight(1f)) {
                   Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -173,7 +169,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     modifier = Modifier.menuAnchor(),
                     leadingIcon = {
                       Icon(
-                          imageVector = Icons.Default.People, // todo
+                          imageVector = Icons.Default.People, // todo get current asso logo
                           contentDescription = "Association Logo")
                     })
 
@@ -187,7 +183,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                         },
                         leadingIcon = {
                           Icon(
-                              imageVector = Icons.Default.People, // todo
+                              imageVector = Icons.Default.People, // todo associations logos
                               contentDescription = "Association Logo")
                         },
                         modifier = Modifier.testTag("associationDropdownItem"))
@@ -200,54 +196,24 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
           Column(
               modifier =
                   Modifier.fillMaxWidth().testTag("settingsList").clip(RoundedCornerShape(12.dp))) {
-                ListItem(
-                    leadingContent = {
-                      Icon(
-                          imageVector = Icons.Default.LightMode,
-                          contentDescription = "manage roles icon")
-                    },
-                    headlineContent = { Text(text = "Theme") },
-                    trailingContent = {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                          contentDescription = "Go to theme settings")
-                    },
-                    colors =
-                        ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("Theme"))
-                ListItem(
-                    leadingContent = {
-                      Icon(
-                          imageVector = Icons.Default.Lock,
-                          contentDescription = "manage roles icon")
-                    },
-                    headlineContent = { Text(text = "Privacy/Security") },
-                    trailingContent = {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                          contentDescription = "Go to privacy/security settings")
-                    },
-                    colors =
-                        ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("Privacy"))
-                ListItem(
-                    leadingContent = {
-                      Icon(
-                          imageVector = Icons.Default.Notifications,
-                          contentDescription = "manage roles icon")
-                    },
-                    headlineContent = { Text(text = "Notifications") },
-                    trailingContent = {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                          contentDescription = "Go to notification settings")
-                    },
-                    colors =
-                        ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("Notifications"))
+                MySettings.entries.forEach { setting ->
+                  ListItem(
+                      leadingContent = {
+                        Icon(
+                            imageVector = setting.getIcon(),
+                            contentDescription = "${setting.name} icon")
+                      },
+                      headlineContent = { Text(text = setting.name) },
+                      trailingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                            contentDescription = "Go to ${setting.name} settings")
+                      },
+                      colors =
+                          ListItemDefaults.colors(
+                              containerColor = MaterialTheme.colorScheme.primaryContainer),
+                      modifier = Modifier.testTag(setting.name))
+                }
               }
 
           // The below part is association dependent, only available if you're an admin !
@@ -258,40 +224,27 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   Modifier.fillMaxWidth()
                       .testTag("manageAssociationList")
                       .clip(RoundedCornerShape(12.dp))) {
-                ListItem(
-                    leadingContent = {
-                      Icon(
-                          imageVector = Icons.Default.People,
-                          contentDescription = "manage roles icon")
-                    },
-                    headlineContent = { Text(text = "Members") },
-                    trailingContent = {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                          contentDescription = "Go to members settings")
-                    },
-                    colors =
-                        ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("manageMembers"))
-                ListItem(
-                    leadingContent = {
-                      Icon(
-                          imageVector = Icons.Default.ManageAccounts,
-                          contentDescription = "manage roles icon")
-                    },
-                    headlineContent = { Text(text = "Roles") },
-                    trailingContent = {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                          contentDescription = "Go to roles settings")
-                    },
-                    colors =
-                        ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("manageRoles"))
+                AssociationSettings.entries.forEach { setting ->
+                  ListItem(
+                      leadingContent = {
+                        Icon(
+                            imageVector = setting.getIcon(),
+                            contentDescription = "${setting.name} icon")
+                      },
+                      headlineContent = { Text(text = setting.name) },
+                      trailingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                            contentDescription = "Go to ${setting.name} settings")
+                      },
+                      colors =
+                          ListItemDefaults.colors(
+                              containerColor = MaterialTheme.colorScheme.primaryContainer),
+                      modifier = Modifier.testTag(setting.name))
+                }
               }
 
+          // log out button (for everyone)
           TextButton(
               onClick = { /*TODO*/},
               modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
