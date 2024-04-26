@@ -13,14 +13,14 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 
 @Composable
 fun ProfileNotificationsScreen(navActions: NavigationActions) {
-    Scaffold(
-        modifier = Modifier.testTag("Notifications Screen"),
-        bottomBar = {
-            MainNavigationBar(
-                onTabSelect = { navActions.navigateToMainTab(it) },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Profile)
-        }) {
+  Scaffold(
+      modifier = Modifier.testTag("Notifications Screen"),
+      bottomBar = {
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Profile)
+      }) {
         Text(modifier = Modifier.padding(it), text = "Notifications Screen : not yet implemented")
-    }
+      }
 }

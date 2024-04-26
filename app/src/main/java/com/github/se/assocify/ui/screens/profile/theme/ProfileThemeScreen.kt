@@ -13,14 +13,14 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 
 @Composable
 fun ProfileThemeScreen(navActions: NavigationActions) {
-    Scaffold(
-        modifier = Modifier.testTag("themeScreen"),
-        bottomBar = {
-            MainNavigationBar(
-                onTabSelect = { navActions.navigateToMainTab(it) },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Profile)
-        }) {
+  Scaffold(
+      modifier = Modifier.testTag("themeScreen"),
+      bottomBar = {
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Profile)
+      }) {
         Text(modifier = Modifier.padding(it), text = "Theme Screen : not yet implemented")
-    }
+      }
 }

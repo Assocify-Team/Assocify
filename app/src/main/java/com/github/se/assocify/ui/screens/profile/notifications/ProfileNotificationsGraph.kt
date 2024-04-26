@@ -6,5 +6,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.profileNotificationsGraph(navigationActions: NavigationActions) {
-    composable(route = Destination.ProfileNotifications.route) { ProfileNotificationsScreen(navigationActions) }
+  composable(route = Destination.ProfileNotifications.route) {
+    ProfileNotificationsScreen(navigationActions)
+  }
 }

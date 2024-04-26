@@ -13,14 +13,15 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 
 @Composable
 fun ProfileSecurity_PrivacyScreen(navActions: NavigationActions) {
-    Scaffold(
-        modifier = Modifier.testTag("security/privacy Screen"),
-        bottomBar = {
-            MainNavigationBar(
-                onTabSelect = { navActions.navigateToMainTab(it) },
-                tabList = MAIN_TABS_LIST,
-                selectedTab = Destination.Profile)
-        }) {
-        Text(modifier = Modifier.padding(it), text = "Security/Privacy Screen : not yet implemented")
-    }
+  Scaffold(
+      modifier = Modifier.testTag("security/privacy Screen"),
+      bottomBar = {
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Profile)
+      }) {
+        Text(
+            modifier = Modifier.padding(it), text = "Security/Privacy Screen : not yet implemented")
+      }
 }
