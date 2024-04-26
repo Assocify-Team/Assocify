@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.profile.security_privacy
+package com.github.se.assocify.ui.screens.profile.securityPrivacy
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

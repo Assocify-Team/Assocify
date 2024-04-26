@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.profile.security_privacy
+package com.github.se.assocify.ui.screens.profile.securityPrivacy
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
