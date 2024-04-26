@@ -29,11 +29,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val navActions = mockk<NavigationActions>(/*relaxUnitFun = true*/ )
+  private val navActions = mockk<NavigationActions>()
   private var tabSelected = false
 
   private val uid = "1"
@@ -54,8 +55,6 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     mViewmodel = ProfileViewModel(mockAssocAPI, mockUserAPI)
 
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    //    every { mViewmodel.showBottomSheet() } answers {
-    // mViewmodel.uiState.value.copy(profileImageURI = uri) }
     composeTestRule.setContent { ProfileScreen(navActions = navActions, mViewmodel) }
   }
 
@@ -79,7 +78,6 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
   }
 
-  // test if profile picture well displayed
   @Test
   fun displayProfilePicture() {
     with(composeTestRule) {
@@ -91,7 +89,6 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
   }
 
-  // test if you can change name
   @Test
   fun changeName() {
     with(composeTestRule) {
