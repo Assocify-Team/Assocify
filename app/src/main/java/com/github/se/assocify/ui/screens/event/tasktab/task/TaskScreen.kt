@@ -43,7 +43,7 @@ fun TaskScreen(
       modifier = Modifier.testTag("taskScreen"),
       topBar = {
         TopAppBar(
-            title = { Text(modifier = Modifier.testTag("taskScreenTitle"), text = "New Task") },
+            title = { Text(modifier = Modifier.testTag("taskScreenTitle"), text = /*TODO title depending on edit or create*/ "New Task") },
             navigationIcon = {
               IconButton(
                   modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
@@ -52,6 +52,7 @@ fun TaskScreen(
             })
       },
       contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
+  /*TODO add snackbar functionnality*/
   /*snackbarHost = {
             SnackbarHost(
                 hostState = taskState.snackbarHostState,
@@ -62,6 +63,7 @@ fun TaskScreen(
             Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
+        /*TODO ViewModel and functionality */
           OutlinedTextField(
               modifier = Modifier.testTag("titleField").fillMaxWidth(),
               value = "", // taskState.title,
