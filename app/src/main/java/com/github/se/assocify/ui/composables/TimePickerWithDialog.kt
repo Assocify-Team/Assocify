@@ -37,7 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.isContainer
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -57,7 +57,6 @@ import java.time.LocalTime
  * @param onTimeSelect Callback function invoked when a date is selected or the dialog is dismissed.
  * @param modifier The modifier to be applied to the composable.
  * @param label The label to be displayed above the text field.
- * @param isSelectableDate The restriction on selectable dates.
  * @param isError Whether the DatePicker is in an error state.
  * @param supportingText Additional supporting text to be displayed below the DatePicker.
  */
@@ -111,8 +110,7 @@ fun TimePickerWithDialog(
           // focus the toggle first.
           Box(
               Modifier.fillMaxSize().semantics {
-                @Suppress("DEPRECATION")
-                isContainer = true
+                isTraversalGroup = true
               }) {
                 IconButton(
                     modifier =
