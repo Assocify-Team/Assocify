@@ -3,7 +3,7 @@ package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 import android.net.Uri
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -11,10 +11,9 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import com.google.firebase.storage.storage
 import java.time.LocalDate
+import java.util.UUID
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,16 +34,11 @@ class ReceiptViewModel {
 
   constructor(
       navActions: NavigationActions,
-      receiptApi: ReceiptAPI =
-          ReceiptAPI(
-              userId = CurrentUser.userUid!!,
-              basePath = "associations/" + CurrentUser.associationUid!!,
-              storage = Firebase.storage,
-              db = Firebase.firestore)
+      receiptApi: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
-    this.receiptUid = receiptApi.getNewId()
+    this.receiptUid = UUID.randomUUID().toString()
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = true, pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
   }
@@ -52,12 +46,7 @@ class ReceiptViewModel {
   constructor(
       receiptUid: String,
       navActions: NavigationActions,
-      receiptApi: ReceiptAPI =
-          ReceiptAPI(
-              userId = CurrentUser.userUid!!,
-              basePath = "associations/" + CurrentUser.associationUid!!,
-              storage = Firebase.storage,
-              db = Firebase.firestore)
+      receiptApi: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
   ) {
     this.navActions = navActions
     this.receiptApi = receiptApi
@@ -74,9 +63,9 @@ class ReceiptViewModel {
                       status = receipt.status,
                       title = receipt.title,
                       description = receipt.description,
-                      amount = PriceUtil.fromCents(receipt.cents),
+                      amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
                       date = DateUtil.toString(receipt.date),
-                      incoming = receipt.incoming)
+                      incoming = receipt.cents >= 0)
             }
           }
         },
@@ -183,9 +172,9 @@ class ReceiptViewModel {
             uid = receiptUid,
             title = _uiState.value.title,
             description = _uiState.value.description,
-            cents = PriceUtil.toCents(_uiState.value.amount),
+            cents =
+                PriceUtil.toCents(_uiState.value.amount) * (if (_uiState.value.incoming) 1 else -1),
             date = date,
-            incoming = _uiState.value.incoming,
             status = _uiState.value.status,
             photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
 

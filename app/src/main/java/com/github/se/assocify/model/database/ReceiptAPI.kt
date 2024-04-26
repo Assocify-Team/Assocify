@@ -1,24 +1,35 @@
 package com.github.se.assocify.model.database
 
-import androidx.annotation.Keep
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
-import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.storage.FirebaseStorage
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.storage
+import io.github.jan.supabase.storage.upload
 import java.time.LocalDate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class ReceiptAPI(
-    userId: String,
-    basePath: String,
-    storage: FirebaseStorage,
-    db: FirebaseFirestore
-) : FirebaseApi(db) {
-  override val collectionName: String = "$basePath/receipts"
-  private val storageReference = storage.getReference("$userId/receipts")
-  private val dbReference = db.collection("$collectionName/$userId/list")
+class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
+  private val bucket = db.storage["receipt"]
+  private val scope = CoroutineScope(Dispatchers.Main)
+
+  private val columns =
+      Columns.raw(
+          """
+              *,
+              receipt_status (
+                status
+              )
+          """
+              .trimIndent()
+              .filter { it != '\n' })
 
   /**
    * Uploads a receipt to the database, as well as the image (if needed). Can create or update a
@@ -38,28 +49,35 @@ class ReceiptAPI(
       onReceiptUploadSuccess: () -> Unit,
       onFailure: (Boolean, Exception) -> Unit
   ) {
-    when (receipt.photo) {
-      is MaybeRemotePhoto.LocalFile -> {
-        storageReference
-            .child(receipt.uid)
-            .putFile(receipt.photo.uri)
-            .addOnSuccessListener { onPhotoUploadSuccess(true) }
-            .addOnFailureListener { onFailure(false, it) }
-      }
-      else -> {
-        onPhotoUploadSuccess(false)
+    scope.launch {
+      try {
+        receipt.photo?.let {
+          when (it) {
+            is MaybeRemotePhoto.LocalFile -> {
+              bucket.upload(receipt.uid, it.uri, upsert = true)
+              onPhotoUploadSuccess(true)
+            }
+            is MaybeRemotePhoto.Remote -> {
+              onPhotoUploadSuccess(false)
+            }
+          }
+        } ?: onPhotoUploadSuccess(false)
+      } catch (e: Exception) {
+        onFailure(false, e)
       }
     }
 
-    dbReference
-        .document(receipt.uid)
-        .set(FirestoreReceipt(receipt))
-        .addOnSuccessListener { onReceiptUploadSuccess() }
-        .addOnFailureListener { onFailure(true, it) }
+    scope.launch {
+      try {
+        val sreceipt = SupabaseReceipt.fromReceipt(receipt)
+        db.from("receipt").upsert(sreceipt)
+        db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
+        onReceiptUploadSuccess()
+      } catch (e: Exception) {
+        onFailure(true, e)
+      }
+    }
   }
-
-  private fun parseReceiptList(snapshot: QuerySnapshot): List<Receipt> =
-      snapshot.documents.map { it.toObject(FirestoreReceipt::class.java)!!.toReceipt() }
 
   /**
    * Gets all receipts created by the current user.
@@ -68,10 +86,17 @@ class ReceiptAPI(
    * @param onError called when the fetch fails with the exception that occurred
    */
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
-    dbReference
-        .get()
-        .addOnSuccessListener { onSuccess(parseReceiptList(it)) }
-        .addOnFailureListener { onError(it) }
+    scope.launch {
+      try {
+        onSuccess(
+            db.from("receipt")
+                .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
+                .decodeList<SupabaseReceipt>()
+                .map { it.toReceipt() })
+      } catch (e: Exception) {
+        onError(e)
+      }
+    }
   }
 
   /**
@@ -82,80 +107,94 @@ class ReceiptAPI(
    * @param onError called when the fetch fails with the exception that occurred
    */
   fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onError: (Exception) -> Unit) {
-    dbReference
-        .document(id)
-        .get()
-        .addOnSuccessListener { onSuccess(it.toObject(FirestoreReceipt::class.java)!!.toReceipt()) }
-        .addOnFailureListener { onError(it) }
+    scope.launch {
+      try {
+        val receipt =
+            db.from("receipt")
+                .select { filter { SupabaseReceipt::uid eq id } }
+                .decodeAs<SupabaseReceipt>()
+                .toReceipt()
+        onSuccess(receipt)
+      } catch (e: Exception) {
+        onError(e)
+      }
+    }
   }
 
   /**
    * Gets *all* receipts created by *all* users, if the current user has permissions to do so.
    *
-   * @param onReceiptsFetched called whenever a new list is fetched. Will be called several times
-   *   with new lists.
-   * @param onError called whenever an error has occurred. The first parameter contains the ID of
-   *   the user whose fetch failed (or `null` if all fetches failed).
+   * @param onSuccess called whenever the fetch is successful with the list of receipts
+   * @param onError called whenever an error has occurred with the exception that occurred
    */
-  fun getAllReceipts(
-      onReceiptsFetched: (List<Receipt>) -> Unit,
-      onError: (String?, Exception) -> Unit
-  ) {
-    db.collection(collectionName)
-        .get()
-        .addOnSuccessListener { query ->
-          query.documents.forEach { snapshot ->
-            snapshot.reference
-                .collection("list")
-                .get()
-                .addOnSuccessListener { onReceiptsFetched(parseReceiptList(it)) }
-                .addOnFailureListener { onError(snapshot.id, it) }
-          }
-        }
-        .addOnFailureListener { onError(null, it) }
+  fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
+    scope.launch {
+      try {
+        val select = db.from("receipt").select(columns)
+        onSuccess(select.decodeList<SupabaseReceipt>().map { it.toReceipt() })
+      } catch (e: Exception) {
+        onError(e)
+      }
+    }
   }
 
+  /**
+   * Deletes a receipt by its ID.
+   *
+   * @param id the ID of the receipt to delete
+   * @param onSuccess called when the deletion is successful
+   * @param onFailure called when the deletion fails with the exception that occurred
+   */
   fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    dbReference
-        .document(id)
-        .delete()
-        .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener(onFailure)
+    scope.launch {
+      try {
+        db.from("receipt").delete { filter { SupabaseReceipt::uid eq id } }
+        onSuccess()
+      } catch (e: Exception) {
+        onFailure(e)
+      }
+    }
   }
 
-  @Keep
-  private data class FirestoreReceipt(
-      @DocumentId val id: String = "",
-      val date: String = "",
-      val incoming: Boolean = false,
-      val cents: Int = 0,
-      val phase: Int = 0,
-      val title: String = "",
-      val description: String = "",
-      val photo: String = "",
+  @Serializable
+  private data class SupabaseReceipt(
+      val uid: String,
+      val date: String,
+      val cents: Int,
+      val title: String,
+      val description: String,
+      @SerialName("user_id") val userId: String,
+      @SerialName("association_id") val associationId: String,
+      @SerialName("receipt_status") val receiptStatus: ReceiptStatus? = null,
   ) {
-    constructor(
-        from: Receipt
-    ) : this(
-        from.uid,
-        from.date.toString(),
-        from.incoming,
-        from.cents,
-        from.status.ordinal,
-        from.title,
-        from.description,
-        from.uid)
+    companion object {
+      fun fromReceipt(receipt: Receipt) =
+          SupabaseReceipt(
+              uid = receipt.uid,
+              date = receipt.date.toString(),
+              cents = receipt.cents,
+              title = receipt.title,
+              description = receipt.description,
+              userId = CurrentUser.userUid!!,
+              associationId = CurrentUser.associationUid!!)
+    }
 
-    fun toReceipt() =
+    fun toReceipt(): Receipt =
         Receipt(
-            uid = this.id,
+            uid = this.uid,
             date = LocalDate.parse(this.date),
-            incoming = this.incoming,
             cents = this.cents,
-            status = Status.entries[this.phase],
             title = this.title,
             description = this.description,
-            photo = MaybeRemotePhoto.Remote(photo),
-        )
+            status = this.receiptStatus!!.status,
+            photo = MaybeRemotePhoto.Remote(this.uid))
   }
+
+  @Serializable private data class ReceiptStatus(val status: Status)
+
+  @Serializable
+  private data class LinkedReceiptStatus(
+      @SerialName("receipt_id") val receiptId: String,
+      val status: Status
+  )
 }
