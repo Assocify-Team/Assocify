@@ -215,7 +215,10 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     colors =
                         ListItemDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("Theme"))
+                    modifier =
+                        Modifier.testTag("Theme").clickable {
+                          navActions.navigateTo(Destination.ProfileTheme)
+                        })
                 ListItem(
                     leadingContent = {
                       Icon(
@@ -231,7 +234,10 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     colors =
                         ListItemDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("Privacy"))
+                    modifier =
+                        Modifier.testTag("Privacy").clickable {
+                          navActions.navigateTo(Destination.ProfileSecurityPrivacy)
+                        })
                 ListItem(
                     leadingContent = {
                       Icon(
@@ -247,7 +253,10 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     colors =
                         ListItemDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.testTag("Notifications"))
+                    modifier =
+                        Modifier.testTag("Notifications").clickable {
+                          navActions.navigateTo(Destination.ProfileNotifications)
+                        })
               }
 
           // The below part is association dependent, only available if you're an admin !
