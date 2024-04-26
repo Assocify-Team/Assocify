@@ -77,7 +77,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
       try {
         val sreceipt = SupabaseReceipt.fromReceipt(receipt)
         db.from("receipt").insert(sreceipt)
-        db.from("receipt_status").insert(LinkedReceiptStatus)
+        db.from("receipt_status").insert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
         onReceiptUploadSuccess()
       } catch (e: Exception) {
         onFailure(true, e)
