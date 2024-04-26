@@ -1,6 +1,8 @@
 package com.github.se.assocify.screens
 
+import android.net.Uri
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -40,17 +42,21 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       mockk<UserAPI> {
         every { getUser(any(), any(), any()) } answers { User("1", "jean", Role("role")) }
       }
-  private val mViewmodel = ProfileViewModel(mockAssocAPI, mockUserAPI)
+
+  private lateinit var mViewmodel: ProfileViewModel
+  private val uri: Uri = Uri.parse("content://test")
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = uid
     CurrentUser.associationUid = "asso"
 
+    mViewmodel = ProfileViewModel(mockAssocAPI, mockUserAPI)
+
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    composeTestRule.setContent {
-      ProfileScreen(navActions = navActions, mViewmodel)
-    }
+    //    every { mViewmodel.showBottomSheet() } answers {
+    // mViewmodel.uiState.value.copy(profileImageURI = uri) }
+    composeTestRule.setContent { ProfileScreen(navActions = navActions, mViewmodel) }
   }
 
   @Test
@@ -74,6 +80,16 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   }
 
   // test if profile picture well displayed
+  @Test
+  fun displayProfilePicture() {
+    with(composeTestRule) {
+      onNodeWithTag("default profile icon").assertIsDisplayed()
+      onNodeWithTag("default profile icon").assertHasClickAction()
+      mViewmodel.setImage(uri)
+      assert(mViewmodel.uiState.value.profileImageURI != null)
+      onNodeWithTag("profilePicture").assertIsDisplayed()
+    }
+  }
 
   // test if you can change name
   @Test
@@ -83,7 +99,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("editName").assertIsDisplayed()
       onNodeWithTag("confirmModifyButton").assertIsDisplayed()
       onNodeWithTag("editName").performClick().performTextInput("newName")
-      onNodeWithTag("confirmModifyButton").performClick()// need to set action in test
+      onNodeWithTag("confirmModifyButton").performClick() // need to set action in test
       assert(mViewmodel.uiState.value.myName == "newName")
     }
   }

@@ -59,8 +59,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -76,10 +74,7 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(
-    navActions: NavigationActions,
-    viewmodel: ProfileViewModel
-) {
+fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
   // for 'change association' part
   val listAsso = listOf("Association1", "Association2", "Association3")
   var expanded by remember { mutableStateOf(false) }
