@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.CircleNotifications
 import androidx.compose.ui.graphics.vector.ImageVector
 import java.time.LocalDate
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 sealed class MaybeRemotePhoto {
   data class LocalFile(val uri: Uri) : MaybeRemotePhoto()
@@ -21,16 +23,16 @@ data class Receipt(
     val description: String,
     val date: LocalDate,
     val cents: Int,
-    val incoming: Boolean,
     val status: Status,
     val photo: MaybeRemotePhoto?,
 )
 
+@Serializable
 enum class Status {
-  Pending,
-  Approved,
-  Reimbursed,
-  Archived;
+  @SerialName("unapproved") Pending,
+  @SerialName("approved") Approved,
+  @SerialName("paid_back") Reimbursed,
+  @SerialName("archived") Archived;
 
   fun getIcon(): ImageVector {
     return when (this) {
