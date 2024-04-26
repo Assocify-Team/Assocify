@@ -23,13 +23,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   private val columns =
       Columns.raw(
           """
-              uid,
-              title,
-              description,
-              date,
-              cents,
-              user_id,
-              association_id,
+              *,
               receipt_status (
                 status
               )
@@ -76,8 +70,8 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
     scope.launch {
       try {
         val sreceipt = SupabaseReceipt.fromReceipt(receipt)
-        db.from("receipt").insert(sreceipt)
-        db.from("receipt_status").insert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
+        db.from("receipt").upsert(sreceipt)
+        db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
         onReceiptUploadSuccess()
       } catch (e: Exception) {
         onFailure(true, e)
@@ -96,7 +90,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
       try {
         onSuccess(
             db.from("receipt")
-                .select(columns) { filter { SupabaseReceipt::uid eq CurrentUser.userUid } }
+                .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
                 .decodeList<SupabaseReceipt>()
                 .map { it.toReceipt() })
       } catch (e: Exception) {
