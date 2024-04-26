@@ -20,7 +20,7 @@ fun AssocifyApp() {
   val userAPI = UserAPI(db)
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
-  NavHost(navController = navController, startDestination = Destination.Profile.route) {
+  NavHost(navController = navController, startDestination = Destination.Login.route) {
     mainNavGraph(
         navActions = navActions,
         userAPI = userAPI,
