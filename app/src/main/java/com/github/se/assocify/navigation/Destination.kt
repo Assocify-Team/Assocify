@@ -23,7 +23,7 @@ sealed class Destination(
 
   data object ProfileNotifications : Destination("profile/notifications")
 
-  data object ProfileSecurityPrivacy : Destination("profile/security_privacy")
+  data object ProfileSecurityPrivacy : Destination("profile/securityPrivacy")
 
   data object ProfileTheme : Destination("profile/theme")
 
