@@ -32,36 +32,56 @@ class ProfileViewModel(private val assoAPI: AssociationAPI, private val userAPI:
         { _uiState.value = _uiState.value.copy(myName = "name not found") })
   }
 
-  fun modifyNameOpen() {
-    _uiState.value = _uiState.value.copy(openEdit = true)
-  }
-
   fun modifyName(name: String) {
     _uiState.value = _uiState.value.copy(modifyingName = name)
   }
 
-  fun cancelModifyName() {
-    _uiState.value = _uiState.value.copy(openEdit = false)
+  /**
+   * This function is used to control the visibility of the name edit field.
+   *
+   * @param show true if the name edit field should be shown, false if should be hidden
+   */
+  fun controlNameEdit(show: Boolean) {
+    _uiState.value = _uiState.value.copy(openEdit = show)
   }
 
   fun confirmModifyName() {
-    _uiState.value = _uiState.value.copy(openEdit = false)
-    _uiState.value = _uiState.value.copy(myName = _uiState.value.modifyingName)
-    // change in DB : unsure if this works
+    _uiState.value = _uiState.value.copy(openEdit = false, myName = _uiState.value.modifyingName)
     CurrentUser.userUid?.let { uid ->
       userAPI.getUser(
           uid,
-          { user -> userAPI.addUser(user.copy(name = _uiState.value.modifyingName), {}, {}) },
-          {})
+          { user ->
+            userAPI.addUser(
+                user.copy(name = _uiState.value.modifyingName),
+                {
+                  CoroutineScope(Dispatchers.Main).launch {
+                    _uiState.value.snackbarHostState.showSnackbar(
+                        message = "Name changed !", duration = SnackbarDuration.Short)
+                  }
+                },
+                {
+                  CoroutineScope(Dispatchers.Main).launch {
+                    _uiState.value.snackbarHostState.showSnackbar(
+                        message = "Couldn't change name", duration = SnackbarDuration.Short)
+                  }
+                })
+          },
+          {
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarHostState.showSnackbar(
+                  message = "Current user not found", duration = SnackbarDuration.Short)
+            }
+          })
     }
   }
 
-  fun showBottomSheet() {
-    _uiState.value = _uiState.value.copy(showPicOptions = true)
-  }
-
-  fun hideBottomSheet() {
-    _uiState.value = _uiState.value.copy(showPicOptions = false)
+  /**
+   * This function is used to control the visibility of the bottom sheet.
+   *
+   * @param show true if the bottom sheet should be shown, false if should be hidden
+   */
+  fun controlBottomSheet(show: Boolean) {
+    _uiState.value = _uiState.value.copy(showPicOptions = show)
   }
 
   fun setImage(uri: Uri?) {

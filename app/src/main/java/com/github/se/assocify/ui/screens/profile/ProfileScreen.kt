@@ -38,6 +38,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -99,199 +101,207 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
             })
       },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp),
-  ) { innerPadding ->
-    Column(
-        modifier =
-            Modifier.padding(innerPadding).verticalScroll(rememberScrollState()).fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)) {
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)) {
+      snackbarHost = {
+        SnackbarHost(
+            hostState = state.snackbarHostState,
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+      }) { innerPadding ->
+        Column(
+            modifier =
+                Modifier.padding(innerPadding).verticalScroll(rememberScrollState()).fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)) {
 
-                // profile picture
-                if (state.profileImageURI != null) {
-                  AsyncImage(
-                      modifier =
-                          Modifier.size(80.dp)
-                              .clip(CircleShape) // Clip the image to a circle shape
-                              .aspectRatio(1f)
-                              .clickable { viewmodel.showBottomSheet() }
-                              .testTag("profilePicture"),
-                      model = state.profileImageURI,
-                      contentDescription = "profile picture",
-                      contentScale = ContentScale.Crop)
-                } else {
-                  Image(
-                      modifier =
-                          Modifier.testTag("default profile icon").size(80.dp).clickable {
-                            viewmodel.showBottomSheet()
-                          },
-                      imageVector = Icons.Outlined.AccountCircle,
-                      contentDescription = "default profile icon")
-                }
+                    // profile picture
+                    if (state.profileImageURI != null) {
+                      AsyncImage(
+                          modifier =
+                              Modifier.size(80.dp)
+                                  .clip(CircleShape) // Clip the image to a circle shape
+                                  .aspectRatio(1f)
+                                  .clickable { viewmodel.controlBottomSheet(true) }
+                                  .testTag("profilePicture"),
+                          model = state.profileImageURI,
+                          contentDescription = "profile picture",
+                          contentScale = ContentScale.Crop)
+                    } else {
+                      Image(
+                          modifier =
+                              Modifier.testTag("default profile icon").size(80.dp).clickable {
+                                viewmodel.controlBottomSheet(true)
+                              },
+                          imageVector = Icons.Outlined.AccountCircle,
+                          contentDescription = "default profile icon")
+                    }
 
-                // personal information : name and role (depends on current association)
-                Column(modifier = Modifier.testTag("profileInfos").weight(1f)) {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        state.myName,
-                        modifier = Modifier.testTag("profileName").weight(1f),
-                        style = MaterialTheme.typography.headlineSmall)
+                    // personal information : name and role (depends on current association)
+                    Column(modifier = Modifier.testTag("profileInfos").weight(1f)) {
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            state.myName,
+                            modifier = Modifier.testTag("profileName").weight(1f),
+                            style = MaterialTheme.typography.headlineSmall)
 
-                    // edit name button
-                    IconButton(
-                        onClick = { viewmodel.modifyNameOpen() },
-                        modifier = Modifier.testTag("editProfile")) {
+                        // edit name button
+                        IconButton(
+                            onClick = { viewmodel.controlNameEdit(true) },
+                            modifier = Modifier.testTag("editProfile")) {
+                              Icon(
+                                  imageVector = Icons.Filled.Edit,
+                                  contentDescription = "Edit Profile Icon")
+                            }
+                      }
+
+                      Text("Role", modifier = Modifier.testTag("profileRole"))
+                    }
+                  }
+
+              // Change_association dropdown
+              ExposedDropdownMenuBox(
+                  expanded = expanded,
+                  onExpandedChange = { expanded = !expanded },
+                  modifier =
+                      Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally)) {
+                    OutlinedTextField(
+                        value = selectedText,
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        modifier = Modifier.menuAnchor(),
+                        leadingIcon = {
                           Icon(
-                              imageVector = Icons.Filled.Edit,
-                              contentDescription = "Edit Profile Icon")
+                              imageVector = Icons.Default.People, // todo get current asso logo
+                              contentDescription = "Association Logo")
+                        })
+
+                    ExposedDropdownMenu(
+                        expanded = expanded, onDismissRequest = { expanded = false }) {
+                          listAsso.forEach { item -> // todo get asso from DB
+                            DropdownMenuItem(
+                                text = { Text(text = item) },
+                                onClick = {
+                                  selectedText = item
+                                  expanded = false
+                                },
+                                leadingIcon = {
+                                  Icon(
+                                      imageVector = Icons.Default.People, // todo associations logos
+                                      contentDescription = "Association Logo")
+                                },
+                                modifier = Modifier.testTag("associationDropdownItem"))
+                          }
                         }
                   }
 
-                  Text("Role", modifier = Modifier.testTag("profileRole"))
-                }
-              }
+              Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
 
-          // Change_association dropdown
-          ExposedDropdownMenuBox(
-              expanded = expanded,
-              onExpandedChange = { expanded = !expanded },
-              modifier =
-                  Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally)) {
-                OutlinedTextField(
-                    value = selectedText,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier.menuAnchor(),
-                    leadingIcon = {
-                      Icon(
-                          imageVector = Icons.Default.People, // todo get current asso logo
-                          contentDescription = "Association Logo")
-                    })
-
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                  listAsso.forEach { item -> // todo get asso from DB
-                    DropdownMenuItem(
-                        text = { Text(text = item) },
-                        onClick = {
-                          selectedText = item
-                          expanded = false
-                        },
-                        leadingIcon = {
-                          Icon(
-                              imageVector = Icons.Default.People, // todo associations logos
-                              contentDescription = "Association Logo")
-                        },
-                        modifier = Modifier.testTag("associationDropdownItem"))
-                  }
-                }
-              }
-
-          Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
-
-          Column(
-              modifier =
-                  Modifier.fillMaxWidth().testTag("settingsList").clip(RoundedCornerShape(12.dp))) {
-                MySettings.entries.forEach { setting ->
-                  ListItem(
-                      leadingContent = {
-                        Icon(
-                            imageVector = setting.getIcon(),
-                            contentDescription = "${setting.name} icon")
-                      },
-                      headlineContent = { Text(text = setting.name) },
-                      trailingContent = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                            contentDescription = "Go to ${setting.name} settings")
-                      },
-                      colors =
-                          ListItemDefaults.colors(
-                              containerColor = MaterialTheme.colorScheme.primaryContainer),
-                      modifier = Modifier.testTag(setting.name))
-                }
-              }
-
-          // The below part is association dependent, only available if you're an admin !
-          Text(text = "Manage $selectedText", style = MaterialTheme.typography.titleMedium)
-
-          Column(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .testTag("manageAssociationList")
-                      .clip(RoundedCornerShape(12.dp))) {
-                AssociationSettings.entries.forEach { setting ->
-                  ListItem(
-                      leadingContent = {
-                        Icon(
-                            imageVector = setting.getIcon(),
-                            contentDescription = "${setting.name} icon")
-                      },
-                      headlineContent = { Text(text = setting.name) },
-                      trailingContent = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                            contentDescription = "Go to ${setting.name} settings")
-                      },
-                      colors =
-                          ListItemDefaults.colors(
-                              containerColor = MaterialTheme.colorScheme.primaryContainer),
-                      modifier = Modifier.testTag(setting.name))
-                }
-              }
-
-          // log out button (for everyone)
-          TextButton(
-              onClick = { /*TODO*/},
-              modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-              contentPadding = ButtonDefaults.TextButtonContentPadding,
-              colors =
-                  ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Log out Icon")
-                Spacer(modifier = Modifier.padding(4.dp))
-                Text(text = "Log out", textAlign = TextAlign.Center)
-              }
-        }
-
-    // open dialog to edit member
-    if (state.openEdit) {
-      Dialog(onDismissRequest = { viewmodel.cancelModifyName() }) {
-        ElevatedCard {
-          Column(
-              modifier = Modifier.padding(16.dp).fillMaxWidth(),
-              horizontalAlignment = Alignment.CenterHorizontally) {
-                OutlinedTextField(
-                    value = state.modifyingName,
-                    onValueChange = { viewmodel.modifyName(it) },
-                    label = { Text("Edit your name") },
-                    modifier = Modifier.fillMaxWidth().testTag("editName"))
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                      OutlinedButton(
-                          onClick = { viewmodel.confirmModifyName() },
-                          modifier =
-                              Modifier.wrapContentSize()
-                                  .weight(1f)
-                                  .testTag("confirmModifyButton")) {
-                            Text(text = "Confirm", textAlign = TextAlign.Center)
-                          }
+              Column(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .testTag("settingsList")
+                          .clip(RoundedCornerShape(12.dp))) {
+                    MySettings.entries.forEach { setting ->
+                      ListItem(
+                          leadingContent = {
+                            Icon(
+                                imageVector = setting.getIcon(),
+                                contentDescription = "${setting.name} icon")
+                          },
+                          headlineContent = { Text(text = setting.name) },
+                          trailingContent = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                contentDescription = "Go to ${setting.name} settings")
+                          },
+                          colors =
+                              ListItemDefaults.colors(
+                                  containerColor = MaterialTheme.colorScheme.primaryContainer),
+                          modifier = Modifier.testTag(setting.name))
                     }
-              }
-        }
-      }
-    }
+                  }
 
-    PhotoSelectionSheet(
-        visible = state.showPicOptions,
-        hideSheet = { viewmodel.hideBottomSheet() },
-        setImageUri = { viewmodel.setImage(it) },
-        signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
-  }
+              // The below part is association dependent, only available if you're an admin !
+              Text(text = "Manage $selectedText", style = MaterialTheme.typography.titleMedium)
+
+              Column(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .testTag("manageAssociationList")
+                          .clip(RoundedCornerShape(12.dp))) {
+                    AssociationSettings.entries.forEach { setting ->
+                      ListItem(
+                          leadingContent = {
+                            Icon(
+                                imageVector = setting.getIcon(),
+                                contentDescription = "${setting.name} icon")
+                          },
+                          headlineContent = { Text(text = setting.name) },
+                          trailingContent = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                contentDescription = "Go to ${setting.name} settings")
+                          },
+                          colors =
+                              ListItemDefaults.colors(
+                                  containerColor = MaterialTheme.colorScheme.primaryContainer),
+                          modifier = Modifier.testTag(setting.name))
+                    }
+                  }
+
+              // log out button (for everyone)
+              TextButton(
+                  onClick = { /*TODO logout*/},
+                  modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
+                  contentPadding = ButtonDefaults.TextButtonContentPadding,
+                  colors =
+                      ButtonDefaults.textButtonColors(
+                          contentColor = MaterialTheme.colorScheme.error)) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = "Log out Icon")
+                    Spacer(modifier = Modifier.padding(4.dp))
+                    Text(text = "Log out", textAlign = TextAlign.Center)
+                  }
+            }
+
+        // open dialog to edit member
+        if (state.openEdit) {
+          Dialog(onDismissRequest = { viewmodel.controlNameEdit(false) }) {
+            ElevatedCard {
+              Column(
+                  modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                  horizontalAlignment = Alignment.CenterHorizontally) {
+                    OutlinedTextField(
+                        value = state.modifyingName,
+                        onValueChange = { viewmodel.modifyName(it) },
+                        label = { Text("Edit your name") },
+                        modifier = Modifier.fillMaxWidth().testTag("editName"))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                          OutlinedButton(
+                              onClick = { viewmodel.confirmModifyName() },
+                              modifier =
+                                  Modifier.wrapContentSize()
+                                      .weight(1f)
+                                      .testTag("confirmModifyButton")) {
+                                Text(text = "Confirm", textAlign = TextAlign.Center)
+                              }
+                        }
+                  }
+            }
+          }
+        }
+
+        PhotoSelectionSheet(
+            visible = state.showPicOptions,
+            hideSheet = { viewmodel.controlBottomSheet(false) },
+            setImageUri = { viewmodel.setImage(it) },
+            signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
+      }
 }
