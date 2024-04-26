@@ -15,11 +15,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonPrimitive
 
 class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   private val bucket = db.storage["receipt"]
   private val scope = CoroutineScope(Dispatchers.Main)
+
+  private val columns =
+      Columns.raw(
+          """
+              uid,
+              title,
+              description,
+              date,
+              cents,
+              user_id,
+              association_id,
+              receipt_status (
+                status
+              )
+          """
+              .trimIndent()
+              .filter { it != '\n' })
 
   /**
    * Uploads a receipt to the database, as well as the image (if needed). Can create or update a
@@ -53,7 +69,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
           }
         } ?: onPhotoUploadSuccess(false)
       } catch (e: Exception) {
-        onFailure(true, e)
+        onFailure(false, e)
       }
     }
 
@@ -61,14 +77,10 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
       try {
         val sreceipt = SupabaseReceipt.fromReceipt(receipt)
         db.from("receipt").insert(sreceipt)
-        db.from("receipt_status")
-            .insert(
-                mapOf(
-                    "receipt_id" to JsonPrimitive(receipt.uid),
-                    "status" to JsonPrimitive(receipt.status.name)))
+        db.from("receipt_status").insert(LinkedReceiptStatus)
         onReceiptUploadSuccess()
       } catch (e: Exception) {
-        onFailure(false, e)
+        onFailure(true, e)
       }
     }
   }
@@ -82,21 +94,6 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
     scope.launch {
       try {
-        val columns =
-            Columns.raw(
-                """
-              uid,
-              title,
-              description,
-              date,
-              cents,
-              user_id,
-              association_id,
-              receipt_status (
-                status
-              )
-          """
-                    .trimIndent())
         onSuccess(
             db.from("receipt")
                 .select(columns) { filter { SupabaseReceipt::uid eq CurrentUser.userUid } }
@@ -139,29 +136,8 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
     scope.launch {
       try {
-        val columns =
-            Columns.raw(
-                """
-              uid,
-              title,
-              description,
-              date,
-              cents,
-              user_id,
-              association_id,
-              receipt_status (
-                status
-              )
-          """
-                    .trimIndent()
-                    .filter { it != '\n' })
         val select = db.from("receipt").select(columns)
-        println(select.data)
-        onSuccess(
-            select.decodeList<SupabaseReceipt>().map {
-              println(it)
-              it.toReceipt()
-            })
+        onSuccess(select.decodeList<SupabaseReceipt>().map { it.toReceipt() })
       } catch (e: Exception) {
         onError(e)
       }
@@ -221,4 +197,10 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   @Serializable private data class ReceiptStatus(val status: Status)
+
+  @Serializable
+  private data class LinkedReceiptStatus(
+      @SerialName("receipt_id") val receiptId: String,
+      val status: Status
+  )
 }
