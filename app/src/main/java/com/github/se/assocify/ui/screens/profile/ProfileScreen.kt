@@ -221,9 +221,10 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                           colors =
                               ListItemDefaults.colors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer),
-                          modifier = Modifier.testTag(setting.name).clickable {
-                          navActions.navigateTo(Destination.Profile /*TODO AFTER MERGE*/)
-                        })
+                          modifier =
+                              Modifier.testTag(setting.name).clickable {
+                                navActions.navigateTo(setting.getDestination())
+                              })
                     }
                   }
 
