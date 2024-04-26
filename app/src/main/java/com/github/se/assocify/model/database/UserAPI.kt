@@ -79,11 +79,3 @@ class UserAPI(db: FirebaseFirestore) : FirebaseApi(db) {
   }
 }
 
-@Serializable
-data class SupabaseUser(
-    val uid: String? = null,
-    val name: String,
-    @SerialName("email") val email: String,
-) {
-  fun toUser() = User(uid!!, name, Role("pending"))
-}
