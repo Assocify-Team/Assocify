@@ -77,8 +77,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Theme").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("manageMembers").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("manageRoles").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Members").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
       onAllNodesWithTag("associationDropdownItem").assertCountEquals(3) // depends on listAsso
