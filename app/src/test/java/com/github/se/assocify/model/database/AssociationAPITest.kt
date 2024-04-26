@@ -2,6 +2,8 @@ package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
@@ -13,10 +15,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
 import java.util.UUID
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
@@ -36,7 +35,7 @@ class AssociationAPITest {
   @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
-    Dispatchers.setMain(UnconfinedTestDispatcher())
+    APITestUtils.setup()
     assoAPI =
         AssociationAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -182,5 +181,26 @@ class AssociationAPITest {
     assoAPI.deleteAssociation(uuid1.toString(), { fail("Should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test fun testGetApplicants() {}
+
+  @Test
+  fun testAcceptUser() {
+    assoAPI =
+        AssociationAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+            })
+    assoAPI.acceptUser(
+        "971c8c8a-37b8-4ba0-96f0-d3b6af24d2a7",
+        PermissionRole(
+            "387adfbc-e553-45e9-b39d-6146723e04e1",
+            "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            RoleType.STAFF),
+        { println("SUCCESS") },
+        { println(it) })
+
+    Thread.sleep(1000)
   }
 }

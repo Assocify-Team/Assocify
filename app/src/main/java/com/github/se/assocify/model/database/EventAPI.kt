@@ -3,13 +3,9 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
-
-  private val scope = CoroutineScope(Dispatchers.Main)
   private val postgrest = db.postgrest
   private val collectionName = "event"
 
