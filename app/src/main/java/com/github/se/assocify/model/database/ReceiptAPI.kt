@@ -171,7 +171,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
       val description: String,
       @SerialName("user_id") val userId: String,
       @SerialName("association_id") val associationId: String,
-      val receipt_status: ReceiptStatus? = null,
+      @SerialName("receipt_status") val receiptStatus: ReceiptStatus? = null,
   ) {
     companion object {
       fun fromReceipt(receipt: Receipt) =
@@ -192,7 +192,7 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
             cents = this.cents,
             title = this.title,
             description = this.description,
-            status = this.receipt_status!!.status,
+            status = this.receiptStatus!!.status,
             photo = MaybeRemotePhoto.Remote(this.uid))
   }
 
