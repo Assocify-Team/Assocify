@@ -23,7 +23,7 @@ fun ProfileSecurity_PrivacyScreen(navActions: NavigationActions) {
         CenterAlignedTopAppBar(
             title = { Text("Security/Privacy Settings") },
             navigationIcon = {
-              IconButton(onClick = { navActions.back() }) {
+              IconButton(onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Arrow Back")

@@ -23,7 +23,7 @@ fun ProfileNotificationsScreen(navActions: NavigationActions) {
         CenterAlignedTopAppBar(
             title = { Text("Notifications Settings") },
             navigationIcon = {
-              IconButton(onClick = { navActions.back() }) {
+              IconButton(onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Arrow Back")
