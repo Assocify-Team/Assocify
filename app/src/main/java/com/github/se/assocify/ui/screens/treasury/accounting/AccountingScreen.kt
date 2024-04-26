@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -21,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
@@ -42,7 +40,7 @@ enum class AccountingPage {
  * @param navigationActions: The navigation actions
  */
 @Composable
-fun Accounting(
+fun AccountingScreen(
     page: AccountingPage,
     subCategoryList: List<AccountingSubCategory>,
     navigationActions: NavigationActions
@@ -69,18 +67,7 @@ fun Accounting(
        subCategoryList
       else subCategoryList.filter { it.category.name == selectedCategory }
 
-  LazyColumn(modifier = Modifier.fillMaxWidth().padding(25.dp).testTag("AccountingScreen")) {
-    item {
-      Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
-        DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
-        DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
-          selectedCategory = it
-        }
-        // TODO: change amount given TVA
-        DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
-      }
-    }
-
+  LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
     items(filteredSubCategoryList) {
       DisplayLine(it, "displayLine${it.name}", page, navigationActions)
       HorizontalDivider(Modifier.fillMaxWidth())
@@ -90,6 +77,35 @@ fun Accounting(
       val totalAmount = filteredSubCategoryList.sumOf { it.amount }
       TotalLine(totalAmount = totalAmount)
     }
+  }
+}
+
+@Composable
+fun FilterBar() {
+  val yearList =
+      listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
+
+  val categoryList =
+      listOf(
+          AccountingCategory("Global"),
+          AccountingCategory("Pole"),
+          AccountingCategory("Events"),
+          AccountingCategory("Commission"),
+          AccountingCategory("Fees"))
+
+  val tvaList: List<String> = listOf("TTC", "HT")
+
+  var selectedYear by remember { mutableStateOf(yearList.first()) }
+  var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
+  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+
+  Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
+    DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
+    DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
+      selectedCategory = it
+    }
+    // TODO: change amount given TVA
+    DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
   }
 }
 

@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.treasury.receipt
+package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

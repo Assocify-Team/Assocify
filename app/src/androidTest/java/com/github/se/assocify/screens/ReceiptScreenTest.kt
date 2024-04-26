@@ -19,8 +19,8 @@ import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
-import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
+import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.ReceiptScreen
+import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.ReceiptViewModel
 import com.github.se.assocify.ui.util.DateUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
