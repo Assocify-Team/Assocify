@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.treasury
+package com.github.se.assocify.ui.screens.treasury.receiptstab
 
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.SupabaseClient

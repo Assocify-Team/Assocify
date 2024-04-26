@@ -4,12 +4,12 @@ import androidx.compose.runtime.Composable
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.treasury.accounting.Accounting
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
 
 /** The accounting screen displaying the budget screen of the association */
 @Composable
-fun Budget(navigationActions: NavigationActions) {
+fun BudgetScreen(navigationActions: NavigationActions) {
   // TODO: fetch from db
   val list =
       listOf(
@@ -19,5 +19,5 @@ fun Budget(navigationActions: NavigationActions) {
           AccountingSubCategory("4", "Champachelor", AccountingCategory("Events"), 5000),
           AccountingSubCategory("5", "OGJ", AccountingCategory("Commission"), 6000),
           AccountingSubCategory("6", "Communication Fees", AccountingCategory("Fees"), 3000))
-  Accounting(AccountingPage.BUDGET, list, navigationActions)
+  AccountingScreen(AccountingPage.BUDGET, list, navigationActions)
 }
