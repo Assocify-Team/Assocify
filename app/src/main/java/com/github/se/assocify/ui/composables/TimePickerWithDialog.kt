@@ -108,37 +108,34 @@ fun TimePickerWithDialog(
         if (LocalConfiguration.current.screenHeightDp > 400) {
           // Make this take the entire viewport. This will guarantee that Screen readers
           // focus the toggle first.
-          Box(
-              Modifier.fillMaxSize().semantics {
-                isTraversalGroup = true
-              }) {
-                IconButton(
-                    modifier =
-                        Modifier
-                            // This is a workaround so that the Icon comes up first
-                            // in the talkback traversal order. So that users of a11y
-                            // services can use the text input. When talkback traversal
-                            // order is customizable we can remove this.
-                            .size(64.dp, 72.dp)
-                            .align(Alignment.BottomStart)
-                            .zIndex(5f),
-                    onClick = { showingPicker.value = !showingPicker.value }) {
-                      val icon =
+          Box(Modifier.fillMaxSize().semantics { isTraversalGroup = true }) {
+            IconButton(
+                modifier =
+                    Modifier
+                        // This is a workaround so that the Icon comes up first
+                        // in the talkback traversal order. So that users of a11y
+                        // services can use the text input. When talkback traversal
+                        // order is customizable we can remove this.
+                        .size(64.dp, 72.dp)
+                        .align(Alignment.BottomStart)
+                        .zIndex(5f),
+                onClick = { showingPicker.value = !showingPicker.value }) {
+                  val icon =
+                      if (showingPicker.value) {
+                        Icons.Outlined.Keyboard
+                      } else {
+                        Icons.Outlined.Schedule
+                      }
+                  Icon(
+                      icon,
+                      contentDescription =
                           if (showingPicker.value) {
-                            Icons.Outlined.Keyboard
+                            "Switch to Text Input"
                           } else {
-                            Icons.Outlined.Schedule
-                          }
-                      Icon(
-                          icon,
-                          contentDescription =
-                              if (showingPicker.value) {
-                                "Switch to Text Input"
-                              } else {
-                                "Switch to Touch Input"
-                              })
-                    }
-              }
+                            "Switch to Touch Input"
+                          })
+                }
+          }
         }
         Column(
             modifier = Modifier.padding(24.dp),
