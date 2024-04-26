@@ -23,11 +23,12 @@ fun ProfileNotificationsScreen(navActions: NavigationActions) {
         CenterAlignedTopAppBar(
             title = { Text("Notifications Settings") },
             navigationIcon = {
-              IconButton(onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Arrow Back")
-              }
+              IconButton(
+                  onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Arrow Back")
+                  }
             })
       }) {
         Text(modifier = Modifier.padding(it), text = "Notifications Screen : not yet implemented")

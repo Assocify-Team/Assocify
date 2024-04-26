@@ -23,11 +23,12 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
         CenterAlignedTopAppBar(
             title = { Text("Theme Settings") },
             navigationIcon = {
-              IconButton(onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Arrow Back")
-              }
+              IconButton(
+                  onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Arrow Back")
+                  }
             })
       }) {
         Text(modifier = Modifier.padding(it), text = "Theme Screen : not yet implemented")
