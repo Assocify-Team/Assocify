@@ -3,8 +3,8 @@ package com.github.se.assocify.model.database
 import android.net.Uri
 import android.util.Log
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.Status
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -49,7 +49,7 @@ class ReceiptsAPITest {
           date = LocalDate.EPOCH,
           incoming = false,
           cents = 100,
-          phase = Phase.Approved,
+          status = Status.Approved,
           title = "title",
           description = "notes",
           photo = MaybeRemotePhoto.Remote("path"))
@@ -60,7 +60,7 @@ class ReceiptsAPITest {
           date = LocalDate.EPOCH,
           incoming = false,
           cents = 100,
-          phase = Phase.Approved,
+          status = Status.Approved,
           title = "title",
           description = "notes",
           photo = MaybeRemotePhoto.LocalFile(uriMock))

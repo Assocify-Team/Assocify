@@ -2,6 +2,7 @@ package com.github.se.assocify.screens
 
 import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -15,8 +16,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
 import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
@@ -47,7 +48,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
           cents = 10000,
           date = DateUtil.toDate("01/01/2021")!!,
           incoming = false,
-          phase = Phase.Unapproved,
+          status = Status.Pending,
           photo = MaybeRemotePhoto.LocalFile(testUri),
       )
 
@@ -79,6 +80,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("backButton").assertIsDisplayed()
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("titleField").assertIsDisplayed()
+      onNodeWithTag("statusDropdownChip").assertIsDisplayed()
       onNodeWithTag("descriptionField").assertIsDisplayed()
       onNodeWithTag("amountField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
@@ -226,10 +228,24 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun photoSheet() {
     with(composeTestRule) {
-      onNodeWithTag("editImageButton").performClick()
+      onNodeWithTag("editImageButton").performScrollTo().performClick()
       onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
       viewModel.hideBottomSheet()
       onNodeWithTag("photoSelectionSheet").assertDoesNotExist()
+    }
+  }
+
+  @Test
+  fun status() {
+    with(composeTestRule) {
+      onNodeWithTag("statusChip").assertTextContains("Pending")
+      onNodeWithTag("statusChip").performScrollTo().performClick()
+      onNodeWithText("Approved", true).assertIsDisplayed()
+      onNodeWithText("Reimbursed", true).assertIsDisplayed()
+      onNodeWithText("Reimbursed", true).performClick()
+      onNodeWithTag("statusChip").assertTextContains("Reimbursed")
+      onNodeWithText("Approved", true).assertIsNotDisplayed()
+      onNodeWithText("Pending", true).assertIsNotDisplayed()
     }
   }
 }
@@ -248,7 +264,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           cents = 10000,
           date = DateUtil.toDate("01/01/2021")!!,
           incoming = false,
-          phase = Phase.Unapproved,
+          status = Status.Pending,
           photo = null,
       )
 
