@@ -133,16 +133,6 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
-  @Serializable
-  private data class SupabaseAssociation(
-      val uid: String? = null,
-      val name: String,
-      val description: String,
-      @SerialName("creation_date") val creationDate: String,
-  ) {
-    fun toAssociation() = Association(uid!!, name, description, LocalDate.parse(creationDate))
-  }
-
   /**
    * Gets all associations from the database that match the filter
    *
@@ -239,5 +229,24 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     getFilteredUsers(assocId, onSuccess, onFailure) { true }
+  }
+
+  @Serializable
+  private data class SupabaseAssociation(
+    val uid: String? = null,
+    val name: String,
+    val description: String,
+    @SerialName("creation_date") val creationDate: String,
+  ) {
+    fun toAssociation() = Association(uid!!, name, description, LocalDate.parse(creationDate))
+  }
+
+  @Serializable
+  private data class SupabaseUser(
+    val uuid: String,
+    val name: String,
+    val description: String,
+  ) {
+    fun toUser() = User(uuid, name, description, Role("pending"))
   }
 }
