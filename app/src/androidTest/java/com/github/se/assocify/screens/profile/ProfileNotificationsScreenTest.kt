@@ -8,7 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.notifications.ProfileNotificationsScreen
-import com.github.se.assocify.ui.screens.profile.theme.ProfileThemeScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase

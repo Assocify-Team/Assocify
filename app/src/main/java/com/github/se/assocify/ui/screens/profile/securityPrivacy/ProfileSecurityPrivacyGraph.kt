@@ -7,6 +7,6 @@ import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.profileSecurityPrivacyGraph(navigationActions: NavigationActions) {
   composable(route = Destination.ProfileSecurityPrivacy.route) {
-    ProfileSecurity_PrivacyScreen(navActions = navigationActions)
+    ProfileSecurityPrivacyScreen(navActions = navigationActions)
   }
 }

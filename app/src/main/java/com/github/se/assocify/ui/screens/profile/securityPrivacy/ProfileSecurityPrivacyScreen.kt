@@ -16,7 +16,7 @@ import com.github.se.assocify.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileSecurity_PrivacyScreen(navActions: NavigationActions) {
+fun ProfileSecurityPrivacyScreen(navActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("security/privacy Screen"),
       topBar = {
