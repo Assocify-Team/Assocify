@@ -23,7 +23,7 @@ class ProfileNotificationsScreenTest :
     TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val navActions = mockk<NavigationActions>(/*relaxUnitFun = true*/ )
+  private val navActions = mockk<NavigationActions>()
   private var goBack = false
 
   @Before
