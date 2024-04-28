@@ -92,7 +92,7 @@ fun MainTopBar(
         },
         trailingIcon = {
           IconButton(
-                modifier = Modifier.testTag("searchClearButton"),
+              modifier = Modifier.testTag("searchClearButton"),
               onClick = {
                 onQueryChange("")
                 onSearch("")
