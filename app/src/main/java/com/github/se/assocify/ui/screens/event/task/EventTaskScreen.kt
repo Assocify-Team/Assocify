@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import com.github.se.assocify.model.entities.Task
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
@@ -17,14 +18,13 @@ import androidx.compose.ui.Modifier
  * @param tasks List of tasks to be displayed.
  */
 @Composable
-fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel) {
-  val state = eventTaskViewModel.uiState.collectAsState()
+fun EventTaskScreen(tasks: List<Task>) {
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
-    state.value.tasks.forEach {
+    tasks.forEach {
       item {
         ListItem(
             modifier = Modifier.clickable { /*TODO: navigate to the task details screen*/},
-            headlineContent = { Text(it.name) },
+            headlineContent = { Text(it.title) },
             supportingContent = { Text(it.category) },
             trailingContent = {
               Checkbox(
@@ -32,7 +32,7 @@ fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel) {
                   onCheckedChange = { /*TODO what happens if the checkbox is clicked*/},
               )
             },
-            overlineContent = { Text(it.startTime) })
+            overlineContent = { Text(it.startTime.toString()) })
         HorizontalDivider()
       }
     }
