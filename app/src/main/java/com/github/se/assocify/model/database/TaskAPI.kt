@@ -10,9 +10,21 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * API for interacting with the task table in the database.
+ *
+ * @property db the Supabase client
+ */
 class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
   private val scope = CoroutineScope(Dispatchers.Main)
 
+  /**
+   * Gets a task from the database.
+   *
+   * @param id the id of the task to get
+   * @param onSuccess called on success with the task
+   * @param onFailure called on failure
+   */
   fun getTask(id: String, onSuccess: (Task) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
@@ -30,7 +42,12 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
     }
   }
-
+  /**
+   * Gets all tasks from the database.
+   *
+   * @param onSuccess called on success with the list of tasks
+   * @param onFailure called on failure
+   */
   fun getTasks(onSuccess: (List<Task>) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
@@ -42,6 +59,13 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Adds a task to the database.
+   *
+   * @param task the task to add
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun addTask(task: Task, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
@@ -64,6 +88,19 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Edits a task in the database.
+   *
+   * @param title the new title of the task
+   * @param description the new description of the task
+   * @param isCompleted the new completion status of the task
+   * @param startTime the new start time of the task
+   * @param peopleNeeded the new number of people needed for the task
+   * @param category the new category of the task
+   * @param location the new location of the task
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun editTask(
       title: String,
       description: String,
@@ -93,7 +130,13 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
     }
   }
-
+  /**
+   * Deletes a task from the database.
+   *
+   * @param id the id of the task to delete
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun deleteTask(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
