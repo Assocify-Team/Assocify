@@ -4,11 +4,13 @@ import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
+import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.ktor.http.Headers
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -27,8 +29,10 @@ class AssociationAPITest {
 
   private var error = false
   private var response = ""
+  private var responseHeaders = Headers.Empty
   private val uuid1 = UUID.fromString("00000000-0000-0000-0000-000000000000")!!
   private val uuid2 = UUID.fromString("ABCDEF00-0000-0000-0000-000000000000")!!
+  private val uuid3 = UUID.fromString("12345600-0000-0000-0000-000000000000")!!
 
   private lateinit var assoAPI: AssociationAPI
 
@@ -42,7 +46,7 @@ class AssociationAPITest {
               install(Postgrest)
               httpEngine = MockEngine {
                 if (!error) {
-                  respond(response)
+                  respond(response, headers = responseHeaders)
                 } else {
                   respondBadRequest()
                 }
@@ -183,24 +187,63 @@ class AssociationAPITest {
     verify(timeout = 1000) { onFailure(any()) }
   }
 
-  @Test fun testGetApplicants() {}
+  @Test
+  fun testGetApplicants() {
+    val onSuccess: (List<User>) -> Unit = mockk(relaxed = true)
+
+    response =
+        """
+      [
+        {
+          "association_id": "$uuid3",
+          "users": {
+            "uid": "$uuid1",
+            "name": "UUID1"
+          }
+        },
+        {
+          "association_id": "$uuid3",
+          "users": {
+            "uid": "$uuid2",
+            "name": "UUID2",
+            "email": "uuid2@example.com"
+          }
+        }
+      ]
+      """
+            .trimIndent()
+
+    assoAPI.getApplicants(uuid3.toString(), onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(any()) }
+
+    // Test failure
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
+
+    assoAPI.getApplicants(uuid3.toString(), { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
 
   @Test
   fun testAcceptUser() {
-    assoAPI =
-        AssociationAPI(
-            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-              install(Postgrest)
-            })
-    assoAPI.acceptUser(
-        "971c8c8a-37b8-4ba0-96f0-d3b6af24d2a7",
-        PermissionRole(
-            "387adfbc-e553-45e9-b39d-6146723e04e1",
-            "aa3d4ad7-c901-435a-b089-bb835f6ec560",
-            RoleType.STAFF),
-        { println("SUCCESS") },
-        { println(it) })
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    response = """{"count": 1}"""
+    responseHeaders = Headers.build { append("Content-Range", "/1") }
 
-    Thread.sleep(1000)
+    val permissionRole = PermissionRole(uuid2.toString(), uuid3.toString(), RoleType.PRESIDENCY)
+    assoAPI.acceptUser(
+        uuid1.toString(), permissionRole, onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    // Test failure
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
+
+    assoAPI.acceptUser(uuid1.toString(), permissionRole, { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
   }
 }
