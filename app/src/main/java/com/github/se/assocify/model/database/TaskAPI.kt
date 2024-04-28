@@ -148,6 +148,27 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  
+  /**
+   * Gets all tasks associated with an event from the database.
+   *
+   * @param eventId the id of the event to get tasks for
+   * @param onSuccess called on success with the list of tasks
+   * @param onFailure called on failure
+   */
+  fun getTasksOfEvent(eventId: String, onSuccess: (List<Task>) -> Unit, onFailure: (Exception) -> Unit) {
+    scope.launch {
+      try {
+        val tasks = db.from("task").select {
+          filter { SupabaseTask::eventId eq eventId }
+        }.decodeList<SupabaseTask>()
+        onSuccess(tasks.map { it.toTask() })
+      } catch (e: Exception) {
+        onFailure(e)
+      }
+    }
+  }
+
   @Serializable
   private data class SupabaseTask(
       @SerialName("uid") val uid: String,
@@ -157,7 +178,8 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       @SerialName("start_time") val startTime: String,
       @SerialName("people_needed") val peopleNeeded: Int,
       @SerialName("category") val category: String,
-      @SerialName("location") val location: String
+      @SerialName("location") val location: String,
+      @SerialName("event_id") val eventId: String
   ) {
     fun toTask(): Task {
       return Task(
@@ -168,7 +190,9 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
           startTime = LocalDate.parse(startTime),
           peopleNeeded = peopleNeeded,
           category = category,
-          location = location)
+          location = location,
+          eventUid = eventId)
     }
   }
+
 }

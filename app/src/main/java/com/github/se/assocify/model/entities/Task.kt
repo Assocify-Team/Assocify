@@ -22,5 +22,6 @@ data class Task(
     val startTime: LocalDate = LocalDate.now(),
     val peopleNeeded: Int = 0,
     val category: String = "Committee",
-    val location: String = "Here"
+    val location: String = "Here",
+    val eventUid: String = "eventUid"
 )
