@@ -79,7 +79,8 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
                     startTime = task.startTime.toString(),
                     peopleNeeded = task.peopleNeeded,
                     category = task.category,
-                    location = task.location))
+                    location = task.location,
+                    eventId = task.eventUid))
 
         onSuccess()
       } catch (e: Exception) {
@@ -148,7 +149,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
-  
+
   /**
    * Gets all tasks associated with an event from the database.
    *
