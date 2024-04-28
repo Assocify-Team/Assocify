@@ -81,6 +81,7 @@ fun MainTopBar(
         placeholder = { Text("Search receipts") },
         leadingIcon = {
           IconButton(
+              modifier = Modifier.testTag("searchBackButton"),
               onClick = {
                 onQueryChange("")
                 onSearch("")
@@ -91,6 +92,7 @@ fun MainTopBar(
         },
         trailingIcon = {
           IconButton(
+                modifier = Modifier.testTag("searchClearButton"),
               onClick = {
                 onQueryChange("")
                 onSearch("")
