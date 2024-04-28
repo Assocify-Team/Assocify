@@ -46,18 +46,17 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
     scope.launch {
       try {
         db.from("task")
-          .insert(
-            SupabaseTask(
-              uid = task.uid,
-              title = task.title,
-              description = task.description,
-              isCompleted = task.isCompleted,
-              startTime = task.startTime.toString(),
-              peopleNeeded = task.peopleNeeded,
-              category = task.category,
-              location = task.location
+            .insert(
+                SupabaseTask(
+                    uid = task.uid,
+                    title = task.title,
+                    description = task.description,
+                    isCompleted = task.isCompleted,
+                    startTime = task.startTime.toString(),
+                    peopleNeeded = task.peopleNeeded,
+                    category = task.category,
+                    location = task.location))
 
-          ))
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
@@ -65,19 +64,29 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
-  fun editTask(title: String, description: String, isCompleted: Boolean, startTime: LocalDate, peopleNeeded: Int, category: String, location: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+  fun editTask(
+      title: String,
+      description: String,
+      isCompleted: Boolean,
+      startTime: LocalDate,
+      peopleNeeded: Int,
+      category: String,
+      location: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     scope.launch {
       try {
         db.from("task")
-          .update(
-            { SupabaseTask::title setTo title
+            .update({
+              SupabaseTask::title setTo title
               SupabaseTask::description setTo description
               SupabaseTask::isCompleted setTo isCompleted
               SupabaseTask::startTime setTo startTime.toString()
               SupabaseTask::peopleNeeded setTo peopleNeeded
               SupabaseTask::category setTo category
-              SupabaseTask::location setTo location}
-          )
+              SupabaseTask::location setTo location
+            })
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
@@ -88,10 +97,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun deleteTask(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        db.from("task")
-          .delete {
-            filter { SupabaseTask::uid eq id }
-          }
+        db.from("task").delete { filter { SupabaseTask::uid eq id } }
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
