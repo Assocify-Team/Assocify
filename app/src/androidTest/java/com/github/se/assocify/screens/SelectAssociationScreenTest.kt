@@ -2,7 +2,6 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -14,12 +13,12 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssociation.DisplayOrganization
 import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociation
+import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociationViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -83,6 +82,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun setup() {
     CurrentUser.userUid = "adfslkj"
     CurrentUser.associationUid = "testAssocId"
+    CurrentUser.user = User("adfslkj", "Tonno")
     every { mockAssocAPI.getAssociations(any(), any()) } answers
         {
           val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
@@ -138,7 +138,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the message is displayed when you're not registered to any organization */
   @Test
   fun testNoRegisteredOrganization() {
-    val exception = Exception("the test does not work")
     every { mockAssocAPI.getAssociations(any(), any()) } answers
         {
           val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
@@ -147,7 +146,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
         }
     composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
     // Find the text node with the expected message and assert it is displayed
-    composeTestRule.onNodeWithText("There is no organization to display.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("There are no organizations to display.").assertIsDisplayed()
   }
 
   /**
@@ -156,9 +155,8 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
    */
   @Test
   fun testNavigateToHomeWithSelectButton() {
-    composeTestRule.setContent {
-      DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
-    }
+    val model = SelectAssociationViewModel(mockAssocAPI, mockUserAPI, mockNavActions)
+    composeTestRule.setContent { DisplayOrganization(organization = testAssociation, model) }
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
       organizationSelect {
         assertIsDisplayed()
@@ -174,9 +172,8 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
    */
   @Test
   fun testNavigateToHomeByClickingOnAssoc() {
-    composeTestRule.setContent {
-      DisplayOrganization(organization = testAssociation, navActions = mockNavActions)
-    }
+    val model = SelectAssociationViewModel(mockAssocAPI, mockUserAPI, mockNavActions)
+    composeTestRule.setContent { DisplayOrganization(organization = testAssociation, model) }
     composeTestRule.onNodeWithTag("DisplayOrganizationScreen").performClick()
   }
 
@@ -199,23 +196,5 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       searchOrgaButton { assertIsDisplayed() }
       arrowBackButton { assertIsNotDisplayed() }
     }
-  }
-
-  @Test
-  fun testWithDifferentUserId() {
-    every {
-      mockUserAPI.getUser("testId", any<(User) -> Unit>(), any<(Exception) -> Unit>())
-    } answers
-        {
-          val onSuccessCallback = secondArg<(User) -> Unit>()
-          val user = User("testId", "Ciro", Role("president"))
-          onSuccessCallback(user)
-        }
-    CurrentUser.userUid = "testId"
-    CurrentUser.associationUid = "testAssocId"
-
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
-    composeTestRule.onNodeWithText("Hello Tonno !!").assertIsNotDisplayed()
-    composeTestRule.onNodeWithText("Hello Ciro !!").assertIsDisplayed()
   }
 }

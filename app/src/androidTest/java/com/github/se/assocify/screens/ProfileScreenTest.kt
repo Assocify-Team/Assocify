@@ -14,7 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.entities.Role
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.ProfileScreen
@@ -39,9 +38,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private val uid = "1"
   private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true)
   private val mockUserAPI =
-      mockk<UserAPI> {
-        every { getUser(any(), any(), any()) } answers { User("1", "jean", Role("role")) }
-      }
+      mockk<UserAPI> { every { getUser(any(), any(), any()) } answers { User("1", "jean") } }
 
   private lateinit var mViewmodel: ProfileViewModel
   private val uri: Uri = Uri.parse("content://test")
