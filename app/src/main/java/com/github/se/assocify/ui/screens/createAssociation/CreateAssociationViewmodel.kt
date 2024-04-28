@@ -136,7 +136,7 @@ class CreateAssociationViewmodel(
   fun modifyMemberRole(role: String) {
     if (_uiState.value.editMember != null) {
       _uiState.value.editMember?.let {
-        _uiState.value = _uiState.value // .copy(editMember = it.toggleRole(role))
+        // _uiState.value = _uiState.value.copy(editMember = it.toggleRole(role))
       }
     }
   }
