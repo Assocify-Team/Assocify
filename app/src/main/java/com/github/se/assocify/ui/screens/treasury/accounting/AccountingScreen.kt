@@ -81,7 +81,7 @@ fun AccountingScreen(
 }
 
 @Composable
-fun FilterBar() {
+fun AccountingFilterBar() {
   val yearList =
       listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
 
