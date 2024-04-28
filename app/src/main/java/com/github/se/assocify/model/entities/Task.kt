@@ -17,10 +17,10 @@ import java.time.format.DateTimeFormatter
  */
 data class Task(
     val uid: String = "testUid",
-    val name: String = "testName",
+    val title: String = "testName",
     val description: String = "description",
     val isCompleted: Boolean = false,
-    val startTime: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+    val startTime: LocalDate = LocalDate.now(),
     val peopleNeeded: Int = 0,
     val category: String = "Committee",
     val location: String = "Here"
