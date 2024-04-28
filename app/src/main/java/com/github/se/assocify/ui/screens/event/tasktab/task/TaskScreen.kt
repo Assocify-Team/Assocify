@@ -22,9 +22,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -38,7 +42,10 @@ import com.github.se.assocify.ui.composables.TimePickerWithDialog
 @Composable
 fun TaskScreen(
     navActions: NavigationActions,
+    viewModel: TaskViewModel = TaskViewModel(navActions)
 ) {
+  val taskState by viewModel.uiState.collectAsState()
+
   Scaffold(
       modifier = Modifier.testTag("taskScreen"),
       topBar = {
@@ -46,7 +53,7 @@ fun TaskScreen(
             title = {
               Text(
                   modifier = Modifier.testTag("taskScreenTitle"),
-                  text = /*TODO title depending on edit or create*/ "New Task")
+                  text = taskState.pageTitle)
             },
             navigationIcon = {
               IconButton(
@@ -56,78 +63,70 @@ fun TaskScreen(
             })
       },
       contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
-  /*TODO add snackbar functionnality*//*snackbarHost = {
-            SnackbarHost(
+      snackbarHost = {
+          SnackbarHost(
                 hostState = taskState.snackbarHostState,
                 snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
-        }*/ ) { paddingValues ->
+        }) { paddingValues ->
     Column(
         modifier =
             Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
-          /*TODO ViewModel and functionality */
           OutlinedTextField(
               modifier = Modifier.testTag("titleField").fillMaxWidth(),
-              value = "", // taskState.title,
-              onValueChange = { /*viewModel.setTitle(it)*/},
+              value = taskState.title,
+              onValueChange = { viewModel.setTitle(it) },
               label = { Text("Title") },
-              // isError = taskState.titleError != null,
-              supportingText = { /*taskState.titleError?.let { Text(it) }*/})
+              isError = taskState.titleError != null,
+              supportingText = { taskState.titleError?.let { Text(it) }})
           OutlinedTextField(
               modifier = Modifier.testTag("descriptionField").fillMaxWidth(),
-              value = "", // receiptState.description,
-              onValueChange = { /*viewModel.setDescription(it)*/},
+              value = taskState.description,
+              onValueChange = { viewModel.setDescription(it) },
               label = { Text("Description") },
               minLines = 3,
               supportingText = {})
           OutlinedTextField(
               modifier = Modifier.testTag("categoryField").fillMaxWidth(),
-              value = "", // receiptState.category,
-              onValueChange = { /*viewModel.setCategory(it)*/},
+              value = taskState.category,
+              onValueChange = { viewModel.setCategory(it) },
               label = { Text("Category") },
               supportingText = {})
           OutlinedTextField(
               modifier = Modifier.testTag("staffNumberField").fillMaxWidth(),
-              value = "" /*taskState.staffNumber*/,
-              onValueChange = { /*viewModel.setStaffNumber(it)*/},
+              value = taskState.staffNumber,
+              onValueChange = { viewModel.setStaffNumber(it)},
               label = { Text("Number of Staff") },
               keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-              // isError = taskState.staffNumberError != null,
-              supportingText = { /*taskState.amountError?.let { Text(it) }*/})
+              isError = taskState.staffNumberError != null,
+              supportingText = { taskState.staffNumberError?.let { Text(it) }})
           DatePickerWithDialog(
               modifier = Modifier.testTag("dateField").fillMaxWidth(),
-              value = "" /*taskState.date*/,
-              onDateSelect = { /*viewModel.setDate(it)*/},
+              value = taskState.date,
+              onDateSelect = { viewModel.setDate(it) },
               label = { Text("Date") },
-              // isError = taskState.dateError != null,
-              supportingText = { /*taskState.dateError?.let { Text(it) }*/})
+              isError = taskState.dateError != null,
+              supportingText = { taskState.dateError?.let { Text(it) }})
           TimePickerWithDialog(
               modifier = Modifier.testTag("timeField").fillMaxWidth(),
-              value = "",
-              onTimeSelect = { /*viewModel.setTime(it)*/},
+              value = taskState.time,
+              onTimeSelect = { viewModel.setTime(it) },
               label = { Text("Time") },
-              supportingText = { /*taskState.timeError?.let { Text(it) }*/})
-          OutlinedTextField(
-              modifier = Modifier.testTag("locationField").fillMaxWidth(),
-              value = "" /*taskState.staffNumber*/,
-              onValueChange = { /*viewModel.setStaffNumber(it)*/},
-              label = { Text("Location") },
-              // isError = taskState.staffNumberError != null,
-              supportingText = { /*taskState.amountError?.let { Text(it) }*/})
+              supportingText = { taskState.timeError?.let { Text(it) }})
           Column {
             Button(
                 modifier = Modifier.testTag("saveButton").fillMaxWidth(),
-                onClick = { /*viewModel.saveReceipt()*/},
+                onClick = { viewModel.saveTask() },
                 content = { Text("Save") })
             OutlinedButton(
                 modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
-                onClick = { /*viewModel.deleteReceipt()*/},
-                content = { Text("Delete" /*if (taskState.isNewTask) {
+                onClick = { viewModel.deleteTask() },
+                content = { Text(if (taskState.isNewTask) {
                       "Cancel"
                     } else {
                       "Delete"
-                    }*/) },
+                    }) },
                 colors =
                     ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error),
