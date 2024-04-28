@@ -149,7 +149,6 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
-
   /**
    * Gets all tasks associated with an event from the database.
    *
@@ -157,12 +156,17 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onSuccess called on success with the list of tasks
    * @param onFailure called on failure
    */
-  fun getTasksOfEvent(eventId: String, onSuccess: (List<Task>) -> Unit, onFailure: (Exception) -> Unit) {
+  fun getTasksOfEvent(
+      eventId: String,
+      onSuccess: (List<Task>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     scope.launch {
       try {
-        val tasks = db.from("task").select {
-          filter { SupabaseTask::eventId eq eventId }
-        }.decodeList<SupabaseTask>()
+        val tasks =
+            db.from("task")
+                .select { filter { SupabaseTask::eventId eq eventId } }
+                .decodeList<SupabaseTask>()
         onSuccess(tasks.map { it.toTask() })
       } catch (e: Exception) {
         onFailure(e)
@@ -195,5 +199,4 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
           eventUid = eventId)
     }
   }
-
 }
