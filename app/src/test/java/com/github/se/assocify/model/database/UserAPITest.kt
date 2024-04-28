@@ -119,4 +119,22 @@ class UserAPITest {
 
     verify(timeout = 1000) { onFailure(any()) }
   }
+
+  @Test
+  fun testRequestJoin() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+
+    error = false
+    userAPI.requestJoin(
+        APITestUtils.ASSOCIATION.uid, onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    error = true
+    userAPI.requestJoin(APITestUtils.ASSOCIATION.uid, { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
 }
