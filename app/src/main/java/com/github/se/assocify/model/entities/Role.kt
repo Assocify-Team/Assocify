@@ -22,7 +22,7 @@ data class Role(val name: String) {
    */
   fun getRoleType(): RoleType {
     return when (name.lowercase()) {
-      "presidence" -> RoleType.PRESIDENCY
+      "presidency" -> RoleType.PRESIDENCY
       "treasury" -> RoleType.TREASURY
       "committee" -> RoleType.COMMITTEE
       "member" -> RoleType.MEMBER
