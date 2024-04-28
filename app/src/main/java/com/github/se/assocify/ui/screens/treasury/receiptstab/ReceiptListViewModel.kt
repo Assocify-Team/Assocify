@@ -48,10 +48,12 @@ class ReceiptListViewModel(
     receiptsDatabase.getUserReceipts(
         onSuccess = { receipts ->
           _uiState.value =
-              ReceiptUIState(
-                  userReceipts = receipts,
-                  allReceipts = _uiState.value.allReceipts,
-                  searchQuery = _uiState.value.searchQuery)
+              _uiState.value.copy(
+                  userReceipts =
+                      receipts.filter {
+                        it.uid == CurrentUser.userUid &&
+                            it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
+                      })
         },
         onError = {
           // TODO on sprint 4 with error API
@@ -66,32 +68,27 @@ class ReceiptListViewModel(
     receiptsDatabase.getAllReceipts(
         onSuccess = { receipts ->
           _uiState.value =
-              ReceiptUIState(
-                  userReceipts = _uiState.value.userReceipts,
-                  allReceipts = receipts,
-                  searchQuery = _uiState.value.searchQuery)
+              _uiState.value.copy(
+                  allReceipts =
+                      receipts.filter {
+                        it.uid != CurrentUser.userUid &&
+                            it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
+                      })
         },
         onError = { _ ->
           // TODO on sprint 4 with error API
         })
   }
 
-  /** Filter the list of receipts when the user types in the search bar. */
-  fun onSearch(): List<Receipt> {
-    val filter = _uiState.value.searchQuery.trim()
-    return _uiState.value.allReceipts.filter { receipt ->
-      receipt.title.contains(filter, ignoreCase = true) ||
-          receipt.description.contains(filter, ignoreCase = true)
-    }
-  }
-
-  /** Set the search query when changed in the search bar */
-  fun setSearchQuery(query: String) {
-    _uiState.value =
-        ReceiptUIState(
-            userReceipts = _uiState.value.userReceipts,
-            allReceipts = _uiState.value.allReceipts,
-            searchQuery = query)
+  /**
+   * Filter the list of receipts when the user uses the search bar.
+   *
+   * @param searchQuery: Search query in the search bar
+   */
+  fun onSearch(searchQuery: String) {
+    _uiState.value = _uiState.value.copy(searchQuery = searchQuery)
+    updateUserReceipts()
+    updateAllReceipts()
   }
 
   fun onReceiptClick(receipt: Receipt) {
@@ -109,5 +106,5 @@ class ReceiptListViewModel(
 data class ReceiptUIState(
     val userReceipts: List<Receipt> = listOf(),
     val allReceipts: List<Receipt> = listOf(),
-    val searchQuery: String = "",
+    val searchQuery: String = ""
 )
