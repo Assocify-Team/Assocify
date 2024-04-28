@@ -6,6 +6,9 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.profile.notifications.profileNotificationsGraph
+import com.github.se.assocify.ui.screens.profile.securityPrivacy.profileSecurityPrivacyGraph
+import com.github.se.assocify.ui.screens.profile.theme.profileThemeGraph
 
 fun NavGraphBuilder.profileGraph(
     navigationActions: NavigationActions,
@@ -17,4 +20,8 @@ fun NavGraphBuilder.profileGraph(
   ) {
     ProfileScreen(navigationActions, ProfileViewModel(associationAPI, userAPI))
   }
+
+  profileNotificationsGraph(navigationActions)
+  profileSecurityPrivacyGraph(navigationActions)
+  profileThemeGraph(navigationActions)
 }

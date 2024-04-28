@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.navigation.Destination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -135,6 +136,14 @@ enum class MySettings {
       Theme -> Icons.Default.LightMode
       Privacy -> Icons.Default.Lock
       Notifications -> Icons.Default.Notifications
+    }
+  }
+
+  fun getDestination(): Destination {
+    return when (this) {
+      Theme -> Destination.ProfileTheme
+      Privacy -> Destination.ProfileSecurityPrivacy
+      Notifications -> Destination.ProfileNotifications
     }
   }
 }
