@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.event.map
+package com.github.se.assocify.ui.screens.event.maptab
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
