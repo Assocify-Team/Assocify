@@ -103,6 +103,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun editTask(
+      uid: String,
       title: String,
       description: String,
       isCompleted: Boolean,
@@ -115,16 +116,17 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
   ) {
     scope.launch {
       try {
-        db.from("task")
-            .update({
-              SupabaseTask::title setTo title
-              SupabaseTask::description setTo description
-              SupabaseTask::isCompleted setTo isCompleted
-              SupabaseTask::startTime setTo startTime.toString()
-              SupabaseTask::peopleNeeded setTo peopleNeeded
-              SupabaseTask::category setTo category
-              SupabaseTask::location setTo location
-            })
+        db.from("task").update({
+          SupabaseTask::title setTo title
+          SupabaseTask::description setTo description
+          SupabaseTask::isCompleted setTo isCompleted
+          SupabaseTask::startTime setTo startTime.toString()
+          SupabaseTask::peopleNeeded setTo peopleNeeded
+          SupabaseTask::category setTo category
+          SupabaseTask::location setTo location
+        }) {
+          filter { SupabaseTask::uid eq uid }
+        }
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
