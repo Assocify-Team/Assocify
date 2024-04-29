@@ -174,7 +174,7 @@ class TaskAPITest {
         }
     verify(timeout = 1000) { onSuccess() }
 
-    error = false
+    error = true
     taskAPI.editTask(
         uuid1.toString(),
         "newName",
