@@ -94,7 +94,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel, 
           EventTitleTopBar(navActions, viewModel)
         }
       }) {
-        if (false) {
+        if (state.value.error) {
           Column(
               modifier = Modifier.padding(it).fillMaxSize(),
               horizontalAlignment = Alignment.CenterHorizontally,
