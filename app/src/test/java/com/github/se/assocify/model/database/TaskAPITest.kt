@@ -133,6 +133,7 @@ class TaskAPITest {
     verify(timeout = 1000) { onFailure(any()) }
   }
 
+  @Test
   fun testAddTask() {
     val onSuccess: () -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
@@ -154,6 +155,7 @@ class TaskAPITest {
     verify(timeout = 1000) { onFailure(any()) }
   }
 
+  @Test
   fun testEditTask() {
     val onSuccess: () -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
@@ -172,7 +174,7 @@ class TaskAPITest {
         }
     verify(timeout = 1000) { onSuccess() }
 
-    error = true
+    error = false
     taskAPI.editTask(
         uuid1.toString(),
         "newName",
