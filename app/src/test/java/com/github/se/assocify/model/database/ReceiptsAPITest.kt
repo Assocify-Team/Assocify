@@ -1,26 +1,31 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
-import android.util.Log
+import com.github.se.assocify.BuildConfig
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Phase
 import com.github.se.assocify.model.entities.Receipt
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
+import com.github.se.assocify.model.entities.Status
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.resumable.MemoryResumableCache
+import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.spyk
 import io.mockk.verify
 import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail
 import org.junit.Before
@@ -31,223 +36,194 @@ import org.junit.Test
 class ReceiptsAPITest {
   @get:Rule val mockkRule = MockKRule(this)
 
-  @MockK lateinit var storage: FirebaseStorage
-
-  @MockK lateinit var storageReference: StorageReference
-
-  @MockK lateinit var firestore: FirebaseFirestore
-
-  @MockK lateinit var collectionReference: CollectionReference
-
   private lateinit var api: ReceiptAPI
+  private var error = false
+  private var response = ""
 
-  private val successfulReceipt =
+  private val uriMock = mockk<Uri>()
+
+  private val remoteReceipt =
       Receipt(
-          uid = "successful_rid",
+          uid = "00000000-ABCD-0000-0000-000000000000",
           date = LocalDate.EPOCH,
-          incoming = false,
-          cents = 100,
-          phase = Phase.Approved,
+          cents = -100,
+          status = Status.Pending,
           title = "title",
           description = "notes",
-          photo = MaybeRemotePhoto.Remote("path"))
+          photo = MaybeRemotePhoto.Remote("00000000-ABCD-0000-0000-000000000000"))
 
-  private val failingReceipt =
+  private val localReceipt =
       Receipt(
-          uid = "failing_rid",
+          uid = "00000000-ABCD-0000-0000-000000000001",
           date = LocalDate.EPOCH,
-          incoming = false,
-          cents = 100,
-          phase = Phase.Approved,
+          cents = -100,
+          status = Status.Approved,
           title = "title",
           description = "notes",
-          photo = MaybeRemotePhoto.LocalFile("path"))
+          photo = MaybeRemotePhoto.LocalFile(uriMock))
 
+  private val remoteJson =
+      """
+      {
+        "uid": "${remoteReceipt.uid}",
+        "date": "1970-01-01",
+        "cents": -100,
+        "receipt_status": {
+            "status": "unapproved"
+        },
+        "title": "title",
+        "description": "notes",
+        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
+      }
+    """
+          .trimIndent()
+
+  private val localJson =
+      """
+      {
+        "uid": "${localReceipt.uid}",
+        "date": "1970-01-01",
+        "cents": -100,
+        "receipt_status": {
+            "status": "approved"
+        },
+        "title": "title",
+        "description": "notes",
+        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
+      }
+    """
+          .trimIndent()
+
+  private val receivedList =
+      listOf(remoteReceipt, localReceipt.copy(photo = MaybeRemotePhoto.Remote(localReceipt.uid)))
+
+  private val receivedListJson = "[$remoteJson, $localJson]"
+
+  @OptIn(SupabaseInternal::class, ExperimentalCoroutinesApi::class)
   @Before
   fun setUp() {
-
-    every { storage.getReference("uid/receipts") }.returns(storageReference)
-    every { firestore.collection("aid/receipts/uid/list") }.returns(collectionReference)
-
-    every { collectionReference.document("successful_rid").set(any()) }
-        .answers { APITestUtils.mockSuccessfulTask<Void>() }
-
-    every { collectionReference.document("failing_rid").set(any()) }
-        .answers { APITestUtils.mockFailingTask<Void>() }
+    Dispatchers.setMain(UnconfinedTestDispatcher())
 
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
 
-    // Temporary workaround
-    mockkStatic(Log::class)
-    every { Log.w(any(), any<String>()) }.returns(0)
+    // Workaround for supabase internals that create a class unsupported on Linux.
+    mockkStatic(::createDefaultResumableCache)
+    every { createDefaultResumableCache() } returns MemoryResumableCache()
 
-    api = spyk<ReceiptAPI>(ReceiptAPI("uid", "aid", storage, firestore), recordPrivateCalls = true)
-
-    every { api["parseReceiptList"](any<QuerySnapshot>()) } returns
-        listOf(successfulReceipt, failingReceipt)
+    CurrentUser.userUid = "2c256037-ad67-4185-991a-1a2b9bb1f9b3"
+    CurrentUser.associationUid = "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
+    api =
+        ReceiptAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+              install(Storage)
+              httpEngine = MockEngine {
+                if (!error) {
+                  respond(response)
+                } else {
+                  respondBadRequest()
+                }
+              }
+            })
   }
 
   @Test
   fun uploadReceipt() {
-    every { storageReference.child("successful_rid") }.returns(storageReference)
-
-    every { storageReference.putFile(any()) }.returns(APITestUtils.mockSuccessfulTaskAdvanced())
-
     val successMock = mockk<() -> Unit>(relaxed = true)
     api.uploadReceipt(
-        successfulReceipt, { assertFalse(it) }, successMock, { _, _ -> fail("Should not fail") })
+        remoteReceipt,
+        { assertFalse(it) },
+        successMock,
+        { _, e -> fail("Should not fail, failed with $e") })
+    error = false
+    verify(timeout = 1000) { successMock() }
 
-    verify { successMock.invoke() }
-
-    every { storageReference.child("failing_rid") }.returns(storageReference)
-
-    every { storageReference.putFile(any()) }.returns(APITestUtils.mockFailingTaskAdvanced())
-
+    error = true
     val failureMock = mockk<(Boolean, Exception) -> Unit>(relaxed = true)
     api.uploadReceipt(
-        failingReceipt,
+        localReceipt,
         { fail("Should not succeed (image)") },
         { fail("Should not succeed (receipt)") },
         failureMock)
 
-    verify { failureMock.invoke(true, any()) }
+    verify(timeout = 1000) {
+      failureMock(true, any())
+      failureMock(false, any())
+    }
   }
 
   @Test
   fun getUserReceipts() {
-    every { collectionReference.get() }
-        .returns(APITestUtils.mockSuccessfulTask<QuerySnapshot>(mockk()))
-
     val successMock = mockk<(List<Receipt>) -> Unit>(relaxed = true)
-    api.getUserReceipts(successMock, { fail("Should not fail") })
 
-    verify { successMock.invoke(listOf(successfulReceipt, failingReceipt)) }
+    response = receivedListJson
 
-    every { collectionReference.get() }.returns(APITestUtils.mockFailingTaskAdvanced())
+    api.getUserReceipts(successMock, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { successMock(receivedList) }
+
+    error = true
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getUserReceipts({ fail("Should not succeed") }, failureMock)
 
-    verify { failureMock.invoke(any()) }
+    verify(timeout = 1000) { failureMock.invoke(any()) }
   }
 
   @Test
   fun getReceipt() {
-    // Horribly cursed hack to avoid having to mock a call to toObject with a private type
-    val documentReference = mockk<DocumentReference> { every { id } returns "successful_rid" }
-
-    val documentSnapshot =
-        spyk<DocumentSnapshot>(
-            objToCopy = mockk(),
-        )
-    every { documentSnapshot.reference } returns documentReference
-    every { documentSnapshot.getData(any()) } answers
-        {
-          mapOf(
-              "payer" to "payer",
-              "date" to "1970-01-01",
-              "incoming" to false,
-              "cents" to 100,
-              "phase" to 1,
-              "title" to "title",
-              "description" to "notes",
-              "photo" to "path",
-          )
-        }
-
-    every { collectionReference.document("successful_rid").get() } returns
-        APITestUtils.mockSuccessfulTask(documentSnapshot)
-
     val successMock = mockk<(Receipt) -> Unit>(relaxed = true)
-    api.getReceipt("successful_rid", successMock, { fail("Should not fail") })
 
-    verify { successMock.invoke(successfulReceipt) }
+    response = remoteJson
 
-    every { collectionReference.document("failing_rid").get() } returns
-        APITestUtils.mockFailingTask()
+    api.getReceipt("successful_rid", successMock, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { successMock(remoteReceipt) }
+
+    error = true
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
 
-    verify { failureMock.invoke(any()) }
+    verify(timeout = 1000) { failureMock.invoke(any()) }
   }
 
   @Test
   fun getAllReceipts() {
-    val collectionQuerySnapshot = mockk<QuerySnapshot>()
-    val userADocumentSnapshot = mockk<DocumentSnapshot>()
-    val userBDocumentSnapshot = mockk<DocumentSnapshot>()
-    val userAQuerySnapshot = mockk<QuerySnapshot>()
-    val userBQuerySnapshot = mockk<QuerySnapshot>()
-
-    every { collectionQuerySnapshot.documents } returns
-        listOf(userADocumentSnapshot, userBDocumentSnapshot)
-
-    every { userADocumentSnapshot.reference.collection("list").get() } returns
-        APITestUtils.mockSuccessfulTask(userAQuerySnapshot)
-
-    every { userBDocumentSnapshot.reference.collection("list").get() } returns
-        APITestUtils.mockSuccessfulTask(userBQuerySnapshot)
-
-    every { userADocumentSnapshot.id } returns "userA"
-
-    every { userBDocumentSnapshot.id } returns "userB"
-
-    every { firestore.collection("aid/receipts").get() } returns
-        APITestUtils.mockSuccessfulTask(collectionQuerySnapshot)
-
-    every { api["parseReceiptList"](userAQuerySnapshot) } returns
-        listOf(successfulReceipt, failingReceipt)
-
-    every { api["parseReceiptList"](userBQuerySnapshot) } returns listOf(failingReceipt)
-
     val successMock = mockk<(List<Receipt>) -> Unit>(relaxed = true)
 
-    api.getAllReceipts(successMock, { _, _ -> fail("Should not fail") })
+    response = receivedListJson
 
-    verify {
-      successMock.invoke(listOf(successfulReceipt, failingReceipt))
-      successMock.invoke(listOf(failingReceipt))
-    }
+    api.getAllReceipts(successMock, { fail("Should not fail, failed with $it") })
 
-    every { userADocumentSnapshot.reference.collection("list").get() } returns
-        APITestUtils.mockFailingTask()
+    verify(timeout = 1000) { successMock(receivedList) }
 
-    every { userBDocumentSnapshot.reference.collection("list").get() } returns
-        APITestUtils.mockFailingTask()
+    error = true
 
-    val failureMock = mockk<(String?, Exception) -> Unit>(relaxed = true)
+    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getAllReceipts({ fail("Should not succeed") }, failureMock)
 
-    verify {
-      failureMock.invoke("userA", any())
-      failureMock.invoke("userB", any())
-    }
-
-    every { firestore.collection("aid/receipts").get() } returns APITestUtils.mockFailingTask()
-
-    api.getAllReceipts({ fail("Should not succeed") }, failureMock)
-
-    verify { failureMock.invoke(null, any()) }
+    verify(timeout = 1000) { failureMock(any()) }
   }
 
   @Test
   fun deleteReceipt() {
-    every { collectionReference.document("successful_rid").delete() }
-        .returns(APITestUtils.mockSuccessfulTask())
-
     val successMock = mockk<() -> Unit>(relaxed = true)
-    api.deleteReceipt("successful_rid", successMock, { fail("Should not fail") })
+    api.deleteReceipt(
+        "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        successMock,
+        { fail("Should not fail, failed with $it") })
 
-    verify { successMock.invoke() }
+    verify(timeout = 1000) { successMock() }
 
-    every { collectionReference.document("failing_rid").delete() }
-        .returns(APITestUtils.mockFailingTask())
+    error = true
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.deleteReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
 
-    verify { failureMock.invoke(any()) }
+    verify(timeout = 1000) { failureMock(any()) }
   }
 }

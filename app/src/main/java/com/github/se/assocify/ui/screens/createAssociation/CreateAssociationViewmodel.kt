@@ -8,7 +8,7 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -157,11 +157,14 @@ class CreateAssociationViewmodel(
    * Saves the association in the database
    */
   fun saveAsso() {
-    // create asso today
-    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    // TODO: add members to association
     val asso =
         Association(
-            assoAPI.getNewId(), _uiState.value.name, "", date, "", _uiState.value.members, listOf())
+            UUID.randomUUID().toString(),
+            _uiState.value.name,
+            "",
+            LocalDate.now(),
+        )
     assoAPI.addAssociation(
         asso,
         onSuccess = { /* navigate to home page with the new association as the current asso */},

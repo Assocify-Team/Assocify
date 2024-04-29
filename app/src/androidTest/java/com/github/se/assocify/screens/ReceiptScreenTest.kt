@@ -1,10 +1,13 @@
 package com.github.se.assocify.screens
 
+import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
@@ -12,18 +15,21 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
-import com.github.se.assocify.model.entities.Phase
+import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptScreen
-import com.github.se.assocify.ui.screens.treasury.receipt.ReceiptViewModel
+import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.ReceiptScreen
+import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.ReceiptViewModel
 import com.github.se.assocify.ui.util.DateUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,37 +39,41 @@ import org.junit.runner.RunWith
 class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
+  private var testUri = Uri.parse("content://test")
+
   private var capturedReceipt: Receipt? = null
   private var expectedReceipt =
       Receipt(
-          uid = "testReceipt",
+          uid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
           title = "Test Title",
           description = "",
-          cents = 10000,
+          cents = -10000,
           date = DateUtil.toDate("01/01/2021")!!,
-          incoming = false,
-          phase = Phase.Unapproved,
-          photo = null,
+          status = Status.Pending,
+          photo = MaybeRemotePhoto.LocalFile(testUri),
       )
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
   private val receiptAPI =
-      mockk<ReceiptAPI>() {
+      mockk<ReceiptAPI> {
         every { uploadReceipt(any(), any(), any(), any()) } answers
             {
               capturedReceipt = firstArg<Receipt>()
-              println("capturedReceiptRightNow: $capturedReceipt")
-              navActions.back()
             }
-        every { getNewId() } returns "testReceipt"
         every { deleteReceipt(any(), any(), any()) } answers {}
       }
+
+  init {
+    mockkStatic(UUID::class)
+    every { UUID.randomUUID() } returns UUID.fromString("08a11dc8-975c-4da1-93a6-865c20c7adec")
+  }
+
   private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptAPI)
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
-    CurrentUser.associationUid = "testUser"
+    CurrentUser.associationUid = "testAssociation"
     composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel = viewModel) }
   }
 
@@ -75,6 +85,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("backButton").assertIsDisplayed()
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("titleField").assertIsDisplayed()
+      onNodeWithTag("statusDropdownChip").assertIsDisplayed()
       onNodeWithTag("descriptionField").assertIsDisplayed()
       onNodeWithTag("amountField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
@@ -173,8 +184,14 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       assert(viewModel.uiState.value.dateError == null)
 
       onNodeWithTag("saveButton").performScrollTo().performClick()
-      verify { receiptAPI.uploadReceipt(any(), any(), any(), any()) }
-      assert(capturedReceipt == expectedReceipt)
+      onNodeWithText("Receipt image is required", true).assertIsDisplayed()
+
+      viewModel.setImage(testUri)
+      assert(viewModel.uiState.value.receiptImageURI != null)
+
+      // Since we already tested that the saveButton triggers stuff (see above), this is fine.
+      viewModel.saveReceipt()
+      verify { receiptAPI.uploadReceipt(expectedReceipt, any(), any(), any()) }
     }
   }
 
@@ -204,62 +221,92 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("dateField").assertTextContains("Date cannot be empty")
     }
   }
+
+  @Test
+  fun cameraPermission() {
+    with(composeTestRule) {
+      viewModel.signalCameraPermissionDenied()
+      onNodeWithText("Camera permission denied", true).assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun photoSheet() {
+    with(composeTestRule) {
+      onNodeWithTag("editImageButton").performScrollTo().performClick()
+      onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
+      viewModel.hideBottomSheet()
+      onNodeWithTag("photoSelectionSheet").assertDoesNotExist()
+    }
+  }
+
+  @Test
+  fun status() {
+    with(composeTestRule) {
+      onNodeWithTag("statusChip").assertTextContains("Pending")
+      onNodeWithTag("statusChip").performScrollTo().performClick()
+      onNodeWithText("Approved", true).assertIsDisplayed()
+      onNodeWithText("Reimbursed", true).assertIsDisplayed()
+      onNodeWithText("Reimbursed", true).performClick()
+      onNodeWithTag("statusChip").assertTextContains("Reimbursed")
+      onNodeWithText("Approved", true).assertIsNotDisplayed()
+      onNodeWithText("Pending", true).assertIsNotDisplayed()
+    }
+  }
 }
 
 @RunWith(AndroidJUnit4::class)
 class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private var receiptList =
-      listOf(
-          Receipt(
-              uid = "testReceipt",
-              title = "Edited Receipt",
-              description = "",
-              cents = 10000,
-              date = DateUtil.toDate("01/01/2021")!!,
-              incoming = false,
-              phase = Phase.Unapproved,
-              photo = null,
-          ))
+  private var testUri = Uri.parse("content://test")
 
   private var expectedReceipt =
       Receipt(
-          uid = "testReceipt",
-          title = "Test Title",
+          uid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
+          title = "Edited Receipt",
           description = "",
-          cents = 10000,
+          cents = -10000,
           date = DateUtil.toDate("01/01/2021")!!,
-          incoming = false,
-          phase = Phase.Unapproved,
+          status = Status.Pending,
           photo = null,
       )
+
+  private var receiptList = listOf(expectedReceipt)
+
   private var capturedReceipt: Receipt? = null
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
   private val receiptsAPI =
       mockk<ReceiptAPI> {
-        every { uploadReceipt(any(), any(), any(), any()) } answers
-            {
-              capturedReceipt = firstArg()
-              navActions.back()
-            }
+        every { uploadReceipt(any(), any(), any(), any()) } answers { capturedReceipt = firstArg() }
         every { getUserReceipts(any(), any()) } answers
             {
               firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
-              navActions.back()
             }
-        every { getNewId() } answers { "testReceipt" }
       }
+
+  init {
+    mockkStatic(UUID::class)
+    every { UUID.randomUUID() } returns UUID.fromString("08a11dc8-975c-4da1-93a6-865c20c7adec")
+  }
+
   private val viewModel =
       ReceiptViewModel(
-          receiptUid = "testReceipt", navActions = navActions, receiptApi = receiptsAPI)
+          receiptUid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
+          navActions = navActions,
+          receiptApi = receiptsAPI)
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testUser"
-    composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel = viewModel) }
+    composeTestRule.setContent {
+      ReceiptScreen(
+          receiptUid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
+          navActions = navActions,
+          viewModel = viewModel)
+    }
   }
 
   @Test
@@ -271,6 +318,13 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       onNodeWithTag("titleField").assertTextContains("Edited Receipt")
       onNodeWithTag("amountField").assertTextContains("100.00")
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
+
+      viewModel.setImage(testUri)
+      assert(viewModel.uiState.value.receiptImageURI != null)
+
+      onNodeWithTag("saveButton").performScrollTo().performClick()
+      assert(capturedReceipt?.title == expectedReceipt.title)
+      assert(capturedReceipt?.cents == expectedReceipt.cents)
     }
   }
 }

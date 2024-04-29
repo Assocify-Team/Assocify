@@ -30,6 +30,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.verify
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -76,14 +77,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @RelaxedMockK lateinit var mockUserAPI: UserAPI
 
   val testAssociation =
-      Association(
-          "testAssociation",
-          "an association to test the viewModel",
-          "a",
-          "b",
-          "c",
-          emptyList(),
-          emptyList())
+      Association("testAssociation", "an association to test the viewModel", "a", LocalDate.EPOCH)
 
   @Before
   fun setup() {
@@ -137,7 +131,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     // Check if the organizations are displayed
     val organizations = listOf(testAssociation)
     organizations.forEach { organization ->
-      composeTestRule.onNodeWithText(organization.getName()).assertIsDisplayed()
+      composeTestRule.onNodeWithText(organization.name).assertIsDisplayed()
     }
   }
 

@@ -16,6 +16,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respondBadRequest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,8 +30,13 @@ fun LoginApp() {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController)
   val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+  val supabaseClient: SupabaseClient =
+      createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+        install(Postgrest)
+        httpEngine = MockEngine { respondBadRequest() }
+      }
   val userAPI = UserAPI(db)
-  val associationAPI = AssociationAPI(db)
+  val associationAPI = AssociationAPI(supabaseClient)
   NavHost(navController = navController, startDestination = Destination.Login.route) {
     loginGraph(navigationActions = navActions, userAPI = userAPI, associationAPI = associationAPI)
   }

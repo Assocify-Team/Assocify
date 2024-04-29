@@ -21,6 +21,12 @@ sealed class Destination(
   data object Profile :
       Destination("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
 
+  data object ProfileNotifications : Destination("profile/notifications")
+
+  data object ProfileSecurityPrivacy : Destination("profile/securityPrivacy")
+
+  data object ProfileTheme : Destination("profile/theme")
+
   data object Login : Destination("login/authentication")
 
   data object SelectAsso : Destination("login/selectAsso")
@@ -30,6 +36,16 @@ sealed class Destination(
   data object NewReceipt : Destination("treasury/receipt")
 
   data class EditReceipt(val receiptUid: String) : Destination("treasury/receipt/$receiptUid")
+
+  data class BudgetDetailed(val subCategoryUid: String) :
+      Destination("treasury/budget/$subCategoryUid")
+
+  data class BalanceDetailed(val subCategoryUid: String) :
+      Destination("treasury/balance/$subCategoryUid")
+
+  data object NewTask : Destination("event/task")
+
+  data class EditTask(val taskUid: String) : Destination("event/task/$taskUid")
 }
 
 val MAIN_TABS_LIST =
