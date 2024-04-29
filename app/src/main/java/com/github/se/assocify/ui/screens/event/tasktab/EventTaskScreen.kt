@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.event.task
+package com.github.se.assocify.ui.screens.event.tasktab
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +12,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.event.task.EventTaskViewModel
+import com.github.se.assocify.ui.util.DateUtil
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
@@ -26,7 +28,7 @@ fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: Navigati
       item {
         ListItem(
             modifier = Modifier.clickable { navActions.navigateTo(Destination.EditTask(it.uid)) },
-            headlineContent = { Text(it.name) },
+            headlineContent = { Text(it.title) },
             supportingContent = { Text(it.category) },
             trailingContent = {
               Checkbox(
@@ -34,7 +36,7 @@ fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: Navigati
                   onCheckedChange = { /*TODO what happens if the checkbox is clicked*/},
               )
             },
-            overlineContent = { Text(it.startTime) })
+            overlineContent = { Text(DateUtil.toString(it.startTime)) })
         HorizontalDivider()
       }
     }
