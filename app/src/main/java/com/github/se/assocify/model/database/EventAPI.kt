@@ -9,6 +9,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.sql.Timestamp
+import java.time.OffsetDateTime
+import java.util.UUID
 
 class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
 
@@ -43,8 +46,8 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val events = postgrest.from(collectionName).select().decodeList<Event>()
-        onSuccess(events)
+        val events = postgrest.from(collectionName).select().decodeList<SupabaseEvent>()
+        onSuccess(events.map { it.toEvent() })
       } catch (e: Exception) {
         onFailure(e)
       }
@@ -82,9 +85,49 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun updateEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
+    updateEvent(uid = event.uid,
+      name = event.name,
+      description = event.description,
+      startDate = event.startDate,
+      endDate = event.endDate,
+      guestsOrArtists = event.guestsOrArtists,
+      location = event.location,
+      onSuccess = onSuccess,
+      onFailure = onFailure
+    )
+  }
+
+  /**
+   * Updates an event in the database
+   *
+   * @param uid the id of the event to update
+   * @param name the name of the event
+   * @param description the description of the event
+   * @param startDate the start date of the event
+   * @param endDate the end date of the event
+   * @param guestsOrArtists the guests or artists of the event
+   * @param location the location of the event
+   * @param onSuccess called on success (by default does nothing)
+   * @param onFailure called on failure
+   */
+  fun updateEvent(uid: String,
+                  name: String,
+                  description: String,
+                  startDate: OffsetDateTime,
+                  endDate: OffsetDateTime,
+                  guestsOrArtists: String,
+                  location: String,
+                  onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit){
     scope.launch {
       try {
-        postgrest.from(collectionName).update(event) { filter { Event::uid eq event.uid } }
+        postgrest.from(collectionName).update({
+          SupabaseEvent::name setTo name
+          SupabaseEvent::description setTo description
+          SupabaseEvent::startDate setTo startDate.toString()
+          SupabaseEvent::endDate setTo endDate.toString()
+          SupabaseEvent::guestsOrArtists setTo guestsOrArtists
+          SupabaseEvent::location setTo location
+        }) { filter { Event::uid eq uid } }
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
@@ -124,8 +167,8 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
         uid = uid ?: "",
         name = name,
         description = description,
-        startDate = LocalDate.parse(startDate),
-        endDate = LocalDate.parse(endDate),
+        startDate = OffsetDateTime.parse(startDate),
+        endDate = OffsetDateTime.parse(endDate),
         guestsOrArtists = guestsOrArtists,
         location = location
     )

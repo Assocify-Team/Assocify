@@ -20,6 +20,8 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @MockKExtension.ConfirmVerification
 class EventAPITest {
@@ -28,6 +30,8 @@ class EventAPITest {
 
   private var error = false
   private var response = ""
+  private var responseTime = OffsetDateTime.now().toString()
+  private var uuid1 = UUID.fromString("00000000-0000-0000-0000-000000000000")!!
 
   private lateinit var eventAPI: EventAPI
 
@@ -59,18 +63,18 @@ class EventAPITest {
     response =
         """
             {
-                "uid": "1",
+                "uid": "$uuid1",
                 "name": "Test Event",
                 "description": "Test Description",
-                "startDate": "2021-10-10T10:10:10",
-                "endDate": "2021-10-10T10:10:10",
-                "guestsOrArtists": "Test Guest",
+                "start_date": "$responseTime",
+                "end_date": "$responseTime",
+                "guest_or_artists": "Test Guest",
                 "location": "Test Location"
             }
         """
             .trimIndent()
 
-    eventAPI.getEvent("1", onSuccess, onFailure)
+    eventAPI.getEvent("$uuid1", onSuccess, onFailure)
     verify(timeout = 100) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
 
@@ -88,23 +92,23 @@ class EventAPITest {
     response =
         """
             [
-                {
-                    "uid": "1",
-                    "name": "Test Event",
-                    "description": "Test Description",
-                    "startDate": "2021-10-10T10:10:10",
-                    "endDate": "2021-10-10T10:10:10",
-                    "guestsOrArtists": "Test Guest",
-                    "location": "Test Location"
-                }, {
-                    "uid": "2",
-                    "name": "Test Event 2",
-                    "description": "Test Description 2",
-                    "startDate": "2021-10-10T10:10:10",
-                    "endDate": "2021-10-10T10:10:10",
-                    "guestsOrArtists": "Test Guest 2",
-                    "location": "Test Location 2"
-                }
+            {
+                "uid": "$uuid1",
+                "name": "Test Event",
+                "description": "Test Description",
+                "start_date": "$responseTime",
+                "end_date": "$responseTime",
+                "guest_or_artists": "Test Guest",
+                "location": "Test Location"
+            }, {
+                "uid": "$uuid1",
+                "name": "Test Event",
+                "description": "Test Description",
+                "start_date": "$responseTime",
+                "end_date": "$responseTime",
+                "guest_or_artists": "Test Guest",
+                "location": "Test Location"
+            }
                 
             ]
         """
@@ -120,19 +124,18 @@ class EventAPITest {
     error = false
 
     val onSuccess: (String) -> Unit = mockk(relaxed = true)
-    val currentTime = LocalDateTime.now()
+    val currentTime = OffsetDateTime.now()
 
-    val uid = "1"
     // need to define the response as the object serialized to make the test pass
     response =
         """
             {
-                "uid": "$uid",
+                "uid": "$uuid1",
                 "name": "Test Event",
                 "description": "Test Description",
-                "startDate": "$currentTime",
-                "endDate": "$currentTime",
-                "guestsOrArtists": "Test Guest",
+                "start_date": "$currentTime",
+                "end_date": "$currentTime",
+                "guest_or_artists": "Test Guest",
                 "location": "Test Location"
             }
         """
@@ -140,7 +143,7 @@ class EventAPITest {
 
     eventAPI.addEvent(
         Event(
-            uid = uid,
+            uid = uuid1.toString(),
             name = "Test Event",
             description = "Test Description",
             startDate = currentTime,
@@ -166,11 +169,11 @@ class EventAPITest {
 
     val onSuccess: () -> Unit = mockk(relaxed = true)
     error = false
-    val currentTime = LocalDateTime.now()
+    val currentTime = OffsetDateTime.now()
 
     eventAPI.updateEvent(
         Event(
-            uid = "1",
+            uid = "$uuid1",
             name = "Test Event",
             description = "Test Description",
             startDate = currentTime,

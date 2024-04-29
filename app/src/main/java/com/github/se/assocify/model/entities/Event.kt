@@ -3,6 +3,9 @@ package com.github.se.assocify.model.entities
 import java.util.UUID
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
+import java.sql.Timestamp
+import java.time.OffsetDateTime
+import java.time.OffsetTime
 
 /**
  * @param uid unique identifier of the event
@@ -17,8 +20,8 @@ data class Event(
     val uid: String = UUID.randomUUID().toString(),
     val name: String,
     val description: String,
-    val startDate: LocalDate,
-    val endDate: LocalDate,
+    val startDate: OffsetDateTime,
+    val endDate: OffsetDateTime,
     val guestsOrArtists: String,
     val location: String
 )
