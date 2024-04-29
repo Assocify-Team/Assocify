@@ -30,6 +30,7 @@ class TaskAPITest {
   private var response = ""
   private val uuid1: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
   private val uuid2: UUID = UUID.fromString("11111111-1111-1111-1111-111111111111")
+  private val uuid3: UUID = UUID.fromString("22222222-2222-2222-2222-222222222222")
 
   private lateinit var taskAPI: TaskAPI
 
@@ -197,6 +198,53 @@ class TaskAPITest {
 
     error = true
     taskAPI.deleteTask(uuid1.toString(), { fail("should not fail") }, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testTaskOfEvent() {
+    val onSuccess: (List<Task>) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    // Test success
+    error = false
+    response =
+        """
+        [
+          {
+            "uid": "$uuid1",
+            "title": "testName",
+            "description": "description",
+            "is_completed": false,
+            "start_time": "2021-10-10",
+            "people_needed": 0,
+            "category": "Committee",
+            "location": "Here",
+            "event_id": "eventUid"
+          },
+          {
+            "uid": "$uuid2",
+            "title": "testName2",
+            "description": "description2",
+            "is_completed": false,
+            "start_time": "2022-10-10",
+            "people_needed": 2,
+            "category": "Committee2",
+            "location": "Here2",
+            "event_id": "eventUid2"
+          }
+        ]
+    """
+            .trimIndent()
+
+    taskAPI.getTasksOfEvent(uuid3.toString(), onSuccess, onFailure)
+
+    verify(timeout = 1000) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
+
+    // Test failure
+    error = true
+    taskAPI.getTasksOfEvent("eventUid", { fail("should not succeed") }, onFailure)
+
     verify(timeout = 1000) { onFailure(any()) }
   }
 }
