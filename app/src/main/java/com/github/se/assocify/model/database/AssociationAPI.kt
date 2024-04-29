@@ -44,6 +44,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+
   /**
    * Gets all associations from the database
    *

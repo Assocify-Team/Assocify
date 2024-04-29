@@ -6,6 +6,9 @@ import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
 
@@ -58,8 +61,13 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getEvent(id: String, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val event = postgrest.from(collectionName).select { filter { Event::uid eq id } }
-        onSuccess(event.decodeAs())
+        val event = postgrest.from(collectionName).select {
+          filter { Event::uid eq id }
+          limit(1)
+          single()
+        }
+          .decodeAs<SupabaseEvent>()
+        onSuccess(event.toEvent())
       } catch (e: Exception) {
         onFailure(e)
       }
@@ -100,5 +108,26 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
         onFailure(e)
       }
     }
+  }
+
+  @Serializable
+  private data class SupabaseEvent(
+      val uid: String? = null,
+      val name: String,
+      val description: String,
+      @SerialName("start_date") val startDate: String,
+      @SerialName("end_date") val endDate: String,
+      @SerialName("guest_or_artists") val guestsOrArtists: String,
+      val location: String
+  ){
+    fun toEvent() = Event(
+        uid = uid ?: "",
+        name = name,
+        description = description,
+        startDate = LocalDate.parse(startDate),
+        endDate = LocalDate.parse(endDate),
+        guestsOrArtists = guestsOrArtists,
+        location = location
+    )
   }
 }
