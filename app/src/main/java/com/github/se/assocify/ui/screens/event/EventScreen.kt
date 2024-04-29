@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
@@ -44,6 +45,7 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
+import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -55,8 +57,9 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) {
+fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel, taskAPI: TaskAPI) {
   val state = viewModel.uiState.collectAsState()
+  val taskListViewModel = EventTaskViewModel(taskAPI)
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
@@ -86,12 +89,12 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
       },
       topBar = {
         if (state.value.searching) {
-          EventSearchTopBar(viewModel)
+          EventSearchTopBar(viewModel, taskListViewModel)
         } else {
           EventTitleTopBar(navActions, viewModel)
         }
       }) {
-        if (state.value.error) {
+        if (false) {
           Column(
               modifier = Modifier.padding(it).fillMaxSize(),
               horizontalAlignment = Alignment.CenterHorizontally,
@@ -142,7 +145,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
             val testTasks = listOf(t1, t2, t3)
             HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
               when (page) {
-                EventPageIndex.TASKS.index -> EventTaskScreen(navActions, testTasks)
+                EventPageIndex.TASKS.index -> EventTaskScreen(taskListViewModel, navActions)
                 EventPageIndex.MAP.index -> EventMapScreen()
                 EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
               }
@@ -195,7 +198,7 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventSearchTopBar(viewModel: EventScreenViewModel) {
+fun EventSearchTopBar(viewModel: EventScreenViewModel, taskViewModel: EventTaskViewModel) {
   val state = viewModel.uiState.collectAsState()
   SearchBar(
       modifier = Modifier.padding(8.dp).testTag("searchBar").fillMaxWidth(),
@@ -216,7 +219,7 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
                 Modifier.clickable {
                   when (state.value.currentTab) {
                     EventPageIndex.TASKS -> {
-                      /*TODO: implement for tasks screen*/
+                      taskViewModel.updateEvents(state.value.selectedEvents)
                     }
                     EventPageIndex.MAP -> {
                       /*TODO: implement for map screen*/
@@ -233,7 +236,6 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
 
 @Composable
 fun EventFilterBar(viewModel: EventScreenViewModel) {
-
   LazyRow() {
     item {
       val state = viewModel.uiState.collectAsState()

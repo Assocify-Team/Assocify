@@ -12,13 +12,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.event.task.EventTaskViewModel
 import com.github.se.assocify.ui.util.DateUtil
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
  *
- * @param tasks List of tasks to be displayed.
+ * @param eventTaskViewModel the view model that holds the tasks
+ * @param navActions the navigation actions to navigate to other screens
  */
 @Composable
 fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: NavigationActions) {
@@ -33,7 +33,7 @@ fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: Navigati
             trailingContent = {
               Checkbox(
                   checked = it.isCompleted,
-                  onCheckedChange = { /*TODO what happens if the checkbox is clicked*/},
+                  onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
               )
             },
             overlineContent = { Text(DateUtil.toString(it.startTime)) })
