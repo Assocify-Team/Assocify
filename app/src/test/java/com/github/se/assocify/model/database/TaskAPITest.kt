@@ -11,6 +11,7 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,7 +20,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 
 @MockKExtension.ConfirmVerification
 class TaskAPITest {
@@ -27,7 +27,7 @@ class TaskAPITest {
 
   private var error = false
   private var response = ""
-  private val uuid1:UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+  private val uuid1: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 
   private lateinit var taskAPI: TaskAPI
 
@@ -49,13 +49,14 @@ class TaskAPITest {
             })
   }
 
-
-  @Test fun testGetTask() {
+  @Test
+  fun testGetTask() {
     val onSuccess: (Task) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
     error = false
-    response = """  
+    response =
+        """  
         {
           "uid": "$uuid1"
           "title": "testName",
@@ -67,7 +68,8 @@ class TaskAPITest {
           "location": "Here",
           "event_id": "eventUid"
         }
-    """.trimIndent()
+    """
+            .trimIndent()
 
     taskAPI.getTask(uuid1.toString(), onSuccess, onFailure)
 
@@ -79,7 +81,6 @@ class TaskAPITest {
     taskAPI.getTask("testUid", { fail("should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
-
   }
 
   @Test fun testGetAssociation() {}
