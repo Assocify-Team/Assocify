@@ -196,7 +196,7 @@ class TaskAPITest {
     verify(timeout = 1000) { onSuccess() }
 
     error = true
-    taskAPI.deleteTask(uuid1.toString(), onSuccess) { fail("should not fail") }
+    taskAPI.deleteTask(uuid1.toString(), { fail("should not fail") }, onFailure)
     verify(timeout = 1000) { onFailure(any()) }
   }
 }
