@@ -1,8 +1,7 @@
 package com.github.se.assocify.model.entities
 
-import com.github.se.assocify.model.serializer.DateTimeSerializer
-import java.time.LocalDateTime
 import java.util.UUID
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
 /**
@@ -14,13 +13,12 @@ import kotlinx.serialization.Serializable
  * @param guestsOrArtists guests or artists of the event
  * @param location location of the event
  */
-@Serializable
 data class Event(
     val uid: String = UUID.randomUUID().toString(),
     val name: String,
     val description: String,
-    @Serializable(with = DateTimeSerializer::class) val startDate: LocalDateTime,
-    @Serializable(with = DateTimeSerializer::class) val endDate: LocalDateTime,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
     val guestsOrArtists: String,
     val location: String
 )
