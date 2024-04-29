@@ -45,7 +45,6 @@ class BalanceDetailedScreenTest :
           "url",
           LocalDate.now(),
           100,
-          true,
           Status.Pending,
           MaybeRemotePhoto.Remote("path"))
   val balanceItems =
