@@ -17,20 +17,20 @@ import com.github.se.assocify.navigation.NavigationActions
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileMembersScreen(navActions: NavigationActions) {
-    Scaffold(
-        modifier = Modifier.testTag("Members Screen"),
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Members Management") },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Arrow Back")
-                    }
-                })
-        }) {
+  Scaffold(
+      modifier = Modifier.testTag("Members Screen"),
+      topBar = {
+        CenterAlignedTopAppBar(
+            title = { Text("Members Management") },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Arrow Back")
+                  }
+            })
+      }) {
         Text(modifier = Modifier.padding(it), text = "Members Screen : not yet implemented")
-    }
+      }
 }

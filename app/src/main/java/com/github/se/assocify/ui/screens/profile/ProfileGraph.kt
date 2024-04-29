@@ -26,6 +26,6 @@ fun NavGraphBuilder.profileGraph(
   profileNotificationsGraph(navigationActions)
   profileSecurityPrivacyGraph(navigationActions)
   profileThemeGraph(navigationActions)
-    profileRolesGraph(navigationActions)
-    profileMembersGraph(navigationActions)
+  profileRolesGraph(navigationActions)
+  profileMembersGraph(navigationActions)
 }

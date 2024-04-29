@@ -252,7 +252,10 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                           colors =
                               ListItemDefaults.colors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer),
-                          modifier = Modifier.testTag(setting.name))
+                          modifier =
+                              Modifier.testTag(setting.name).clickable {
+                                navActions.navigateTo(setting.getDestination())
+                              })
                     }
                   }
 

@@ -27,9 +27,9 @@ sealed class Destination(
 
   data object ProfileTheme : Destination("profile/theme")
 
-    data object ProfileMembers : Destination("profile/members")
+  data object ProfileMembers : Destination("profile/members")
 
-    data object ProfileRoles : Destination("profile/roles")
+  data object ProfileRoles : Destination("profile/roles")
 
   data object Login : Destination("login/authentication")
 
