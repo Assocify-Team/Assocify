@@ -21,8 +21,10 @@ class EventScreenViewModel(private var db: EventAPI) : ViewModel() {
           updateFilteredEvents(events)
           _uiState.value = _uiState.value.copy(events = events)
         },
-        { _uiState.value = _uiState.value.copy(error = true)
-        _uiState.value = _uiState.value.copy(errorText = it.message ?: "An error occurred")})
+        {
+          _uiState.value = _uiState.value.copy(error = true)
+          _uiState.value = _uiState.value.copy(errorText = it.message ?: "An error occurred")
+        })
   }
 
   private fun updateFilteredEvents(events: List<Event>) {

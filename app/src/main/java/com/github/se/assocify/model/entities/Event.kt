@@ -1,11 +1,7 @@
 package com.github.se.assocify.model.entities
 
-import java.util.UUID
-import kotlinx.datetime.LocalDate
-import kotlinx.serialization.Serializable
-import java.sql.Timestamp
 import java.time.OffsetDateTime
-import java.time.OffsetTime
+import java.util.UUID
 
 /**
  * @param uid unique identifier of the event

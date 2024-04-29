@@ -3,15 +3,12 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
+import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.sql.Timestamp
-import java.time.OffsetDateTime
-import java.util.UUID
 
 class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
 
@@ -29,7 +26,20 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun addEvent(event: Event, onSuccess: (String) -> Unit = {}, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val resp = postgrest.from(collectionName).insert(event).decodeAs<Event>().uid
+        val resp =
+            postgrest
+                .from(collectionName)
+                .insert(
+                    SupabaseEvent(
+                        uid = event.uid,
+                        name = event.name,
+                        description = event.description,
+                        startDate = event.startDate.toString(),
+                        endDate = event.endDate.toString(),
+                        guestsOrArtists = event.guestsOrArtists,
+                        location = event.location))
+                .decodeAs<SupabaseEvent>()
+                .uid
         onSuccess(resp)
       } catch (e: Exception) {
         onFailure(e)
@@ -64,12 +74,15 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getEvent(id: String, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val event = postgrest.from(collectionName).select {
-          filter { Event::uid eq id }
-          limit(1)
-          single()
-        }
-          .decodeAs<SupabaseEvent>()
+        val event =
+            postgrest
+                .from(collectionName)
+                .select {
+                  filter { Event::uid eq id }
+                  limit(1)
+                  single()
+                }
+                .decodeAs<SupabaseEvent>()
         onSuccess(event.toEvent())
       } catch (e: Exception) {
         onFailure(e)
@@ -85,16 +98,16 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun updateEvent(event: Event, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
-    updateEvent(uid = event.uid,
-      name = event.name,
-      description = event.description,
-      startDate = event.startDate,
-      endDate = event.endDate,
-      guestsOrArtists = event.guestsOrArtists,
-      location = event.location,
-      onSuccess = onSuccess,
-      onFailure = onFailure
-    )
+    updateEvent(
+        uid = event.uid,
+        name = event.name,
+        description = event.description,
+        startDate = event.startDate,
+        endDate = event.endDate,
+        guestsOrArtists = event.guestsOrArtists,
+        location = event.location,
+        onSuccess = onSuccess,
+        onFailure = onFailure)
   }
 
   /**
@@ -110,14 +123,17 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onSuccess called on success (by default does nothing)
    * @param onFailure called on failure
    */
-  fun updateEvent(uid: String,
-                  name: String,
-                  description: String,
-                  startDate: OffsetDateTime,
-                  endDate: OffsetDateTime,
-                  guestsOrArtists: String,
-                  location: String,
-                  onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit){
+  fun updateEvent(
+      uid: String,
+      name: String,
+      description: String,
+      startDate: OffsetDateTime,
+      endDate: OffsetDateTime,
+      guestsOrArtists: String,
+      location: String,
+      onSuccess: () -> Unit = {},
+      onFailure: (Exception) -> Unit
+  ) {
     scope.launch {
       try {
         postgrest.from(collectionName).update({
@@ -127,7 +143,9 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
           SupabaseEvent::endDate setTo endDate.toString()
           SupabaseEvent::guestsOrArtists setTo guestsOrArtists
           SupabaseEvent::location setTo location
-        }) { filter { Event::uid eq uid } }
+        }) {
+          filter { Event::uid eq uid }
+        }
         onSuccess()
       } catch (e: Exception) {
         onFailure(e)
@@ -155,22 +173,22 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   private data class SupabaseEvent(
-      val uid: String? = null,
+      val uid: String,
       val name: String,
       val description: String,
       @SerialName("start_date") val startDate: String,
       @SerialName("end_date") val endDate: String,
       @SerialName("guest_or_artists") val guestsOrArtists: String,
       val location: String
-  ){
-    fun toEvent() = Event(
-        uid = uid ?: "",
-        name = name,
-        description = description,
-        startDate = OffsetDateTime.parse(startDate),
-        endDate = OffsetDateTime.parse(endDate),
-        guestsOrArtists = guestsOrArtists,
-        location = location
-    )
+  ) {
+    fun toEvent() =
+        Event(
+            uid = uid ?: "",
+            name = name,
+            description = description,
+            startDate = OffsetDateTime.parse(startDate),
+            endDate = OffsetDateTime.parse(endDate),
+            guestsOrArtists = guestsOrArtists,
+            location = location)
   }
 }
