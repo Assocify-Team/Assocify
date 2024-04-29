@@ -2,9 +2,9 @@ package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.Budget
 import com.github.se.assocify.model.entities.BudgetItem
-import com.github.se.assocify.model.interfaces.BudgetAPIInterfaces
+import com.github.se.assocify.model.interfaces.BudgetAPIInterface
 
-class BudgetAPI : BudgetAPIInterfaces {
+class BudgetAPI : BudgetAPIInterface, SupabaseApi() {
   /**
    * Get the budgets of an association
    *

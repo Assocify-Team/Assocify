@@ -4,7 +4,7 @@ import com.github.se.assocify.model.entities.Budget
 import com.github.se.assocify.model.entities.BudgetItem
 
 /** Interface for the Budget API */
-interface BudgetAPIInterfaces {
+interface BudgetAPIInterface {
   // get
   fun getBudgets(associationUID: String): List<Budget>
 
