@@ -239,9 +239,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     AssociationSettings.entries.forEach { s ->
                       ListItem(
                           leadingContent = {
-                            Icon(
-                                imageVector = s.getIcon(),
-                                contentDescription = "${s.name} icon")
+                            Icon(imageVector = s.getIcon(), contentDescription = "${s.name} icon")
                           },
                           headlineContent = { Text(text = s.name) },
                           trailingContent = {
