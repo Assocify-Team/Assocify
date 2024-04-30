@@ -24,10 +24,6 @@ class LoginViewModel(private val userAPI: UserAPI, private val navActions: Navig
             val newUser =
                 User(info.id, googleUser.displayName ?: googleUser.email!!, googleUser.email!!)
             addUser(newUser)
-            CurrentUser.user =
-                User(info.id, googleUser.displayName ?: googleUser.email!!, googleUser.email!!)
-          } else {
-            CurrentUser.user = user
           }
           navActions.onLogin(user != null)
         },

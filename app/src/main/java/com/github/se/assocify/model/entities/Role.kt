@@ -1,5 +1,8 @@
 package com.github.se.assocify.model.entities
 
+/*
+ * enumeration of all roles, sorted by importance
+ */
 enum class RoleType {
   PRESIDENCY,
   TREASURY,
@@ -10,10 +13,6 @@ enum class RoleType {
 
 data class Role(val name: String) {
   constructor() : this("")
-
-  /*
-   * enumeration of all roles, sorted by importance
-   */
 
   /**
    * Returns the role type of the role
@@ -32,4 +31,5 @@ data class Role(val name: String) {
   }
 }
 
+// A role as represented in the database.
 data class PermissionRole(val uid: String, val associationId: String, val type: RoleType)

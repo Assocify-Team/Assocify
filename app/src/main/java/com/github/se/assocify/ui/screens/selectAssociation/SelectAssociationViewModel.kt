@@ -34,7 +34,7 @@ class SelectAssociationViewModel(
   private fun updateDatabaseValues() {
     associationAPI.getAssociations(
         { assocList -> _uiState.value = _uiState.value.copy(associations = assocList) }, {})
-    _uiState.value = _uiState.value.copy(user = CurrentUser.user!!)
+    userAPI.getUser(CurrentUser.userUid!!, { _uiState.value = _uiState.value.copy(user = it) }, {})
   }
 
   /**

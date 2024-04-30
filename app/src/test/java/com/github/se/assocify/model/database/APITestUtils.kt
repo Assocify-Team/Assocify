@@ -59,6 +59,5 @@ object APITestUtils {
     Dispatchers.setMain(UnconfinedTestDispatcher())
     CurrentUser.userUid = USER.uid
     CurrentUser.associationUid = ASSOCIATION.uid
-    CurrentUser.user = USER
   }
 }

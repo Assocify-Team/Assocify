@@ -177,7 +177,9 @@ fun CreateAssociationScreen(
                             trailingContent = {
                               RadioButton(
                                   modifier = Modifier.testTag("role-${role.name}"),
-                                  selected = false, // state.editMember!!.hasRole(role.name),
+                                  selected =
+                                      false, // state.editMember!!.hasRole(role.name), TODO: remake
+                                  // roles
                                   onClick = { viewmodel.modifyMemberRole(role.name) })
                             },
                             modifier = Modifier.testTag("roleitem-${role.name}"))

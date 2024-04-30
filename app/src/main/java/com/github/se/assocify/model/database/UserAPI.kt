@@ -78,7 +78,7 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       db.from("applicant")
           .insert(
               Json.decodeFromString<JsonElement>(
-                  """{"association_id": "$associationId", "user_id": "${CurrentUser.user!!.uid}"}"""))
+                  """{"association_id": "$associationId", "user_id": "${CurrentUser.userUid!!}"}"""))
       onSuccess()
     }
   }

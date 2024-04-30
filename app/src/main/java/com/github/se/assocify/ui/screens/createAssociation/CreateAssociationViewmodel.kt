@@ -32,7 +32,7 @@ class CreateAssociationViewmodel(
    * Utility function : Sorts the members by role then name
    */
   private fun sortMembers(memberList: List<User>): List<User> {
-    return memberList.sortedWith(compareBy({ it.name }))
+    return memberList.sortedWith(compareBy({ it.name })) // TODO: add role sorting
   }
 
   /*

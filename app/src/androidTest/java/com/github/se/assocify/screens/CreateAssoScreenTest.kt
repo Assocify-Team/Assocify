@@ -127,6 +127,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("userDropdownItem-1").performClick() // jean
       onNodeWithTag("role-PRESIDENCY").assertIsDisplayed()
       onNodeWithTag("role-PRESIDENCY").performClick()
+      // assert(bigView.uiState.value.editMember!!.hasRole("PRESIDENCE"))
       onNodeWithTag("addMemberButton").performClick()
       onNodeWithTag("create").assertHasClickAction()
       onNodeWithTag("create").assertIsEnabled()
@@ -145,7 +146,8 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       onNodeWithTag("userDropdownItem-1").performClick() // jean
       onNodeWithTag("addMemberButton").performClick()
-      // onNodeWithTag("create").assertIsNotEnabled() TEMPORARILY DISABLED while we remake roles.
+      // onNodeWithTag("create").assertIsNotEnabled() TODO TEMPORARILY DISABLED while we remake
+      // roles.
       onNodeWithTag("editMember-jean").performClick()
       onNodeWithTag("role-PRESIDENCY").performClick()
       onNodeWithTag("addMemberButton").performClick()

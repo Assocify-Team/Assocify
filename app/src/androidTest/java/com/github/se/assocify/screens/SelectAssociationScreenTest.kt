@@ -13,7 +13,6 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssociation.DisplayOrganization
@@ -82,7 +81,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun setup() {
     CurrentUser.userUid = "adfslkj"
     CurrentUser.associationUid = "testAssocId"
-    CurrentUser.user = User("adfslkj", "Tonno")
     every { mockAssocAPI.getAssociations(any(), any()) } answers
         {
           val onSuccessCallback = arg<(List<Association>) -> Unit>(0)
