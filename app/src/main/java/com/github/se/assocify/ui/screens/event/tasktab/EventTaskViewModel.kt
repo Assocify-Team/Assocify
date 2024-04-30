@@ -17,6 +17,28 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
     updateTasks()
   }
 
+  /** Updates the list of tasks in the UI. */
+  private fun updateTasks() {
+    db.getTasks(
+        { tasks -> _uiState.value = _uiState.value.copy(tasks = tasks) },
+        { e ->
+          _uiState.value =
+              _uiState.value.copy(
+                  tasks =
+                      listOf(
+                          Task(
+                              uid = "testUid",
+                              title = e.toString(),
+                              description = "description",
+                              isCompleted = false,
+                              startTime = OffsetDateTime.now(),
+                              peopleNeeded = 0,
+                              category = "Committee",
+                              location = "Here",
+                              eventUid = "eventUid")))
+        })
+  }
+
   /**
    * Updates the list of events in the UI.
    *
@@ -46,26 +68,12 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
                 })
   }
 
-  /** Updates the list of tasks in the UI. */
-  private fun updateTasks() {
-    db.getTasks(
-        { tasks -> _uiState.value = _uiState.value.copy(tasks = tasks) },
-        { e ->
-          _uiState.value =
-              _uiState.value.copy(
-                  tasks =
-                      listOf(
-                          Task(
-                              uid = "testUid",
-                              title = e.toString(),
-                              description = "description",
-                              isCompleted = false,
-                              startTime = OffsetDateTime.now(),
-                              peopleNeeded = 0,
-                              category = "Committee",
-                              location = "Here",
-                              eventUid = "eventUid")))
-        })
+  fun getFilteredTasks(): List<Task> {
+    return if (_uiState.value.isFilterActivated) {
+      _uiState.value.tasks.filter { it.title.contains(_uiState.value.filter) }
+    } else {
+      _uiState.value.tasks
+    }
   }
 }
 

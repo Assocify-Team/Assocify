@@ -11,7 +11,7 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.UUID
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.Dispatchers
@@ -165,7 +165,7 @@ class TaskAPITest {
         "newName",
         "newDescription",
         true,
-        LocalDate.now(),
+        OffsetDateTime.now(),
         2,
         "newCategory",
         "newLocation",
@@ -180,7 +180,7 @@ class TaskAPITest {
         "newName",
         "newDescription",
         true,
-        LocalDate.now(),
+        OffsetDateTime.now(),
         2,
         "newCategory",
         "newLocation",
