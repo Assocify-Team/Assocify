@@ -256,7 +256,6 @@ sonar {
         property("sonar.projectKey", "Assocify-Team_Assocify")
         property("sonar.organization", "assocify-team")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.coverage.exclusions", "com/github/se/assocify/model/interfaces/**")
     }
 }
 
