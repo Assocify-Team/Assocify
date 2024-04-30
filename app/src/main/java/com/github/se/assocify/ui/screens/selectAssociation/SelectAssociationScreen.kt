@@ -179,10 +179,7 @@ fun DisplayOrganization(organization: Association, viewModel: SelectAssociationV
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = "Select Icon",
-            modifier =
-                Modifier.testTag("SelectIcon").clickable {
-                  viewModel.selectAssoc(organization.uid)
-                })
+            modifier = Modifier.testTag("SelectIcon"))
       },
       modifier =
           Modifier.clickable { viewModel.selectAssoc(organization.uid) }

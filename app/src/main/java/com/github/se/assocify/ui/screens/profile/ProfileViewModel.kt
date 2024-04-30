@@ -58,28 +58,19 @@ class ProfileViewModel(private val assoAPI: AssociationAPI, private val userAPI:
   fun confirmModifyName() {
     _uiState.value = _uiState.value.copy(openEdit = false, myName = _uiState.value.modifyingName)
     CurrentUser.userUid?.let { uid ->
-      userAPI.getUser(
+      userAPI.setDisplayName(
           uid,
-          { user ->
-            userAPI.addUser(
-                user.copy(name = _uiState.value.modifyingName),
-                {
-                  CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.value.snackbarHostState.showSnackbar(
-                        message = "Name changed !", duration = SnackbarDuration.Short)
-                  }
-                },
-                {
-                  CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.value.snackbarHostState.showSnackbar(
-                        message = "Couldn't change name", duration = SnackbarDuration.Short)
-                  }
-                })
+          _uiState.value.modifyingName,
+          {
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarHostState.showSnackbar(
+                  message = "Name changed !", duration = SnackbarDuration.Short)
+            }
           },
           {
             CoroutineScope(Dispatchers.Main).launch {
               _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Current user not found", duration = SnackbarDuration.Short)
+                  message = "Couldn't change name", duration = SnackbarDuration.Short)
             }
           })
     }
