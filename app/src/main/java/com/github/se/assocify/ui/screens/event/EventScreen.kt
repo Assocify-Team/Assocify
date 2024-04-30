@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -246,8 +248,8 @@ fun EventFilterBar(viewModel: EventScreenViewModel) {
             leadingIcon = {
               if (viewModel.isEventSelected(it)) {
                 Icon(
-                    modifier = Modifier.padding(8.dp),
-                    imageVector = Icons.Default.Check,
+                    modifier = Modifier.padding(8.dp).size(FilterChipDefaults.IconSize),
+                    imageVector = Icons.Filled.Check,
                     contentDescription = "Selected")
               }
             },
