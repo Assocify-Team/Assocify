@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
 
 /**
  * API for interacting with the task table in the database.
@@ -103,16 +104,16 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun editTask(
-      uid: String,
-      title: String,
-      description: String,
-      isCompleted: Boolean,
-      startTime: LocalDate,
-      peopleNeeded: Int,
-      category: String,
-      location: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+    uid: String,
+    title: String,
+    description: String,
+    isCompleted: Boolean,
+    startTime: LocalDateTime,
+    peopleNeeded: Int,
+    category: String,
+    location: String,
+    onSuccess: () -> Unit,
+    onFailure: (Exception) -> Unit
   ) {
     scope.launch {
       try {
@@ -133,6 +134,28 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
     }
   }
+
+  /**
+   * Edits a task in the database.
+   *
+   * @param task the task to edit
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun editTask(task: Task, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    editTask(
+      task.uid,
+      task.title,
+      task.description,
+      task.isCompleted,
+      task.startTime,
+      task.peopleNeeded,
+      task.category,
+      task.location,
+      onSuccess,
+      onFailure)
+  }
+
   /**
    * Deletes a task from the database.
    *
@@ -178,7 +201,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   private data class SupabaseTask(
-      @SerialName("uid") val uid: String,
+      @SerialName("id") val uid: String,
       @SerialName("title") val title: String,
       @SerialName("description") val description: String,
       @SerialName("is_completed") val isCompleted: Boolean,
@@ -194,7 +217,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
           title = title,
           description = description,
           isCompleted = isCompleted,
-          startTime = LocalDate.parse(startTime),
+          startTime = LocalDateTime.parse(startTime),
           peopleNeeded = peopleNeeded,
           category = category,
           location = location,
