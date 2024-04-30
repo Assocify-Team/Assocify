@@ -27,35 +27,32 @@ private const val INITIAL_ZOOM = 15.0
 @Composable
 fun EventMapScreen() {
   Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      // Note : padding is used to avoid a bug where the map
-      //        overlaps the top bar. Has to be changed later on.
-      .padding(top = 80.dp)
-      .testTag("OSMMapScreen")
-  ) {
-      EventMapView()
-  }
+      modifier =
+          Modifier.fillMaxWidth()
+              // Note : padding is used to avoid a bug where the map
+              //        overlaps the top bar. Has to be changed later on.
+              .padding(top = 80.dp)
+              .testTag("OSMMapScreen")) {
+        EventMapView()
+      }
 }
 
 @Composable
 fun EventMapView() {
   AndroidView(
-    factory = { context ->
-      val mapView = createMapView(context)
-      mapView
-    },
-    modifier = Modifier
-      .testTag("EPFLMapView")
-      .fillMaxWidth(),
-    update = { view ->
-      // Note for later : viewmodel stuff will be here
-    }
-  )
+      factory = { context ->
+        val mapView = createMapView(context)
+        mapView
+      },
+      modifier = Modifier.testTag("EPFLMapView").fillMaxWidth(),
+      update = { view ->
+        // Note for later : viewmodel stuff will be here
+      })
 }
 
 /**
  * Creates a new MapView with the default configuration
+ *
  * @param context the context of the application
  */
 private fun createMapView(context: Context): MapView {
@@ -66,6 +63,7 @@ private fun createMapView(context: Context): MapView {
 
 /**
  * Initializes the MapView with the desired configuration
+ *
  * @param context the context of the application
  */
 private fun initMapView(context: Context): MapView {
@@ -87,11 +85,9 @@ private fun initMapView(context: Context): MapView {
   return mapView
 }
 
-/**
- * The custom tile source from the EPFL plan API.
- */
+/** The custom tile source from the EPFL plan API. */
 class CampusTileSource(private val floorId: Int) :
-  OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
+    OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
   override fun getTileURLString(pMapTileIndex: Long): String {
     // EPFL plan API has 3 servers, tilesX correspond to the server number
     return "https://plan-epfl-tiles3.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${

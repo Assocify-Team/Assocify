@@ -1,6 +1,5 @@
 package com.github.se.assocify.screens
 
-import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -95,7 +94,4 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("EPFLMapView").performScrollTo()
     }
   }
-
-
-
 }

@@ -27,11 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -107,10 +103,7 @@ fun EventScreen(
               }
             })
       }) {
-        Column(
-          modifier = Modifier
-            .padding(it)
-        ) {
+        Column(modifier = Modifier.padding(it)) {
           val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
           val coroutineRoute = rememberCoroutineScope()
 
@@ -193,7 +186,6 @@ fun EventFilterBar(events: List<Event>) {
     }
   }
 }
-
 
 @Preview
 @Composable
