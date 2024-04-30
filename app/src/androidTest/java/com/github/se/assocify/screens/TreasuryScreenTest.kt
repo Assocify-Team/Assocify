@@ -55,17 +55,17 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun testTabSwitching() {
     with(composeTestRule) {
-      onNodeWithTag("BudgetTab").assertIsDisplayed()
-      onNodeWithTag("BudgetTab").performClick()
-      onNodeWithTag("BudgetTab").assertIsSelected()
+      onNodeWithTag("budgetTab").assertIsDisplayed()
+      onNodeWithTag("budgetTab").performClick()
+      onNodeWithTag("budgetTab").assertIsSelected()
 
-      onNodeWithTag("BalanceTab").assertIsDisplayed()
-      onNodeWithTag("BalanceTab").performClick()
-      onNodeWithTag("BalanceTab").assertIsSelected()
+      onNodeWithTag("balanceTab").assertIsDisplayed()
+      onNodeWithTag("balanceTab").performClick()
+      onNodeWithTag("balanceTab").assertIsSelected()
 
-      onNodeWithTag("ReceiptsTab").assertIsDisplayed()
-      onNodeWithTag("ReceiptsTab").performClick()
-      onNodeWithTag("ReceiptsTab").assertIsSelected()
+      onNodeWithTag("receiptsTab").assertIsDisplayed()
+      onNodeWithTag("receiptsTab").performClick()
+      onNodeWithTag("receiptsTab").assertIsSelected()
     }
   }
 

@@ -6,6 +6,7 @@ import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.model.isCurrentUser
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.google.firebase.Firebase
@@ -51,7 +52,7 @@ class ReceiptListViewModel(
               _uiState.value.copy(
                   userReceipts =
                       receipts.filter {
-                        it.uid == CurrentUser.userUid &&
+                          isCurrentUser(it.uid) &&
                             it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
         },
@@ -71,7 +72,7 @@ class ReceiptListViewModel(
               _uiState.value.copy(
                   allReceipts =
                       receipts.filter {
-                        it.uid != CurrentUser.userUid &&
+                        isCurrentUser(it.uid) &&
                             it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
         },

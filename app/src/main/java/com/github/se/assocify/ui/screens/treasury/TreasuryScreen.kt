@@ -117,7 +117,7 @@ fun TreasuryScreen(
                         coroutineRoute.launch { pagerState.animateScrollToPage(it.ordinal) }
                       },
                       text = it.name,
-                      modifier = Modifier.testTag(it.name + "Tab"))
+                      modifier = Modifier.testTag(it.name.lowercase() + "Tab"))
                 }
               }
 
