@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -31,7 +31,7 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
                               title = e.toString(),
                               description = "description",
                               isCompleted = false,
-                              startTime = OffsetDateTime.now(),
+                              startTime = LocalDateTime.now(),
                               peopleNeeded = 0,
                               category = "Committee",
                               location = "Here",

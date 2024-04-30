@@ -3,7 +3,7 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Task
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -107,7 +107,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       title: String,
       description: String,
       isCompleted: Boolean,
-      startTime: OffsetDateTime,
+      startTime: LocalDateTime,
       peopleNeeded: Int,
       category: String,
       location: String,
@@ -215,7 +215,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
           title = title,
           description = description,
           isCompleted = isCompleted,
-          startTime = OffsetDateTime.now(),
+          startTime = LocalDateTime.now(),
           peopleNeeded = peopleNeeded,
           category = category,
           location = location,

@@ -1,6 +1,6 @@
 package com.github.se.assocify.model.entities
 
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 /**
  * Data class representing a task that needs to be completed
@@ -20,7 +20,7 @@ data class Task(
     val title: String = "testName",
     val description: String = "description",
     val isCompleted: Boolean = false,
-    val startTime: OffsetDateTime = OffsetDateTime.now(),
+    val startTime: LocalDateTime = LocalDateTime.now(),
     val peopleNeeded: Int = 0,
     val category: String = "Committee",
     val location: String = "Here",
