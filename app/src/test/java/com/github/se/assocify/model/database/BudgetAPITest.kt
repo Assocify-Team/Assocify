@@ -3,7 +3,6 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
-import com.github.se.assocify.model.entities.Budget
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.createSupabaseClient
@@ -34,7 +33,6 @@ class BudgetAPITest {
           TVA.TVA_2,
           "lala",
           AccountingSubCategory("uid", "name", AccountingCategory("asas"), 1))
-  private val budget = Budget(listOf(budgetItem), "name", "uid")
   lateinit var budgetAPI: BudgetAPI
 
   @Before
@@ -57,16 +55,14 @@ class BudgetAPITest {
 
   @Test
   fun testGetBudgets() {
-    val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
     error = false
     response = ""
-    budgetAPI.getBudgets("associationUID", onSuccess = {}, onFailure = {})
+    budgetAPI.getBudget("associationUID", onSuccess = {}, onFailure = {})
   }
 
   @Test
   fun testAddBudgetItem() {
-    val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
     error = false
@@ -75,18 +71,7 @@ class BudgetAPITest {
   }
 
   @Test
-  fun testAddBudget() {
-    val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
-    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-
-    error = false
-    response = ""
-    budgetAPI.addBudget("associationUID", budget, onSuccess = {}, onFailure = {})
-  }
-
-  @Test
   fun testUpdateBudgetItem() {
-    val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
     error = false
@@ -95,32 +80,11 @@ class BudgetAPITest {
   }
 
   @Test
-  fun testUpdateBudget() {
-    val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
-    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-
-    error = false
-    response = ""
-    budgetAPI.updateBudget("associationUID", budget, onSuccess = {}, onFailure = {})
-  }
-
-  @Test
   fun testDeleteBudgetItem() {
-    val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
     error = false
     response = ""
     budgetAPI.deleteBudgetItem("budgetItemUID", onSuccess = {}, onFailure = {})
-  }
-
-  @Test
-  fun testDeleteBudget() {
-    val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
-    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-
-    error = false
-    response = ""
-    budgetAPI.deleteBudget("budgetUID", onSuccess = {}, onFailure = {})
   }
 }

@@ -1,46 +1,32 @@
 package com.github.se.assocify.model.database
 
-import com.github.se.assocify.model.entities.Budget
 import com.github.se.assocify.model.entities.BudgetItem
 import io.github.jan.supabase.SupabaseClient
 
 class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
   /**
-   * Get the budgets of an association
+   * Get the budget of an association
    *
    * @param associationUID the unique identifier of the association
-   * @return the list of budgets of the association
+   * @param onSuccess the callback to be called when the budget items are retrieved
+   * @param onFailure the callback to be called when the budget items could not be retrieved
    */
-  fun getBudgets(
+  fun getBudget(
       associationUID: String,
-      onSuccess: (List<Budget>) -> Unit,
+      onSuccess: (List<BudgetItem>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     // TODO("Not yet implemented")
   }
+
   /**
-   * Add a budget item
+   * Add the budget items of an association
    *
-   * @param budgetUID the unique identifier of the association
-   * @param budgetItem the budget item to add
+   * @param associationUID the unique identifier of the association
    */
   fun addBudgetItem(
-      budgetUID: String,
-      budgetItem: BudgetItem,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    // TODO("Not yet implemented")
-  }
-  /**
-   * Add a budget
-   *
-   * @param associationUID the unique identifier of the association
-   * @param budget the budget to add
-   */
-  fun addBudget(
       associationUID: String,
-      budget: Budget,
+      budgetItem: BudgetItem,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
@@ -51,6 +37,8 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
    *
    * @param associationUID the unique identifier of the association
    * @param budgetItem the budget item to update
+   * @param onSuccess the callback to be called when the budget item is updated
+   * @param onFailure the callback to be called when the budget item could not be updated
    */
   fun updateBudgetItem(
       associationUID: String,
@@ -61,37 +49,17 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
     // TODO("Not yet implemented")
   }
   /**
-   * Update a budget
-   *
-   * @param associationUID the unique identifier of the association
-   * @param budget the budget to update
-   */
-  fun updateBudget(
-      associationUID: String,
-      budget: Budget,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    // TODO("Not yet implemented")
-  }
-  /**
    * Delete a budget item
    *
    * @param budgetItemUID the unique identifier of the budget item
+   * @param onSuccess the callback to be called when the budget item is deleted
+   * @param onFailure the callback to be called when the budget item could not be deleted
    */
   fun deleteBudgetItem(
       budgetItemUID: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    // TODO("Not yet implemented")
-  }
-  /**
-   * Delete a budget
-   *
-   * @param budgetUID the unique identifier of the budget
-   */
-  fun deleteBudget(budgetUID: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     // TODO("Not yet implemented")
   }
 }
