@@ -57,7 +57,6 @@ class BudgetAPITest {
 
   @Test
   fun testGetBudgets() {
-    val onSuccesssss: (Budget) -> Unit = mockk(relaxed = true)
     val onSuccess: (Budget) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
     error = false
