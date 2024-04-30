@@ -99,7 +99,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel, 
               modifier = Modifier.padding(it).fillMaxSize(),
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.Center) {
-                Text("Error loading events")
+                Text(state.value.errorText)
               }
         } else {
           Column(modifier = Modifier.padding(it).fillMaxHeight()) {
