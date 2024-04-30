@@ -91,11 +91,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
    *
    * @param budgetUID the unique identifier of the budget
    */
-  fun deleteBudget(
-      budgetUID: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
+  fun deleteBudget(budgetUID: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     // TODO("Not yet implemented")
   }
 }
