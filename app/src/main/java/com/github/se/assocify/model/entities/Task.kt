@@ -1,6 +1,5 @@
 package com.github.se.assocify.model.entities
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**

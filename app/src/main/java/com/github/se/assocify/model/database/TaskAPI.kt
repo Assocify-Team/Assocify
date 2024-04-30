@@ -3,13 +3,12 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Task
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDateTime
 
 /**
  * API for interacting with the task table in the database.
@@ -104,16 +103,16 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun editTask(
-    uid: String,
-    title: String,
-    description: String,
-    isCompleted: Boolean,
-    startTime: LocalDateTime,
-    peopleNeeded: Int,
-    category: String,
-    location: String,
-    onSuccess: () -> Unit,
-    onFailure: (Exception) -> Unit
+      uid: String,
+      title: String,
+      description: String,
+      isCompleted: Boolean,
+      startTime: LocalDateTime,
+      peopleNeeded: Int,
+      category: String,
+      location: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
     scope.launch {
       try {
@@ -144,16 +143,16 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    */
   fun editTask(task: Task, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     editTask(
-      task.uid,
-      task.title,
-      task.description,
-      task.isCompleted,
-      task.startTime,
-      task.peopleNeeded,
-      task.category,
-      task.location,
-      onSuccess,
-      onFailure)
+        task.uid,
+        task.title,
+        task.description,
+        task.isCompleted,
+        task.startTime,
+        task.peopleNeeded,
+        task.category,
+        task.location,
+        onSuccess,
+        onFailure)
   }
 
   /**
@@ -217,7 +216,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
           title = title,
           description = description,
           isCompleted = isCompleted,
-          startTime = LocalDateTime.parse(startTime),
+          startTime = LocalDateTime.now(),
           peopleNeeded = peopleNeeded,
           category = category,
           location = location,

@@ -11,7 +11,7 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.Dispatchers
@@ -61,11 +61,11 @@ class TaskAPITest {
     response =
         """  
         {
-          "uid": "$uuid1"
+          "id": "$uuid1"
           "title": "testName",
           "description": "description",
           "is_completed": false,
-          "start_time": "2021-10-10",
+          "start_time": "2024-04-30 12:30:00" ,
           "people_needed": 0,
           "category": "Committee",
           "location": "Here",
@@ -96,22 +96,22 @@ class TaskAPITest {
         """
         [
           {
-            "uid": "$uuid1",
+            "id": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
-            "start_time": "2021-10-10",
+            "start_time": "2024-04-30 12:30:00" ,
             "people_needed": 0,
             "category": "Committee",
             "location": "Here",
             "event_id": "eventUid"
           },
           {
-            "uid": "$uuid2",
+            "id": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
-            "start_time": "2022-10-10",
+            "start_time": "2024-04-30 12:30:00" ,
             "people_needed": 2,
             "category": "Committee2",
             "location": "Here2",
@@ -165,7 +165,7 @@ class TaskAPITest {
         "newName",
         "newDescription",
         true,
-        LocalDate.now(),
+        LocalDateTime.now(),
         2,
         "newCategory",
         "newLocation",
@@ -180,7 +180,7 @@ class TaskAPITest {
         "newName",
         "newDescription",
         true,
-        LocalDate.now(),
+        LocalDateTime.now(),
         2,
         "newCategory",
         "newLocation",
@@ -212,22 +212,22 @@ class TaskAPITest {
         """
         [
           {
-            "uid": "$uuid1",
+            "id": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
-            "start_time": "2021-10-10",
+            "start_time": "2024-04-30 12:30:00" ,
             "people_needed": 0,
             "category": "Committee",
             "location": "Here",
             "event_id": "eventUid"
           },
           {
-            "uid": "$uuid2",
+            "id": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
-            "start_time": "2022-10-10",
+            "start_time": "2024-04-30 12:30:00" ,
             "people_needed": 2,
             "category": "Committee2",
             "location": "Here2",
