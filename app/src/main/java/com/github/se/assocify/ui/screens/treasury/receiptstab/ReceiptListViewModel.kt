@@ -52,7 +52,7 @@ class ReceiptListViewModel(
               _uiState.value.copy(
                   userReceipts =
                       receipts.filter {
-                          isCurrentUser(it.uid) &&
+                        isCurrentUser(it.uid) &&
                             it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
         },
