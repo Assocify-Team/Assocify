@@ -20,7 +20,7 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
   /** Updates the list of tasks in the UI. */
   private fun updateTasks() {
     db.getTasks(
-        { tasks -> _uiState.value = _uiState.value.copy(tasks = tasks) },
+        { tasks -> _uiState.value = _uiState.value.copy(tasks = tasks)},
         { e ->
           _uiState.value =
               _uiState.value.copy(
@@ -66,14 +66,6 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
                     it
                   }
                 })
-  }
-
-  fun getFilteredTasks(): List<Task> {
-    return if (_uiState.value.isFilterActivated) {
-      _uiState.value.tasks.filter { it.title.contains(_uiState.value.filter) }
-    } else {
-      _uiState.value.tasks
-    }
   }
 }
 

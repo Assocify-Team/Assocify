@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDateTime
 
 @MockKExtension.ConfirmVerification
 class TaskAPITest {
@@ -61,7 +62,7 @@ class TaskAPITest {
     response =
         """  
         {
-          "uid": "$uuid1"
+          "id": "$uuid1"
           "title": "testName",
           "description": "description",
           "is_completed": false,
@@ -96,7 +97,7 @@ class TaskAPITest {
         """
         [
           {
-            "uid": "$uuid1",
+            "id": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
@@ -107,7 +108,7 @@ class TaskAPITest {
             "event_id": "eventUid"
           },
           {
-            "uid": "$uuid2",
+            "id": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
@@ -165,7 +166,7 @@ class TaskAPITest {
         "newName",
         "newDescription",
         true,
-        OffsetDateTime.now(),
+        LocalDateTime.now(),
         2,
         "newCategory",
         "newLocation",
@@ -180,7 +181,7 @@ class TaskAPITest {
         "newName",
         "newDescription",
         true,
-        OffsetDateTime.now(),
+        LocalDateTime.now(),
         2,
         "newCategory",
         "newLocation",
@@ -212,7 +213,7 @@ class TaskAPITest {
         """
         [
           {
-            "uid": "$uuid1",
+            "id": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
@@ -223,7 +224,7 @@ class TaskAPITest {
             "event_id": "eventUid"
           },
           {
-            "uid": "$uuid2",
+            "id": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
