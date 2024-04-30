@@ -5,22 +5,48 @@ import com.github.se.assocify.model.entities.BudgetItem
 
 /** Interface for the Budget API */
 interface BudgetAPIInterface {
-  // get
-  fun getBudgets(associationUID: String): List<Budget>
+  // get budgets of an Association
+  fun getBudgets(
+      associationUID: String,
+      onSuccess: (List<Budget>) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
+  // add budget item to a budget sheet
+  fun addBudgetItem(
+      budgetUID: String,
+      budgetItem: BudgetItem,
+      onSuccess: () -> Unit = {},
+      onFailure: (Exception) -> Unit
+  )
+  // Add budget to an association
+  fun addBudget(
+      associationUID: String,
+      budget: Budget,
+      onSuccess: () -> Unit = {},
+      onFailure: (Exception) -> Unit
+  )
 
-  fun getBudgetItem(associationUID: String, budgetUID: String): BudgetItem
-  // add
-  fun addBudgetItem(associationUID: String, budgetItem: BudgetItem)
+  // update a budget item from the
+  fun updateBudgetItem(
+      associationUID: String,
+      budgetItem: BudgetItem,
+      onSuccess: () -> Unit = {},
+      onFailure: (Exception) -> Unit
+  )
 
-  fun addBudget(associationUID: String, budget: Budget)
-
-  // update
-  fun updateBudgetItem(associationUID: String, budgetItem: BudgetItem)
-
-  fun updateBudget(associationUID: String, budget: Budget)
+  fun updateBudget(
+      associationUID: String,
+      budget: Budget,
+      onSuccess: () -> Unit = {},
+      onFailure: (Exception) -> Unit
+  )
 
   // delete
-  fun deleteBudgetItem(budgetItemUID: String)
+  fun deleteBudgetItem(
+      budgetItemUID: String,
+      onSuccess: () -> Unit = {},
+      onFailure: (Exception) -> Unit
+  )
 
-  fun deleteBudget(budgetUID: String)
+  fun deleteBudget(budgetUID: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit)
 }
