@@ -178,7 +178,7 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
       val description: String,
       @SerialName("start_date") val startDate: String,
       @SerialName("end_date") val endDate: String,
-      @SerialName("guest_or_artists") val guestsOrArtists: String,
+      @SerialName("guests_or_artists") val guestsOrArtists: String,
       val location: String
   ) {
     fun toEvent() =

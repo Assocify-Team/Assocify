@@ -67,7 +67,7 @@ class EventAPITest {
                 "description": "Test Description",
                 "start_date": "$responseTime",
                 "end_date": "$responseTime",
-                "guest_or_artists": "Test Guest",
+                "guests_or_artists": "Test Guest",
                 "location": "Test Location"
             }
         """
@@ -97,7 +97,7 @@ class EventAPITest {
                 "description": "Test Description",
                 "start_date": "$responseTime",
                 "end_date": "$responseTime",
-                "guest_or_artists": "Test Guest",
+                "guests_or_artists": "Test Guest",
                 "location": "Test Location"
             }, {
                 "uid": "$uuid1",
@@ -105,7 +105,7 @@ class EventAPITest {
                 "description": "Test Description",
                 "start_date": "$responseTime",
                 "end_date": "$responseTime",
-                "guest_or_artists": "Test Guest",
+                "guests_or_artists": "Test Guest",
                 "location": "Test Location"
             }
                 
@@ -134,7 +134,7 @@ class EventAPITest {
                 "description": "Test Description",
                 "start_date": "$currentTime",
                 "end_date": "$currentTime",
-                "guest_or_artists": "Test Guest",
+                "guests_or_artists": "Test Guest",
                 "location": "Test Location"
             }
         """
