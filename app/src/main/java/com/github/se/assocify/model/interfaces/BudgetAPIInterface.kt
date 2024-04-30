@@ -4,6 +4,7 @@ import com.github.se.assocify.model.entities.Budget
 import com.github.se.assocify.model.entities.BudgetItem
 
 /** Interface for the Budget API */
+@SuppressWarnings("java:S106")
 interface BudgetAPIInterface {
   // get budgets of an Association
   fun getBudgets(
