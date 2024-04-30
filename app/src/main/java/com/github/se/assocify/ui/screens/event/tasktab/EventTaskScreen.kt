@@ -25,7 +25,7 @@ fun EventTaskScreen(navActions: NavigationActions, tasks: List<Task>) {
       item {
         ListItem(
             modifier = Modifier.clickable { navActions.navigateTo(Destination.EditTask(it.uid)) },
-            headlineContent = { Text(it.name) },
+            headlineContent = { Text(it.title) },
             supportingContent = { Text(it.category) },
             trailingContent = {
               Checkbox(
@@ -33,7 +33,7 @@ fun EventTaskScreen(navActions: NavigationActions, tasks: List<Task>) {
                   onCheckedChange = { /*TODO what happens if the checkbox is clicked*/},
               )
             },
-            overlineContent = { Text(it.startTime) })
+            overlineContent = { Text(it.startTime.toString()) })
         HorizontalDivider()
       }
     }
