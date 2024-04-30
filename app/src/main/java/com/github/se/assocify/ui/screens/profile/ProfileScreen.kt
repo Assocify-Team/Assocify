@@ -236,23 +236,24 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                       Modifier.fillMaxWidth()
                           .testTag("manageAssociationList")
                           .clip(RoundedCornerShape(12.dp))) {
-                    AssociationSettings.entries.forEach { setting ->
+                    AssociationSettings.entries.forEach { s ->
                       ListItem(
                           leadingContent = {
-                            Icon(
-                                imageVector = setting.getIcon(),
-                                contentDescription = "${setting.name} icon")
+                            Icon(imageVector = s.getIcon(), contentDescription = "${s.name} icon")
                           },
-                          headlineContent = { Text(text = setting.name) },
+                          headlineContent = { Text(text = s.name) },
                           trailingContent = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                                contentDescription = "Go to ${setting.name} settings")
+                                contentDescription = "Go to ${s.name} settings")
                           },
                           colors =
                               ListItemDefaults.colors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer),
-                          modifier = Modifier.testTag(setting.name))
+                          modifier =
+                              Modifier.testTag(s.name).clickable {
+                                navActions.navigateTo(s.getDestination())
+                              })
                     }
                   }
 
