@@ -1,10 +1,12 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.EventScreen
@@ -70,10 +72,30 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   }
 
   @Test
-  fun testGoogleMap() {
+  fun testOSMMapDisplayed() {
     with(composeTestRule) {
       onNodeWithTag("mapTab").performClick()
-      onNodeWithTag("GoogleMap").assertIsDisplayed()
+      onNodeWithTag("OSMMapScreen").assertIsDisplayed()
     }
   }
+
+  @Test
+  fun testEPFLMapDisplayed() {
+    with(composeTestRule) {
+      onNodeWithTag("mapTab").performClick()
+      onNodeWithTag("EPFLMapView").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testEPFLMapSwipeMoves() {
+    with(composeTestRule) {
+      onNodeWithTag("mapTab").performClick()
+      onNodeWithTag("EPFLMapView").performClick()
+      onNodeWithTag("EPFLMapView").performScrollTo()
+    }
+  }
+
+
+
 }
