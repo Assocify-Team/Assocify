@@ -8,7 +8,6 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
-import java.time.LocalDate
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -235,7 +234,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     db.from("invited")
         .insert(
             Json.decodeFromString<JsonElement>(
-                """{"user_id": "$userId","role_id": "${role.uid}"}"""))
+                """{"user_id": "$userId","role_id": "${role.uid}", "association_id":  "${role.associationId}"}"""))
   }
 
   /**
@@ -278,16 +277,6 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       @SerialName("association_id") val associationId: String,
       @SerialName("users") val user: User
   )
-
-  @Serializable
-  private data class SupabaseAssociation(
-      val uid: String? = null,
-      val name: String,
-      val description: String,
-      @SerialName("creation_date") val creationDate: String,
-  ) {
-    fun toAssociation() = Association(uid!!, name, description, LocalDate.parse(creationDate))
-  }
 
   @Serializable
   private data class SupabaseRole(
