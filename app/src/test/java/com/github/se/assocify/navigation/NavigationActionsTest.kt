@@ -1,4 +1,7 @@
+
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import io.mockk.mockk
@@ -12,12 +15,14 @@ import org.junit.runners.JUnit4
 class NavigationActionsTest {
 
   private lateinit var navController: NavHostController
+  private lateinit var loginSave: LoginSave
   private lateinit var navigationActions: NavigationActions
 
   @Before
   fun setUp() {
     navController = mockk(relaxed = true)
-    navigationActions = NavigationActions(navController)
+    loginSave = mockk(relaxed = true)
+    navigationActions = NavigationActions(navController, loginSave)
   }
 
   @Test(expected = IllegalArgumentException::class)
@@ -36,14 +41,14 @@ class NavigationActionsTest {
   fun `onLogin navigates to Home when user exists`() {
     navigationActions.onLogin(true)
 
-    verify { navController.navigate(Destination.Home.route) }
+    verify { navController.navigate(Destination.Home.route, any<(NavOptionsBuilder) -> Unit>()) }
   }
 
   @Test
   fun `onLogin navigates to SelectAsso when user does not exist`() {
     navigationActions.onLogin(false)
 
-    verify { navController.navigate(Destination.SelectAsso.route) }
+    verify { navController.navigate(Destination.SelectAsso.route, any<(NavOptionsBuilder) -> Unit>()) }
   }
 
   @Test
