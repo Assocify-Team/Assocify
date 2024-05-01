@@ -6,6 +6,8 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -16,8 +18,9 @@ import kotlinx.coroutines.flow.StateFlow
  * @param userAPI the database used to fetch the user data
  */
 class SelectAssociationViewModel(
-    private var associationAPI: AssociationAPI,
-    private var userAPI: UserAPI
+    private val associationAPI: AssociationAPI,
+    private val userAPI: UserAPI,
+    private val navActions: NavigationActions,
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<SelectAssociationState> =
       MutableStateFlow(SelectAssociationState())
@@ -30,28 +33,8 @@ class SelectAssociationViewModel(
 
   private fun updateDatabaseValues() {
     associationAPI.getAssociations(
-        { assocList ->
-          _uiState.value =
-              SelectAssociationState(
-                  assocList,
-                  _uiState.value.searchQuery,
-                  _uiState.value.user,
-                  _uiState.value.searchState)
-        },
-        {})
-    if (CurrentUser.userUid != "") {
-      userAPI.getUser(
-          CurrentUser.userUid!!,
-          { user ->
-            _uiState.value =
-                SelectAssociationState(
-                    _uiState.value.associations,
-                    _uiState.value.searchQuery,
-                    user,
-                    _uiState.value.searchState)
-          },
-          {})
-    }
+        { assocList -> _uiState.value = _uiState.value.copy(associations = assocList) }, {})
+    userAPI.getUser(CurrentUser.userUid!!, { _uiState.value = _uiState.value.copy(user = it) }, {})
   }
 
   /**
@@ -61,8 +44,14 @@ class SelectAssociationViewModel(
    * @param searchState if we are filtering the value on the bar or not
    */
   fun updateSearchQuery(query: String, searchState: Boolean) {
-    _uiState.value =
-        SelectAssociationState(_uiState.value.associations, query, _uiState.value.user, searchState)
+    _uiState.value = _uiState.value.copy(searchQuery = query, searchState = searchState)
+  }
+
+  /** Confirms selection of an association and moves to the home screen. */
+  fun selectAssoc(uid: String) {
+    CurrentUser.associationUid = uid
+    userAPI.requestJoin(uid, {}, {})
+    navActions.navigateTo(Destination.Home)
   }
 }
 

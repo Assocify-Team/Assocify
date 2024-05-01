@@ -33,21 +33,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
+import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.Firebase
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
+import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.gotrue.providers.builtin.IDToken
+import io.github.jan.supabase.gotrue.user.UserInfo
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @Composable
-fun rememberFirebaseAuthLauncher(
-    onAuthComplete: (AuthResult) -> Unit,
+fun rememberSupabaseAuthLauncher(
+    onAuthComplete: (UserInfo, GoogleSignInAccount) -> Unit,
     onAuthError: (ApiException) -> Unit
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
   val scope = rememberCoroutineScope()
@@ -56,10 +57,12 @@ fun rememberFirebaseAuthLauncher(
     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
     try {
       val account = task.getResult(ApiException::class.java)!!
-      val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
       scope.launch {
-        val authResult = Firebase.auth.signInWithCredential(credential).await()
-        onAuthComplete(authResult)
+        SupabaseClient.supabaseClient.auth.signInWith(IDToken) {
+          idToken = account.idToken!!
+          provider = Google
+        }
+        onAuthComplete(SupabaseClient.supabaseClient.auth.currentUserOrNull()!!, account)
       }
     } catch (e: ApiException) {
       onAuthError(e)
@@ -72,12 +75,8 @@ fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
   val viewModel = LoginViewModel(userAPI, navActions)
 
   val launcher =
-      rememberFirebaseAuthLauncher(
-          onAuthComplete = { viewModel.updateUser() },
-          onAuthError = {
-            println("Error: $it")
-            navActions.onAuthError()
-          })
+      rememberSupabaseAuthLauncher(
+          onAuthComplete = viewModel::updateUser, onAuthError = { navActions.onAuthError() })
   val token = stringResource(R.string.web_client_id)
   val context = LocalContext.current
 
