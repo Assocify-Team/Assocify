@@ -13,43 +13,36 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param budgetApi the budget api
  */
-class BudgetDetailedViewModel(
-   private var budgetApi: BudgetAPI
-) : ViewModel() {
-    private val _uiState: MutableStateFlow<BudgetItemState> =
-        MutableStateFlow(BudgetItemState())
-    val uiState: StateFlow<BudgetItemState>
+class BudgetDetailedViewModel(private var budgetApi: BudgetAPI) : ViewModel() {
+  private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
+  val uiState: StateFlow<BudgetItemState>
 
-    init {
-        uiState = _uiState
-        updateDatabaseValues()
-    }
+  init {
+    uiState = _uiState
+    updateDatabaseValues()
+  }
 
-    private fun updateDatabaseValues() {
-        budgetApi.getBudget(CurrentUser.associationUid!!,
-            { budgetList -> _uiState.value = _uiState.value.copy(budgetList = budgetList) }, {}
-        )
-    }
+  private fun updateDatabaseValues() {
+    budgetApi.getBudget(
+        CurrentUser.associationUid!!,
+        { budgetList -> _uiState.value = _uiState.value.copy(budgetList = budgetList) },
+        {})
+  }
 
-    /** Gets the list of budgetItems of a given subCategory
-     *  @param accountingSubCategory the subCategory to filter on
-     *  @return the list of budgetItems of the given subCategory
-     * */
+  /**
+   * Gets the list of budgetItems of a given subCategory
+   *
+   * @param accountingSubCategory the subCategory to filter on
+   * @return the list of budgetItems of the given subCategory
+   */
+  fun getBudgetItems(accountingSubCategory: AccountingSubCategory): List<BudgetItem> {
+    return uiState.value.budgetList.filter { item -> item.category == accountingSubCategory }
+  }
 
-    fun getBudgetItems(accountingSubCategory: AccountingSubCategory): List<BudgetItem> {
-      return uiState.value.budgetList.filter { item ->
-            item.category == accountingSubCategory
-      }
-    }
+  // TODO: handle filter
 
-    //TODO: handle filter
-
-    //TODO: handle accoutingSubCategory
-
+  // TODO: handle accoutingSubCategory
 
 }
 
-
-data class BudgetItemState(
-    val budgetList: List<BudgetItem> = emptyList()
-)
+data class BudgetItemState(val budgetList: List<BudgetItem> = emptyList())

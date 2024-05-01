@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
@@ -31,6 +32,7 @@ class BudgetDetailedScreenTest :
   @get:Rule val mockkRule = MockKRule(this)
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
+  @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
   val subCategory =
       AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
   val budgetItems =
@@ -44,7 +46,9 @@ class BudgetDetailedScreenTest :
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    composeTestRule.setContent { BudgetDetailedScreen("subcategoryuid", mockNavActions) }
+    composeTestRule.setContent {
+      BudgetDetailedScreen("subcategoryuid", mockNavActions, mockBudgetAPI)
+    }
   }
 
   /** Tests if the nodes are displayed */

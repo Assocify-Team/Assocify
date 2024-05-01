@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
 import androidx.compose.runtime.Composable
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
@@ -12,6 +13,10 @@ import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
  * @param navigationActions the navigation actions
  */
 @Composable
-fun BudgetDetailedScreen(subCategoryUid: String, navigationActions: NavigationActions) {
+fun BudgetDetailedScreen(
+    subCategoryUid: String,
+    navigationActions: NavigationActions,
+    budgetAPI: BudgetAPI
+) {
   AccountingDetailedScreen(AccountingPage.BUDGET, subCategoryUid, navigationActions)
 }
