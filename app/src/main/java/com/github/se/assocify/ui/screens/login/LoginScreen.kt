@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
 import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.NavigationActions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount

@@ -22,8 +22,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ProfileViewModel(private val assoAPI: AssociationAPI, private val userAPI: UserAPI, private val navActions: NavigationActions) :
-    ViewModel() {
+class ProfileViewModel(
+    private val assoAPI: AssociationAPI,
+    private val userAPI: UserAPI,
+    private val navActions: NavigationActions
+) : ViewModel() {
   private val _uiState = MutableStateFlow(ProfileUIState())
   val uiState: StateFlow<ProfileUIState> = _uiState
 
@@ -113,9 +116,9 @@ class ProfileViewModel(private val assoAPI: AssociationAPI, private val userAPI:
     }
   }
 
-    fun logout() {
-        navActions.onLogout()
-    }
+  fun logout() {
+    navActions.onLogout()
+  }
 }
 
 data class ProfileUIState(

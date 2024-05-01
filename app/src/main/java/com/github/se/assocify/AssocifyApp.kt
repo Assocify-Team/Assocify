@@ -36,6 +36,7 @@ fun AssocifyApp(loginSaver: LoginSave) {
         navActions = navActions,
         userAPI = userAPI,
         associationAPI = associationAPI,
-        eventAPI = eventAPI,)
+        eventAPI = eventAPI,
+    )
   }
 }
