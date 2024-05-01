@@ -153,4 +153,11 @@ enum class AssociationSettings {
       Roles -> Icons.Default.ManageAccounts
     }
   }
+
+  fun getDestination(): Destination {
+    return when (this) {
+      Members -> Destination.ProfileMembers
+      Roles -> Destination.ProfileRoles
+    }
+  }
 }
