@@ -29,7 +29,7 @@ class EventAPITest {
 
   private var error = false
   private var response = ""
-  private var responseTime = OffsetDateTime.now().toString()
+  private var responseTime = "2007-12-03T10:15:30+01:00"
   private var uuid1 = UUID.fromString("00000000-0000-0000-0000-000000000000")!!
 
   private lateinit var eventAPI: EventAPI
@@ -78,7 +78,7 @@ class EventAPITest {
     verify(exactly = 0) { onFailure(any()) }
 
     error = true
-    eventAPI.getEvent("1", onSuccess, onFailure)
+    eventAPI.getEvent("$uuid1", onSuccess, onFailure)
     verify(timeout = 100) { onFailure(any()) }
   }
 
@@ -123,7 +123,7 @@ class EventAPITest {
     error = false
 
     val onSuccess: (String) -> Unit = mockk(relaxed = true)
-    val currentTime = OffsetDateTime.now()
+    val currentTime = OffsetDateTime.parse("2007-12-03T10:15:30+01:00")
 
     // need to define the response as the object serialized to make the test pass
     response =
@@ -168,7 +168,7 @@ class EventAPITest {
 
     val onSuccess: () -> Unit = mockk(relaxed = true)
     error = false
-    val currentTime = OffsetDateTime.now()
+    val currentTime = OffsetDateTime.parse("2007-12-03T10:15:30+01:00")
 
     eventAPI.updateEvent(
         Event(
