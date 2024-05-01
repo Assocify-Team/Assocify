@@ -52,8 +52,8 @@ import kotlinx.coroutines.launch
  * An event screen that displays the tasks, map, and schedule of an event.
  *
  * @param navActions Navigation actions to navigate to other screens.
- * @param event List of events to display.
- * @param currentTab Current tab to display.
+ * @param viewModel The view model for the event screen.
+ * @param taskListViewModel The view model for the task list.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -154,7 +154,14 @@ fun EventScreen(
       }
 }
 
-/** Tab of the event screen */
+/**
+ * A tab for the event screen.
+ *
+ * @param selected Whether the tab is selected.
+ * @param onClick The action to perform when the tab is clicked.
+ * @param text The text to display on the tab.
+ * @param modifier The modifier for the tab.
+ */
 @Composable
 fun EventTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
   Tab(
@@ -173,6 +180,11 @@ fun EventTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Mod
       modifier = modifier)
 }
 
+/**
+ * The Top Bar of the Event Screen when not searching.
+ * @param navActions The navigation actions to navigate to other screens.
+ * @param viewModel The view model for the event screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewModel) {
@@ -195,6 +207,10 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
       })
 }
 
+/**
+ * The Top Bar of the Event Screen when searching.
+ * @param viewModel The view model for the event screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventSearchTopBar(viewModel: EventScreenViewModel) {
@@ -224,6 +240,10 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
       }) {}
 }
 
+/**
+ * The filter bar for the event screen that contains the chips.
+ * @param viewModel The view model for the event screen.
+ */
 @Composable
 fun EventFilterBar(viewModel: EventScreenViewModel) {
   LazyRow() {
