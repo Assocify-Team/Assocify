@@ -5,8 +5,6 @@ import com.github.se.assocify.model.entities.Task
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import java.time.OffsetDateTime
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,8 +15,6 @@ import kotlinx.serialization.Serializable
  * @property db the Supabase client
  */
 class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
-  private val scope = CoroutineScope(Dispatchers.Main)
-
   /**
    * Gets a task from the database.
    *
