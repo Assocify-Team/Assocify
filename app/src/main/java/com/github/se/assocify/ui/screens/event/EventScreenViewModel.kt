@@ -21,7 +21,10 @@ class EventScreenViewModel(private var db: EventAPI) : ViewModel() {
           updateFilteredEvents(events)
           _uiState.value = _uiState.value.copy(events = events)
         },
-        { _uiState.value = _uiState.value.copy(error = true) })
+        {
+          _uiState.value = _uiState.value.copy(error = true)
+          _uiState.value = _uiState.value.copy(errorText = it.message ?: "An error occurred")
+        })
   }
 
   private fun updateFilteredEvents(events: List<Event>) {
@@ -72,5 +75,6 @@ data class EventScreenState(
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
     val currentTab: EventPageIndex = EventPageIndex.TASKS,
-    val error: Boolean = false
+    val error: Boolean = false,
+    val errorText: String = ""
 )
