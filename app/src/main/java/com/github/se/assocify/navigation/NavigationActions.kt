@@ -2,8 +2,10 @@ package com.github.se.assocify.navigation
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.localsave.LoginSave
 
-class NavigationActions(private val navController: NavHostController) {
+class NavigationActions(private val navController: NavHostController, private val loginSaver: LoginSave) {
   fun navigateToMainTab(destination: Destination) {
     if (destination in MAIN_TABS_LIST) {
       navController.navigate(destination.route) {
@@ -22,6 +24,7 @@ class NavigationActions(private val navController: NavHostController) {
 
   fun onLogin(userHasMembership: Boolean) {
     if (userHasMembership) {
+      loginSaver.saveLoginInfo(CurrentUser.userUid!!, CurrentUser.associationUid!!)
       navController.navigate(Destination.Home.route){
         popUpTo(navController.graph.id) { inclusive = true }
       }
@@ -30,6 +33,15 @@ class NavigationActions(private val navController: NavHostController) {
         popUpTo(navController.graph.id) { inclusive = true }
       }
     }
+  }
+
+  fun onLogout() {
+    navController.navigate(Destination.Login.route){
+      popUpTo(navController.graph.id) { inclusive = true }
+    }
+    CurrentUser.userUid = null
+    CurrentUser.associationUid = null
+    loginSaver.clearSavedLoginInfo()
   }
 
   fun onAuthError() {

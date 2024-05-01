@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
-import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlin.math.min
@@ -53,9 +52,8 @@ fun SelectAssociation(
     navActions: NavigationActions,
     associationAPI: AssociationAPI,
     userAPI: UserAPI,
-    loginSaver: LoginSave
 ) {
-  val model = SelectAssociationViewModel(associationAPI, userAPI, navActions, loginSaver)
+  val model = SelectAssociationViewModel(associationAPI, userAPI, navActions)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
 

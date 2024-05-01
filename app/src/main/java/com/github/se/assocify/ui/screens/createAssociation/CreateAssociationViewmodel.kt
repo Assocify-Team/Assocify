@@ -7,7 +7,6 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
-import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +17,6 @@ class CreateAssociationViewmodel(
     private val assoAPI: AssociationAPI,
     private val userAPI: UserAPI,
     private val navActions: NavigationActions,
-    private val loginSaver: LoginSave
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
@@ -173,7 +171,6 @@ class CreateAssociationViewmodel(
         asso,
         onSuccess = {
           CurrentUser.associationUid = asso.uid
-          loginSaver.saveCurrentAssociation(CurrentUser.associationUid!!)
           navActions.onLogin(true)
         },
         onFailure = { exception ->

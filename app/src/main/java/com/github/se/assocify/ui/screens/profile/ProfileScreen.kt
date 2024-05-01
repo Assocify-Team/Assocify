@@ -259,7 +259,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
 
               // log out button (for everyone)
               TextButton(
-                  onClick = { /*TODO logout*/},
+                  onClick = { viewmodel.logout() },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   contentPadding = ButtonDefaults.TextButtonContentPadding,
                   colors =

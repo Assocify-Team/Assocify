@@ -16,7 +16,7 @@ import com.github.se.assocify.navigation.mainNavGraph
 @Composable
 fun AssocifyApp(loginSaver: LoginSave) {
   val navController = rememberNavController()
-  val navActions = NavigationActions(navController)
+  val navActions = NavigationActions(navController, loginSaver)
   val userAPI = UserAPI(SupabaseClient.supabaseClient)
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
@@ -36,7 +36,6 @@ fun AssocifyApp(loginSaver: LoginSave) {
         navActions = navActions,
         userAPI = userAPI,
         associationAPI = associationAPI,
-        eventAPI = eventAPI,
-        loginSaver = loginSaver)
+        eventAPI = eventAPI,)
   }
 }

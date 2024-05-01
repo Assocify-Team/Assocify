@@ -12,13 +12,11 @@ fun NavGraphBuilder.selectAssociationGraph(
     navigationActions: NavigationActions,
     userAPI: UserAPI,
     associationAPI: AssociationAPI,
-    loginSaver: LoginSave
 ) {
   composable(route = Destination.SelectAsso.route) {
     SelectAssociation(
         navActions = navigationActions,
         associationAPI = associationAPI,
-        userAPI = userAPI,
-        loginSaver = loginSaver)
+        userAPI = userAPI,)
   }
 }
