@@ -39,6 +39,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private var goNotif = false
   private var goSecu = false
   private var goTheme = false
+  private var goMembers = false
+  private var goRoles = false
 
   private val uid = "1"
   private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true)
@@ -61,6 +63,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     every { navActions.navigateTo(Destination.ProfileNotifications) } answers { goNotif = true }
     every { navActions.navigateTo(Destination.ProfileSecurityPrivacy) } answers { goSecu = true }
     every { navActions.navigateTo(Destination.ProfileTheme) } answers { goTheme = true }
+    every { navActions.navigateTo(Destination.ProfileMembers) } answers { goMembers = true }
+    every { navActions.navigateTo(Destination.ProfileRoles) } answers { goRoles = true }
 
     composeTestRule.setContent { ProfileScreen(navActions = navActions, mViewmodel) }
   }
@@ -121,6 +125,12 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
       onNodeWithTag("Notifications").performClick()
       assert(goNotif)
+
+      onNodeWithTag("Members").performClick()
+      assert(goMembers)
+
+      onNodeWithTag("Roles").performScrollTo().performClick()
+      assert(goRoles)
     }
   }
 
