@@ -38,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -58,9 +57,12 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel, taskAPI: TaskAPI) {
+fun EventScreen(
+    navActions: NavigationActions,
+    viewModel: EventScreenViewModel,
+    taskListViewModel: EventTaskViewModel
+) {
   val state = viewModel.uiState.collectAsState()
-  val taskListViewModel = EventTaskViewModel(taskAPI)
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {
