@@ -44,6 +44,7 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
+import java.time.OffsetDateTime
 import kotlinx.coroutines.launch
 
 /**
@@ -65,7 +66,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
             onClick = {
               when (state.value.currentTab) {
                 EventPageIndex.TASKS -> {
-                  navActions.navigateTo(Destination.NewTask)
+                  navActions.navigateTo(Destination.NewTask("eventUid")) // TODO : event uid
                 }
                 EventPageIndex.MAP -> {
                   /*TODO: implement for map screen*/
@@ -136,9 +137,39 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) 
                     }
                   })
             }
-            val t1 = Task("uid1", "task 1", "the task 1", true)
-            val t2 = Task("uid2", "task 2", "the task 2", false)
-            val t3 = Task("uid3", "task 3", "the task 3", true)
+            val t1 =
+                Task(
+                    "uid1",
+                    "task 1",
+                    "the task 1",
+                    true,
+                    OffsetDateTime.now(),
+                    1,
+                    "CAT",
+                    "",
+                    "eventuid")
+            val t2 =
+                Task(
+                    "uid2",
+                    "task 2",
+                    "the task 2",
+                    false,
+                    OffsetDateTime.now(),
+                    1,
+                    "CAT",
+                    "",
+                    "eventuid")
+            val t3 =
+                Task(
+                    "uid3",
+                    "task 3",
+                    "the task 3",
+                    true,
+                    OffsetDateTime.now(),
+                    1,
+                    "CAT",
+                    "",
+                    "eventuid")
             val testTasks = listOf(t1, t2, t3)
             HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
               when (page) {

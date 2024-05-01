@@ -28,24 +28,29 @@ class TaskViewModel {
   // private val taskApi: TaskAPI
   private val navActions: NavigationActions
   private val taskUid: String
+  private val eventUid: String
 
   private val _uiState: MutableStateFlow<TaskState>
   val uiState: StateFlow<TaskState>
 
   constructor(
+      eventUid: String,
       navActions: NavigationActions,
-      taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
+      taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient),
   ) {
     this.isNewTask = true
     this.navActions = navActions
     this.taskApi = taskApi
     this.taskUid = UUID.randomUUID().toString()
+    this.eventUid = eventUid
+
     _uiState = MutableStateFlow(TaskState(isNewTask = true, pageTitle = NEW_TASK_TITLE))
     uiState = _uiState
   }
 
   constructor(
       taskUid: String,
+      eventUid: String,
       navActions: NavigationActions,
       taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
   ) {
@@ -53,6 +58,7 @@ class TaskViewModel {
     this.navActions = navActions
     this.taskApi = taskApi
     this.taskUid = taskUid
+    this.eventUid = eventUid
 
     _uiState = MutableStateFlow(TaskState(isNewTask = false, pageTitle = EDIT_TASK_TITLE))
     uiState = _uiState
@@ -146,9 +152,12 @@ class TaskViewModel {
             uid = taskUid,
             title = _uiState.value.title,
             description = _uiState.value.description,
-            category = _uiState.value.category,
-            peopleNeeded = _uiState.value.staffNumber.toInt(),
+            isCompleted = false,
             startTime = startTime,
+            peopleNeeded = _uiState.value.staffNumber.toInt(),
+            category = _uiState.value.category,
+            location = "", // TODO: Add location
+            eventUid = eventUid,
         )
 
     if (isNewTask) {

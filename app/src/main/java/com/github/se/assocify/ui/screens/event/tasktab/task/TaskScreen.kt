@@ -40,10 +40,7 @@ import com.github.se.assocify.ui.composables.TimePickerWithDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskScreen(
-    navActions: NavigationActions,
-    viewModel: TaskViewModel = TaskViewModel(navActions)
-) {
+fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
   val taskState by viewModel.uiState.collectAsState()
 
   Scaffold(

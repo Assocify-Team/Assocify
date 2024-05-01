@@ -47,9 +47,10 @@ sealed class Destination(
   data class BalanceDetailed(val subCategoryUid: String) :
       Destination("treasury/balance/$subCategoryUid")
 
-  data object NewTask : Destination("event/task")
+  data class NewTask(val eventUid: String) : Destination("event/task/$eventUid")
 
-  data class EditTask(val taskUid: String) : Destination("event/task/$taskUid")
+  data class EditTask(val eventUid: String, val taskUid: String) :
+      Destination("event/task/$eventUid/$taskUid")
 }
 
 val MAIN_TABS_LIST =
