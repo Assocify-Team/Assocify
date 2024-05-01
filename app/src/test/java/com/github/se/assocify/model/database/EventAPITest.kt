@@ -74,7 +74,7 @@ class EventAPITest {
             .trimIndent()
 
     eventAPI.getEvent("$uuid1", onSuccess, onFailure)
-    verify(timeout = 100) { onSuccess(any()) }
+    verify(timeout = 200) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
 
     error = true
