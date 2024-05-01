@@ -24,7 +24,10 @@ fun EventTaskScreen(navActions: NavigationActions, tasks: List<Task>) {
     tasks.forEach {
       item {
         ListItem(
-            modifier = Modifier.clickable { navActions.navigateTo(Destination.EditTask("eventUid", it.uid)) }, // TODO: Add the correct eventUid
+            modifier =
+                Modifier.clickable {
+                  navActions.navigateTo(Destination.EditTask("eventUid", it.uid))
+                }, // TODO: Add the correct eventUid
             headlineContent = { Text(it.title) },
             supportingContent = { Text(it.category) },
             trailingContent = {
