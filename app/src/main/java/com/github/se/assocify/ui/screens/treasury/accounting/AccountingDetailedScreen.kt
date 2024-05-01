@@ -51,7 +51,8 @@ import java.time.LocalDate
  *
  * @param page: The page to display (either "budget" or "balance")
  * @param subCategoryUid: The unique identifier of the subcategory
- * @param nameCategory: The name of the subcategory //TODO: remove this parameter when AccountingSubCategoryAPI is implemented
+ * @param nameCategory: The name of the subcategory //TODO: remove this parameter when
+ *   AccountingSubCategoryAPI is implemented
  * @param navigationActions: The navigation actions
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,9 +63,9 @@ fun AccountingDetailedScreen(
     navigationActions: NavigationActions,
     budgetAPI: BudgetAPI
 ) {
-    val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI)
-    val subCategory = budgetDetailedViewModel.getSubCategory(subCategoryUid)
-    val budgetItems = budgetDetailedViewModel.getBudgetItems(subCategoryUid)
+  val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI)
+  val subCategory = budgetDetailedViewModel.getSubCategory(subCategoryUid)
+  val budgetItems = budgetDetailedViewModel.getBudgetItems(subCategoryUid)
   // TODO: fetch from db
   val receipt =
       Receipt(

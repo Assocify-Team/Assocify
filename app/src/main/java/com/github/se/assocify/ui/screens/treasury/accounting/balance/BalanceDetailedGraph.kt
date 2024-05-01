@@ -6,7 +6,10 @@ import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
-fun NavGraphBuilder.balanceDetailedGraph(navigationActions: NavigationActions, budgetAPI: BudgetAPI) {
+fun NavGraphBuilder.balanceDetailedGraph(
+    navigationActions: NavigationActions,
+    budgetAPI: BudgetAPI
+) {
   composable(Destination.BalanceDetailed("{subCategoryUid}").route) { backStackEntry ->
     backStackEntry.arguments?.getString("subCategoryUid")?.let {
       BalanceDetailedScreen(subCategoryUid = it, navigationActions, budgetAPI = budgetAPI)

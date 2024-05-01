@@ -42,11 +42,12 @@ class BudgetDetailedViewModel(private var budgetApi: BudgetAPI) : ViewModel() {
 
   /**
    * Gets subcategory by uid and name
+   *
    * @param subCategoryUid the uid of the subcategory
    */
   fun getSubCategory(subCategoryUid: String): AccountingSubCategory {
-    //TODO: change the name of accountingsubcategory
-    return AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"),1205)
+    // TODO: change the name of accountingsubcategory
+    return AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
   }
 
   // TODO: handle filter
