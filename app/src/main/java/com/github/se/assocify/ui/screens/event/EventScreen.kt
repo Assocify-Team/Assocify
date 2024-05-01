@@ -92,7 +92,7 @@ fun EventScreen(
       },
       topBar = {
         if (state.value.searching) {
-          EventSearchTopBar(viewModel, taskListViewModel)
+          EventSearchTopBar(viewModel)
         } else {
           EventTitleTopBar(navActions, viewModel)
         }
@@ -109,7 +109,7 @@ fun EventScreen(
             val pagerState = rememberPagerState(pageCount = { EventPageIndex.NUMBER_OF_PAGES })
             val coroutineRoute = rememberCoroutineScope()
 
-            EventFilterBar(viewModel, taskListViewModel)
+            EventFilterBar(viewModel)
             TabRow(selectedTabIndex = pagerState.currentPage) {
               EventTab(
                   text = "Tasks",
@@ -144,8 +144,7 @@ fun EventScreen(
             }
             HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
               when (page) {
-                EventPageIndex.TASKS.index ->
-                    EventTaskScreen(viewModel, taskListViewModel, navActions)
+                EventPageIndex.TASKS.index -> EventTaskScreen(taskListViewModel, navActions)
                 EventPageIndex.MAP.index -> EventMapScreen()
                 EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
               }
@@ -198,7 +197,7 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventSearchTopBar(viewModel: EventScreenViewModel, taskViewModel: EventTaskViewModel) {
+fun EventSearchTopBar(viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
   SearchBar(
       modifier = Modifier.padding(8.dp).testTag("searchBar").fillMaxWidth(),
@@ -235,7 +234,7 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel, taskViewModel: EventTaskV
 }
 
 @Composable
-fun EventFilterBar(viewModel: EventScreenViewModel, taskViewModel: EventTaskViewModel) {
+fun EventFilterBar(viewModel: EventScreenViewModel) {
   LazyRow() {
     item {
       val state = viewModel.uiState.collectAsState()

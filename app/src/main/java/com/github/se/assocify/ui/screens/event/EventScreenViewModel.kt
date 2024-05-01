@@ -55,11 +55,14 @@ class EventScreenViewModel(
           _uiState.value.selectedEvents - event
         }
     _uiState.value = _uiState.value.copy(selectedEvents = selectedEvents)
+    taskListViewModel.setEvents(selectedEvents)
   }
 
   fun isEventSelected(event: Event): Boolean {
     return _uiState.value.selectedEvents.contains(event)
   }
+
+  fun searchTaskLists() {}
 }
 
 // Index of each tag for navigation
