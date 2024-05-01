@@ -60,16 +60,27 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
     filterTasks()
   }
 
+  /**
+   * Searches for tasks with a given query.
+   *
+   * @param query the query to search for
+   */
   fun search(query: String) {
     _uiState.value = _uiState.value.copy(filter = query)
     filterTasks()
   }
 
+  /**
+   * Sets the events for the tasks.
+   *
+   * @param events the list of events
+   */
   fun setEvents(events: List<Event>) {
     _uiState.value = _uiState.value.copy(filteredEvents = events)
     filterTasks()
   }
 
+  /** Filters the tasks based on the search query and events. */
   private fun filterTasks() {
     _uiState.value =
         _uiState.value.copy(
