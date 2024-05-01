@@ -1,4 +1,3 @@
-
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import com.github.se.assocify.model.localsave.LoginSave
@@ -48,7 +47,9 @@ class NavigationActionsTest {
   fun `onLogin navigates to SelectAsso when user does not exist`() {
     navigationActions.onLogin(false)
 
-    verify { navController.navigate(Destination.SelectAsso.route, any<(NavOptionsBuilder) -> Unit>()) }
+    verify {
+      navController.navigate(Destination.SelectAsso.route, any<(NavOptionsBuilder) -> Unit>())
+    }
   }
 
   @Test
