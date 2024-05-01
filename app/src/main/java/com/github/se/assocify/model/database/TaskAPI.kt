@@ -51,10 +51,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun getTasks(onSuccess: (List<Task>) -> Unit, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val tasks = db
-          .from("task")
-          .select()
-          .decodeList<SupabaseTask>()
+        val tasks = db.from("task").select().decodeList<SupabaseTask>()
         onSuccess(tasks.map { it.toTask() })
       } catch (e: Exception) {
         onFailure(e)

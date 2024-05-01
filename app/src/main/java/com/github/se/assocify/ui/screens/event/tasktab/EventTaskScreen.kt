@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.event.EventScreenViewModel
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
@@ -20,7 +21,11 @@ import com.github.se.assocify.navigation.NavigationActions
  * @param navActions the navigation actions to navigate to other screens
  */
 @Composable
-fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: NavigationActions) {
+fun EventTaskScreen(
+    viewModel: EventScreenViewModel,
+    eventTaskViewModel: EventTaskViewModel,
+    navActions: NavigationActions
+) {
   val state = eventTaskViewModel.uiState.collectAsState()
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
     state.value.tasks.forEach {

@@ -39,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.database.TaskAPI
-import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -108,7 +107,7 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel, 
             val pagerState = rememberPagerState(pageCount = { EventPageIndex.NUMBER_OF_PAGES })
             val coroutineRoute = rememberCoroutineScope()
 
-            EventFilterBar(viewModel)
+            EventFilterBar(viewModel, taskListViewModel)
             TabRow(selectedTabIndex = pagerState.currentPage) {
               EventTab(
                   text = "Tasks",
@@ -141,13 +140,10 @@ fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel, 
                     }
                   })
             }
-            val t1 = Task("uid1", "task 1", "the task 1", true)
-            val t2 = Task("uid2", "task 2", "the task 2", false)
-            val t3 = Task("uid3", "task 3", "the task 3", true)
-            val testTasks = listOf(t1, t2, t3)
             HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
               when (page) {
-                EventPageIndex.TASKS.index -> EventTaskScreen(taskListViewModel, navActions)
+                EventPageIndex.TASKS.index ->
+                    EventTaskScreen(viewModel, taskListViewModel, navActions)
                 EventPageIndex.MAP.index -> EventMapScreen()
                 EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
               }
@@ -221,7 +217,7 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel, taskViewModel: EventTaskV
                 Modifier.clickable {
                   when (state.value.currentTab) {
                     EventPageIndex.TASKS -> {
-                      taskViewModel.updateEvents(state.value.selectedEvents)
+                      /*TODO: implement for task screen*/
                     }
                     EventPageIndex.MAP -> {
                       /*TODO: implement for map screen*/
@@ -237,7 +233,7 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel, taskViewModel: EventTaskV
 }
 
 @Composable
-fun EventFilterBar(viewModel: EventScreenViewModel) {
+fun EventFilterBar(viewModel: EventScreenViewModel, taskViewModel: EventTaskViewModel) {
   LazyRow() {
     item {
       val state = viewModel.uiState.collectAsState()

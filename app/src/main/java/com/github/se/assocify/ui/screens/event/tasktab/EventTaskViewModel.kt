@@ -2,7 +2,6 @@ package com.github.se.assocify.ui.screens.event.tasktab
 
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
-import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +19,7 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
   /** Updates the list of tasks in the UI. */
   private fun updateTasks() {
     db.getTasks(
-        { tasks -> _uiState.value = _uiState.value.copy(tasks = tasks)},
+        { tasks -> _uiState.value = _uiState.value.copy(tasks = tasks) },
         { e ->
           _uiState.value =
               _uiState.value.copy(
@@ -37,15 +36,6 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
                               location = "Here",
                               eventUid = "eventUid")))
         })
-  }
-
-  /**
-   * Updates the list of events in the UI.
-   *
-   * @param events the list of events to update the UI with
-   */
-  fun updateEvents(events: List<Event>) {
-    _uiState.value = _uiState.value.copy(filteredEvents = events)
   }
 
   /**
@@ -81,7 +71,6 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
 data class EventTaskState(
     val tasks: List<Task> = emptyList(),
     val filteredTasks: List<Task> = emptyList(),
-    val filteredEvents: List<Event> = emptyList(),
     val filter: String = "",
     val isFilterActivated: Boolean = false
 )
