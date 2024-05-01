@@ -4,13 +4,15 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.loginGraph(
     navigationActions: NavigationActions,
     userAPI: UserAPI,
-    associationAPI: AssociationAPI
+    associationAPI: AssociationAPI,
+    loginSaver: LoginSave
 ) {
-  composable(route = Destination.Login.route) { LoginScreen(navigationActions, userAPI) }
+  composable(route = Destination.Login.route) { LoginScreen(navigationActions, userAPI, loginSaver) }
 }

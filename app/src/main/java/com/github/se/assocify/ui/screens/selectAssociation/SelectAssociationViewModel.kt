@@ -6,6 +6,7 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ class SelectAssociationViewModel(
     private val associationAPI: AssociationAPI,
     private val userAPI: UserAPI,
     private val navActions: NavigationActions,
+    private val loginSaver: LoginSave
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<SelectAssociationState> =
       MutableStateFlow(SelectAssociationState())
@@ -50,7 +52,8 @@ class SelectAssociationViewModel(
   /** Confirms selection of an association and moves to the home screen. */
   fun selectAssoc(uid: String) {
     CurrentUser.associationUid = uid
-    userAPI.requestJoin(uid, {}, {})
+    userAPI.requestJoin(uid, {}, {}) // TODO: handle joining assoc (non immediate approval)
+    loginSaver.saveCurrentAssociation(CurrentUser.associationUid!!)
     navActions.navigateTo(Destination.Home)
   }
 }

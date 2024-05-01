@@ -5,12 +5,13 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.User
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.NavigationActions
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.github.jan.supabase.gotrue.user.UserInfo
 
 /** The ViewModel for the login screen */
-class LoginViewModel(private val navActions: NavigationActions, private val userAPI: UserAPI) :
+class LoginViewModel(private val navActions: NavigationActions, private val userAPI: UserAPI, private val loginSaver: LoginSave) :
     ViewModel() {
 
   /** Updates the userId of the UI state */
@@ -32,6 +33,7 @@ class LoginViewModel(private val navActions: NavigationActions, private val user
                     navActions.onLogin(false)
                   } else {
                     CurrentUser.associationUid = associations.first().uid
+                    loginSaver.saveLoginInfo(CurrentUser.userUid!!, CurrentUser.associationUid!!)
                     navActions.onLogin(true)
                   }
                 },

@@ -7,14 +7,19 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
-import java.time.LocalDate
-import java.util.UUID
+import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import java.util.UUID
 
 class CreateAssociationViewmodel(
     private val assoAPI: AssociationAPI,
-    private val userAPI: UserAPI
+    private val userAPI: UserAPI,
+    private val navActions: NavigationActions,
+    private val loginSaver: LoginSave
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
@@ -167,7 +172,11 @@ class CreateAssociationViewmodel(
         )
     assoAPI.addAssociation(
         asso,
-        onSuccess = { /* navigate to home page with the new association as the current asso */},
+        onSuccess = {
+          CurrentUser.associationUid = asso.uid
+          loginSaver.saveCurrentAssociation(CurrentUser.associationUid!!)
+          navActions.navigateTo(Destination.Home)
+        },
         onFailure = { exception ->
           Log.e("CreateAssoViewModel", "Failed to add asso: ${exception.message}")
         })

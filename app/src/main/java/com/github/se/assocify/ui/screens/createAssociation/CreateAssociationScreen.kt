@@ -47,6 +47,7 @@ import com.github.se.assocify.R
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.RoleType
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.UserSearchTextField
@@ -57,7 +58,8 @@ fun CreateAssociationScreen(
     navigationActions: NavigationActions,
     assoAPI: AssociationAPI,
     userAPI: UserAPI,
-    viewmodel: CreateAssociationViewmodel = CreateAssociationViewmodel(assoAPI, userAPI)
+    loginSaver: LoginSave,
+    viewmodel: CreateAssociationViewmodel = CreateAssociationViewmodel(assoAPI, userAPI, navigationActions, loginSaver)
 ) {
 
   val state by viewmodel.uiState.collectAsState()
