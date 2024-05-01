@@ -62,7 +62,33 @@ class EventScreenViewModel(
     return _uiState.value.selectedEvents.contains(event)
   }
 
-  fun searchTaskLists() {}
+  fun deactivateSearch() {
+    when (_uiState.value.currentTab) {
+      EventPageIndex.TASKS -> {
+        taskListViewModel.search("")
+      }
+      EventPageIndex.MAP -> {
+        /*TODO: implement for map screen*/
+      }
+      EventPageIndex.SCHEDULE -> {
+        /*TODO: implement for schedule screen*/
+      }
+    }
+  }
+
+  fun searchTaskLists() {
+    when (_uiState.value.currentTab) {
+      EventPageIndex.TASKS -> {
+        taskListViewModel.search(_uiState.value.searchQuery)
+      }
+      EventPageIndex.MAP -> {
+        /*TODO: implement for map screen*/
+      }
+      EventPageIndex.SCHEDULE -> {
+        /*TODO: implement for schedule screen*/
+      }
+    }
+  }
 }
 
 // Index of each tag for navigation

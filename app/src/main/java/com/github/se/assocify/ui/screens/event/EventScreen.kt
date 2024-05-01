@@ -208,26 +208,17 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
       onActiveChange = {},
       leadingIcon = {
         Icon(
-            modifier = Modifier.clickable { viewModel.modifySearchingState(false) },
+            modifier =
+                Modifier.clickable {
+                  viewModel.modifySearchingState(false)
+                  viewModel.deactivateSearch()
+                },
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Dismiss")
       },
       trailingIcon = {
         Icon(
-            modifier =
-                Modifier.clickable {
-                  when (state.value.currentTab) {
-                    EventPageIndex.TASKS -> {
-                      /*TODO: implement for task screen*/
-                    }
-                    EventPageIndex.MAP -> {
-                      /*TODO: implement for map screen*/
-                    }
-                    EventPageIndex.SCHEDULE -> {
-                      /*TODO: implement for schedule screen*/
-                    }
-                  }
-                },
+            modifier = Modifier.clickable { viewModel.searchTaskLists() },
             imageVector = Icons.Filled.Search,
             contentDescription = "Search")
       }) {}
