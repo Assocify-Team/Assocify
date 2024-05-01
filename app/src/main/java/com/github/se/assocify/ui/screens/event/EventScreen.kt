@@ -91,7 +91,7 @@ fun EventScreen(
             selectedTab = Destination.Event)
       },
       topBar = {
-        if (state.value.searching) {
+        if (state.value.stateBarDisplay) {
           EventSearchTopBar(viewModel)
         } else {
           EventTitleTopBar(navActions, viewModel)
@@ -182,6 +182,7 @@ fun EventTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Mod
 
 /**
  * The Top Bar of the Event Screen when not searching.
+ *
  * @param navActions The navigation actions to navigate to other screens.
  * @param viewModel The view model for the event screen.
  */
@@ -209,6 +210,7 @@ fun EventTitleTopBar(navActions: NavigationActions, viewModel: EventScreenViewMo
 
 /**
  * The Top Bar of the Event Screen when searching.
+ *
  * @param viewModel The view model for the event screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -224,11 +226,7 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
       onActiveChange = {},
       leadingIcon = {
         Icon(
-            modifier =
-                Modifier.clickable {
-                  viewModel.modifySearchingState(false)
-                  viewModel.deactivateSearch()
-                },
+            modifier = Modifier.clickable { viewModel.deactivateSearch() },
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Dismiss")
       },
@@ -242,11 +240,12 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
 
 /**
  * The filter bar for the event screen that contains the chips.
+ *
  * @param viewModel The view model for the event screen.
  */
 @Composable
 fun EventFilterBar(viewModel: EventScreenViewModel) {
-  LazyRow() {
+  LazyRow {
     item {
       val state = viewModel.uiState.collectAsState()
       state.value.events.forEach {

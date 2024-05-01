@@ -36,7 +36,7 @@ class EventScreenViewModel(
   }
 
   fun modifySearchingState(searching: Boolean) {
-    _uiState.value = _uiState.value.copy(searching = searching)
+    _uiState.value = _uiState.value.copy(stateBarDisplay = searching)
   }
 
   fun modifySearchQuery(query: String) {
@@ -66,6 +66,7 @@ class EventScreenViewModel(
     when (_uiState.value.currentTab) {
       EventPageIndex.TASKS -> {
         taskListViewModel.search("")
+        modifySearchingState(false)
       }
       EventPageIndex.MAP -> {
         /*TODO: implement for map screen*/
@@ -104,7 +105,7 @@ enum class EventPageIndex(val index: Int) {
 
 data class EventScreenState(
     val searchQuery: String = "",
-    val searching: Boolean = false,
+    val stateBarDisplay: Boolean = false,
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
     val currentTab: EventPageIndex = EventPageIndex.TASKS,
