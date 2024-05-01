@@ -20,8 +20,8 @@ class NavigationActions(private val navController: NavHostController) {
     navController.navigate(destination.route)
   }
 
-  fun onLogin(userExists: Boolean) {
-    if (userExists) {
+  fun onLogin(userHasMembership: Boolean) {
+    if (userHasMembership) {
       navigateTo(Destination.Home)
     } else {
       navigateTo(Destination.SelectAsso)

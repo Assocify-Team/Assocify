@@ -10,13 +10,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.github.jan.supabase.gotrue.user.UserInfo
 
 /** The ViewModel for the login screen */
-class LoginViewModel(private val userAPI: UserAPI, private val navActions: NavigationActions) :
+class LoginViewModel(private val navActions: NavigationActions, private val userAPI: UserAPI) :
     ViewModel() {
 
   /** Updates the userId of the UI state */
   fun updateUser(info: UserInfo, googleUser: GoogleSignInAccount) {
     CurrentUser.userUid = info.id
-    CurrentUser.associationUid = "associationUid"
+
     userAPI.getAllUsers(
         { users: List<User> ->
           val user = users.find { it.uid == info.id }
@@ -24,8 +24,19 @@ class LoginViewModel(private val userAPI: UserAPI, private val navActions: Navig
             val newUser =
                 User(info.id, googleUser.displayName ?: googleUser.email!!, googleUser.email!!)
             addUser(newUser)
+            navActions.onLogin(false)
+          } else {
+            userAPI.getCurrentUserAssociations(
+                { associations ->
+                  if (associations.isEmpty()) {
+                    navActions.onLogin(false)
+                  } else {
+                    CurrentUser.associationUid = associations.first().uid
+                    navActions.onLogin(true)
+                  }
+                },
+                { exception -> Log.e("Login", "Failed to get associations: ${exception.message}") })
           }
-          navActions.onLogin(user != null)
         },
         { exception -> Log.e("LoginViewModel", "Failed to get users: ${exception.message}") })
   }
