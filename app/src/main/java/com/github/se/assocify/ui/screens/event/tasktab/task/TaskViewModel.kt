@@ -1,18 +1,21 @@
 package com.github.se.assocify.ui.screens.event.tasktab.task
 
 import androidx.compose.material3.SnackbarHostState
+import com.github.se.assocify.model.SupabaseClient
+import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.TimeUtil
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class TaskViewModel {
 
+  private var taskApi: TaskAPI
   private val NEW_TASK_TITLE = "New Task"
   private val EDIT_TASK_TITLE = "Edit Task"
 
@@ -25,10 +28,10 @@ class TaskViewModel {
 
   constructor(
       navActions: NavigationActions,
-      // taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
+      taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
   ) {
     this.navActions = navActions
-    // this.taskApi = taskApi
+    this.taskApi = taskApi
     this.taskUid = UUID.randomUUID().toString()
     _uiState = MutableStateFlow(TaskState(isNewTask = true, pageTitle = NEW_TASK_TITLE))
     uiState = _uiState
@@ -37,13 +40,26 @@ class TaskViewModel {
   constructor(
       taskUid: String,
       navActions: NavigationActions,
-      // taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
+      taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
   ) {
     this.navActions = navActions
-    // this.taskApi = taskApi
+    this.taskApi = taskApi
     this.taskUid = taskUid
+
     _uiState = MutableStateFlow(TaskState(isNewTask = false, pageTitle = EDIT_TASK_TITLE))
     uiState = _uiState
+
+    taskApi.getTask(taskUid, {
+        _uiState.value = _uiState.value.copy(
+            title = it.title,
+            description = it.description,
+            category = it.category,
+            staffNumber = it.peopleNeeded.toString(),
+            date = DateUtil.toString(it.startTime),
+          //  time
+            pageTitle = EDIT_TASK_TITLE
+        )
+    }, { /* handle error */ })
   }
 
   fun setTitle(title: String) {
@@ -100,19 +116,24 @@ class TaskViewModel {
       return
     }
 
-    val date = DateUtil.toDate(_uiState.value.date) ?: return
+    val startTime = DateUtil.toDate(_uiState.value.date).atTime(TimeUtil.toTime(_uiState.value.time)) ?: return
 
     val task =
-        Task(uid = taskUid, name = _uiState.value.title, description = _uiState.value.description)
+        Task(
+            uid = taskUid,
+            title = _uiState.value.title,
+            description = _uiState.value.description,
+            category = _uiState.value.category,
+            peopleNeeded = _uiState.value.staffNumber.toInt(),)
 
-    // taskApi.uploadTask(task)
+    taskApi.addTask(task, { navActions.back() }, { /* handle error */ })
   }
 
   fun deleteTask() {
     if (_uiState.value.isNewTask) {
       navActions.back()
     } else {
-      // taskApi.deleteTask(taskUid)
+      taskApi.deleteTask(taskUid, { navActions.back() }, { /* handle error */ })
       navActions.back()
     }
   }
