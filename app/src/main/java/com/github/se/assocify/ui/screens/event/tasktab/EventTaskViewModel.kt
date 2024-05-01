@@ -6,6 +6,7 @@ import com.github.se.assocify.model.entities.Task
 import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.OffsetDateTime
 
 class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
   private val _uiState = MutableStateFlow(EventTaskState())
@@ -30,7 +31,7 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
                               title = e.toString(),
                               description = "description",
                               isCompleted = false,
-                              startTime = LocalDateTime.now(),
+                              startTime = OffsetDateTime.now(),
                               peopleNeeded = 0,
                               category = "Committee",
                               location = "Here",

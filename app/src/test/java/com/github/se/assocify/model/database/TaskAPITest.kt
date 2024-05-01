@@ -11,7 +11,7 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.UUID
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +31,7 @@ class TaskAPITest {
   private val uuid1: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
   private val uuid2: UUID = UUID.fromString("11111111-1111-1111-1111-111111111111")
   private val uuid3: UUID = UUID.fromString("22222222-2222-2222-2222-222222222222")
+  private val responseTime = OffsetDateTime.now()
 
   private lateinit var taskAPI: TaskAPI
 
@@ -65,7 +66,7 @@ class TaskAPITest {
           "title": "testName",
           "description": "description",
           "is_completed": false,
-          "start_time": "2024-04-30 12:30:00" ,
+          "start_time": "$responseTime" ,
           "people_needed": 0,
           "category": "Committee",
           "location": "Here",
@@ -77,6 +78,7 @@ class TaskAPITest {
     taskAPI.getTask(uuid1.toString(), onSuccess, onFailure)
 
     verify(timeout = 1000) { onSuccess(any()) }
+
     verify(exactly = 0) { onFailure(any()) }
 
     // Test failure
@@ -100,7 +102,7 @@ class TaskAPITest {
             "title": "testName",
             "description": "description",
             "is_completed": false,
-            "start_time": "2024-04-30 12:30:00" ,
+            "start_time": "$responseTime" ,
             "people_needed": 0,
             "category": "Committee",
             "location": "Here",
@@ -111,7 +113,7 @@ class TaskAPITest {
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
-            "start_time": "2024-04-30 12:30:00" ,
+            "start_time": "$responseTime",
             "people_needed": 2,
             "category": "Committee2",
             "location": "Here2",
@@ -161,14 +163,15 @@ class TaskAPITest {
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
     error = false
     taskAPI.editTask(
-        uuid1.toString(),
-        "newName",
-        "newDescription",
-        true,
-        LocalDateTime.now(),
-        2,
-        "newCategory",
-        "newLocation",
+        Task(
+            uuid1.toString(),
+            "newName",
+            "newDescription",
+            true,
+            OffsetDateTime.now(),
+            2,
+            "newCategory",
+            "newLocation"),
         onSuccess) {
           fail("should not fail")
         }
@@ -176,14 +179,15 @@ class TaskAPITest {
 
     error = true
     taskAPI.editTask(
-        uuid1.toString(),
-        "newName",
-        "newDescription",
-        true,
-        LocalDateTime.now(),
-        2,
-        "newCategory",
-        "newLocation",
+        Task(
+            uuid1.toString(),
+            "newName",
+            "newDescription",
+            true,
+            OffsetDateTime.now(),
+            2,
+            "newCategory",
+            "newLocation"),
         { fail("should not fail") },
         onFailure)
     verify(timeout = 1000) { onFailure(any()) }
@@ -216,7 +220,7 @@ class TaskAPITest {
             "title": "testName",
             "description": "description",
             "is_completed": false,
-            "start_time": "2024-04-30 12:30:00" ,
+            "start_time": "$responseTime" ,
             "people_needed": 0,
             "category": "Committee",
             "location": "Here",
@@ -227,7 +231,7 @@ class TaskAPITest {
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
-            "start_time": "2024-04-30 12:30:00" ,
+            "start_time": "$responseTime" ,
             "people_needed": 2,
             "category": "Committee2",
             "location": "Here2",

@@ -26,21 +26,19 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun addEvent(event: Event, onSuccess: (String) -> Unit = {}, onFailure: (Exception) -> Unit) {
     scope.launch {
       try {
-        val resp =
-            postgrest
-                .from(collectionName)
-                .insert(
-                    SupabaseEvent(
-                        uid = event.uid,
-                        name = event.name,
-                        description = event.description,
-                        startDate = event.startDate.toString(),
-                        endDate = event.endDate.toString(),
-                        guestsOrArtists = event.guestsOrArtists,
-                        location = event.location))
-                .decodeAs<SupabaseEvent>()
-                .uid
-        onSuccess(resp)
+
+        postgrest
+            .from(collectionName)
+            .insert(
+                SupabaseEvent(
+                    uid = event.uid,
+                    name = event.name,
+                    description = event.description,
+                    startDate = event.startDate.toString(),
+                    endDate = event.endDate.toString(),
+                    guestsOrArtists = event.guestsOrArtists,
+                    location = event.location))
+        onSuccess(event.uid)
       } catch (e: Exception) {
         onFailure(e)
       }
@@ -183,7 +181,7 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
   ) {
     fun toEvent() =
         Event(
-            uid = uid ?: "",
+            uid = uid,
             name = name,
             description = description,
             startDate = OffsetDateTime.parse(startDate),
