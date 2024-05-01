@@ -22,9 +22,13 @@ class NavigationActions(private val navController: NavHostController) {
 
   fun onLogin(userHasMembership: Boolean) {
     if (userHasMembership) {
-      navigateTo(Destination.Home)
+      navController.navigate(Destination.Home.route){
+        popUpTo(navController.graph.id) { inclusive = true }
+      }
     } else {
-      navigateTo(Destination.SelectAsso)
+      navController.navigate(Destination.SelectAsso.route){
+        popUpTo(navController.graph.id) { inclusive = true }
+      }
     }
   }
 

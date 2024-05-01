@@ -7,7 +7,6 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.model.localsave.LoginSave
-import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,7 +53,7 @@ class SelectAssociationViewModel(
     CurrentUser.associationUid = uid
     userAPI.requestJoin(uid, {}, {}) // TODO: handle joining assoc (non immediate approval)
     loginSaver.saveCurrentAssociation(CurrentUser.associationUid!!)
-    navActions.navigateTo(Destination.Home)
+    navActions.onLogin(true)
   }
 }
 
