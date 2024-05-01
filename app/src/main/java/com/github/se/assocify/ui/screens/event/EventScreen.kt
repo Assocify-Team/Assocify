@@ -99,7 +99,7 @@ fun EventScreen(
       }) {
         if (state.value.error) {
           Column(
-              modifier = Modifier.padding(it).fillMaxSize(),
+              modifier = Modifier.padding(it).fillMaxSize().testTag("errorText"),
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.Center) {
                 Text(state.value.errorText)

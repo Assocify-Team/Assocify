@@ -209,4 +209,20 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("searchBarButton").performClick()
     }
   }
+
+  @Test
+  fun errorEventTest() {
+    every { mockEventAPI.getEvents(any(), any()) } answers
+        {
+          val onFailureError = arg<(Exception) -> Unit>(1)
+          onFailureError(IllegalArgumentException("Test error"))
+        }
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
+    with(composeTestRule) { onNodeWithTag("errorText").assertIsDisplayed() }
+  }
 }
