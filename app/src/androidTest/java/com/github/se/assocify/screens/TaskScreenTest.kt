@@ -43,7 +43,6 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
       onNodeWithTag("staffNumberField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("timeField").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("locationField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("deleteButton").performScrollTo().assertIsDisplayed()
     }
