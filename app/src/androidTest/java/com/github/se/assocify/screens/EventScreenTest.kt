@@ -182,4 +182,22 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("searchBar").assertIsDisplayed()
     }
   }
+
+  @Test
+  fun testDisplayTask() {
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
+    with(composeTestRule) {
+      onNodeWithTag("TaskItem").assertIsNotDisplayed()
+      onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
+      onNodeWithTag("filterChipTestEvent").performClick()
+      Thread.sleep(2000)
+      onNodeWithTag("filterChipTestEvent").assertIsSelected()
+      onNodeWithTag("TaskItem").assertIsDisplayed()
+    }
+  }
 }

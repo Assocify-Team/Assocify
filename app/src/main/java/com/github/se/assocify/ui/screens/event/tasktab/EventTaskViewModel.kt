@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
-import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -15,28 +14,17 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
   init {
     uiState = _uiState
     updateTasks()
+    filterTasks()
   }
 
   /** Updates the list of tasks in the UI. */
   private fun updateTasks() {
     db.getTasks(
-        { tasks -> _uiState.value = _uiState.value.copy(tasks = tasks) },
-        { e ->
-          _uiState.value =
-              _uiState.value.copy(
-                  tasks =
-                      listOf(
-                          Task(
-                              uid = "testUid",
-                              title = e.toString(),
-                              description = "description",
-                              isCompleted = false,
-                              startTime = OffsetDateTime.now(),
-                              peopleNeeded = 0,
-                              category = "Committee",
-                              location = "Here",
-                              eventUid = "eventUid")))
-        })
+        { tasks ->
+          _uiState.value = _uiState.value.copy(tasks = tasks)
+          filterTasks()
+        },
+        {})
   }
 
   /**
