@@ -3,10 +3,9 @@ package com.github.se.assocify.ui.screens.event.tasktab
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Task
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.OffsetDateTime
 
 class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
   private val _uiState = MutableStateFlow(EventTaskState())

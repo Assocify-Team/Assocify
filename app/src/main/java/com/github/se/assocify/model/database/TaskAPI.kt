@@ -133,6 +133,28 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
     }
   }
+
+  /**
+   * Edits a task in the database.
+   *
+   * @param task the task to edit
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun editTask(task: Task, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    editTask(
+        task.uid,
+        task.title,
+        task.description,
+        task.isCompleted,
+        task.startTime,
+        task.peopleNeeded,
+        task.category,
+        task.location,
+        onSuccess,
+        onFailure)
+  }
+
   /**
    * Deletes a task from the database.
    *
