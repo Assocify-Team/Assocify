@@ -4,15 +4,11 @@ import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import java.time.OffsetDateTime
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
-
-  private val scope = CoroutineScope(Dispatchers.Main)
   private val postgrest = db.postgrest
   private val collectionName = "event"
 

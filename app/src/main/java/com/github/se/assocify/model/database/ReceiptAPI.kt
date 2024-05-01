@@ -10,15 +10,12 @@ import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.upload
 import java.time.LocalDate
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
   private val bucket = db.storage["receipt"]
-  private val scope = CoroutineScope(Dispatchers.Main)
 
   private val columns =
       Columns.raw(

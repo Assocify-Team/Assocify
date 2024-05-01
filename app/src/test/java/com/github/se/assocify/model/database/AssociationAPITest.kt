@@ -2,21 +2,22 @@ package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
+import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.ktor.http.Headers
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
 import java.util.UUID
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
@@ -28,22 +29,24 @@ class AssociationAPITest {
 
   private var error = false
   private var response = ""
+  private var responseHeaders = Headers.Empty
   private val uuid1 = UUID.fromString("00000000-0000-0000-0000-000000000000")!!
   private val uuid2 = UUID.fromString("ABCDEF00-0000-0000-0000-000000000000")!!
+  private val uuid3 = UUID.fromString("12345600-0000-0000-0000-000000000000")!!
 
   private lateinit var assoAPI: AssociationAPI
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
-    Dispatchers.setMain(UnconfinedTestDispatcher())
+    APITestUtils.setup()
     assoAPI =
         AssociationAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
               httpEngine = MockEngine {
                 if (!error) {
-                  respond(response)
+                  respond(response, headers = responseHeaders)
                 } else {
                   respondBadRequest()
                 }
@@ -180,6 +183,66 @@ class AssociationAPITest {
     error = true
 
     assoAPI.deleteAssociation(uuid1.toString(), { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testGetApplicants() {
+    val onSuccess: (List<User>) -> Unit = mockk(relaxed = true)
+
+    response =
+        """
+      [
+        {
+          "association_id": "$uuid3",
+          "users": {
+            "uid": "$uuid1",
+            "name": "UUID1"
+          }
+        },
+        {
+          "association_id": "$uuid3",
+          "users": {
+            "uid": "$uuid2",
+            "name": "UUID2",
+            "email": "uuid2@example.com"
+          }
+        }
+      ]
+      """
+            .trimIndent()
+
+    assoAPI.getApplicants(uuid3.toString(), onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(any()) }
+
+    // Test failure
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
+
+    assoAPI.getApplicants(uuid3.toString(), { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testAcceptUser() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    response = """{"count": 1}"""
+    responseHeaders = Headers.build { append("Content-Range", "/1") }
+
+    val permissionRole = PermissionRole(uuid2.toString(), uuid3.toString(), RoleType.PRESIDENCY)
+    assoAPI.acceptUser(
+        uuid1.toString(), permissionRole, onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    // Test failure
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
+
+    assoAPI.acceptUser(uuid1.toString(), permissionRole, { fail("Should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
   }
