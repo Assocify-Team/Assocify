@@ -11,8 +11,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.github.jan.supabase.gotrue.user.UserInfo
 
 /** The ViewModel for the login screen */
-class LoginViewModel(private val navActions: NavigationActions, private val userAPI: UserAPI, private val loginSaver: LoginSave) :
-    ViewModel() {
+class LoginViewModel(
+    private val navActions: NavigationActions,
+    private val userAPI: UserAPI,
+    private val loginSaver: LoginSave
+) : ViewModel() {
 
   /** Updates the userId of the UI state */
   fun updateUser(info: UserInfo, googleUser: GoogleSignInAccount) {

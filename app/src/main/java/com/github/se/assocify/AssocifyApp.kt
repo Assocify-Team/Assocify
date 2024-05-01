@@ -24,11 +24,12 @@ fun AssocifyApp(loginSaver: LoginSave) {
   CurrentUser.userUid = loginSaver.getSavedUserUid()
   CurrentUser.associationUid = loginSaver.getSavedAssociationUid()
 
-  val firstDest = if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
-    Destination.Home.route
-  } else {
-    Destination.Login.route
-  }
+  val firstDest =
+      if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
+        Destination.Home.route
+      } else {
+        Destination.Login.route
+      }
 
   NavHost(navController = navController, startDestination = firstDest) {
     mainNavGraph(

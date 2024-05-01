@@ -59,7 +59,8 @@ fun CreateAssociationScreen(
     assoAPI: AssociationAPI,
     userAPI: UserAPI,
     loginSaver: LoginSave,
-    viewmodel: CreateAssociationViewmodel = CreateAssociationViewmodel(assoAPI, userAPI, navigationActions, loginSaver)
+    viewmodel: CreateAssociationViewmodel =
+        CreateAssociationViewmodel(assoAPI, userAPI, navigationActions, loginSaver)
 ) {
 
   val state by viewmodel.uiState.collectAsState()

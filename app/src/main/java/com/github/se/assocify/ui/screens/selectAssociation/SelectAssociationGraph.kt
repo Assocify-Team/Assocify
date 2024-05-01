@@ -19,7 +19,6 @@ fun NavGraphBuilder.selectAssociationGraph(
         navActions = navigationActions,
         associationAPI = associationAPI,
         userAPI = userAPI,
-        loginSaver = loginSaver
-    )
+        loginSaver = loginSaver)
   }
 }
