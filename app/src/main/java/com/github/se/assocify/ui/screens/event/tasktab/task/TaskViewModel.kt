@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.event.tasktab.task
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.TaskAPI
@@ -7,15 +8,20 @@ import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.TimeUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.OffsetDateTime
 import java.util.UUID
 
 class TaskViewModel {
 
   private var taskApi: TaskAPI
+  private val isNewTask: Boolean
   private val NEW_TASK_TITLE = "New Task"
   private val EDIT_TASK_TITLE = "Edit Task"
 
@@ -30,6 +36,7 @@ class TaskViewModel {
       navActions: NavigationActions,
       taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
   ) {
+      this.isNewTask = true
     this.navActions = navActions
     this.taskApi = taskApi
     this.taskUid = UUID.randomUUID().toString()
@@ -42,6 +49,7 @@ class TaskViewModel {
       navActions: NavigationActions,
       taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
   ) {
+      this.isNewTask = false
     this.navActions = navActions
     this.taskApi = taskApi
     this.taskUid = taskUid
@@ -50,16 +58,24 @@ class TaskViewModel {
     uiState = _uiState
 
     taskApi.getTask(taskUid, {
+        val date = it.startTime.toLocalDate()
+        val time = it.startTime.toLocalTime()
+
         _uiState.value = _uiState.value.copy(
             title = it.title,
             description = it.description,
             category = it.category,
             staffNumber = it.peopleNeeded.toString(),
-            date = DateUtil.toString(it.startTime),
-          //  time
+            date = DateUtil.toString(date),
+            time = TimeUtil.toString(time),
             pageTitle = EDIT_TASK_TITLE
         )
-    }, { /* handle error */ })
+    }, {
+        CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Failed to load task", duration = SnackbarDuration.Short)
+        }
+    })
   }
 
   fun setTitle(title: String) {
@@ -116,7 +132,11 @@ class TaskViewModel {
       return
     }
 
-    val startTime = DateUtil.toDate(_uiState.value.date).atTime(TimeUtil.toTime(_uiState.value.time)) ?: return
+    val date = DateUtil.toDate(_uiState.value.date) ?: return
+    val time = TimeUtil.toTime(_uiState.value.time) ?: return
+    val zone = OffsetDateTime.now().offset
+
+    val startTime = OffsetDateTime.of(date, time, zone)
 
     val task =
         Task(
@@ -124,16 +144,38 @@ class TaskViewModel {
             title = _uiState.value.title,
             description = _uiState.value.description,
             category = _uiState.value.category,
-            peopleNeeded = _uiState.value.staffNumber.toInt(),)
+            peopleNeeded = _uiState.value.staffNumber.toInt(),
+            startTime = startTime,
+        )
 
-    taskApi.addTask(task, { navActions.back() }, { /* handle error */ })
+      if (isNewTask) {
+          taskApi.addTask(task, { navActions.back() }, {
+              CoroutineScope(Dispatchers.Main).launch {
+                  _uiState.value.snackbarHostState.showSnackbar(
+                      message = "Failed to create task", duration = SnackbarDuration.Short)
+              }
+          })
+      } else {
+          taskApi.editTask(task, { navActions.back() }, {
+              CoroutineScope(Dispatchers.Main).launch {
+                  _uiState.value.snackbarHostState.showSnackbar(
+                      message = "Failed to save task", duration = SnackbarDuration.Short)
+              }
+          })
+      }
+
   }
 
   fun deleteTask() {
     if (_uiState.value.isNewTask) {
       navActions.back()
     } else {
-      taskApi.deleteTask(taskUid, { navActions.back() }, { /* handle error */ })
+      taskApi.deleteTask(taskUid, { navActions.back() }, {
+          CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarHostState.showSnackbar(
+                  message = "Failed to delete task", duration = SnackbarDuration.Short)
+          }
+      })
       navActions.back()
     }
   }
