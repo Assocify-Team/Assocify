@@ -3,7 +3,7 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Task
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import java.time.LocalDate
+import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -107,7 +107,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       title: String,
       description: String,
       isCompleted: Boolean,
-      startTime: LocalDate,
+      startTime: OffsetDateTime,
       peopleNeeded: Int,
       category: String,
       location: String,
@@ -133,6 +133,28 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
     }
   }
+
+  /**
+   * Edits a task in the database.
+   *
+   * @param task the task to edit
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun editTask(task: Task, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    editTask(
+        task.uid,
+        task.title,
+        task.description,
+        task.isCompleted,
+        task.startTime,
+        task.peopleNeeded,
+        task.category,
+        task.location,
+        onSuccess,
+        onFailure)
+  }
+
   /**
    * Deletes a task from the database.
    *
@@ -178,7 +200,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   private data class SupabaseTask(
-      @SerialName("uid") val uid: String,
+      @SerialName("id") val uid: String,
       @SerialName("title") val title: String,
       @SerialName("description") val description: String,
       @SerialName("is_completed") val isCompleted: Boolean,
@@ -194,7 +216,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
           title = title,
           description = description,
           isCompleted = isCompleted,
-          startTime = LocalDate.parse(startTime),
+          startTime = OffsetDateTime.parse(startTime),
           peopleNeeded = peopleNeeded,
           category = category,
           location = location,
