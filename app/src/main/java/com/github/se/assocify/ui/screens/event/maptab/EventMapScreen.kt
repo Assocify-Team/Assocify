@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.event.map
+package com.github.se.assocify.ui.screens.event.maptab
 
 import android.content.Context
 import androidx.compose.foundation.layout.Column
