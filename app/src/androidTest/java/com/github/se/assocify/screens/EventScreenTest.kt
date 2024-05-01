@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
@@ -201,6 +202,11 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("TaskItem").assertIsNotDisplayed()
       onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
       onNodeWithTag("filterChipTestEvent").performClick()
+      onNodeWithTag("TaskItem").assertIsDisplayed()
+      onNodeWithTag("TaskItem").assertHasClickAction()
+      onNodeWithTag("TaskCheckbox").assertHasClickAction()
+      onNodeWithTag("TaskCheckbox").performClick()
+      onNodeWithTag("TaskCheckbox").assertIsDisplayed()
       onNodeWithTag("TaskItem").assertIsDisplayed()
     }
   }
