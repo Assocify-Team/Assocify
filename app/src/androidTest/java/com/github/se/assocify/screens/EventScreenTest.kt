@@ -41,7 +41,6 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   @Before
   fun testSetup() {
-
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
           val e1 =
@@ -197,10 +196,17 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
           EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
           EventTaskViewModel(mockTaskAPI))
     }
+
     with(composeTestRule) {
       onNodeWithTag("TaskItem").assertIsNotDisplayed()
       onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
       onNodeWithTag("filterChipTestEvent").performClick()
+      onNodeWithTag("eventSearchButton").assertIsDisplayed()
+      onNodeWithTag("eventSearchButton").performClick()
+      onNodeWithTag("eveSearchButton").assertIsNotDisplayed()
+      onNodeWithTag("searchBar").assertIsDisplayed()
+      onNodeWithTag("searchBarButton").assertIsDisplayed()
+      onNodeWithTag("searchBarButton").performClick()
     }
   }
 }

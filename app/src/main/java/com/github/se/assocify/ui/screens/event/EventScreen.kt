@@ -232,7 +232,8 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
       },
       trailingIcon = {
         Icon(
-            modifier = Modifier.clickable { viewModel.searchTaskLists() },
+            modifier =
+                Modifier.clickable { viewModel.searchTaskLists() }.testTag("searchBarButton"),
             imageVector = Icons.Filled.Search,
             contentDescription = "Search")
       }) {}
