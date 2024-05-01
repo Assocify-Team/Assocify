@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
+import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.EventScreen
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
@@ -43,8 +44,39 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
+          val e1 =
+              Event(
+                  "3", "testEvent1", "a", OffsetDateTime.now(), OffsetDateTime.now(), "me", "home")
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
-          onSuccessCallback(emptyList())
+          onSuccessCallback(listOf(e1))
+        }
+
+    every { mockTaskAPI.getTasks(any(), any()) } answers
+        {
+          val t1 =
+              Task(
+                  "1",
+                  "testTask1",
+                  "description",
+                  false,
+                  OffsetDateTime.now(),
+                  0,
+                  "Committee",
+                  "Here",
+                  "3")
+          val t2 =
+              Task(
+                  "2",
+                  "testTask2",
+                  "description",
+                  false,
+                  OffsetDateTime.now(),
+                  0,
+                  "Committee",
+                  "Here",
+                  "3")
+          val onSuccessCallback = arg<(List<Task>) -> Unit>(0)
+          onSuccessCallback(listOf(t1, t2))
         }
 
     every { mockNavActions.navigateToMainTab(any()) } answers { tabSelected = true }

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
@@ -26,7 +27,9 @@ fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: Navigati
     state.value.filteredTasks.forEach {
       item {
         ListItem(
-            modifier = Modifier.clickable { navActions.navigateTo(Destination.EditTask(it.uid)) },
+            modifier =
+                Modifier.clickable { navActions.navigateTo(Destination.EditTask(it.uid)) }
+                    .testTag("TaskItem"),
             headlineContent = { Text(it.title) },
             supportingContent = { Text(it.category) },
             trailingContent = {
