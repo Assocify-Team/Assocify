@@ -1,6 +1,7 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
@@ -200,6 +201,78 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  fun getRoles(
+      associationId: String,
+      onSuccess: (List<PermissionRole>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      val roles =
+          db.from("role")
+              .select { filter { PermissionRole::associationId eq associationId } }
+              .decodeList<PermissionRole>()
+      onSuccess(roles)
+    }
+  }
+
+  private suspend fun addRoleSus(role: PermissionRole) {
+    val supabaseRole = SupabaseRole(role.uid, role.associationId, role.type.name.lowercase())
+    db.from("role").insert(supabaseRole)
+  }
+
+  fun addRole(role: PermissionRole, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      addRoleSus(role)
+      onSuccess()
+    }
+  }
+
+  fun inviteUser(member: AssociationMember, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    inviteUser(member.user.uid, member.role, onSuccess, onFailure)
+  }
+
+  private suspend fun inviteUserSus(userId: String, role: PermissionRole) {
+    db.from("invited")
+        .insert(
+            Json.decodeFromString<JsonElement>(
+                """{"user_id": "$userId","role_id": "${role.uid}"}"""))
+  }
+
+  /**
+   * Invites a user to the association with a specific role.
+   *
+   * @param userId the user to invite
+   * @param role the role to give the user
+   */
+  fun inviteUser(
+      userId: String,
+      role: PermissionRole,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      inviteUserSus(userId, role)
+      onSuccess()
+    }
+  }
+
+  fun initAssociation(
+      roles: Collection<PermissionRole>,
+      users: Collection<AssociationMember>,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      for (role in roles) {
+        addRoleSus(role)
+      }
+      for (user in users) {
+        inviteUserSus(user.user.uid, user.role)
+      }
+      onSuccess()
+    }
+  }
+
   @Serializable
   private data class Applicant(
       @SerialName("association_id") val associationId: String,
@@ -215,4 +288,11 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   ) {
     fun toAssociation() = Association(uid!!, name, description, LocalDate.parse(creationDate))
   }
+
+  @Serializable
+  private data class SupabaseRole(
+      val uid: String,
+      @SerialName("association_id") val associationId: String,
+      val type: String
+  )
 }

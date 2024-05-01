@@ -1,5 +1,8 @@
 package com.github.se.assocify.model.entities
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 /*
  * enumeration of all roles, sorted by importance
  */
@@ -31,5 +34,9 @@ data class Role(val name: String) {
   }
 }
 
-// A role as represented in the database.
-data class PermissionRole(val uid: String, val associationId: String, val type: RoleType)
+@Serializable
+data class PermissionRole(
+    val uid: String,
+    @SerialName("association_id") val associationId: String,
+    val type: RoleType
+)

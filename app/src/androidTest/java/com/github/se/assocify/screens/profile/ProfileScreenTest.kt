@@ -44,9 +44,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private val uid = "1"
   private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true)
   private val mockUserAPI =
-      mockk<UserAPI>(relaxUnitFun = true) {
-        every { getUser(any(), any(), any()) } answers { User("1", "jean") }
-      }
+      mockk<UserAPI> { every { getUser(any(), any(), any()) } answers { User("1", "jean") } }
 
   private lateinit var mViewmodel: ProfileViewModel
   private val uri: Uri = Uri.parse("content://test")

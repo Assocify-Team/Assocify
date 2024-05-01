@@ -49,7 +49,7 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   /**
-   * Adds/edit a user to the database
+   * Adds a user to the database
    *
    * @param user the user to add/edit
    * @param onSuccess called on success (by default does nothing)
@@ -58,6 +58,18 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun addUser(user: User, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("users").insert(user)
+      onSuccess()
+    }
+  }
+
+  fun setDisplayName(
+      userId: String,
+      newName: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      db.from("users").update({ User::name setTo newName }) { filter { User::uid eq userId } }
       onSuccess()
     }
   }
@@ -78,10 +90,12 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       db.from("applicant")
           .insert(
               Json.decodeFromString<JsonElement>(
-                  """{"association_id": "$associationId", "user_id": "${CurrentUser.userUid!!}"}"""))
+                  """{"association_id": "$associationId", "user_id": "${CurrentUser.user!!.uid}"}"""))
       onSuccess()
     }
   }
+
+  fun acceptInvitation(associationId: String) {}
 
   /**
    * Deletes a user from the database

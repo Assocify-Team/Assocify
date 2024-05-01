@@ -14,10 +14,6 @@ import io.mockk.verify
 import java.time.OffsetDateTime
 import java.util.UUID
 import junit.framework.TestCase.fail
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,10 +31,9 @@ class TaskAPITest {
 
   private lateinit var taskAPI: TaskAPI
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
-    Dispatchers.setMain(UnconfinedTestDispatcher())
+    APITestUtils.setup()
     taskAPI =
         TaskAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
