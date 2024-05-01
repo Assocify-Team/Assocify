@@ -39,12 +39,10 @@ class NavigationActions(
   }
 
   fun onLogout() {
+    loginSaver.clearSavedLoginInfo()
     navController.navigate(Destination.Login.route) {
       popUpTo(navController.graph.id) { inclusive = true }
     }
-    CurrentUser.userUid = null
-    CurrentUser.associationUid = null
-    loginSaver.clearSavedLoginInfo()
   }
 
   fun onAuthError() {
