@@ -18,5 +18,5 @@ fun BudgetDetailedScreen(
     navigationActions: NavigationActions,
     budgetAPI: BudgetAPI
 ) {
-  AccountingDetailedScreen(AccountingPage.BUDGET, subCategoryUid, navigationActions)
+  AccountingDetailedScreen(AccountingPage.BUDGET, subCategoryUid, navigationActions, budgetAPI)
 }

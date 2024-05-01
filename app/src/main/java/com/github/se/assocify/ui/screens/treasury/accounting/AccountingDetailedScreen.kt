@@ -34,8 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.entities.AccountingCategory
-import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
@@ -44,6 +43,7 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import java.time.LocalDate
 
 /**
@@ -51,6 +51,7 @@ import java.time.LocalDate
  *
  * @param page: The page to display (either "budget" or "balance")
  * @param subCategoryUid: The unique identifier of the subcategory
+ * @param nameCategory: The name of the subcategory //TODO: remove this parameter when AccountingSubCategoryAPI is implemented
  * @param navigationActions: The navigation actions
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,11 +59,12 @@ import java.time.LocalDate
 fun AccountingDetailedScreen(
     page: AccountingPage,
     subCategoryUid: String,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    budgetAPI: BudgetAPI
 ) {
-  // TODO: get subcategory from db
-  val subCategory =
-      AccountingSubCategory(subCategoryUid, "Logistics Pole", AccountingCategory("Pole"), 1205)
+    val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI)
+    val subCategory = budgetDetailedViewModel.getSubCategory(subCategoryUid)
+    val budgetItems = budgetDetailedViewModel.getBudgetItems(subCategoryUid)
   // TODO: fetch from db
   val receipt =
       Receipt(
@@ -73,12 +75,6 @@ fun AccountingDetailedScreen(
           100,
           Status.Pending,
           MaybeRemotePhoto.Remote("path"))
-  val budgetItems =
-      listOf(
-          BudgetItem(
-              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", subCategory),
-          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory))
   val balanceItems =
       listOf(
           BalanceItem(

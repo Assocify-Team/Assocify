@@ -17,5 +17,5 @@ fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions, budgetAP
   }
   receiptGraph(navigationActions)
   budgetDetailedGraph(navigationActions, budgetAPI)
-  balanceDetailedGraph(navigationActions)
+  balanceDetailedGraph(navigationActions, budgetAPI)
 }

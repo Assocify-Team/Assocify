@@ -3,6 +3,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting.budget
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,8 +36,17 @@ class BudgetDetailedViewModel(private var budgetApi: BudgetAPI) : ViewModel() {
    * @param accountingSubCategory the subCategory to filter on
    * @return the list of budgetItems of the given subCategory
    */
-  fun getBudgetItems(accountingSubCategory: AccountingSubCategory): List<BudgetItem> {
-    return uiState.value.budgetList.filter { item -> item.category == accountingSubCategory }
+  fun getBudgetItems(subCategoryUid: String): List<BudgetItem> {
+    return uiState.value.budgetList.filter { item -> item.category.uid == subCategoryUid }
+  }
+
+  /**
+   * Gets subcategory by uid and name
+   * @param subCategoryUid the uid of the subcategory
+   */
+  fun getSubCategory(subCategoryUid: String): AccountingSubCategory {
+    //TODO: change the name of accountingsubcategory
+    return AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"),1205)
   }
 
   // TODO: handle filter
