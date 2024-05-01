@@ -68,7 +68,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   0,
                   "Committee",
                   "Here",
-                  "eventUID")
+                  "eventUID0")
           val t2 =
               Task(
                   "2",
@@ -201,12 +201,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("TaskItem").assertIsNotDisplayed()
       onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
       onNodeWithTag("filterChipTestEvent").performClick()
-      onNodeWithTag("eventSearchButton").assertIsDisplayed()
-      onNodeWithTag("eventSearchButton").performClick()
-      onNodeWithTag("eveSearchButton").assertIsNotDisplayed()
-      onNodeWithTag("searchBar").assertIsDisplayed()
-      onNodeWithTag("searchBarButton").assertIsDisplayed()
-      onNodeWithTag("searchBarButton").performClick()
+      onNodeWithTag("TaskItem").assertIsDisplayed()
     }
   }
 

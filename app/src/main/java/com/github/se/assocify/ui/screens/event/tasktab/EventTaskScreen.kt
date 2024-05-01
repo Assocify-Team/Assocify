@@ -9,10 +9,12 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.event.EventScreenViewModel
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
@@ -21,28 +23,35 @@ import com.github.se.assocify.navigation.NavigationActions
  * @param navActions the navigation actions to navigate to other screens
  */
 @Composable
-fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: NavigationActions) {
-  val state = eventTaskViewModel.uiState.collectAsState()
+fun EventTaskScreen(
+    eventViewModel: EventScreenViewModel,
+    eventTaskViewModel: EventTaskViewModel,
+    navActions: NavigationActions
+) {
+  val mainState by eventViewModel.uiState.collectAsState()
+  val state by eventTaskViewModel.uiState.collectAsState()
   LazyColumn(modifier = Modifier.fillMaxWidth()) {
-    state.value.filteredTasks.forEach {
-      item {
-        ListItem(
-            modifier =
-                Modifier.testTag("TaskItem").clickable {
-                  navActions.navigateTo(Destination.EditTask(it.uid))
+    state.filteredTasks
+        .filter { t -> mainState.selectedEvents.any { ev -> ev.uid == t.eventUid } }
+        .forEach {
+          item {
+            ListItem(
+                modifier =
+                    Modifier.testTag("TaskItem").clickable {
+                      navActions.navigateTo(Destination.EditTask(it.uid))
+                    },
+                headlineContent = { Text(it.title) },
+                supportingContent = { Text(it.category) },
+                trailingContent = {
+                  Checkbox(
+                      modifier = Modifier.testTag("TaskCheckbox"),
+                      checked = it.isCompleted,
+                      onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
+                  )
                 },
-            headlineContent = { Text(it.title) },
-            supportingContent = { Text(it.category) },
-            trailingContent = {
-              Checkbox(
-                  modifier = Modifier.testTag("TaskCheckbox"),
-                  checked = it.isCompleted,
-                  onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
-              )
-            },
-            overlineContent = { Text(it.startTime.toString()) })
-        HorizontalDivider()
-      }
-    }
+                overlineContent = { Text(it.startTime.toString()) })
+            HorizontalDivider()
+          }
+        }
   }
 }

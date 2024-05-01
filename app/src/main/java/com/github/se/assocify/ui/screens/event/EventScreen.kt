@@ -144,7 +144,8 @@ fun EventScreen(
             }
             HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
               when (page) {
-                EventPageIndex.TASKS.index -> EventTaskScreen(taskListViewModel, navActions)
+                EventPageIndex.TASKS.index ->
+                    EventTaskScreen(viewModel, taskListViewModel, navActions)
                 EventPageIndex.MAP.index -> EventMapScreen()
                 EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
               }
@@ -226,7 +227,8 @@ fun EventSearchTopBar(viewModel: EventScreenViewModel) {
       onActiveChange = {},
       leadingIcon = {
         Icon(
-            modifier = Modifier.clickable { viewModel.deactivateSearch() },
+            modifier =
+                Modifier.clickable { viewModel.deactivateSearch() }.testTag("dismissBarButton"),
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Dismiss")
       },

@@ -73,9 +73,8 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
         _uiState.value.copy(
             filteredTasks =
                 _uiState.value.tasks.filter { task ->
-                  _uiState.value.filteredEvents.any { it.uid == task.eventUid } &&
-                      (_uiState.value.filter.isEmpty() ||
-                          task.title.lowercase().contains(_uiState.value.filter.lowercase()))
+                  (_uiState.value.filter.isEmpty() ||
+                      task.title.lowercase().contains(_uiState.value.filter.lowercase()))
                 })
   }
 }
