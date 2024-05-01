@@ -19,7 +19,7 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -90,8 +90,8 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                       "1",
                       "filterChipTestEvent1",
                       "a",
-                      LocalDateTime.now(),
-                      LocalDateTime.now(),
+                      OffsetDateTime.now(),
+                      OffsetDateTime.now(),
                       "me",
                       "home"))
           val onSuccessCallback = firstArg<(List<Event>) -> Unit>()
