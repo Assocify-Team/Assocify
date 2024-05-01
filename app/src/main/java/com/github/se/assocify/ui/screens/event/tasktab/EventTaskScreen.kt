@@ -28,12 +28,14 @@ fun EventTaskScreen(eventTaskViewModel: EventTaskViewModel, navActions: Navigati
       item {
         ListItem(
             modifier =
-                Modifier.clickable { navActions.navigateTo(Destination.EditTask(it.uid)) }
-                    .testTag("TaskItem"),
+                Modifier.testTag("TaskItem").clickable {
+                  navActions.navigateTo(Destination.EditTask(it.uid))
+                },
             headlineContent = { Text(it.title) },
             supportingContent = { Text(it.category) },
             trailingContent = {
               Checkbox(
+                  modifier = Modifier.testTag("TaskCheckbox"),
                   checked = it.isCompleted,
                   onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
               )

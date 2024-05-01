@@ -14,7 +14,6 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
   init {
     uiState = _uiState
     updateTasks()
-    filterTasks()
   }
 
   /** Updates the list of tasks in the UI. */

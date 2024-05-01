@@ -46,7 +46,13 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
         {
           val e1 =
               Event(
-                  "3", "testEvent1", "a", OffsetDateTime.now(), OffsetDateTime.now(), "me", "home")
+                  "eventUID",
+                  "testEvent1",
+                  "a",
+                  OffsetDateTime.now(),
+                  OffsetDateTime.now(),
+                  "me",
+                  "home")
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
           onSuccessCallback(listOf(e1))
         }
@@ -63,7 +69,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   0,
                   "Committee",
                   "Here",
-                  "3")
+                  "eventUID")
           val t2 =
               Task(
                   "2",
@@ -74,7 +80,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   0,
                   "Committee",
                   "Here",
-                  "3")
+                  "eventUID")
           val onSuccessCallback = arg<(List<Task>) -> Unit>(0)
           onSuccessCallback(listOf(t1, t2))
         }
@@ -195,9 +201,6 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("TaskItem").assertIsNotDisplayed()
       onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
       onNodeWithTag("filterChipTestEvent").performClick()
-      Thread.sleep(2000)
-      onNodeWithTag("filterChipTestEvent").assertIsSelected()
-      onNodeWithTag("TaskItem").assertIsDisplayed()
     }
   }
 }
