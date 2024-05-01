@@ -1,5 +1,6 @@
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -19,6 +20,8 @@ class NavigationActionsTest {
 
   @Before
   fun setUp() {
+    CurrentUser.userUid = "userUid"
+    CurrentUser.associationUid = "associationUid"
     navController = mockk(relaxed = true)
     loginSave = mockk(relaxed = true)
     navigationActions = NavigationActions(navController, loginSave)
