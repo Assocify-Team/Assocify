@@ -60,6 +60,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("DisplayOrganizationScreen") }) {
   val organizationSelect: KNode = child { hasTestTag("SelectIcon") }
+  val node: KNode = onNode { hasTestTag("DisplayOrganizationScreen") }
 }
 
 /** This class represents the SelectAssociationScreen */
@@ -156,7 +157,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     val model = SelectAssociationViewModel(mockAssocAPI, mockUserAPI, mockNavActions)
     composeTestRule.setContent { DisplayOrganization(organization = testAssociation, model) }
     ComposeScreen.onComposeScreen<DisplayOrganizationScreenTest>(composeTestRule) {
-      organizationSelect {
+      node {
         assertIsDisplayed()
         performClick()
       }
