@@ -129,15 +129,13 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                           contentScale = ContentScale.Crop)
                     } else {
                       IconButton(
-                          modifier =
-                              Modifier.testTag("default profile icon").size(80.dp),
+                          modifier = Modifier.testTag("default profile icon").size(80.dp),
                           onClick = { viewmodel.controlBottomSheet(true) }) {
-                          Icon(
-                              modifier = Modifier.fillMaxSize(),
-                              imageVector = Icons.Outlined.AccountCircle,
-                              contentDescription = "default profile icon"
-                          )
-                      }
+                            Icon(
+                                modifier = Modifier.fillMaxSize(),
+                                imageVector = Icons.Outlined.AccountCircle,
+                                contentDescription = "default profile icon")
+                          }
                     }
 
                     // personal information : name and role (depends on current association)
