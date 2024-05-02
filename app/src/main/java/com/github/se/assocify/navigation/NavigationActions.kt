@@ -1,9 +1,14 @@
 package com.github.se.assocify.navigation
 
+import android.util.Log
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import com.github.se.assocify.model.localsave.LoginSave
 
-class NavigationActions(private val navController: NavHostController) {
+class NavigationActions(
+    private val navController: NavHostController,
+    private val loginSaver: LoginSave
+) {
   fun navigateToMainTab(destination: Destination) {
     if (destination in MAIN_TABS_LIST) {
       navController.navigate(destination.route) {
@@ -20,16 +25,28 @@ class NavigationActions(private val navController: NavHostController) {
     navController.navigate(destination.route)
   }
 
-  fun onLogin(userExists: Boolean) {
-    if (userExists) {
-      navigateTo(Destination.Home)
+  fun onLogin(userHasMembership: Boolean) {
+    if (userHasMembership) {
+      loginSaver.saveUserInfo()
+      navController.navigate(Destination.Home.route) {
+        popUpTo(navController.graph.id) { inclusive = true }
+      }
     } else {
-      navigateTo(Destination.SelectAsso)
+      navController.navigate(Destination.SelectAsso.route) {
+        popUpTo(navController.graph.id) { inclusive = true }
+      }
+    }
+  }
+
+  fun onLogout() {
+    loginSaver.clearSavedUserInfo()
+    navController.navigate(Destination.Login.route) {
+      popUpTo(navController.graph.id) { inclusive = true }
     }
   }
 
   fun onAuthError() {
-    // throw Exception("Authentication error")
+    Log.e("Authentication", "Error occurred during authentication")
   }
 
   fun back() {
