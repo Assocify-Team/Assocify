@@ -2,11 +2,14 @@ package com.github.se.assocify
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.localsave.LoginSave
@@ -22,6 +25,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.mockk
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,9 +62,26 @@ class LoginAppTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
 class ActivityAppTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
+  @Before
+  fun setup() {
+    composeTestRule.setContent { MainActivity() }
+  }
   @Test
   fun loginStart() {
-    composeTestRule.setContent { MainActivity() }
-    with(composeTestRule) { onRoot().assertExists() }
+
+    with(composeTestRule) {
+      onRoot().assertExists()
+      onNodeWithTag("LoginScreen").isDisplayed()
+    }
+  }
+
+  @Test
+  fun homeStart() {
+    CurrentUser.userUid = "testUser"
+    CurrentUser.associationUid = "testAssociation"
+    with(composeTestRule) {
+      onRoot().assertExists()
+      onNodeWithTag("HomeScreen").isDisplayed()
+    }
   }
 }
