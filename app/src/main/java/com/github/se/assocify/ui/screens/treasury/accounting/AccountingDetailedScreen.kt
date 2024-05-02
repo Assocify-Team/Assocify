@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,10 +66,7 @@ fun AccountingDetailedScreen(
     budgetAPI: BudgetAPI,
     budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
-    println("YOOOOOOOOOO")
-
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
-    println("budgetModel: ${budgetModel.budgetList}")
   val subCategory =
       AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
 
@@ -124,10 +120,7 @@ fun AccountingDetailedScreen(
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
-
-  var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedStatus by remember { mutableStateOf(statusList.first()) }
-  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
   val filteredBalanceList =
       if (selectedStatus == statusList.first()) // display everything under the status category
@@ -170,10 +163,7 @@ fun AccountingDetailedScreen(
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
-                  //budgetItems = budgetItems.filter{budgetItem ->  budgetItem.year == it.toInt()}
-                  budgetDetailedViewModel.onYearFilter(it.toInt())
-                 // budgetItems = budgetModel.value.budgetList
-                  println("yearFilter: $it")
+                budgetDetailedViewModel.onYearFilter(it.toInt())
               }
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
@@ -182,7 +172,7 @@ fun AccountingDetailedScreen(
               }
 
               // TODO: change amount given TVA
-              DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
+              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { budgetDetailedViewModel.onTVAFilter(it)}
             }
           }
           if (page == AccountingPage.BALANCE) {
