@@ -36,9 +36,9 @@ class BudgetDetailedScreenTest :
   val budgetItems =
       listOf(
           BudgetItem(
-              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", subCategory),
-          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory))
+              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", subCategory,2022),
+          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory,2022),
+          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory,2222))
 
   @Before
   fun setup() {
