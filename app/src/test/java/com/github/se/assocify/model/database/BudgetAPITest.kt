@@ -7,8 +7,12 @@ import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -48,54 +52,82 @@ class BudgetAPITest {
         BudgetAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
+                httpEngine = MockEngine {
+                    if (!error) {
+                        respond(response)
+                    } else {
+                        respondBadRequest()
+                    }
+                }
             })
   }
 
   @Test
   fun testGetBudgets() {
+    val onSuccess = mockk<(List<BudgetItem>) -> Unit>(relaxed = true)
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
     error = false
-    response = ""
+    response =
+        """
+            [
+                {
+                    "item_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+                    "association_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+                    "name": "name",
+                    "year": 2022,
+                    "description": "lala",
+                    "amount": 1,
+                    "tva": 2.6,
+                    "category": "subCategoryUID"
+                }
+            ]
+        """.trimIndent()
+
+    budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess,onFailure )
+    verify(timeout = 300) { onSuccess(any()) }
+    verify(exactly = 0) {onFailure(any())}
 
 
 
-    var listResponse = listOf<BudgetItem>()
-    budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess = { listResponse = it}, onFailure = {})
-    sleep(1000)
-    print(listResponse)
-    assert(listResponse.isNotEmpty())
   }
 
   @Test
   fun testAddBudgetItem() {
+      val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+      val onSuccess = mockk<() -> Unit>(relaxed = true)
     error = false
     response = ""
     val  budgetItemUpdt = budgetItem.copy(uid = UUID.randomUUID().toString())
-              budgetAPI.addBudgetItem("aa3d4ad7-c901-435a-b089-bb835f6ec560", budgetItemUpdt, onSuccess = {println("SUCESS")}, onFailure = {println(it.toString())})
+    budgetAPI.addBudgetItem("aa3d4ad7-c901-435a-b089-bb835f6ec560", budgetItemUpdt, onSuccess, onFailure)
     sleep(1000)
+    verify(timeout = 1000) {onSuccess()}
+    verify(exactly = 0) {onFailure(any())  }
+
   }
 
   @Test
   fun testUpdateBudgetItem() {
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    val onSuccess: () -> Unit = mockk(relaxed = true)
     error = false
     response = ""
 
-    var listResponse = listOf<BudgetItem>()
-    budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess = { listResponse = it}, onFailure = {})
-    sleep(1000)
-      println(listResponse)
-    val budgetItemUpdt = listResponse[0].copy(nameItem = "NameitemUPDATED!!")
     budgetAPI.updateBudgetItem("aa3d4ad7-c901-435a-b089-bb835f6ec560",
-        budgetItemUpdt, onSuccess = { println("SUCESSSS") }, onFailure = { println(it.toString()) })
-    sleep(1000)
+        budgetItem, onSuccess, onFailure)
+    verify(timeout = 1000) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
+    error = true
+
   }
 
   @Test
   fun testDeleteBudgetItem() {
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    val onSuccess: () -> Unit = mockk(relaxed = true)
 
     error = false
     response = ""
-    budgetAPI.deleteBudgetItem("budgetItemUID", onSuccess = {}, onFailure = {})
+    budgetAPI.deleteBudgetItem("uiiddddd", onSuccess, onFailure)
+    verify(timeout = 1000) { onSuccess() }
   }
 }

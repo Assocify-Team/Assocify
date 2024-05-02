@@ -30,8 +30,8 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
             filter {
                 SupabaseBudgetItem::associationUID eq associationUID
             }
-        }.decodeList<SupabaseBudgetItem>().map { it.toBudgetItem() }
-        onSuccess(response)
+        }.decodeList<SupabaseBudgetItem>()
+        onSuccess(response.map { it.toBudgetItem() })
     }
   }
 
@@ -110,7 +110,14 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    // TODO("Not yet implemented")
+        tryAsync(onFailure) {
+            db.from(collectionName).delete {
+                filter {
+                    SupabaseBudgetItem::itemUID eq budgetItemUID
+                }
+            }
+            onSuccess()
+        }
   }
 
     @Serializable
