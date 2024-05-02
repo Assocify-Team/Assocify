@@ -172,7 +172,9 @@ fun AccountingDetailedScreen(
               }
 
               // TODO: change amount given TVA
-              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { budgetDetailedViewModel.onTVAFilter(it)}
+              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+                budgetDetailedViewModel.onTVAFilter(it)
+              }
             }
           }
           if (page == AccountingPage.BALANCE) {

@@ -24,6 +24,5 @@ fun BalanceDetailedScreen(
       subCategoryUid = subCategoryUid,
       navigationActions = navigationActions,
       budgetAPI = budgetAPI,
-      budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid)
-  )
+      budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid))
 }

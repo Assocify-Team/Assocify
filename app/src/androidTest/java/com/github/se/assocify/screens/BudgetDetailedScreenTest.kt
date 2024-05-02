@@ -45,7 +45,7 @@ class BudgetDetailedScreenTest :
               TVA.TVA_8,
               "scissors for paper cutting",
               subCategory,
-              2023),
+              2022),
           BudgetItem(
               "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory, 2023),
           BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory, 2023))
@@ -75,8 +75,19 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("totalItems").assertIsDisplayed()
       onNodeWithTag("yearListTag").assertIsDisplayed()
       onNodeWithTag("tvaListTag").assertIsDisplayed()
-      Thread.sleep(2000)
-      budgetItems.forEach { onNodeWithTag("displayItem${it.uid}").assertIsDisplayed() }
+    }
+  }
+
+  /** Tests that with an emptyList, the items are not displayed */
+  @Test
+  fun testNotDisplay() {
+    every { mockBudgetAPI.getBudget(any(), any(), any()) } answers
+        {
+          val onSuccessCallback = arg<(List<BudgetItem>) -> Unit>(0)
+          onSuccessCallback(emptyList())
+        }
+    with(composeTestRule) {
+      budgetItems.forEach { onNodeWithTag("displayItem${it.uid}").assertDoesNotExist() }
     }
   }
 

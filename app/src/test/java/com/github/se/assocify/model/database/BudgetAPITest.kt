@@ -32,7 +32,8 @@ class BudgetAPITest {
           1,
           TVA.TVA_2,
           "lala",
-          AccountingSubCategory("uid", "name", AccountingCategory("asas"), 1))
+          AccountingSubCategory("uid", "name", AccountingCategory("asas"), 1),
+          2022)
   lateinit var budgetAPI: BudgetAPI
 
   @Before

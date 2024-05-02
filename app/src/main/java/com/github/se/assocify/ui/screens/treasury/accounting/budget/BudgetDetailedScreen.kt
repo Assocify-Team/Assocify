@@ -18,6 +18,7 @@ fun BudgetDetailedScreen(
     navigationActions: NavigationActions,
     budgetAPI: BudgetAPI
 ) {
-   val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid)
-  AccountingDetailedScreen(AccountingPage.BUDGET, subCategoryUid, navigationActions, budgetAPI,  budgetDetailedViewModel)
+  val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid)
+  AccountingDetailedScreen(
+      AccountingPage.BUDGET, subCategoryUid, navigationActions, budgetAPI, budgetDetailedViewModel)
 }

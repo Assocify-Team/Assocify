@@ -32,8 +32,8 @@ class BudgetDetailedViewModel(
           // Filter the budgetList to only include items with the matching subCategoryUid
           val filteredList =
               budgetList.filter { budgetItem ->
-              /** budgetItem.category.uid == subCategoryUid */
-                budgetItem.year == _uiState.value.yearFilter
+                budgetItem.category.uid == subCategoryUid &&
+                    budgetItem.year == _uiState.value.yearFilter
               }
 
           // TODO: handle TVA filter: HT = amount in budgetITem, TTC = amount in budgetItem + amount
