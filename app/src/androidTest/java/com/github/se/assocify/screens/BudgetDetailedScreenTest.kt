@@ -11,6 +11,7 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
@@ -18,6 +19,7 @@ import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetail
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import org.junit.Before
@@ -47,8 +49,14 @@ class BudgetDetailedScreenTest :
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     composeTestRule.setContent {
-      BudgetDetailedScreen("subcategoryuid", mockNavActions, mockBudgetAPI)
+      BudgetDetailedScreen("subCategoryUid", mockNavActions, mockBudgetAPI)
     }
+
+    every { mockBudgetAPI.getBudget(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = arg<(List<BudgetItem>) -> Unit>(0)
+              onSuccessCallback(budgetItems)
+            }
   }
 
   /** Tests if the nodes are displayed */
@@ -61,6 +69,7 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("totalItems").assertIsDisplayed()
       onNodeWithTag("yearListTag").assertIsDisplayed()
       onNodeWithTag("tvaListTag").assertIsDisplayed()
+      Thread.sleep(2000)
       budgetItems.forEach { onNodeWithTag("displayItem${it.uid}").assertIsDisplayed() }
     }
   }

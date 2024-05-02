@@ -6,6 +6,7 @@ import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.model.entities.TVA
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param budgetApi the budget api
  */
-class BudgetDetailedViewModel(private var budgetApi: BudgetAPI) : ViewModel() {
+class BudgetDetailedViewModel(private var budgetApi: BudgetAPI, private var subCategoryUid: String) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
   val uiState: StateFlow<BudgetItemState>
 
@@ -24,30 +25,22 @@ class BudgetDetailedViewModel(private var budgetApi: BudgetAPI) : ViewModel() {
   }
 
   private fun updateDatabaseValues() {
-    budgetApi.getBudget(
-        CurrentUser.associationUid!!,
-        { budgetList -> _uiState.value = _uiState.value.copy(budgetList = budgetList) },
-        {})
-  }
+   budgetApi.getBudget(
+      CurrentUser.associationUid!!,
+      { budgetList ->
+        // Filter the budgetList to only include items with the matching subCategoryUid
+        val filteredList = budgetList.filter { budgetItem ->
+          budgetItem.category.uid == subCategoryUid
+        }
+        // Update the UI state with the filtered list
+        _uiState.value = _uiState.value.copy(budgetList = budgetList)
 
-  /**
-   * Gets the list of budgetItems of a given subCategory
-   *
-   * @param accountingSubCategory the subCategory to filter on
-   * @return the list of budgetItems of the given subCategory
-   */
-  fun getBudgetItems(subCategoryUid: String): List<BudgetItem> {
-    return uiState.value.budgetList.filter { item -> item.category.uid == subCategoryUid }
-  }
 
-  /**
-   * Gets subcategory by uid and name
-   *
-   * @param subCategoryUid the uid of the subcategory
-   */
-  fun getSubCategory(subCategoryUid: String): AccountingSubCategory {
-    // TODO: change the name of accountingsubcategory
-    return AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
+      },
+      {}
+    )
+      println(_uiState.value.budgetList + "TAMERE")
+      println("BOUGE")
   }
 
   // TODO: handle filter

@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingCategory
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
@@ -63,9 +66,13 @@ fun AccountingDetailedScreen(
     navigationActions: NavigationActions,
     budgetAPI: BudgetAPI
 ) {
-  val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI)
-  val subCategory = budgetDetailedViewModel.getSubCategory(subCategoryUid)
-  val budgetItems = budgetDetailedViewModel.getBudgetItems(subCategoryUid)
+  val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid)
+    val budgetModel = budgetDetailedViewModel.uiState.collectAsState()
+    val budgetItems = budgetModel.value.budgetList
+    println("budgetItems: $budgetItems")
+    println("COUUUUUCOU")
+  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
+
   // TODO: fetch from db
   val receipt =
       Receipt(
@@ -143,7 +150,9 @@ fun AccountingDetailedScreen(
             })
       },
       contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
-      modifier = Modifier.fillMaxWidth().testTag("AccountingDetailedScreen"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .testTag("AccountingDetailedScreen"),
       floatingActionButton = {
         FloatingActionButton(
             modifier = Modifier.testTag("createNewItem"),
@@ -155,10 +164,15 @@ fun AccountingDetailedScreen(
       },
       content = { innerPadding ->
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().padding(innerPadding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding),
         ) {
           item {
-            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+            Row(
+                Modifier
+                    .testTag("filterRowDetailed")
+                    .horizontalScroll(rememberScrollState())) {
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") { selectedYear = it }
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
@@ -196,7 +210,9 @@ fun AccountingDetailedScreen(
 @Composable
 fun TotalItems(totalAmount: Int) {
   ListItem(
-      modifier = Modifier.fillMaxWidth().testTag("totalItems"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .testTag("totalItems"),
       headlineContent = {
         Text(
             text = "Total",
@@ -222,7 +238,9 @@ fun DisplayBudgetItem(budgetItem: BudgetItem, testTag: String) {
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
-      modifier = Modifier.clickable { /*TODO: edit and view details*/}.testTag(testTag))
+      modifier = Modifier
+          .clickable { /*TODO: edit and view details*/ }
+          .testTag(testTag))
 }
 
 /**
@@ -245,5 +263,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       },
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
-      modifier = Modifier.clickable { /*TODO: edit and view details*/}.testTag(testTag))
+      modifier = Modifier
+          .clickable { /*TODO: edit and view details*/ }
+          .testTag(testTag))
 }
