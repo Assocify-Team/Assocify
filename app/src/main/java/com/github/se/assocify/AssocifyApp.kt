@@ -17,29 +17,29 @@ import com.github.se.assocify.navigation.mainNavGraph
 
 @Composable
 fun AssocifyApp(loginSaver: LoginSave) {
-    val navController = rememberNavController()
-    val navActions = NavigationActions(navController, loginSaver)
-    val userAPI = UserAPI(SupabaseClient.supabaseClient)
-    val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
-    val eventAPI = EventAPI(SupabaseClient.supabaseClient)
-    val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
-    val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
-    loginSaver.loadUserInfo()
+  val navController = rememberNavController()
+  val navActions = NavigationActions(navController, loginSaver)
+  val userAPI = UserAPI(SupabaseClient.supabaseClient)
+  val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
+  val eventAPI = EventAPI(SupabaseClient.supabaseClient)
+  val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
+  val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
+  loginSaver.loadUserInfo()
 
-    val firstDest =
-        if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
-            Destination.Home.route
-        } else {
-            Destination.Login.route
-        }
+  val firstDest =
+      if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
+        Destination.Home.route
+      } else {
+        Destination.Login.route
+      }
 
-    NavHost(navController = navController, startDestination = firstDest) {
-        mainNavGraph(
-            navActions = navActions,
-            userAPI = userAPI,
-            associationAPI = associationAPI,
-            eventAPI = eventAPI,
-            budgetAPI = budgetAPI,
-            taskAPI = taskAPI)
-    }
+  NavHost(navController = navController, startDestination = firstDest) {
+    mainNavGraph(
+        navActions = navActions,
+        userAPI = userAPI,
+        associationAPI = associationAPI,
+        eventAPI = eventAPI,
+        budgetAPI = budgetAPI,
+        taskAPI = taskAPI)
+  }
 }

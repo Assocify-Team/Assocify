@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -34,6 +35,7 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
+
   val subCategory =
       AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
   val budgetItems =
@@ -65,19 +67,15 @@ class BudgetDetailedScreenTest :
         }
   }
 
-  /** Tests if the nodes are displayed */
+  /** Tests if the nodes of filter year are displayed */
   @Test
-  fun testDisplay() {
-    // Test the accounting screen
+  fun testFilterByYear() {
     with(composeTestRule) {
-      onNodeWithTag("AccountingDetailedScreen").assertIsDisplayed()
-      onNodeWithTag("filterRowDetailed").assertIsDisplayed()
-      onNodeWithTag("totalItems").assertIsDisplayed()
-      onNodeWithTag("yearListTag").assertIsDisplayed()
-      onNodeWithTag("tvaListTag").assertIsDisplayed()
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").assertExists()
+      onNodeWithText("2021").assertExists()
     }
   }
-
   /** Tests that with an emptyList, the items are not displayed */
   @Test
   fun testNotDisplay() {
