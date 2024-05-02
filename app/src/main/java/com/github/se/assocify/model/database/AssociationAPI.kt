@@ -1,14 +1,18 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Count
 import java.time.LocalDate
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 
 /**
  * API for interacting with the associations in the database
@@ -16,8 +20,6 @@ import kotlinx.serialization.Serializable
  * @property db the Supabase client
  */
 class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
-  private val scope = CoroutineScope(Dispatchers.Main)
-
   /**
    * Gets an association from the database
    *
@@ -129,6 +131,80 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
     }
   }
+
+  /**
+   * Gets a list of applicants to an association.
+   *
+   * @param associationId the association to get applicants for
+   * @param onSuccess called on success with the list of applicants
+   * @param onFailure called on failure
+   */
+  fun getApplicants(
+      associationId: String,
+      onSuccess: (List<User>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      val applicants =
+          db.from("applicant")
+              .select(
+                  Columns.raw(
+                      """
+                        association_id,
+                        users (
+                            *
+                        )
+                    """
+                          .trimIndent()
+                          .filter { it != '\n' })) {
+                    filter { Applicant::associationId eq associationId }
+                  }
+              .decodeList<Applicant>()
+              .map { it.user }
+      onSuccess(applicants)
+    }
+  }
+
+  /**
+   * Accepts an applicant to an association.
+   *
+   * @param userId the user to accept
+   * @param role the role to give the user
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun acceptUser(
+      userId: String,
+      role: PermissionRole,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      if (db.from("applicant")
+          .delete {
+            filter {
+              eq("user_id", userId)
+              eq("association_id", role.associationId)
+            }
+            count(Count.EXACT)
+          }
+          .countOrNull()!! == 0L) {
+        throw Exception("User is not an applicant")
+      } else {
+        db.from("member_of")
+            .insert(
+                Json.decodeFromString<JsonElement>(
+                    """{"user_id": "$userId","role_id": "${role.uid}"}"""))
+        onSuccess()
+      }
+    }
+  }
+
+  @Serializable
+  private data class Applicant(
+      @SerialName("association_id") val associationId: String,
+      @SerialName("users") val user: User
+  )
 
   @Serializable
   private data class SupabaseAssociation(

@@ -9,8 +9,6 @@ import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.model.isCurrentUser
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -29,7 +27,7 @@ class ReceiptListViewModel(
   val uiState: StateFlow<ReceiptUIState>
 
   // User entity and it's API
-  private val userAPI = UserAPI(Firebase.firestore)
+  private val userAPI = UserAPI(SupabaseClient.supabaseClient)
   private var user: User? = null
 
   init {

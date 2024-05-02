@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -54,7 +53,7 @@ fun SelectAssociation(
     associationAPI: AssociationAPI,
     userAPI: UserAPI
 ) {
-  val model = SelectAssociationViewModel(associationAPI, userAPI)
+  val model = SelectAssociationViewModel(associationAPI, userAPI, navActions)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
 
@@ -116,7 +115,7 @@ fun SelectAssociation(
                             ass.name.take(min).lowercase() ==
                                 state.value.searchQuery.take(min).lowercase()
                           }
-                      filteredAssos.map { ass -> DisplayOrganization(ass, navActions) }
+                      filteredAssos.map { ass -> DisplayOrganization(ass, model) }
                     } else {
                       state.value.associations
                     }
@@ -142,10 +141,10 @@ fun SelectAssociation(
               // Display only registered organization
               val registeredAssociation = state.value.associations
               if (registeredAssociation.isEmpty()) {
-                item { Text(text = "There is no organization to display.") }
+                item { Text(text = "There are no organizations to display.") }
               } else {
                 itemsIndexed(registeredAssociation) { index, organization ->
-                  DisplayOrganization(organization, navActions)
+                  DisplayOrganization(organization, model)
                   // Add a Divider for each organization except the last one
                   if (index < registeredAssociation.size - 1) {
                     HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))
@@ -162,7 +161,7 @@ fun SelectAssociation(
  * @param organization the name of the organization
  */
 @Composable
-fun DisplayOrganization(organization: Association, navActions: NavigationActions) {
+fun DisplayOrganization(organization: Association, viewModel: SelectAssociationViewModel) {
   ListItem(
       headlineContent = {
         Text(
@@ -180,16 +179,9 @@ fun DisplayOrganization(organization: Association, navActions: NavigationActions
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = "Select Icon",
-            modifier =
-                Modifier.testTag("SelectIcon").clickable {
-                  CurrentUser.associationUid = organization.uid
-                  navActions.navigateTo(Destination.Home)
-                })
+            modifier = Modifier.testTag("SelectIcon"))
       },
       modifier =
-          Modifier.clickable {
-                CurrentUser.associationUid = organization.uid
-                navActions.navigateTo(Destination.Home)
-              }
+          Modifier.clickable { viewModel.selectAssoc(organization.uid) }
               .testTag("DisplayOrganizationScreen"))
 }
