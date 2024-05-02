@@ -3,6 +3,7 @@ package com.github.se.assocify.model.database
 import android.util.Log
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
@@ -35,6 +36,8 @@ object APITestUtils {
       {"uid": "${PERMISSION_ROLE.uid}", "association_id": "${PERMISSION_ROLE.associationId}", "type": "${PERMISSION_ROLE.type.name.lowercase()}"}
   """
           .trimIndent()
+
+  val ASSOCIATION_MEMBER = AssociationMember(USER, ASSOCIATION, PERMISSION_ROLE)
 
   /**
    * Sets up various convenient mocks for API testing.
