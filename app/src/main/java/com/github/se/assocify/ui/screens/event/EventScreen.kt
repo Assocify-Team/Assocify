@@ -46,7 +46,6 @@ import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
-import java.time.OffsetDateTime
 import kotlinx.coroutines.launch
 
 /**
@@ -72,7 +71,7 @@ fun EventScreen(
             onClick = {
               when (state.value.currentTab) {
                 EventPageIndex.TASKS -> {
-                  navActions.navigateTo(Destination.NewTask("eventUid")) // TODO : event uid
+                  navActions.navigateTo(Destination.NewTask) // TODO : event uid
                 }
                 EventPageIndex.MAP -> {
                   /*TODO: implement for map screen*/

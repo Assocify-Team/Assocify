@@ -28,13 +28,11 @@ class TaskViewModel {
   // private val taskApi: TaskAPI
   private val navActions: NavigationActions
   private val taskUid: String
-  private val eventUid: String
 
   private val _uiState: MutableStateFlow<TaskState>
   val uiState: StateFlow<TaskState>
 
   constructor(
-      eventUid: String,
       navActions: NavigationActions,
       taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient),
   ) {
@@ -42,7 +40,6 @@ class TaskViewModel {
     this.navActions = navActions
     this.taskApi = taskApi
     this.taskUid = UUID.randomUUID().toString()
-    this.eventUid = eventUid
 
     _uiState = MutableStateFlow(TaskState(isNewTask = true, pageTitle = NEW_TASK_TITLE))
     uiState = _uiState
@@ -50,7 +47,6 @@ class TaskViewModel {
 
   constructor(
       taskUid: String,
-      eventUid: String,
       navActions: NavigationActions,
       taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
   ) {
@@ -58,7 +54,6 @@ class TaskViewModel {
     this.navActions = navActions
     this.taskApi = taskApi
     this.taskUid = taskUid
-    this.eventUid = eventUid
 
     _uiState = MutableStateFlow(TaskState(isNewTask = false, pageTitle = EDIT_TASK_TITLE))
     uiState = _uiState
@@ -141,6 +136,8 @@ class TaskViewModel {
       return
     }
 
+    val eventUid = _uiState.value.eventUid ?: return
+
     val date = DateUtil.toDate(_uiState.value.date) ?: return
     val time = TimeUtil.toTime(_uiState.value.time) ?: return
     val zone = OffsetDateTime.now().offset
@@ -210,6 +207,7 @@ data class TaskState(
     val staffNumber: String = "",
     val date: String = "",
     val time: String = "",
+    val eventUid: String? = null,
     val titleError: String? = null,
     val staffNumberError: String? = null,
     val dateError: String? = null,
