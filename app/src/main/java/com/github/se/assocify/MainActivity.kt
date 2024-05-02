@@ -13,6 +13,7 @@ import com.github.se.assocify.ui.theme.AssocifyTheme
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    setContentView(R.layout.main)
     setContent {
       AssocifyTheme {
         // A surface container using the 'background' color from the theme

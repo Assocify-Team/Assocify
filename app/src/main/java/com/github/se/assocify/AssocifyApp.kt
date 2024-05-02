@@ -7,6 +7,7 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
@@ -20,6 +21,7 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val userAPI = UserAPI(SupabaseClient.supabaseClient)
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
+  val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
 
   loginSaver.loadUserInfo()
 
@@ -36,6 +38,6 @@ fun AssocifyApp(loginSaver: LoginSave) {
         userAPI = userAPI,
         associationAPI = associationAPI,
         eventAPI = eventAPI,
-    )
+        taskAPI = taskAPI)
   }
 }
