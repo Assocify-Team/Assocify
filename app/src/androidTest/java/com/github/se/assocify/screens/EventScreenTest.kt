@@ -111,14 +111,6 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   }
 
   @Test
-  fun testOSMMapDisplayed() {
-    with(composeTestRule) {
-      onNodeWithTag("mapTab").performClick()
-      onNodeWithTag("OSMMapScreen").assertIsDisplayed()
-    }
-  }
-
-  @Test
   fun testEPFLMapDisplayed() {
     with(composeTestRule) {
       onNodeWithTag("mapTab").performClick()
