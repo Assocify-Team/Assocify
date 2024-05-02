@@ -147,7 +147,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       onNodeWithTag("userDropdownItem-1").performClick() // jean
       onNodeWithTag("addMemberButton").performClick()
-      // onNodeWithTag("create").assertIsNotEnabled() TEMPORARILY DISABLED while we remake roles.
       onNodeWithTag("editMember-jean").performClick()
       onNodeWithTag("role-PRESIDENCY").performClick()
       onNodeWithTag("addMemberButton").performClick()
