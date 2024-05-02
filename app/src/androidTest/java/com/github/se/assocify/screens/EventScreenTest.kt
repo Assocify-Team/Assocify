@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
@@ -9,10 +10,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
+import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.EventScreen
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
+import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -31,17 +35,54 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @get:Rule val mockkRule = MockKRule(this)
 
   @RelaxedMockK lateinit var mockEventAPI: EventAPI
+  @RelaxedMockK lateinit var mockTaskAPI: TaskAPI
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   private var tabSelected = false
 
   @Before
   fun testSetup() {
-
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
+          val e1 =
+              Event(
+                  "eventUID",
+                  "testEvent1",
+                  "a",
+                  OffsetDateTime.now(),
+                  OffsetDateTime.now(),
+                  "me",
+                  "home")
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
-          onSuccessCallback(emptyList())
+          onSuccessCallback(listOf(e1))
+        }
+
+    every { mockTaskAPI.getTasks(any(), any()) } answers
+        {
+          val t1 =
+              Task(
+                  "1",
+                  "testTask1",
+                  "description",
+                  false,
+                  OffsetDateTime.now(),
+                  0,
+                  "Committee",
+                  "Here",
+                  "eventUID0")
+          val t2 =
+              Task(
+                  "2",
+                  "testTask2",
+                  "description",
+                  false,
+                  OffsetDateTime.now(),
+                  0,
+                  "Committee",
+                  "Here",
+                  "eventUID")
+          val onSuccessCallback = arg<(List<Task>) -> Unit>(0)
+          onSuccessCallback(listOf(t1, t2))
         }
 
     every { mockNavActions.navigateToMainTab(any()) } answers { tabSelected = true }
@@ -49,13 +90,23 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   @Test
   fun display() {
-    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
     with(composeTestRule) { onNodeWithTag("eventScreen").assertIsDisplayed() }
   }
 
   @Test
   fun navigate() {
-    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
     with(composeTestRule) {
       onNodeWithTag("mainNavBarItem/treasury").performClick()
       assert(tabSelected)
@@ -64,7 +115,12 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
 
   @Test
   fun testTabSwitching() {
-    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
     with(composeTestRule) {
       onNodeWithTag("tasksTab").assertIsDisplayed()
       onNodeWithTag("tasksTab").performClick()
@@ -97,7 +153,12 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
           val onSuccessCallback = firstArg<(List<Event>) -> Unit>()
           onSuccessCallback(events)
         }
-    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
 
     with(composeTestRule) {
       val chip = onNodeWithTag("filterChipTestEvent")
@@ -130,7 +191,12 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
     }
   */
   fun searchBarSearchesWell() {
-    composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
     with(composeTestRule) {
       onNodeWithTag("searchBar").assertIsNotDisplayed()
       onNodeWithTag("eventAccountIcon").assertIsDisplayed()
@@ -139,6 +205,50 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("eventAccountIcon").assertIsNotDisplayed()
       onNodeWithTag("eventSearchIcon").assertIsNotDisplayed()
       onNodeWithTag("searchBar").assertIsDisplayed()
+      onNodeWithTag("searchBarButton").assertHasClickAction()
+      onNodeWithTag("searchBarButton").performClick()
+      onNodeWithTag("searchBar").assertIsDisplayed()
+      onNodeWithTag("dismissBarButton").assertIsDisplayed()
+      onNodeWithTag("dismissBarButton").performClick()
+      onNodeWithTag("dismissBarButton").assertIsNotDisplayed()
     }
+  }
+
+  @Test
+  fun testDisplayTask() {
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
+
+    with(composeTestRule) {
+      onNodeWithTag("TaskItem").assertIsNotDisplayed()
+      onNodeWithTag("filterChipTestEvent").assertIsDisplayed()
+      onNodeWithTag("filterChipTestEvent").performClick()
+      onNodeWithTag("TaskItem").assertIsDisplayed()
+      onNodeWithTag("TaskItem").assertHasClickAction()
+      onNodeWithTag("TaskCheckbox").assertHasClickAction()
+      onNodeWithTag("TaskCheckbox").performClick()
+      onNodeWithTag("TaskCheckbox").assertIsDisplayed()
+      onNodeWithTag("TaskItem").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun errorEventTest() {
+    every { mockEventAPI.getEvents(any(), any()) } answers
+        {
+          val onFailureError = arg<(Exception) -> Unit>(1)
+          onFailureError(IllegalArgumentException("Test error"))
+        }
+    composeTestRule.setContent {
+      EventScreen(
+          mockNavActions,
+          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
+          EventTaskViewModel(mockTaskAPI))
+    }
+    with(composeTestRule) { onNodeWithTag("errorText").assertIsDisplayed() }
   }
 }
