@@ -7,7 +7,6 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.entities.Event
@@ -110,27 +109,26 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
     }
   }
 
-
   /*
-  TODO : these tests completely break the CI after 9mn. No clue why.
-         will look for it later.
-  @Test
-  fun testEPFLMapDisplayed() {
-    with(composeTestRule) {
-      onNodeWithTag("mapTab").performClick()
-      onNodeWithTag("EPFLMapView").assertIsDisplayed()
+    TODO : these tests completely break the CI after 9mn. No clue why.
+           will look for it later.
+    @Test
+    fun testEPFLMapDisplayed() {
+      with(composeTestRule) {
+        onNodeWithTag("mapTab").performClick()
+        onNodeWithTag("EPFLMapView").assertIsDisplayed()
+      }
     }
-  }
 
-  @Test
-  fun testEPFLMapSwipeMoves() {
-    with(composeTestRule) {
-      onNodeWithTag("mapTab").performClick()
-      onNodeWithTag("EPFLMapView").performClick()
-      onNodeWithTag("EPFLMapView").performScrollTo()
+    @Test
+    fun testEPFLMapSwipeMoves() {
+      with(composeTestRule) {
+        onNodeWithTag("mapTab").performClick()
+        onNodeWithTag("EPFLMapView").performClick()
+        onNodeWithTag("EPFLMapView").performScrollTo()
+      }
     }
-  }
-*/
+  */
   fun searchBarSearchesWell() {
     composeTestRule.setContent { EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI)) }
     with(composeTestRule) {

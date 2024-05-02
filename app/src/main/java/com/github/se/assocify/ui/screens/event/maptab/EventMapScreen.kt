@@ -85,9 +85,11 @@ private fun initMapView(context: Context): MapView {
   return mapView
 }
 
-/** The custom tile source from the EPFL plan API.
+/**
+ * The custom tile source from the EPFL plan API.
+ *
  * @param floorId the floor id of the map to display
- * */
+ */
 class CampusTileSource(private val floorId: Int) :
     OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
   override fun getTileURLString(pMapTileIndex: Long): String {
