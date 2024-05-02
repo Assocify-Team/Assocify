@@ -162,7 +162,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
         performClick()
       }
     }
-    verify(timeout = 250) { mockNavActions.navigateTo(Destination.Home) }
+    verify(timeout = 250) { mockNavActions.onLogin(true) }
   }
 
   /**
