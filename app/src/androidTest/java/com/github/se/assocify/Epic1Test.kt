@@ -70,6 +70,11 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
               onSuccessCallback.invoke(listOf(asso))
             }
+          every { addAssociation(any(), any(), any()) } answers
+                  {
+                      val onSuccessCallback = secondArg<(Association) -> Unit>()
+                      onSuccessCallback.invoke(asso)
+                  }
       }
 
   private val userAPI =
@@ -78,6 +83,11 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
             {
               val onSuccessCallback = firstArg<(List<User>) -> Unit>()
               onSuccessCallback(bigList)
+            }
+          every { getUser(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(User) -> Unit>()
+              onSuccessCallback.invoke(bigList[0])
             }
       }
 
