@@ -13,8 +13,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.navigation.mainNavGraph
@@ -55,14 +57,18 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val eventAPI = mockk<EventAPI>() { every { getEvents(any(), any()) } answers {} }
 
+  private val taskAPI = mockk<TaskAPI>(relaxUnitFun = true)
+
+  private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
+
   @Before
   fun testSetup() {
     composeTestRule.setContent {
       navController = TestNavHostController(LocalContext.current)
       navController.navigatorProvider.addNavigator(ComposeNavigator())
-      navActions = NavigationActions(navController)
+      navActions = NavigationActions(navController, loginSave)
 
-      TestAssocifyApp(navController, navActions, userAPI, associationAPI, eventAPI)
+      TestAssocifyApp(navController, navActions, userAPI, associationAPI, eventAPI, taskAPI)
     }
   }
 
@@ -85,7 +91,8 @@ fun TestAssocifyApp(
     navActions: NavigationActions,
     userAPI: UserAPI,
     associationAPI: AssociationAPI,
-    eventAPI: EventAPI
+    eventAPI: EventAPI,
+    taskAPI: TaskAPI
 ) {
   CurrentUser.userUid = "1"
 
@@ -94,6 +101,7 @@ fun TestAssocifyApp(
         navActions = navActions,
         userAPI = userAPI,
         associationAPI = associationAPI,
-        eventAPI = eventAPI)
+        eventAPI = eventAPI,
+        taskAPI)
   }
 }
