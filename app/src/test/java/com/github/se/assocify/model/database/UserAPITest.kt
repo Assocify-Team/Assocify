@@ -1,6 +1,7 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -134,6 +135,36 @@ class UserAPITest {
 
     error = true
     userAPI.requestJoin(APITestUtils.ASSOCIATION.uid, { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testGetCurrentUserAssociations() {
+    val onSuccess: (List<Association>) -> Unit = mockk(relaxed = true)
+
+    error = false
+    response =
+        """
+      [{
+        "user_id": "$uuid1",
+        "role_id": "$uuid1",
+        "association_id": "$uuid1",
+        "type": "presidency",
+        "association_name": "Test",
+        "association_description": "Test",
+        "association_creation_date": "2022-01-01"
+      }]
+    """
+            .trimIndent()
+    userAPI.getCurrentUserAssociations(onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(any()) }
+
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    error = true
+    userAPI.getCurrentUserAssociations({ fail("Should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
   }
