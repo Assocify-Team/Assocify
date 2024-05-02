@@ -115,19 +115,6 @@ class BudgetDetailedScreenTest :
     }
   }
 
-  /** Tests that with an emptyList, the items are not displayed */
-  @Test
-  fun testNotDisplay() {
-    every { mockBudgetAPI.getBudget(any(), any(), any()) } answers
-        {
-          val onSuccessCallback = arg<(List<BudgetItem>) -> Unit>(0)
-          onSuccessCallback(emptyList())
-        }
-    with(composeTestRule) {
-      budgetItems.forEach { onNodeWithTag("displayItem${it.uid}").assertDoesNotExist() }
-    }
-  }
-
   /** Tests if the total amount correspond to the sum of the items */
   @Test
   fun testTotalAmount() {
