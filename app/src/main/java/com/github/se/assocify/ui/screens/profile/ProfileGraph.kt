@@ -20,7 +20,7 @@ fun NavGraphBuilder.profileGraph(
   composable(
       route = Destination.Profile.route,
   ) {
-    ProfileScreen(navigationActions, ProfileViewModel(associationAPI, userAPI))
+    ProfileScreen(navigationActions, ProfileViewModel(associationAPI, userAPI, navigationActions))
   }
 
   profileNotificationsGraph(navigationActions)

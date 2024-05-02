@@ -140,6 +140,36 @@ class UserAPITest {
     verify(timeout = 1000) { onFailure(any()) }
   }
 
+  @Test
+  fun testGetCurrentUserAssociations() {
+    val onSuccess: (List<Association>) -> Unit = mockk(relaxed = true)
+
+    error = false
+    response =
+        """
+      [{
+        "user_id": "$uuid1",
+        "role_id": "$uuid1",
+        "association_id": "$uuid1",
+        "type": "presidency",
+        "association_name": "Test",
+        "association_description": "Test",
+        "association_creation_date": "2022-01-01"
+      }]
+    """
+            .trimIndent()
+    userAPI.getCurrentUserAssociations(onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(any()) }
+
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    error = true
+    userAPI.getCurrentUserAssociations({ fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
   // Note: these tests aren't super useful, but we don't have a good enough test setup, so...
   @Test
   fun testSetDisplayName() {

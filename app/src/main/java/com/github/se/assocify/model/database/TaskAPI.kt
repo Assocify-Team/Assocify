@@ -171,7 +171,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   private data class SupabaseTask(
-      @SerialName("id") val uid: String,
+      @SerialName("uid") val uid: String,
       @SerialName("title") val title: String,
       @SerialName("description") val description: String,
       @SerialName("is_completed") val isCompleted: Boolean,

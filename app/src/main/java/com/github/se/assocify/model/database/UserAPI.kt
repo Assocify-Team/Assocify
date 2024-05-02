@@ -3,10 +3,12 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -175,6 +177,49 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
     tryAsync(onFailure) {
       db.from("users").delete { filter { User::uid eq id } }
       onSuccess()
+    }
+  }
+
+  /**
+   * Gets the associations that the current user is a part of
+   *
+   * @param onSuccess called on success with the list of associations
+   * @param onFailure called on failure
+   */
+  fun getCurrentUserAssociations(
+      onSuccess: (List<Association>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      val associations =
+          db.from("member_role_association_view")
+              .select { filter { Membership::userId eq CurrentUser.userUid!! } }
+              .decodeList<Membership>()
+      onSuccess(associations.map { it.getAssociation() })
+    }
+  }
+
+  @Serializable
+  private data class Membership(
+      @SerialName("user_id") val userId: String,
+      @SerialName("role_id") val roleId: String,
+      @SerialName("association_id") val associationId: String,
+      @SerialName("type") val type: RoleType,
+      @SerialName("association_name") val associationName: String,
+      @SerialName("association_description") val associationDescription: String,
+      @SerialName("association_creation_date") val associationCreationDate: String,
+  ) {
+    fun getAssociation(): Association {
+      return Association(
+          associationId,
+          associationName,
+          associationDescription,
+          LocalDate.parse(associationCreationDate),
+      )
+    }
+
+    fun getRole(): PermissionRole {
+      return PermissionRole(roleId, associationId, type)
     }
   }
 }

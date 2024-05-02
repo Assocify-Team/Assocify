@@ -57,7 +57,7 @@ class TaskAPITest {
     response =
         """  
         {
-          "id": "$uuid1"
+          "uid": "$uuid1"
           "title": "testName",
           "description": "description",
           "is_completed": false,
@@ -93,7 +93,7 @@ class TaskAPITest {
         """
         [
           {
-            "id": "$uuid1",
+            "uid": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
@@ -104,7 +104,7 @@ class TaskAPITest {
             "event_id": "eventUid"
           },
           {
-            "id": "$uuid2",
+            "uid": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
@@ -211,7 +211,7 @@ class TaskAPITest {
         """
         [
           {
-            "id": "$uuid1",
+            "uid": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
@@ -222,7 +222,7 @@ class TaskAPITest {
             "event_id": "eventUid"
           },
           {
-            "id": "$uuid2",
+            "uid": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
