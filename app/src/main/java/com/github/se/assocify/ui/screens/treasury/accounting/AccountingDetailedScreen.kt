@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
@@ -63,7 +62,6 @@ fun AccountingDetailedScreen(
     page: AccountingPage,
     subCategoryUid: String,
     navigationActions: NavigationActions,
-    budgetAPI: BudgetAPI,
     budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
@@ -173,7 +171,7 @@ fun AccountingDetailedScreen(
 
               // TODO: change amount given TVA
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-                budgetDetailedViewModel.onTVAFilter(it)
+                // TODO: budgetDetailedViewModel.onTVAFilter(it)
               }
             }
           }

@@ -18,7 +18,6 @@ class BudgetDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
   val uiState: StateFlow<BudgetItemState>
-  private var lastInputTime = 0L
 
   init {
     updateDatabaseValues()
@@ -48,15 +47,9 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
     updateDatabaseValues()
   }
-
-  fun onTVAFilter(tvaFilter: String) {
-    _uiState.value = _uiState.value.copy(tvaFilter = tvaFilter)
-    updateDatabaseValues()
-  }
 }
 
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
-    val yearFilter: Int = 2023,
-    val tvaFilter: String = "HT"
+    val yearFilter: Int = 2023
 )

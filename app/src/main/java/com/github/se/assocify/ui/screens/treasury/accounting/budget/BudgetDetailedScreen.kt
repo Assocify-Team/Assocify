@@ -16,9 +16,10 @@ import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 fun BudgetDetailedScreen(
     subCategoryUid: String,
     navigationActions: NavigationActions,
-    budgetAPI: BudgetAPI
+    budgetAPI: BudgetAPI,
+    budgetDetailedViewModel: BudgetDetailedViewModel =
+        BudgetDetailedViewModel(budgetAPI, subCategoryUid)
 ) {
-  val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid)
   AccountingDetailedScreen(
-      AccountingPage.BUDGET, subCategoryUid, navigationActions, budgetAPI, budgetDetailedViewModel)
+      AccountingPage.BUDGET, subCategoryUid, navigationActions, budgetDetailedViewModel)
 }

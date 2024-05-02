@@ -23,6 +23,5 @@ fun BalanceDetailedScreen(
       page = AccountingPage.BALANCE,
       subCategoryUid = subCategoryUid,
       navigationActions = navigationActions,
-      budgetAPI = budgetAPI,
       budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid))
 }
