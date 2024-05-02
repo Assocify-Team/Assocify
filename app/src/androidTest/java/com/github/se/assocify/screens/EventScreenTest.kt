@@ -186,6 +186,12 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
       onNodeWithTag("eventAccountIcon").assertIsNotDisplayed()
       onNodeWithTag("eventSearchIcon").assertIsNotDisplayed()
       onNodeWithTag("searchBar").assertIsDisplayed()
+      onNodeWithTag("searchBarButton").assertHasClickAction()
+      onNodeWithTag("searchBarButton").performClick()
+      onNodeWithTag("searchBar").assertIsDisplayed()
+      onNodeWithTag("dismissBarButton").assertIsDisplayed()
+      onNodeWithTag("dismissBarButton").performClick()
+      onNodeWithTag("dismissBarButton").assertIsNotDisplayed()
     }
   }
 
