@@ -25,6 +25,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -99,6 +100,15 @@ class BudgetDetailedScreenTest :
 
     assert(
         budgetItems.filter { it.year == 2023 } == budgetDetailedViewModel.uiState.value.budgetList)
+  }
+
+  /** Tests if go back to Treasury */
+  @Test
+  fun goBackTest() {
+    with(composeTestRule) {
+      onNodeWithTag("backButton").performClick()
+      verify { mockNavActions.back() }
+    }
   }
 
   /** Tests if the nodes of filter year are displayed */
