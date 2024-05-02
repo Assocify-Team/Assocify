@@ -92,6 +92,15 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Edits an association in the database.
+   *
+   * @param uid the id of the association to edit
+   * @param name the new name of the association
+   * @param description the new description of the association
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun editAssociation(
       uid: String,
       name: String,
@@ -200,6 +209,13 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Gets the roles of an association.
+   *
+   * @param associationId the association to get the roles for
+   * @param onSuccess called on success with the list of roles
+   * @param onFailure called on failure
+   */
   fun getRoles(
       associationId: String,
       onSuccess: (List<PermissionRole>) -> Unit,
@@ -219,6 +235,13 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     db.from("role").insert(supabaseRole)
   }
 
+  /**
+   * Adds a role to the association.
+   *
+   * @param role the role to add
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun addRole(role: PermissionRole, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       addRoleSus(role)
@@ -226,6 +249,13 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Invites a user to the association with a specific role.
+   *
+   * @param member the member to invite
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun inviteUser(member: AssociationMember, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     inviteUser(member.user.uid, member.role, onSuccess, onFailure)
   }
@@ -255,6 +285,16 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Initializes an association with roles and users. It is guaranteed that the roles will be
+   * successfully first, then the users. Will fail if the association doesn't exist in the database,
+   * so it must be created first.
+   *
+   * @param roles the roles to add
+   * @param users the users to invite
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun initAssociation(
       roles: Collection<PermissionRole>,
       users: Collection<AssociationMember>,

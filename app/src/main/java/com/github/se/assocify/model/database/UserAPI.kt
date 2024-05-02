@@ -67,6 +67,14 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Updates the display name of a user.
+   *
+   * @param userId the id of the user to update
+   * @param newName the new display name
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun setDisplayName(
       userId: String,
       newName: String,
@@ -83,14 +91,10 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
    * Requests to join an association.
    *
    * @param associationId the association that the current user wants to join
-   * @param onSuccess called on success (by default does nothing)
+   * @param onSuccess called on success
    * @param onFailure called on failure
    */
-  fun requestJoin(
-      associationId: String,
-      onSuccess: () -> Unit = {},
-      onFailure: (Exception) -> Unit
-  ) {
+  fun requestJoin(associationId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("applicant")
           .insert(

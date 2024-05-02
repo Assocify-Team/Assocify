@@ -7,11 +7,11 @@ import kotlinx.serialization.Serializable
  * enumeration of all roles, sorted by importance
  */
 enum class RoleType {
-  PRESIDENCY,
-  TREASURY,
-  COMMITTEE,
-  MEMBER,
-  STAFF
+  @SerialName("presidency") PRESIDENCY,
+  @SerialName("treasury") TREASURY,
+  @SerialName("committee") COMMITTEE,
+  @SerialName("member") MEMBER,
+  @SerialName("staff") STAFF
 }
 
 data class Role(val name: String) {
