@@ -56,7 +56,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
             }
       }
 
-  val bigView = CreateAssociationViewmodel(mockAssocAPI, mockUserAPI)
+  val bigView = CreateAssociationViewmodel(mockAssocAPI, mockUserAPI, mockNavActions)
 
   @Before
   fun setup() {

@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.login.loginGraph
@@ -20,6 +21,7 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +29,8 @@ import org.junit.runner.RunWith
 @Composable
 fun LoginApp() {
   val navController = rememberNavController()
-  val navActions = NavigationActions(navController)
+  val mockLoginSave: LoginSave = mockk(relaxed = true)
+  val navActions = NavigationActions(navController, mockLoginSave)
   val supabaseClient: SupabaseClient =
       createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
         install(Postgrest)
@@ -36,7 +39,7 @@ fun LoginApp() {
   val userAPI = UserAPI(supabaseClient)
   val associationAPI = AssociationAPI(supabaseClient)
   NavHost(navController = navController, startDestination = Destination.Login.route) {
-    loginGraph(navigationActions = navActions, userAPI = userAPI, associationAPI = associationAPI)
+    loginGraph(navigationActions = navActions, userAPI = userAPI)
   }
 }
 
