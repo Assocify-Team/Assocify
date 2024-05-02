@@ -7,6 +7,7 @@ import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -19,6 +20,7 @@ fun AssocifyApp() {
   val userAPI = UserAPI(SupabaseClient.supabaseClient)
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
+  val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
   val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
   NavHost(navController = navController, startDestination = Destination.Login.route) {
     mainNavGraph(
@@ -26,6 +28,7 @@ fun AssocifyApp() {
         userAPI = userAPI,
         associationAPI = associationAPI,
         eventAPI = eventAPI,
-        budgetAPI = budgetAPI)
+        budgetAPI = budgetAPI,
+        taskAPI = taskAPI)
   }
 }
