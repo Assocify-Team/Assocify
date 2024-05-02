@@ -247,7 +247,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
           Icon(
-              Icons.AutoMirrored.Filled.Help,
+              balanceItem.receipt!!.status.getIcon(),
               contentDescription = "Create") // TODO: add logo depending on the phase
         }
       },
