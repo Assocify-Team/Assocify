@@ -1,12 +1,12 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab
 
+import android.util.Log
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.User
-import com.github.se.assocify.model.isCurrentUser
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,7 @@ class ReceiptListViewModel(
     userAPI.getUser(
         CurrentUser.userUid!!,
         onSuccess = { user = it },
-        onFailure = { // TODO on sprint 4 with error API
+        onFailure = { // TODO Error message
         })
     updateUserReceipts()
     updateAllReceipts()
@@ -50,31 +50,29 @@ class ReceiptListViewModel(
               _uiState.value.copy(
                   userReceipts =
                       receipts.filter {
-                        isCurrentUser(it.uid) &&
-                            it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
+                        it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
         },
         onError = {
-          // TODO on sprint 4 with error API
+          Log.e("ReceiptListViewModel", "Error fetching user receipts", it)
+          // TODO Error message
         })
   }
 
-  /** Update all receipts, if you have permissions */
+  /** Update all receipts */
   fun updateAllReceipts() {
     // TODO : Add a permission check.
-    // TODO Note : not done because permissions & database will change
-    // TODO Note : on sprint 4.
     receiptsDatabase.getAllReceipts(
         onSuccess = { receipts ->
           _uiState.value =
               _uiState.value.copy(
                   allReceipts =
                       receipts.filter {
-                        isCurrentUser(it.uid) &&
-                            it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
+                        it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
         },
-        onError = { _ ->
+        onError = {
+          Log.e("ReceiptListViewModel", "Error fetching all receipts", it)
           // TODO on sprint 4 with error API
         })
   }
