@@ -21,8 +21,7 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
 
-  CurrentUser.userUid = loginSaver.getSavedUserUid()
-  CurrentUser.associationUid = loginSaver.getSavedAssociationUid()
+  loginSaver.loadUserInfo()
 
   val firstDest =
       if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {

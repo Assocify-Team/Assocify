@@ -3,6 +3,7 @@ package com.github.se.assocify.model.localsave
 import android.content.Context
 import android.content.SharedPreferences
 import com.github.se.assocify.MainActivity
+import com.github.se.assocify.model.CurrentUser
 
 class LoginSave(private val activity: MainActivity) {
 
@@ -10,36 +11,41 @@ class LoginSave(private val activity: MainActivity) {
   private val USER_PREF = "user_uid"
   private val ASSOC_PREF = "association_uid"
 
-  fun saveLoginInfo(userUid: String, associationUid: String) {
+  fun saveUserInfo() {
     val sharedPref: SharedPreferences =
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
     val editor = sharedPref.edit()
-    editor.putString(USER_PREF, userUid)
-    editor.putString(ASSOC_PREF, associationUid)
+    editor.putString(USER_PREF, CurrentUser.userUid)
+    editor.putString(ASSOC_PREF, CurrentUser.associationUid)
     editor.apply()
   }
 
-  fun saveCurrentAssociation(associationUid: String) {
+  fun saveAssociation() {
     val sharedPref: SharedPreferences =
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
     val editor = sharedPref.edit()
-    editor.putString(ASSOC_PREF, associationUid)
+    editor.putString(ASSOC_PREF, CurrentUser.associationUid)
     editor.apply()
   }
 
-  fun getSavedUserUid(): String? {
-    val sharedPref: SharedPreferences =
-        activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
-    return sharedPref.getString(USER_PREF, null)
+  fun loadUserInfo() {
+    loadUserUid()
+    loadAssociation()
   }
 
-  fun getSavedAssociationUid(): String? {
+  fun loadUserUid() {
     val sharedPref: SharedPreferences =
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
-    return sharedPref.getString(ASSOC_PREF, null)
+    CurrentUser.userUid = sharedPref.getString(USER_PREF, null)
   }
 
-  fun clearSavedLoginInfo() {
+  fun loadAssociation() {
+    val sharedPref: SharedPreferences =
+        activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
+    CurrentUser.associationUid = sharedPref.getString(ASSOC_PREF, null)
+  }
+
+  fun clearSavedUserInfo() {
     val sharedPref: SharedPreferences =
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
     val editor = sharedPref.edit()

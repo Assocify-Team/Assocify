@@ -2,7 +2,6 @@ package com.github.se.assocify.navigation
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.localsave.LoginSave
 
 class NavigationActions(
@@ -27,7 +26,7 @@ class NavigationActions(
 
   fun onLogin(userHasMembership: Boolean) {
     if (userHasMembership) {
-      loginSaver.saveLoginInfo(CurrentUser.userUid!!, CurrentUser.associationUid!!)
+      loginSaver.saveUserInfo()
       navController.navigate(Destination.Home.route) {
         popUpTo(navController.graph.id) { inclusive = true }
       }
@@ -39,7 +38,7 @@ class NavigationActions(
   }
 
   fun onLogout() {
-    loginSaver.clearSavedLoginInfo()
+    loginSaver.clearSavedUserInfo()
     navController.navigate(Destination.Login.route) {
       popUpTo(navController.graph.id) { inclusive = true }
     }
