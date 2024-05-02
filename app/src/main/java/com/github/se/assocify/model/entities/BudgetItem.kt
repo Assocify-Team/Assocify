@@ -1,5 +1,4 @@
 package com.github.se.assocify.model.entities
-import java.time.OffsetDateTime
 
 /**
  * Represents an item in the budget sheet For example some sweater in the category Logistics Pole
@@ -18,5 +17,5 @@ data class BudgetItem(
     val tva: TVA,
     val description: String,
     val category: AccountingSubCategory,
-    val year : Int
+    val year: Int
 )

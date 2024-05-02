@@ -40,18 +40,17 @@ enum class TVA(val rate: Float) {
   TVA_2(2.6f), // Reduced rate
   TVA_3(3.8f); // Special housing rate
 
-    companion object {
-        fun floatToTVA(tva: Float): TVA {
-            return when (tva) {
-                TVA_0.rate -> TVA_0
-                TVA_8.rate -> TVA_8
-                TVA_2.rate -> TVA_2
-                TVA_3.rate -> TVA_3
-                else -> {
-                    throw IllegalArgumentException("Invalid TVA rate")
-                }
-            }
-
+  companion object {
+    fun floatToTVA(tva: Float): TVA {
+      return when (tva) {
+        TVA_0.rate -> TVA_0
+        TVA_8.rate -> TVA_8
+        TVA_2.rate -> TVA_2
+        TVA_3.rate -> TVA_3
+        else -> {
+          throw IllegalArgumentException("Invalid TVA rate")
         }
+      }
     }
+  }
 }
