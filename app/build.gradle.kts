@@ -213,6 +213,9 @@ dependencies {
     androidTestImplementation("io.mockk:mockk-android:$mockkVersion")
     androidTestImplementation("io.mockk:mockk-agent:$mockkVersion")
 
+    // testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.7")
+
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
