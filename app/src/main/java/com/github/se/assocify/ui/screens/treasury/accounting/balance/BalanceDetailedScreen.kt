@@ -5,6 +5,7 @@ import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 
 /**
  * Detailed balance screen for a subcategory
@@ -22,5 +23,7 @@ fun BalanceDetailedScreen(
       page = AccountingPage.BALANCE,
       subCategoryUid = subCategoryUid,
       navigationActions = navigationActions,
-      budgetAPI = budgetAPI)
+      budgetAPI = budgetAPI,
+      budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid)
+  )
 }

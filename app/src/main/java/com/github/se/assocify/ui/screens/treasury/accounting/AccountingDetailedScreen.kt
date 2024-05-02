@@ -64,17 +64,17 @@ fun AccountingDetailedScreen(
     page: AccountingPage,
     subCategoryUid: String,
     navigationActions: NavigationActions,
-    budgetAPI: BudgetAPI
+    budgetAPI: BudgetAPI,
+    budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
-  val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid)
-  val budgetModel = budgetDetailedViewModel.uiState.collectAsState()
-  val budgetItems = budgetModel.value.budgetList
-  println("budgetItems: $budgetItems")
-  println("COUUUUUCOU")
+    println("YOOOOOOOOOO")
+
+  val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
+    println("budgetModel: ${budgetModel.budgetList}")
   val subCategory =
       AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
 
-  // TODO: fetch from db
+  // TODO: fetch from balance detailed view model
   val receipt =
       Receipt(
           "1",
@@ -124,9 +124,11 @@ fun AccountingDetailedScreen(
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
+
   var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedStatus by remember { mutableStateOf(statusList.first()) }
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+
   val filteredBalanceList =
       if (selectedStatus == statusList.first()) // display everything under the status category
        balanceItems
@@ -134,7 +136,7 @@ fun AccountingDetailedScreen(
 
   val totalAmount =
       when (page) {
-        AccountingPage.BUDGET -> budgetItems.sumOf { it.amount }
+        AccountingPage.BUDGET -> budgetModel.budgetList.sumOf { it.amount }
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
       }
 
@@ -167,7 +169,12 @@ fun AccountingDetailedScreen(
         ) {
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
-              DropdownFilterChip(yearList.first(), yearList, "yearListTag") { selectedYear = it }
+              DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
+                  //budgetItems = budgetItems.filter{budgetItem ->  budgetItem.year == it.toInt()}
+                  budgetDetailedViewModel.onYearFilter(it.toInt())
+                 // budgetItems = budgetModel.value.budgetList
+                  println("yearFilter: $it")
+              }
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                   selectedStatus = it
@@ -184,7 +191,7 @@ fun AccountingDetailedScreen(
               HorizontalDivider(Modifier.fillMaxWidth())
             }
           } else if (page == AccountingPage.BUDGET) {
-            items(budgetItems) {
+            items(budgetModel.budgetList) {
               DisplayBudgetItem(it, "displayItem${it.uid}")
               HorizontalDivider(Modifier.fillMaxWidth())
             }
