@@ -12,7 +12,6 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.login.loginGraph
-import com.google.firebase.firestore.FirebaseFirestore
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -29,13 +28,12 @@ import org.junit.runner.RunWith
 fun LoginApp() {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController)
-  val db: FirebaseFirestore = FirebaseFirestore.getInstance()
   val supabaseClient: SupabaseClient =
       createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
         install(Postgrest)
         httpEngine = MockEngine { respondBadRequest() }
       }
-  val userAPI = UserAPI(db)
+  val userAPI = UserAPI(supabaseClient)
   val associationAPI = AssociationAPI(supabaseClient)
   NavHost(navController = navController, startDestination = Destination.Login.route) {
     loginGraph(navigationActions = navActions, userAPI = userAPI, associationAPI = associationAPI)

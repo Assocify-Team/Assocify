@@ -46,7 +46,7 @@ import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.UserSearchTextField
@@ -112,7 +112,7 @@ fun CreateAssociationScreen(
                             Modifier.clip(RoundedCornerShape(10.dp))
                                 .testTag("MemberListItem-${member.name}"),
                         headlineContent = { Text(member.name) },
-                        overlineContent = { Text(member.role.name) },
+                        overlineContent = { Text(member.name) },
                         leadingContent = {
                           Icon(Icons.Default.Person, contentDescription = "Person")
                         },
@@ -171,19 +171,19 @@ fun CreateAssociationScreen(
                         supportingText = state.memberError?.let { { Text(it) } })
                     if (state.editMember != null) {
                       // can't select role before selecting member
-                      Role.RoleType.entries
-                          .filter { role -> role != Role.RoleType.PENDING }
-                          .forEach { role ->
-                            ListItem(
-                                headlineContent = { Text(role.name.uppercase()) },
-                                trailingContent = {
-                                  RadioButton(
-                                      modifier = Modifier.testTag("role-${role.name}"),
-                                      selected = state.editMember!!.hasRole(role.name),
-                                      onClick = { viewmodel.modifyMemberRole(role.name) })
-                                },
-                                modifier = Modifier.testTag("roleitem-${role.name}"))
-                          }
+                      RoleType.entries.forEach { role ->
+                        ListItem(
+                            headlineContent = { Text(role.name.uppercase()) },
+                            trailingContent = {
+                              RadioButton(
+                                  modifier = Modifier.testTag("role-${role.name}"),
+                                  selected =
+                                      false, // state.editMember!!.hasRole(role.name), TODO: remake
+                                  // roles
+                                  onClick = { viewmodel.modifyMemberRole(role.name) })
+                            },
+                            modifier = Modifier.testTag("roleitem-${role.name}"))
+                      }
 
                       Row(
                           modifier = Modifier.fillMaxWidth().padding(4.dp),

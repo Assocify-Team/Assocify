@@ -1,66 +1,63 @@
 package com.github.se.assocify.model.database
 
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.Task
+import android.util.Log
+import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.User
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.mockkStatic
+import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.setMain
 
 object APITestUtils {
-  /**
-   * Mocks a successful task that succeeds with the given result immediately.
-   *
-   * @param result the result to return, null by default
-   */
-  inline fun <reified T> mockSuccessfulTask(result: T? = null): Task<T> {
-    return mockSuccessfulTaskAdvanced<T, Task<T>>(result)
-  }
+  val USER = User("DEADBEEF-0000-0000-0000-000000000000", "API Test User", "test@example.com")
+  val ASSOCIATION =
+      Association(
+          "13379999-0000-0000-0000-000000000000",
+          "API Test Association",
+          "A test association",
+          LocalDate.of(2020, 2, 20))
 
   /**
-   * Mocks a successful task that succeeds with the given result immediately, but can return a
-   * subclass of Task.
+   * Sets up various convenient mocks for API testing.
+   *
+   * Currently sets up:
+   * - Logging
+   * - Dispatchers
+   * - Current user
    */
-  inline fun <reified S, reified T : Task<S>> mockSuccessfulTaskAdvanced(result: S? = null): T {
-    val task = mockk<T>()
-    every { task.addOnSuccessListener(any()) }
-        .answers {
-          @Suppress("UNCHECKED_CAST")
-          (it.invocation.args[0] as OnSuccessListener<S>).onSuccess(result)
-          task
+  @OptIn(ExperimentalCoroutinesApi::class)
+  fun setup() {
+    mockkStatic(Log::class)
+    every { Log.e(any(), any()) } answers
+        {
+          println("\u001b[31m[ERROR] ${invocation.args[0]}: ${invocation.args[1]}\u001b[0m")
+          1
         }
 
-    every { task.addOnFailureListener(any()) }.returns(task)
-
-    return task
-  }
-
-  /**
-   * Mocks a failing task that throws the given exception immediately.
-   *
-   * @param exception the exception to throw, a test exception by default
-   */
-  inline fun <reified T> mockFailingTask(
-      exception: Exception = Exception("Test exception")
-  ): Task<T> {
-    return mockFailingTaskAdvanced<T, Task<T>>(exception)
-  }
-
-  /**
-   * Mocks a failing task that throws the given exception immediately, but can return a subclass of
-   * Task.
-   */
-  inline fun <reified S, reified T : Task<S>> mockFailingTaskAdvanced(
-      exception: Exception = Exception("Test exception")
-  ): T {
-    val task = mockk<T>()
-    every { task.addOnFailureListener(any()) }
-        .answers {
-          (it.invocation.args[0] as OnFailureListener).onFailure(exception)
-          task
+    every { Log.i(any(), any()) } answers
+        {
+          println("\u001b[32m[INFO] ${invocation.args[0]}: ${invocation.args[1]}\u001b[0m")
+          1
         }
 
-    every { task.addOnSuccessListener(any()) }.returns(task)
+    every { Log.d(any(), any()) } answers
+        {
+          println("\u001b[34m[DEBUG] ${invocation.args[0]}: ${invocation.args[1]}\u001b[0m")
+          1
+        }
 
-    return task
+    every { Log.w(any(), any<String>()) } answers
+        {
+          println("\u001b[33m[WARN] ${invocation.args[0]}: ${invocation.args[1]}\u001b[0m")
+          1
+        }
+
+    Dispatchers.setMain(UnconfinedTestDispatcher())
+    CurrentUser.userUid = USER.uid
+    CurrentUser.associationUid = ASSOCIATION.uid
   }
 }

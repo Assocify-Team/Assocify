@@ -1,18 +1,17 @@
 package com.github.se.assocify.model.database
 
-import com.github.se.assocify.model.entities.Role
+import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.User
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
@@ -21,100 +20,121 @@ import org.junit.Test
 @MockKExtension.ConfirmVerification
 class UserAPITest {
   @get:Rule val mockkRule = MockKRule(this)
-  @MockK private lateinit var db: FirebaseFirestore
-
-  @MockK private lateinit var documentSnapshot: DocumentSnapshot
-  @MockK private lateinit var documentReference: DocumentReference
-  @MockK private lateinit var collectionReference: CollectionReference
-
-  @MockK private lateinit var query: QuerySnapshot
 
   private lateinit var userAPI: UserAPI
-  private val testUser = User("testId", "testName", Role("testId"))
+  private val uuid1 = UUID.fromString("00000000-0000-0000-0000-000000000000")!!
+  private val testUser1 = User(uuid1.toString(), "testName")
+  private val testUserJson1 = """{"uid":"$uuid1","name":"testName"}"""
+
+  private val uuid2 = UUID.fromString("ABCDEF00-0000-0000-0000-000000000000")!!
+  private val testUser2 = User(uuid2.toString(), "testName2")
+  private val testUserJson2 = """{"uid":"$uuid2","name":"testName2"}"""
+
+  private var error = false
+  private var response = ""
 
   @Before
   fun setup() {
-    every { documentSnapshot.exists() } returns true
-    every { documentSnapshot.toObject(User::class.java) } returns testUser
-    every { db.collection("users").document("testId") } returns documentReference
-    every { db.collection("users") } returns collectionReference
-    every { collectionReference.document("testId") } returns documentReference
-    every { query.documents } returns listOf(documentSnapshot)
-
-    userAPI = UserAPI(db)
+    APITestUtils.setup()
+    userAPI =
+        UserAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+              httpEngine = MockEngine {
+                if (!error) {
+                  respond(response)
+                } else {
+                  respondBadRequest()
+                }
+              }
+            })
   }
 
   @Test
   fun testGetUser() {
-    every { documentReference.get() } returns APITestUtils.mockSuccessfulTask(documentSnapshot)
+    val onSuccess: (User) -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<(User) -> Unit>(relaxed = true)
-    userAPI.getUser(testUser.uid, successMock, { fail("Should not fail") })
+    error = false
+    response = testUserJson1
+    userAPI.getUser("testId", onSuccess, { fail("Should not fail, failed with $it") })
 
-    verify(timeout = 100) { successMock.invoke(testUser) }
+    verify(timeout = 1000) { onSuccess(testUser1) }
 
-    every { documentReference.get() } returns APITestUtils.mockFailingTask()
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-    userAPI.getUser(testUser.uid, { fail("Should not succeed") }, failureMock)
+    error = true
+    userAPI.getUser("testId", { fail("Should not succeed") }, onFailure)
 
-    verify(timeout = 100) { failureMock.invoke(any()) }
+    verify(timeout = 1000) { onFailure(any()) }
   }
 
   @Test
   fun testGetAllUsers() {
-    every { collectionReference.get() } returns APITestUtils.mockSuccessfulTask(query)
+    val onSuccess: (List<User>) -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<(List<User>) -> Unit>(relaxed = true)
+    error = false
+    response = "[$testUserJson1, $testUserJson2]"
+    userAPI.getAllUsers(onSuccess, { fail("Should not fail, failed with $it") })
 
-    userAPI.getAllUsers(successMock, { fail("Should not fail") })
+    verify(timeout = 1000) { onSuccess(listOf(testUser1, testUser2)) }
 
-    verify { successMock.invoke(listOf(testUser)) }
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    every { collectionReference.get() } returns APITestUtils.mockFailingTask()
+    error = true
+    userAPI.getAllUsers({ fail("Should not succeed") }, onFailure)
 
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-
-    userAPI.getAllUsers({ fail("Should not succeed") }, failureMock)
-
-    verify { failureMock.invoke(any()) }
+    verify(timeout = 1000) { onFailure(any()) }
   }
 
   @Test
   fun testAddUser() {
-    every { documentReference.set(testUser) } returns APITestUtils.mockSuccessfulTask()
+    val onSuccess: () -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<() -> Unit>(relaxed = true)
+    error = false
+    userAPI.addUser(testUser1, onSuccess, { fail("Should not fail, failed with $it") })
 
-    userAPI.addUser(testUser, successMock, { fail("Should not fail") })
+    verify(timeout = 1000) { onSuccess() }
 
-    verify { successMock.invoke() }
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    every { documentReference.set(testUser) } returns APITestUtils.mockFailingTask()
+    error = true
+    userAPI.addUser(testUser1, { fail("Should not succeed") }, onFailure)
 
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-
-    userAPI.addUser(testUser, { fail("Should not succeed") }, failureMock)
-
-    verify { failureMock.invoke(any()) }
+    verify(timeout = 1000) { onFailure(any()) }
   }
 
   @Test
   fun testDeleteUser() {
-    every { documentReference.delete() } returns APITestUtils.mockSuccessfulTask()
+    val onSuccess: () -> Unit = mockk(relaxed = true)
 
-    val successMock = mockk<() -> Unit>(relaxed = true)
+    error = false
+    userAPI.deleteUser("testId", onSuccess, { fail("Should not fail, failed with $it") })
 
-    userAPI.deleteUser(testUser.uid, successMock, { fail("Should not fail") })
+    verify(timeout = 1000) { onSuccess() }
 
-    verify { successMock.invoke() }
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    every { documentReference.delete() } returns APITestUtils.mockFailingTask()
+    error = true
+    userAPI.deleteUser("testId", { fail("Should not succeed") }, onFailure)
 
-    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
+    verify(timeout = 1000) { onFailure(any()) }
+  }
 
-    userAPI.deleteUser(testUser.uid, { fail("Should not succeed") }, failureMock)
+  @Test
+  fun testRequestJoin() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
 
-    verify { failureMock.invoke(any()) }
+    error = false
+    userAPI.requestJoin(
+        APITestUtils.ASSOCIATION.uid, onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    error = true
+    userAPI.requestJoin(APITestUtils.ASSOCIATION.uid, { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
   }
 }
