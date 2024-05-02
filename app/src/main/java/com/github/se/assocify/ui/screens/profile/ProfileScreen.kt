@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -128,13 +128,16 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                           contentDescription = "profile picture",
                           contentScale = ContentScale.Crop)
                     } else {
-                      Image(
+                      IconButton(
                           modifier =
-                              Modifier.testTag("default profile icon").size(80.dp).clickable {
-                                viewmodel.controlBottomSheet(true)
-                              },
-                          imageVector = Icons.Outlined.AccountCircle,
-                          contentDescription = "default profile icon")
+                              Modifier.testTag("default profile icon").size(80.dp),
+                          onClick = { viewmodel.controlBottomSheet(true) }) {
+                          Icon(
+                              modifier = Modifier.fillMaxSize(),
+                              imageVector = Icons.Outlined.AccountCircle,
+                              contentDescription = "default profile icon"
+                          )
+                      }
                     }
 
                     // personal information : name and role (depends on current association)
