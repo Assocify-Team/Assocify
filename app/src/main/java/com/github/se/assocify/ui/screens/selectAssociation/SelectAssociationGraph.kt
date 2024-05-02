@@ -16,7 +16,7 @@ fun NavGraphBuilder.selectAssociationGraph(
     SelectAssociation(
         navActions = navigationActions,
         associationAPI = associationAPI,
-        userAPI = userAPI,
+        userAPI = userAPI
     )
   }
 }

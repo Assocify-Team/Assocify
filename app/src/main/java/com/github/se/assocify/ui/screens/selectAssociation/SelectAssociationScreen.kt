@@ -51,7 +51,7 @@ import kotlin.math.min
 fun SelectAssociation(
     navActions: NavigationActions,
     associationAPI: AssociationAPI,
-    userAPI: UserAPI,
+    userAPI: UserAPI
 ) {
   val model = SelectAssociationViewModel(associationAPI, userAPI, navActions)
   val state = model.uiState.collectAsState()

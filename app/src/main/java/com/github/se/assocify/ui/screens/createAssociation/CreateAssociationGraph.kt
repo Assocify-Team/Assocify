@@ -10,7 +10,7 @@ import com.github.se.assocify.navigation.NavigationActions
 fun NavGraphBuilder.createAssociationGraph(
     navigationActions: NavigationActions,
     userAPI: UserAPI,
-    associationAPI: AssociationAPI,
+    associationAPI: AssociationAPI
 ) {
   composable(route = Destination.CreateAsso.route) {
     CreateAssociationScreen(navigationActions, associationAPI, userAPI)

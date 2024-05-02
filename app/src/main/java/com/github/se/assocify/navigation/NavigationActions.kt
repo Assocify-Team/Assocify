@@ -1,5 +1,6 @@
 package com.github.se.assocify.navigation
 
+import android.util.Log
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.github.se.assocify.model.localsave.LoginSave
@@ -45,7 +46,7 @@ class NavigationActions(
   }
 
   fun onAuthError() {
-    // throw Exception("Authentication error")
+    Log.e("Authentication", "Error occurred during authentication")
   }
 
   fun back() {

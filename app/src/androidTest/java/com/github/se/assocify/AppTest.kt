@@ -10,7 +10,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
@@ -41,7 +40,6 @@ fun LoginApp() {
         httpEngine = MockEngine { respondBadRequest() }
       }
   val userAPI = UserAPI(supabaseClient)
-  val associationAPI = AssociationAPI(supabaseClient)
   NavHost(navController = navController, startDestination = Destination.Login.route) {
     loginGraph(navigationActions = navActions, userAPI = userAPI)
   }
