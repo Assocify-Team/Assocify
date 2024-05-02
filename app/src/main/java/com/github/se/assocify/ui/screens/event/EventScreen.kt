@@ -57,7 +57,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun EventScreen(navActions: NavigationActions, viewModel: EventScreenViewModel) {
   val state = viewModel.uiState.collectAsState()
-
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       floatingActionButton = {

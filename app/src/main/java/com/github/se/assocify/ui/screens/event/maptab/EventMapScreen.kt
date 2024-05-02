@@ -29,7 +29,7 @@ fun EventMapScreen() {
   Column(
       modifier =
           Modifier.fillMaxWidth()
-              // Note : padding is used to avoid a bug where the map
+              // TODO : padding is used to avoid a bug where the map
               //        overlaps the top bar. Has to be changed later on.
               .padding(top = 80.dp)
               .testTag("OSMMapScreen")) {
@@ -46,7 +46,7 @@ fun EventMapView() {
       },
       modifier = Modifier.testTag("EPFLMapView").fillMaxWidth(),
       update = { view ->
-        // Note for later : viewmodel stuff will be here
+        // TODO : viewmodel stuff will be here
       })
 }
 
@@ -85,7 +85,9 @@ private fun initMapView(context: Context): MapView {
   return mapView
 }
 
-/** The custom tile source from the EPFL plan API. */
+/** The custom tile source from the EPFL plan API.
+ * @param floorId the floor id of the map to display
+ * */
 class CampusTileSource(private val floorId: Int) :
     OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
   override fun getTileURLString(pMapTileIndex: Long): String {
