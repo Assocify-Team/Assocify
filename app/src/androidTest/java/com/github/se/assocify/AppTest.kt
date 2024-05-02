@@ -66,6 +66,7 @@ class ActivityAppTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   fun setup() {
     composeTestRule.setContent { MainActivity() }
   }
+
   @Test
   fun loginStart() {
 
