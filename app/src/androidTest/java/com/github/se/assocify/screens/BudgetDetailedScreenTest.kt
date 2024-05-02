@@ -11,7 +11,6 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
-import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
@@ -53,10 +52,10 @@ class BudgetDetailedScreenTest :
     }
 
     every { mockBudgetAPI.getBudget(any(), any(), any()) } answers
-            {
-              val onSuccessCallback = arg<(List<BudgetItem>) -> Unit>(0)
-              onSuccessCallback(budgetItems)
-            }
+        {
+          val onSuccessCallback = arg<(List<BudgetItem>) -> Unit>(0)
+          onSuccessCallback(budgetItems)
+        }
   }
 
   /** Tests if the nodes are displayed */
