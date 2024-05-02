@@ -7,9 +7,6 @@ import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +15,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
+import java.lang.Thread.sleep
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @MockKExtension.ConfirmVerification
 class BudgetAPITest {
@@ -32,7 +32,12 @@ class BudgetAPITest {
           1,
           TVA.TVA_2,
           "lala",
-          AccountingSubCategory("uid", "name", AccountingCategory("asas"), 1))
+          year = 2022,
+          category = AccountingSubCategory("subCategoryUID", "name", AccountingCategory("categoryUID"), 1)
+      )
+
+
+
   lateinit var budgetAPI: BudgetAPI
 
   @Before
@@ -43,40 +48,46 @@ class BudgetAPITest {
         BudgetAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
-              httpEngine = MockEngine {
-                if (!error) {
-                  respond(response)
-                } else {
-                  respondBadRequest()
-                }
-              }
             })
   }
 
   @Test
   fun testGetBudgets() {
-    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
     error = false
     response = ""
-    budgetAPI.getBudget("associationUID", onSuccess = {}, onFailure = {})
+
+
+
+    var listResponse = listOf<BudgetItem>()
+    budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess = { listResponse = it}, onFailure = {})
+    sleep(1000)
+    print(listResponse)
+    assert(listResponse.isNotEmpty())
   }
 
   @Test
   fun testAddBudgetItem() {
-    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-
     error = false
     response = ""
-    budgetAPI.addBudgetItem("associationUID", budgetItem, onSuccess = {}, onFailure = {})
+    val  budgetItemUpdt = budgetItem.copy(uid = UUID.randomUUID().toString())
+              budgetAPI.addBudgetItem("aa3d4ad7-c901-435a-b089-bb835f6ec560", budgetItemUpdt, onSuccess = {println("SUCESS")}, onFailure = {println(it.toString())})
+    sleep(1000)
   }
 
   @Test
   fun testUpdateBudgetItem() {
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-
     error = false
     response = ""
-    budgetAPI.updateBudgetItem("associationUID", budgetItem, onSuccess = {}, onFailure = {})
+
+    var listResponse = listOf<BudgetItem>()
+    budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess = { listResponse = it}, onFailure = {})
+    sleep(1000)
+      println(listResponse)
+    val budgetItemUpdt = listResponse[0].copy(nameItem = "NameitemUPDATED!!")
+    budgetAPI.updateBudgetItem("aa3d4ad7-c901-435a-b089-bb835f6ec560",
+        budgetItemUpdt, onSuccess = { println("SUCESSSS") }, onFailure = { println(it.toString()) })
+    sleep(1000)
   }
 
   @Test

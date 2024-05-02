@@ -45,6 +45,7 @@ import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -76,9 +77,10 @@ fun AccountingDetailedScreen(
   val budgetItems =
       listOf(
           BudgetItem(
-              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", subCategory),
-          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory))
+              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", subCategory,2022),
+          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory,2023),
+          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory,
+              2022))
   val balanceItems =
       listOf(
           BalanceItem(
