@@ -10,13 +10,10 @@ import com.github.se.assocify.navigation.NavigationActions
 fun NavGraphBuilder.selectAssociationGraph(
     navigationActions: NavigationActions,
     userAPI: UserAPI,
-    associationAPI: AssociationAPI
+    associationAPI: AssociationAPI,
 ) {
   composable(route = Destination.SelectAsso.route) {
     SelectAssociation(
-        navActions = navigationActions,
-        associationAPI = associationAPI,
-        userAPI = userAPI,
-    )
+        navActions = navigationActions, associationAPI = associationAPI, userAPI = userAPI)
   }
 }
