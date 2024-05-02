@@ -27,11 +27,11 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -53,9 +53,7 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   }
 
   private val navActions = mockk<NavigationActions>()
-  private val userAPI = mockk<UserAPI>() {
-    every { addUser(any(), any(), any()) } answers {  }
-  }
+  private val userAPI = mockk<UserAPI>() { every { addUser(any(), any(), any()) } answers {} }
   private val viewmodel = LoginViewModel(navActions, userAPI)
 
   private var authSuccess = false
@@ -119,30 +117,33 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
     every { googleUser.displayName } returns "testName"
     every { googleUser.email } returns "testEmail"
     val userList = listOf<User>()
-    every { userAPI.getAllUsers(any(), any()) } answers {
-      firstArg<(List<User>) -> Unit>().invoke(userList)
-    }
+    every { userAPI.getAllUsers(any(), any()) } answers
+        {
+          firstArg<(List<User>) -> Unit>().invoke(userList)
+        }
     viewmodel.updateUser(userInfo, googleUser)
     verify { navActions.onLogin(false) }
   }
 
- @Test
- fun testUpdateUser2() {
+  @Test
+  fun testUpdateUser2() {
     val userInfo = mockk<UserInfo>()
-   val googleUser = mockk<GoogleSignInAccount>()
-   every { userInfo.id } returns "testId"
-   every { googleUser.displayName } returns "testName"
-   every { googleUser.email } returns "testEmail"
-   val userList = listOf(User("testId", "testName", "testEmail"))
-   every { userAPI.getAllUsers(any(), any()) } answers {
-     firstArg<(List<User>) -> Unit>().invoke(userList)
-   }
-   every { userAPI.getCurrentUserAssociations(any(), any()) } answers {
-     firstArg<(List<Association>) -> Unit>().invoke(listOf())
-   }
-   viewmodel.updateUser(userInfo, googleUser)
-   verify { navActions.onLogin(false) }
- }
+    val googleUser = mockk<GoogleSignInAccount>()
+    every { userInfo.id } returns "testId"
+    every { googleUser.displayName } returns "testName"
+    every { googleUser.email } returns "testEmail"
+    val userList = listOf(User("testId", "testName", "testEmail"))
+    every { userAPI.getAllUsers(any(), any()) } answers
+        {
+          firstArg<(List<User>) -> Unit>().invoke(userList)
+        }
+    every { userAPI.getCurrentUserAssociations(any(), any()) } answers
+        {
+          firstArg<(List<Association>) -> Unit>().invoke(listOf())
+        }
+    viewmodel.updateUser(userInfo, googleUser)
+    verify { navActions.onLogin(false) }
+  }
 
   @Test
   fun testUpdateUser3() {
@@ -152,13 +153,15 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
     every { googleUser.displayName } returns "testName"
     every { googleUser.email } returns "testEmail"
     val userList = listOf(User("testId", "testName", "testEmail"))
-    every { userAPI.getAllUsers(any(), any()) } answers {
-      firstArg<(List<User>) -> Unit>().invoke(userList)
-    }
+    every { userAPI.getAllUsers(any(), any()) } answers
+        {
+          firstArg<(List<User>) -> Unit>().invoke(userList)
+        }
     val assocList = listOf(Association("testId", "testName", "testDescription", LocalDate.now()))
-    every { userAPI.getCurrentUserAssociations(any(), any()) } answers {
-      firstArg<(List<Association>) -> Unit>().invoke(assocList)
-    }
+    every { userAPI.getCurrentUserAssociations(any(), any()) } answers
+        {
+          firstArg<(List<Association>) -> Unit>().invoke(assocList)
+        }
     viewmodel.updateUser(userInfo, googleUser)
     verify { navActions.onLogin(true) }
   }
