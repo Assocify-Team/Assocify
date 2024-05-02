@@ -28,11 +28,11 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.verify
-import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
 
 /**
  * This class represents the SelectAssociationScreen
@@ -162,7 +162,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
         performClick()
       }
     }
-    verify(timeout = 250) { mockNavActions.navigateTo(Destination.Home) }
+    verify(timeout = 250) { mockNavActions.onLogin(true) }
   }
 
   /**
