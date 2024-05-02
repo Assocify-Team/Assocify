@@ -12,11 +12,11 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 
 @MockKExtension.ConfirmVerification
 class UserAPITest {
@@ -145,7 +145,7 @@ class UserAPITest {
 
     error = false
     response =
-      """
+        """
       [{
         "user_id": "$uuid1",
         "role_id": "$uuid1",
@@ -156,7 +156,7 @@ class UserAPITest {
         "association_creation_date": "2022-01-01"
       }]
     """
-        .trimIndent()
+            .trimIndent()
     userAPI.getCurrentUserAssociations(onSuccess, { fail("Should not fail, failed with $it") })
 
     verify(timeout = 1000) { onSuccess(any()) }
