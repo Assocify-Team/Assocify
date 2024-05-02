@@ -26,7 +26,7 @@ fun NavGraphBuilder.mainNavGraph(
   eventGraph(navActions, eventAPI, taskAPI)
   chatGraph(navActions)
   profileGraph(navActions, userAPI, associationAPI)
-  loginGraph(navActions, userAPI, associationAPI)
+  loginGraph(navActions, userAPI)
   selectAssociationGraph(navActions, userAPI, associationAPI)
   createAssociationGraph(navActions, userAPI, associationAPI)
 }

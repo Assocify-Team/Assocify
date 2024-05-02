@@ -6,6 +6,7 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import com.github.se.assocify.ui.screens.event.tasktab.task.taskGraph
 
 fun NavGraphBuilder.eventGraph(
@@ -14,7 +15,8 @@ fun NavGraphBuilder.eventGraph(
     taskAPI: TaskAPI
 ) {
   composable(route = Destination.Event.route) {
-    EventScreen(navigationActions, EventScreenViewModel(eventAPI))
+    val taskViewModel = EventTaskViewModel(taskAPI)
+    EventScreen(navigationActions, EventScreenViewModel(eventAPI, taskViewModel), taskViewModel)
   }
   taskGraph(navigationActions, taskAPI)
 }
