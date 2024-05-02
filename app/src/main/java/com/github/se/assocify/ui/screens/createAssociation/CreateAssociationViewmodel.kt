@@ -127,7 +127,7 @@ class CreateAssociationViewmodel(
    * Selects a member from the search list
    */
   fun selectMember(member: User) {
-    val associationMember = AssociationMember(member, association, roles[RoleType.MEMBER]!!)
+    val associationMember = AssociationMember(member, association, roles.get(RoleType.MEMBER)!!)
     _uiState.value =
         _uiState.value.copy(
             editMember = associationMember, searchMember = "", searchMemberList = listOf())
@@ -148,7 +148,7 @@ class CreateAssociationViewmodel(
   fun modifyMemberRole(role: RoleType) {
     _uiState.value.editMember?.let {
       _uiState.value =
-          _uiState.value.copy(openEdit = true, editMember = it.copy(role = roles[role]!!))
+          _uiState.value.copy(openEdit = true, editMember = it.copy(role = roles.get(role)!!))
     }
   }
 
