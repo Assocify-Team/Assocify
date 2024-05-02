@@ -16,5 +16,6 @@ data class BudgetItem(
     val amount: Int,
     val tva: TVA,
     val description: String,
-    val category: AccountingSubCategory
+    val category: AccountingSubCategory,
+    val year: Int
 )

@@ -18,10 +18,11 @@ class BudgetDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
   val uiState: StateFlow<BudgetItemState>
+  private var lastInputTime = 0L
 
   init {
-    uiState = _uiState
     updateDatabaseValues()
+    uiState = _uiState
   }
 
   private fun updateDatabaseValues() {
@@ -30,19 +31,35 @@ class BudgetDetailedViewModel(
         { budgetList ->
           // Filter the budgetList to only include items with the matching subCategoryUid
           val filteredList =
-              budgetList.filter { budgetItem -> budgetItem.category.uid == subCategoryUid }
+              budgetList.filter { budgetItem ->
+              /** budgetItem.category.uid == subCategoryUid */
+                budgetItem.year == _uiState.value.yearFilter
+              }
+
+          // TODO: handle TVA filter: HT = amount in budgetITem, TTC = amount in budgetItem + amount
+          // * tva
+          // TODO: sprint 7
+
           // Update the UI state with the filtered list
-          _uiState.value = _uiState.value.copy(budgetList = budgetList)
+          _uiState.value = _uiState.value.copy(budgetList = filteredList)
         },
         {})
-    println(_uiState.value.budgetList + "TAMERE")
-    println("BOUGE")
+    // Log.d("BudgetList in viewmodel: ", _uiState.value.budgetList.toString())
   }
 
-  // TODO: handle filter
+  fun onYearFilter(yearFilter: Int) {
+    _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
+    updateDatabaseValues()
+  }
 
-  // TODO: handle accoutingSubCategory
-
+  fun onTVAFilter(tvaFilter: String) {
+    _uiState.value = _uiState.value.copy(tvaFilter = tvaFilter)
+    updateDatabaseValues()
+  }
 }
 
-data class BudgetItemState(val budgetList: List<BudgetItem> = emptyList())
+data class BudgetItemState(
+    val budgetList: List<BudgetItem> = emptyList(),
+    val yearFilter: Int = 2023,
+    val tvaFilter: String = "HT"
+)
