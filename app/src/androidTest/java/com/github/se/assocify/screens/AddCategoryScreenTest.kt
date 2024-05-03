@@ -35,7 +35,7 @@ class AddCategoryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     with(composeTestRule) {
       onNodeWithTag("addAccountingSubCategoryScreen").assertIsDisplayed()
       onNodeWithTag("subCategoryTitle").assertIsDisplayed()
-      onNodeWithTag("backButton").assertIsDisplayed()
+      onNodeWithTag("cancelButton").assertIsDisplayed()
 
       onNodeWithTag("categoryDropdown").assertIsDisplayed()
       onNodeWithTag("categoryNameField").assertIsDisplayed()

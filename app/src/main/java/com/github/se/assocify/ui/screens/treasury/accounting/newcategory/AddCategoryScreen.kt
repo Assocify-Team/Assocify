@@ -47,6 +47,10 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.BackButton
 
+// Scaffold padding values
+val HorizontalPadding = 20.dp
+val VerticalPadding = 40.dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAccountingSubCategory(
@@ -84,80 +88,85 @@ fun AddAccountingSubCategory(
             },
             navigationIcon = {
               BackButton(
-                  contentDescription = "Back",
+                  contentDescription = "Cancel",
                   onClick = { navActions.back() },
-                  modifier = Modifier.testTag("backButton"))
+                  modifier = Modifier.testTag("cancelButton"))
             })
       },
-      contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
-  ) { paddingValues ->
-    Column(
-        modifier =
-            Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+      contentWindowInsets =
+          WindowInsets(
+              top = VerticalPadding,
+              left = HorizontalPadding,
+              bottom = VerticalPadding,
+              right = 0.dp)) { paddingValues ->
+        Column(
+            modifier =
+                Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
 
-          // Name field
-          OutlinedTextField(
-              modifier = Modifier.testTag("categoryNameField").fillMaxWidth(),
-              value = subCategoryTitle,
-              onValueChange = { subCategoryTitle = it },
-              label = { Text("Category name") },
-              supportingText = { /* TODO: Error management */})
-          // Value field
-          OutlinedTextField(
-              modifier = Modifier.testTag("valueField").fillMaxWidth(),
-              value = selectedValue.toString(),
-              onValueChange = { selectedValue = it.toIntOrNull() ?: 0 },
-              label = { Text("Value") },
-              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-              supportingText = { /* TODO: Error management */})
+              // Name field
+              OutlinedTextField(
+                  modifier = Modifier.testTag("categoryNameField").fillMaxWidth(),
+                  value = subCategoryTitle,
+                  onValueChange = { subCategoryTitle = it },
+                  label = { Text("Category name") },
+                  supportingText = { /* TODO: Error management */})
+              // Value field
+              OutlinedTextField(
+                  modifier = Modifier.testTag("valueField").fillMaxWidth(),
+                  value = selectedValue.toString(),
+                  onValueChange = { selectedValue = it.toIntOrNull() ?: 0 },
+                  label = { Text("Value") },
+                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                  supportingText = { /* TODO: Error management */})
 
-          // Accounting category dropdown
-          var expanded by remember { mutableStateOf(false) }
-          ExposedDropdownMenuBox(
-              expanded = expanded,
-              onExpandedChange = { expanded = !expanded },
-              modifier = Modifier.testTag("categoryDropdown")) {
-                TextField(
-                    value = selectedSubCategory,
-                    onValueChange = {},
-                    label = { Text("Category") },
-                    trailingIcon = {
-                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ExposedDropdownMenuDefaults.textFieldColors())
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                  categoryList.forEach { category ->
-                    DropdownMenuItem(
-                        text = { Text(category.name) },
-                        onClick = { selectedSubCategory = category.name })
+              // Accounting category dropdown
+              var expanded by remember { mutableStateOf(false) }
+              ExposedDropdownMenuBox(
+                  expanded = expanded,
+                  onExpandedChange = { expanded = !expanded },
+                  modifier = Modifier.testTag("categoryDropdown")) {
+                    TextField(
+                        value = selectedSubCategory,
+                        onValueChange = {},
+                        label = { Text("Category") },
+                        trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        readOnly = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ExposedDropdownMenuDefaults.textFieldColors())
+                    ExposedDropdownMenu(
+                        expanded = expanded, onDismissRequest = { expanded = false }) {
+                          categoryList.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category.name) },
+                                onClick = { selectedSubCategory = category.name })
+                          }
+                        }
                   }
-                }
+
+              // Add category button
+              OutlinedButton(
+                  modifier = Modifier.testTag("addSubCategoryButton").fillMaxWidth(),
+                  onClick = { showAddCategoryDialog = true },
+                  content = {
+                    Icon(Icons.Outlined.Edit, contentDescription = "Add sub category")
+                    Text(" Add sub category")
+                  })
+              Spacer(modifier = Modifier.height(16.dp))
+
+              Column {
+                Button(
+                    modifier = Modifier.testTag("createButton").fillMaxWidth(),
+                    onClick = { /* TODO */},
+                    content = { Text("Create") })
               }
 
-          // Add category button
-          OutlinedButton(
-              modifier = Modifier.testTag("addSubCategoryButton").fillMaxWidth(),
-              onClick = { showAddCategoryDialog = true },
-              content = {
-                Icon(Icons.Outlined.Edit, contentDescription = "Add sub category")
-                Text(" Add sub category")
-              })
-          Spacer(modifier = Modifier.height(16.dp))
-
-          Column {
-            Button(
-                modifier = Modifier.testTag("createButton").fillMaxWidth(),
-                onClick = { /* TODO */},
-                content = { Text("Create") })
-          }
-
-          Spacer(modifier = Modifier.weight(1.0f))
-        }
-  }
+              Spacer(modifier = Modifier.weight(1.0f))
+            }
+      }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
