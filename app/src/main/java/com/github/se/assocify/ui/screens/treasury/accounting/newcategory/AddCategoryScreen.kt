@@ -30,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -125,7 +124,7 @@ fun AddAccountingSubCategory(
                   expanded = expanded,
                   onExpandedChange = { expanded = !expanded },
                   modifier = Modifier.testTag("categoryDropdown")) {
-                    TextField(
+                    OutlinedTextField(
                         value = selectedSubCategory,
                         onValueChange = {},
                         label = { Text("Tag") },
@@ -151,7 +150,7 @@ fun AddAccountingSubCategory(
                   onClick = { showAddCategoryDialog = true },
                   content = {
                     Icon(Icons.Outlined.Edit, contentDescription = "Create new tag")
-                    Text(" Add sub category")
+                    Text(" Create new tag")
                   })
               Spacer(modifier = Modifier.height(16.dp))
 
