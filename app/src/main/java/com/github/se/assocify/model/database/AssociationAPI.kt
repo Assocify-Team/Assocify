@@ -287,8 +287,8 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
 
   /**
    * Initializes an association with roles and users. It is guaranteed that the roles will be
-   * successfully first, then the users. Will fail if the association doesn't exist in the database,
-   * so it must be created first.
+   * successfully first, then the users. Fails if the association doesn't exist in the database, so
+   * it must be created first (via `addAssociation`).
    *
    * @param roles the roles to add
    * @param users the users to invite
