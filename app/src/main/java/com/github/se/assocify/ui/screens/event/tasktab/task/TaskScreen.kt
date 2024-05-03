@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,7 +21,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -44,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.BackButton
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.TimePickerWithDialog
 
@@ -60,10 +59,10 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
               Text(modifier = Modifier.testTag("taskScreenTitle"), text = taskState.pageTitle)
             },
             navigationIcon = {
-              IconButton(
-                  modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                  }
+              BackButton(
+                  contentDescription = "Back",
+                  onClick = { navActions.back() },
+                  modifier = Modifier.testTag("backButton"))
             })
       },
       contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
