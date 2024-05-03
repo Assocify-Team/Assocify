@@ -27,11 +27,11 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -47,22 +47,27 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   private val uid = "1"
   private val asso = Association("asso", "test", "test", LocalDate.EPOCH)
-  private val mockAssocAPI = mockk<AssociationAPI>() {
-    every { getAssociation(any(), any(), any()) } answers {
-      val onSuccessCallback = secondArg<(Association) -> Unit>()
-      onSuccessCallback(asso) }
-  }
+  private val mockAssocAPI =
+      mockk<AssociationAPI>() {
+        every { getAssociation(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(Association) -> Unit>()
+              onSuccessCallback(asso)
+            }
+      }
   private val mockUserAPI =
       mockk<UserAPI>() {
-        every { getUser(any(), any(), any()) } answers {
-          val onSuccessCallback = secondArg<(User) -> Unit>()
-          onSuccessCallback(User("1", "jean")) }
-        every { getCurrentUserAssociations(any(), any()) } answers {
-          val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
-          onSuccessCallback(listOf(asso)) }
-        every { setDisplayName(any(), "newName", any(), any()) } answers {
-
-        }
+        every { getUser(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(User) -> Unit>()
+              onSuccessCallback(User("1", "jean"))
+            }
+        every { getCurrentUserAssociations(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
+              onSuccessCallback(listOf(asso))
+            }
+        every { setDisplayName(any(), "newName", any(), any()) } answers {}
       }
 
   private lateinit var mViewmodel: ProfileViewModel
@@ -129,7 +134,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("editName").performTextClearance()
       onNodeWithTag("editName").performTextInput("newName")
       onNodeWithTag("confirmModifyButton").performClick() // need to set action in test
-      verify { mockUserAPI.setDisplayName(any(), "newName", any(), any())}
+      verify { mockUserAPI.setDisplayName(any(), "newName", any(), any()) }
       assert(mViewmodel.uiState.value.myName == "newName")
     }
   }
