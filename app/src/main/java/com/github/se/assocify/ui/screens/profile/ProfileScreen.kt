@@ -148,7 +148,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                             }
                       }
 
-                      Text("Role", modifier = Modifier.testTag("profileRole"))
+                      Text(state.currentRole.type.name, modifier = Modifier.testTag("profileRole"))
                     }
                   }
 

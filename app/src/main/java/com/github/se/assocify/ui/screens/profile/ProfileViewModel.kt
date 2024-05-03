@@ -15,6 +15,8 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import java.time.LocalDate
@@ -59,6 +61,8 @@ class ProfileViewModel(
           _uiState.value =
               _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
         })
+    userAPI.getCurrentUserRole(
+        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
   }
 
   /**
@@ -96,6 +100,8 @@ class ProfileViewModel(
   fun setAssociation(association: Association) {
     CurrentUser.associationUid = association.uid
     _uiState.value = _uiState.value.copy(selectedAssociation = association)
+    userAPI.getCurrentUserRole(
+        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
   }
 
   /**
@@ -173,7 +179,10 @@ data class ProfileUIState(
     // true if the association dropdown should be shown, false if should be hidden
     val openAssociationDropdown: Boolean = false,
     // the selected (current) association - TODO idk what to do with the temporary association
-    val selectedAssociation: Association = Association("none", "", "none", LocalDate.now())
+    val selectedAssociation: Association = Association("none", "", "none", LocalDate.now()),
+    // current role of the user in the association
+    val currentRole: PermissionRole =
+        PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)
 )
 
 /**
