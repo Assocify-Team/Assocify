@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
@@ -25,6 +26,7 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,13 +47,22 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   private val uid = "1"
   private val asso = Association("asso", "test", "test", LocalDate.EPOCH)
-  private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true) {
-    every { getAssociation(any(), any(), any()) } answers { asso }
+  private val mockAssocAPI = mockk<AssociationAPI>() {
+    every { getAssociation(any(), any(), any()) } answers {
+      val onSuccessCallback = secondArg<(Association) -> Unit>()
+      onSuccessCallback(asso) }
   }
   private val mockUserAPI =
-      mockk<UserAPI>(relaxUnitFun = true) {
-        every { getUser(any(), any(), any()) } answers { User("1", "jean") }
-        every { getCurrentUserAssociations(any(), any()) } answers { listOf(asso) }
+      mockk<UserAPI>() {
+        every { getUser(any(), any(), any()) } answers {
+          val onSuccessCallback = secondArg<(User) -> Unit>()
+          onSuccessCallback(User("1", "jean")) }
+        every { getCurrentUserAssociations(any(), any()) } answers {
+          val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
+          onSuccessCallback(listOf(asso)) }
+        every { setDisplayName(any(), "newName", any(), any()) } answers {
+
+        }
       }
 
   private lateinit var mViewmodel: ProfileViewModel
@@ -90,7 +101,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
-      println(mViewmodel.uiState.value.myAssociations)
+      println("ASSO PUTE" + mViewmodel.uiState.value.myAssociations)
       onAllNodesWithTag("associationDropdownItem").assertCountEquals(1) // depends on listAsso
     }
   }
@@ -114,8 +125,11 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("editProfile").performClick()
       onNodeWithTag("editName").assertIsDisplayed()
       onNodeWithTag("confirmModifyButton").assertIsDisplayed()
-      onNodeWithTag("editName").performClick().performTextInput("newName")
+      onNodeWithTag("editName").performClick()
+      onNodeWithTag("editName").performTextClearance()
+      onNodeWithTag("editName").performTextInput("newName")
       onNodeWithTag("confirmModifyButton").performClick() // need to set action in test
+      verify { mockUserAPI.setDisplayName(any(), "newName", any(), any())}
       assert(mViewmodel.uiState.value.myName == "newName")
     }
   }
