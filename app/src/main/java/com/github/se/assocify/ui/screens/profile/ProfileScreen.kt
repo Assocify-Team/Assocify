@@ -45,9 +45,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,11 +71,6 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
-  // for 'change association' part
-  val listAsso = listOf("Association1", "Association2", "Association3")
-  var expanded by remember { mutableStateOf(false) }
-  var selectedText by remember { mutableStateOf(listAsso[0]) }
-
   val state by viewmodel.uiState.collectAsState()
 
   Scaffold(
@@ -162,16 +154,17 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
 
               // Change_association dropdown
               ExposedDropdownMenuBox(
-                  expanded = expanded,
-                  onExpandedChange = { expanded = !expanded },
+                  expanded = state.openAssociationDropdown,
+                  onExpandedChange = { viewmodel.controlAssociationDropdown(true) },
                   modifier =
                       Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally)) {
                     OutlinedTextField(
-                        value = selectedText,
+                        value = state.selectedAssociation.name,
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                          ExposedDropdownMenuDefaults.TrailingIcon(
+                              expanded = state.openAssociationDropdown)
                         },
                         modifier = Modifier.menuAnchor(),
                         leadingIcon = {
@@ -181,20 +174,21 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                         })
 
                     ExposedDropdownMenu(
-                        expanded = expanded, onDismissRequest = { expanded = false }) {
-                          listAsso.forEach { item -> // todo get asso from DB
+                        expanded = state.openAssociationDropdown,
+                        onDismissRequest = { viewmodel.controlAssociationDropdown(false) }) {
+                          state.myAssociations.forEach { item ->
                             DropdownMenuItem(
-                                text = { Text(text = item) },
+                                text = { Text(text = item.name) },
                                 onClick = {
-                                  selectedText = item
-                                  expanded = false
+                                  viewmodel.setAssociation(item)
+                                  viewmodel.controlAssociationDropdown(false)
                                 },
                                 leadingIcon = {
                                   Icon(
                                       imageVector = Icons.Default.People, // todo associations logos
                                       contentDescription = "Association Logo")
                                 },
-                                modifier = Modifier.testTag("associationDropdownItem"))
+                                modifier = Modifier.testTag("associationDropdownItem-${item.uid}"))
                           }
                         }
                   }
@@ -230,7 +224,9 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   }
 
               // The below part is association dependent, only available if you're an admin !
-              Text(text = "Manage $selectedText", style = MaterialTheme.typography.titleMedium)
+              Text(
+                  text = "Manage ${state.selectedAssociation.name}",
+                  style = MaterialTheme.typography.titleMedium)
 
               Column(
                   modifier =
