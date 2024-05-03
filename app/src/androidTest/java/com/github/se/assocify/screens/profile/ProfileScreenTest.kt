@@ -1,11 +1,9 @@
 package com.github.se.assocify.screens.profile
 
 import android.net.Uri
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -46,13 +44,19 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private var goRoles = false
 
   private val uid = "1"
-  private val asso = Association("asso", "test", "test", LocalDate.EPOCH)
+  private val asso1 = Association("asso", "test", "test", LocalDate.EPOCH)
+  private val asso2 = Association("asso2", "test2", "test2", LocalDate.EPOCH)
   private val mockAssocAPI =
       mockk<AssociationAPI>() {
-        every { getAssociation(any(), any(), any()) } answers
+        every { getAssociation("asso", any(), any()) } answers
             {
               val onSuccessCallback = secondArg<(Association) -> Unit>()
-              onSuccessCallback(asso)
+              onSuccessCallback(asso1)
+            }
+        every { getAssociation("asso2", any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(Association) -> Unit>()
+              onSuccessCallback(asso2)
             }
       }
   private val mockUserAPI =
@@ -65,7 +69,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
         every { getCurrentUserAssociations(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
-              onSuccessCallback(listOf(asso))
+              onSuccessCallback(listOf(asso1, asso2))
             }
         every { setDisplayName(any(), "newName", any(), any()) } answers {}
       }
@@ -106,8 +110,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
-      println("ASSO PUTE" + mViewmodel.uiState.value.myAssociations)
-      onAllNodesWithTag("associationDropdownItem").assertCountEquals(1) // depends on listAsso
+      onNodeWithTag("associationDropdownItem-${asso1.uid}").assertIsDisplayed()
+      onNodeWithTag("associationDropdownItem-${asso2.uid}").assertIsDisplayed()
     }
   }
 
@@ -140,6 +144,16 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   }
 
   @Test
+  fun changeAssociation() {
+    with(composeTestRule) {
+      onNodeWithTag("associationDropdown").assertIsDisplayed().performClick()
+      onNodeWithTag("associationDropdownItem-${asso2.uid}").performClick()
+      assert(mViewmodel.uiState.value.selectedAssociation == asso2)
+      assert(CurrentUser.associationUid == asso2.uid)
+    }
+  }
+
+  @Test
   fun navigateToSubScreen() {
     with(composeTestRule) {
       onNodeWithTag("Theme").performClick()
@@ -151,7 +165,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Notifications").performClick()
       assert(goNotif)
 
-      onNodeWithTag("Members").performClick()
+      onNodeWithTag("Members").performScrollTo().performClick()
       assert(goMembers)
 
       onNodeWithTag("Roles").performScrollTo().performClick()

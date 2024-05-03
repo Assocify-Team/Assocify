@@ -17,6 +17,7 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,10 +45,11 @@ class ProfileViewModel(
 
     assoAPI.getAssociation(
         CurrentUser.associationUid!!,
-        { association ->
-          _uiState.value = _uiState.value.copy(selectedAssociationName = association.name)
-        },
-        { _uiState.value = _uiState.value.copy(selectedAssociationName = "None") })
+        { association -> _uiState.value = _uiState.value.copy(selectedAssociation = association) },
+        {
+          _uiState.value =
+              _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
+        })
   }
 
   /**
@@ -77,8 +79,14 @@ class ProfileViewModel(
     _uiState.value = _uiState.value.copy(openAssociationDropdown = show)
   }
 
-  fun setAssociation(association: String) {
-    _uiState.value = _uiState.value.copy(selectedAssociationName = association)
+  /**
+   * This function is used to set the association of the user.
+   *
+   * @param association the name of the association
+   */
+  fun setAssociation(association: Association) {
+    CurrentUser.associationUid = association.uid
+    _uiState.value = _uiState.value.copy(selectedAssociation = association)
   }
 
   /**
@@ -155,8 +163,8 @@ data class ProfileUIState(
     val myAssociations: List<Association> = emptyList(),
     // true if the association dropdown should be shown, false if should be hidden
     val openAssociationDropdown: Boolean = false,
-    // the selected (current) association - TODO not yet "functional"
-    val selectedAssociationName: String = ""
+    // the selected (current) association - TODO idk what to do with the temporary association
+    val selectedAssociation: Association = Association("none", "", "none", LocalDate.now())
 )
 
 /**

@@ -159,7 +159,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   modifier =
                       Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally)) {
                     OutlinedTextField(
-                        value = state.selectedAssociationName,
+                        value = state.selectedAssociation.name,
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = {
@@ -180,7 +180,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                             DropdownMenuItem(
                                 text = { Text(text = item.name) },
                                 onClick = {
-                                  viewmodel.setAssociation(item.name)
+                                  viewmodel.setAssociation(item)
                                   viewmodel.controlAssociationDropdown(false)
                                 },
                                 leadingIcon = {
@@ -188,7 +188,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                                       imageVector = Icons.Default.People, // todo associations logos
                                       contentDescription = "Association Logo")
                                 },
-                                modifier = Modifier.testTag("associationDropdownItem"))
+                                modifier = Modifier.testTag("associationDropdownItem-${item.uid}"))
                           }
                         }
                   }
@@ -225,7 +225,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
 
               // The below part is association dependent, only available if you're an admin !
               Text(
-                  text = "Manage ${state.selectedAssociationName}",
+                  text = "Manage ${state.selectedAssociation.name}",
                   style = MaterialTheme.typography.titleMedium)
 
               Column(
