@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class ProfileViewModel(
     private val assoAPI: AssociationAPI,
@@ -37,6 +39,11 @@ class ProfileViewModel(
           _uiState.value = _uiState.value.copy(myName = user.name, modifyingName = user.name)
         },
         { _uiState.value = _uiState.value.copy(myName = "name not found") })
+      userAPI.getCurrentUserAssociations(
+          { associations ->
+            _uiState.value = _uiState.value.copy(myAssociations = associations)
+          },
+          { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
   }
 
   /**
@@ -120,7 +127,9 @@ data class ProfileUIState(
     val openEdit: Boolean = false,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     val showPicOptions: Boolean = false,
-    val profileImageURI: Uri? = null
+    val profileImageURI: Uri? = null,
+    val myAssociations: List<Association> = emptyList(),
+    val openAssociationDropdown: Boolean = false
 )
 
 /**
