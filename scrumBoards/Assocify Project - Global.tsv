@@ -1,0 +1,104 @@
+Title	URL	Assignees	Status	Task Type	Nature	Epic	Sprint	Expected time	Actual time
+Epic 2 : As a member, I want to register a receipt to be able to be reimbursed later, and keep track of the other receipts I have			Product Backlog						
+Epic 3 : As the treasurer of my association, I want to see my budget to edit one of its items then create a new balance item as I received a new receipt			Product Backlog						
+User Story: As a staff member, I want my schedule to reflect my tasks			Product Backlog						
+User Story : As the treasurer of the association, I want to plan the budget for the year to come, with the help of the previous ones for comparison			Product Backlog						
+User Story : As the manager of a new event, I want to register it and plan it with its map and its first tasks			Product Backlog						
+User Story : As a commitee member of the association, I want to make an announcements regarding the next meeting of the association			Product Backlog						
+User Story : As a member of the association, I want to keep track of what's said during a meeting by recording it			Product Backlog						
+User Story : As a member of multiple associations, I want to keep track of the news of all of them quickly to plan my future tasks			Product Backlog						
+User Story : As a member of multiple associations, I want to easily change from one association to the other to see the minutes of meeting of the week for each of them			Product Backlog						
+Invitation management	https://github.com/Assocify-Team/Assocify/issues/196		Product Backlog	Frontend : Functionality	Sprint Task			6	
+Create single-association API	https://github.com/Assocify-Team/Assocify/issues/85	ortoLover	Product Backlog	Backend	Sprint Task	Misc		4	
+Smooth out association creation flow	https://github.com/Assocify-Team/Assocify/issues/195		Product Backlog	Frontend : Functionality	Sprint Task			3	
+Animation for login page	https://github.com/Assocify-Team/Assocify/issues/101		Product Backlog		Sprint Task				
+Handle setter of associationUid	https://github.com/Assocify-Team/Assocify/issues/137		Product Backlog						
+User Story : As the treasurer of my association I want to keep track of receipts (in the accounting books)			Sprint Backlog						
+User Story: As a treasurer, I want to create the budget of the current year and keep track of the balance			Sprint Backlog						
+User Story: As a commitee, I want to create tasks			Sprint Backlog						
+User Story : As a staff member of an event, I want to see what tasks need to be done and assign myself one			Sprint Backlog						
+User Story: As a staff member, I want to see the details of a task by clicking on it			Sprint Backlog						
+User Story: As a staff member, I want to see the to-dos on the map			Sprint Backlog						
+Edit a balance or budget item	https://github.com/Assocify-Team/Assocify/issues/149		Product Backlog						
+Create a balance item or budget item	https://github.com/Assocify-Team/Assocify/issues/150		Product Backlog						
+Edit a balance or budget sheet	https://github.com/Assocify-Team/Assocify/issues/151		Product Backlog						
+End-to-end test 2	https://github.com/Assocify-Team/Assocify/issues/224	Mai-LinhC	Sprint Tasks				Sprint 7	2	
+UI for profile : Theme settings	https://github.com/Assocify-Team/Assocify/issues/170	Mai-LinhC	Sprint Tasks	Frontend : UI	Sprint Task		Sprint 7	4	
+UI for profile : Notifications settings	https://github.com/Assocify-Team/Assocify/issues/172	Mai-LinhC	Sprint Tasks	Frontend : UI	Sprint Task		Sprint 7	4	
+Balance API	https://github.com/Assocify-Team/Assocify/issues/176	zizouet	Sprint Tasks	Backend	Sprint Task	Accounting	Sprint 7	12	
+Create Loading page and ad to screens	https://github.com/Assocify-Team/Assocify/issues/227		Product Backlog						
+Reload DB content when scroll up	https://github.com/Assocify-Team/Assocify/issues/228		Product Backlog						
+Photo capture for receipt	https://github.com/Assocify-Team/Assocify/issues/109	SidonieBouthors	Done in Sprint 4		Sprint Task		Sprint 4	6	7
+Dependency cleanup	https://github.com/Assocify-Team/Assocify/issues/88	SidonieBouthors	Done in Sprint 4	Setup	Sprint Task		Sprint 4	2	3
+Integrate and Implement Google Map	https://github.com/Assocify-Team/Assocify/issues/136	Polymeth	Done in Sprint 4				Sprint 4	2	2
+Setup Supabase : dependencies + secret 	https://github.com/Assocify-Team/Assocify/pull/92	zizouet	Done in Sprint 4	Backend	Sprint Task	Misc	Sprint 4	4	3
+Move over to supabase	https://github.com/Assocify-Team/Assocify/issues/84	SekoiaTree, zizouet	Done in Sprint 4	Backend	Sprint Task		Sprint 4	5	6
+Create Event Screen Task UI	https://github.com/Assocify-Team/Assocify/issues/104	ortoLover	Done in Sprint 4		Sprint Task		Sprint 4	6	8
+User Story : As a first time user, they have to get into an association : they can either create one or join an existing one (which is in the database of the app). The actual app is not accessible if they're not registered in an association.	https://github.com/Assocify-Team/Assocify/issues/31		Done in Sprint 4		User Story				
+Accounting SubCategoryAPI	https://github.com/Assocify-Team/Assocify/issues/202	zizouet	In Development	Backend	Sprint Task	Accounting	Sprint 7	7	
+User Story : As the president of a new association, I want to register my association on the app to manage it with other members	https://github.com/Assocify-Team/Assocify/issues/32		Done in Sprint 4						
+UI for budget page	https://github.com/Assocify-Team/Assocify/issues/128	sarahbadr17	Done in Sprint 4		Sprint Task		Sprint 4	4	5
+UI for balance page	https://github.com/Assocify-Team/Assocify/issues/129	sarahbadr17	Done in Sprint 4		Sprint Task		Sprint 4	4	2
+Clickable association on select associaiton	https://github.com/Assocify-Team/Assocify/issues/97	sarahbadr17	Done in Sprint 4		User Story		Sprint 4	2	7
+Create profile page	https://github.com/Assocify-Team/Assocify/issues/28	Mai-LinhC	Done in Sprint 4		Sprint Task		Sprint 4	7	7
+Add animation to tab of event page	https://github.com/Assocify-Team/Assocify/issues/223	Polymeth	Done in Sprint 4			Tasks	Sprint 7	1	1
+Association Util : Check if name is valid (not too long, not the same as already existing one ?)	https://github.com/Assocify-Team/Assocify/issues/131	SekoiaTree	Sprint Tasks	Backend	Sprint Task		Sprint 7	2	
+Viewmodel for budget and balance sheet	https://github.com/Assocify-Team/Assocify/issues/108	sarahbadr17	Sprint Tasks	Frontend : Functionality	Sprint Task	Accounting	Sprint 7	6	
+User Story: Once I am connected in the app, I want to know what role I have in the current association	https://github.com/Assocify-Team/Assocify/issues/35		Done in Sprint 6						
+Viewmodel for profile page : See your role	https://github.com/Assocify-Team/Assocify/issues/217	Mai-LinhC	Done in Sprint 6	Frontend : Functionality	Sprint Task		Sprint 6	1	0.5
+Viewmodel for profile page	https://github.com/Assocify-Team/Assocify/issues/115	Mai-LinhC	Done in Sprint 6	Frontend : Functionality	Sprint Task		Sprint 6	12	20.5
+Epic 1 : As the president of my association, I want to register myself, the association and its members in the application, and then go to my profile to modify my information			Done in Sprint 6						
+Viewmodel for profile page : See your associations	https://github.com/Assocify-Team/Assocify/issues/218	Mai-LinhC	Done in Sprint 6	Frontend : Functionality	Sprint Task		Sprint 6	2	3
+Viewmodel for profile page : Change my association - done in #218	https://github.com/Assocify-Team/Assocify/issues/123	Mai-LinhC	Done in Sprint 6	Backend	Sprint Task		Sprint 7	0	
+End-to-end test 1	https://github.com/Assocify-Team/Assocify/issues/189	Mai-LinhC	Done in Sprint 6		Sprint Task		Sprint 6	5	4.5
+Implement roles and invitations	https://github.com/Assocify-Team/Assocify/issues/190	SekoiaTree	Done in Sprint 6	Backend	Sprint Task	Login	Sprint 6	4	4
+Create a balance or budget sheet	https://github.com/Assocify-Team/Assocify/issues/152	Polymeth	Done in Sprint 6	Frontend : UI	Sprint Task	Accounting	Sprint 6	4	4
+Viewmodel for budget items	https://github.com/Assocify-Team/Assocify/issues/113	sarahbadr17	Done in Sprint 6	Frontend : Functionality	Sprint Task	Accounting	Sprint 6	4	12
+Move over UserAPI to Supabase	https://github.com/Assocify-Team/Assocify/issues/119	SekoiaTree	Done in Sprint 6	Backend	Sprint Task		Sprint 6	3	8
+Create/edit task viewmodel	https://github.com/Assocify-Team/Assocify/issues/164	SidonieBouthors	Done in Sprint 6	Frontend : Functionality	Sprint Task	Tasks	Sprint 6	6	7
+Login skip	https://github.com/Assocify-Team/Assocify/issues/165	SidonieBouthors	Done in Sprint 6	Extra	Sprint Task	Login	Sprint 6	4	4.5
+Treasury Search Bar	https://github.com/Assocify-Team/Assocify/issues/182	SidonieBouthors	Done in Sprint 6	Frontend	Sprint Task	Receipts	Sprint 6	3	3
+Viewmodel for profile page : Navigation to association settings	https://github.com/Assocify-Team/Assocify/issues/124	Mai-LinhC	Done in Sprint 6				Sprint 6	2	2
+UI for profile : Figma	https://github.com/Assocify-Team/Assocify/issues/169	Mai-LinhC	Done in Sprint 6				Sprint 6	6	4.5
+Figma : Link screens	https://github.com/Assocify-Team/Assocify/issues/222	Mai-LinhC	Done in Sprint 6	Figma			Sprint 6	1	1.5
+Create the Task API	https://github.com/Assocify-Team/Assocify/issues/173	ortoLover	Done in Sprint 6	Backend	Sprint Task		Sprint 6	6	5
+Viewmodel for the task list	https://github.com/Assocify-Team/Assocify/issues/117	ortoLover	Done in Sprint 6				Sprint 6	6	10
+Budget API	https://github.com/Assocify-Team/Assocify/issues/174	zizouet	Done in Sprint 6	Backend	Sprint Task		Sprint 6	5	7
+User Story : As the treasurer of my association, I want to see what reimbursements i need to do	https://github.com/Assocify-Team/Assocify/issues/33		Done in Sprint 6						
+UI on Figma: pending request for joining an association	https://github.com/Assocify-Team/Assocify/issues/127		Product Backlog	Figma	Sprint Task			2	0
+UI for profile : Association members management	https://github.com/Assocify-Team/Assocify/issues/229		Product Backlog						
+UI for profile : Association roles management	https://github.com/Assocify-Team/Assocify/issues/230		Product Backlog						
+UI for profile : Security/Privacy settings	https://github.com/Assocify-Team/Assocify/issues/171	Mai-LinhC	Product Backlog					4	
+Viewmodel for tasks map : Add pins	https://github.com/Assocify-Team/Assocify/issues/125	Polymeth	Product Backlog						6
+Viewmodel for tasks map : Add itinerary	https://github.com/Assocify-Team/Assocify/issues/126	Polymeth	Product Backlog						4
+Fix map position on the tab	https://github.com/Assocify-Team/Assocify/issues/209	Polymeth	Product Backlog	Bug Fix		Task Map	Sprint 7	4	
+Link a receipt to a balance Item	https://github.com/Assocify-Team/Assocify/issues/192		Product Backlog						
+Viewmodel for balance items	https://github.com/Assocify-Team/Assocify/issues/160	sarahbadr17	Sprint Tasks	Frontend : Functionality	Sprint Task	Accounting	Sprint 7	6	
+Schedule UI	https://github.com/Assocify-Team/Assocify/issues/199	SidonieBouthors	Sprint Tasks	Frontend : UI	Sprint Task		Sprint 7	7	
+Consistency between tabs + Tab structure	https://github.com/Assocify-Team/Assocify/issues/200	SidonieBouthors	Sprint Tasks	Frontend : UI	Sprint Task	Misc	Sprint 7	4	
+Pick task location	https://github.com/Assocify-Team/Assocify/issues/201	SidonieBouthors	Sprint Tasks	Frontend : Functionality	Sprint Task		Sprint 7	4	
+Add caching to APIs	https://github.com/Assocify-Team/Assocify/issues/206	SekoiaTree	Sprint Tasks	Backend	Sprint Task	Misc	Sprint 7	8	
+Notifications Backend	https://github.com/Assocify-Team/Assocify/issues/207	ortoLover	Product Backlog	Frontend : Functionality	Sprint Task	Profile		8	
+Notifications Look	https://github.com/Assocify-Team/Assocify/issues/211	ortoLover	Product Backlog	Frontend : UI	Sprint Task	Profile		4	
+One map per event	https://github.com/Assocify-Team/Assocify/issues/208	Polymeth	Sprint Tasks			Task Map	Sprint 7	4	
+Fix map tab swipe gesture priority	https://github.com/Assocify-Team/Assocify/issues/210	Polymeth	Sprint Tasks			Task Map	Sprint 7	3	
+Translate Receipt API over to supabase	https://github.com/Assocify-Team/Assocify/issues/154	SekoiaTree	Done in Sprint 5	Backend	Sprint Task		Sprint 5	4	4
+Viewmodel for profile page : Navigation to my settings	https://github.com/Assocify-Team/Assocify/issues/122	Mai-LinhC	Done in Sprint 5	Backend	Sprint Task		Sprint 5	2	3.5
+Viewmodel for profile page : Modify my profile	https://github.com/Assocify-Team/Assocify/issues/120	Mai-LinhC	Done in Sprint 5	Frontend : Functionality	Sprint Task		Sprint 5	4	10
+Create/edit task UI	https://github.com/Assocify-Team/Assocify/issues/130	SidonieBouthors	Done in Sprint 5				Sprint 5	4	4.5
+Add receipt status	https://github.com/Assocify-Team/Assocify/issues/114	SidonieBouthors	Done in Sprint 5	Frontend	Sprint Task	Receipts	Sprint 5	4	4.5
+Cleanup UI	https://github.com/Assocify-Team/Assocify/issues/112	SidonieBouthors	Done in Sprint 5				Sprint 5	2	2.5
+Make filters row scrollable	https://github.com/Assocify-Team/Assocify/issues/156	sarahbadr17	Done in Sprint 5	Bug Fix	Sprint Task	Accounting	Sprint 5	0.5	0.5
+Move over AssociationAPI to Supabase	https://github.com/Assocify-Team/Assocify/issues/118	SekoiaTree	Done in Sprint 5	Backend	Sprint Task	Misc	Sprint 5	3	6
+UI details of budget and balance sheets	https://github.com/Assocify-Team/Assocify/issues/146	sarahbadr17	Done in Sprint 5		Sprint Task		Sprint 5	4	6
+Budget and Balance entity	https://github.com/Assocify-Team/Assocify/issues/144	sarahbadr17	Done in Sprint 5	Backend	Sprint Task		Sprint 5	3	5
+Bug fix: set association uid to non empty string	https://github.com/Assocify-Team/Assocify/issues/139	sarahbadr17	Done in Sprint 5	Backend	Sprint Task		Sprint 5	0.1	0.1
+Bugfix : change back User (Role already done) to have public values and no getters	https://github.com/Assocify-Team/Assocify/issues/111	Mai-LinhC	Done in Sprint 5				Sprint 5	0.5	0.5
+Create EventAPI	https://github.com/Assocify-Team/Assocify/issues/121	zizouet	Done in Sprint 5	Backend	Sprint Task		Sprint 5	9	9
+Create Main Event Screen ViewModel	https://github.com/Assocify-Team/Assocify/issues/168	ortoLover	Done in Sprint 5	Frontend : Functionality	Sprint Task		Sprint 5	4	6
+User Story : As a member of an association/a staff member of an event, I want to scan a receipt that I just paid in order to get reimbursed later			Done in Sprint 5						
+Transfer from GMaps to OSM	https://github.com/Assocify-Team/Assocify/issues/175	Polymeth	Done in Sprint 5			Task Map	Sprint 5	8	9
+User Story: As a member of an association, I want to receive notifications when new items related to me are added in the app (tasks, receipts...)			Sprint Backlog						
+User Story: As a user, I want to be able to set my preferences from my profile, such as the App theme and text size			Sprint Backlog						
+Create Budget / Balance Category (VM)	https://github.com/Assocify-Team/Assocify/issues/225	ortoLover	Sprint Tasks	Frontend : Functionality	Sprint Task	Accounting	Sprint 7	7	
+Create Balance / Budget Detail UI	https://github.com/Assocify-Team/Assocify/issues/226	ortoLover	Sprint Tasks	Frontend : UI	Sprint Task	Accounting	Sprint 7	7	
