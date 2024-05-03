@@ -52,9 +52,8 @@ import java.time.LocalDate
  *
  * @param page: The page to display (either "budget" or "balance")
  * @param subCategoryUid: The unique identifier of the subcategory
- * @param nameCategory: The name of the subcategory //TODO: remove this parameter when
- *   AccountingSubCategoryAPI is implemented
  * @param navigationActions: The navigation actions
+ * @param budgetDetailedViewModel: The view model for the budget detailed screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

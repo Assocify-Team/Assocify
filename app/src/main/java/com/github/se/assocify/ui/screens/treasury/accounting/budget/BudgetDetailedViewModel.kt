@@ -8,9 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * The view model for the budget screen
+ * The view model for the budget detailed screen
  *
  * @param budgetApi the budget api
+ * @param subCategoryUid the subcategory uid
  */
 class BudgetDetailedViewModel(
     private var budgetApi: BudgetAPI,
