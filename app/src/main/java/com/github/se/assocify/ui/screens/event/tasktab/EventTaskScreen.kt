@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.testTag
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
+import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.TimeUtil
 
 /**
@@ -50,7 +51,12 @@ fun EventTaskScreen(
                       onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
                   )
                 },
-                overlineContent = { Text(TimeUtil.toString(it.startTime)) })
+                overlineContent = {
+                  Text(
+                      DateUtil.toString(it.startTime.toLocalDate()) +
+                          " " +
+                          TimeUtil.toString(it.startTime.toLocalTime()))
+                })
             HorizontalDivider()
           }
         }
