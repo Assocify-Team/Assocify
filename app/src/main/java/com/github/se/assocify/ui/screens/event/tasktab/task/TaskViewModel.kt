@@ -240,7 +240,6 @@ class TaskViewModel {
                   message = "Failed to delete task", duration = SnackbarDuration.Short)
             }
           })
-      navActions.back()
     }
   }
 }
