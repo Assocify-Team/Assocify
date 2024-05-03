@@ -13,6 +13,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 
 /**
  * API for interacting with the users in the database
@@ -119,12 +120,20 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.from("invited").delete {
-        filter {
-          eq("user_id", CurrentUser.userUid!!)
-          eq("association_id", associationId)
-        }
-      }
+      val invitation =
+          db.from("invited")
+              .delete {
+                filter {
+                  eq("user_id", CurrentUser.userUid!!)
+                  eq("association_id", associationId)
+                }
+                select()
+              }
+              .decodeSingle<JsonObject>()
+      db.from("member_of")
+          .insert(
+              Json.decodeFromString<JsonElement>(
+                  """{"user_id": "${CurrentUser.userUid}","role_id": ${invitation["role_id"]}}"""))
       onSuccess()
     }
   }
@@ -196,6 +205,27 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
               .select { filter { Membership::userId eq CurrentUser.userUid!! } }
               .decodeList<Membership>()
       onSuccess(associations.map { it.getAssociation() })
+    }
+  }
+
+  /**
+   * Gets the current user's role in the current association
+   *
+   * @param onSuccess called on success with the current user's role in the association
+   * @param onFailure called on failure
+   */
+  fun getCurrentUserRole(onSuccess: (PermissionRole) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      val membership =
+          db.from("member_role_association_view")
+              .select {
+                filter {
+                  Membership::userId eq CurrentUser.userUid!!
+                  Membership::associationId eq CurrentUser.associationUid!!
+                }
+              }
+              .decodeSingle<Membership>()
+      onSuccess(membership.getRole())
     }
   }
 

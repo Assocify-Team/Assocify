@@ -54,7 +54,7 @@ class ReceiptViewModel {
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
 
-    this.receiptApi.getUserReceipts(
+    this.receiptApi.getAllReceipts(
         onSuccess = { receipts ->
           receipts.forEach { receipt ->
             if (receipt.uid == receiptUid) {

@@ -16,13 +16,13 @@ import java.time.OffsetDateTime
  * @param eventUid unique identifier of the event the task is for
  */
 data class Task(
-    val uid: String = "testUid",
-    val title: String = "testName",
-    val description: String = "description",
-    val isCompleted: Boolean = false,
-    val startTime: OffsetDateTime = OffsetDateTime.now(),
-    val peopleNeeded: Int = 0,
-    val category: String = "Committee",
-    val location: String = "Here",
-    val eventUid: String = "eventUid"
+    val uid: String,
+    val title: String,
+    val description: String,
+    val isCompleted: Boolean,
+    val startTime: OffsetDateTime,
+    val peopleNeeded: Int,
+    val category: String,
+    val location: String,
+    val eventUid: String
 )

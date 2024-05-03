@@ -215,6 +215,10 @@ dependencies {
 
     // OSMdroid
     implementation("org.osmdroid:osmdroid-android:6.1.14")
+    
+    // testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.7")
+
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
