@@ -140,7 +140,17 @@ class TaskAPITest {
     val onSuccess: () -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    val task = Task()
+    val task =
+        Task(
+            uuid1.toString(),
+            "testName",
+            "description",
+            false,
+            OffsetDateTime.now(),
+            0,
+            "Committee",
+            "Here",
+            "eventUid")
 
     error = false
     response = ""
@@ -171,7 +181,8 @@ class TaskAPITest {
             OffsetDateTime.now(),
             2,
             "newCategory",
-            "newLocation"),
+            "newLocation",
+            "newEventUid"),
         onSuccess) {
           fail("should not fail")
         }
@@ -187,7 +198,8 @@ class TaskAPITest {
             OffsetDateTime.now(),
             2,
             "newCategory",
-            "newLocation"),
+            "newLocation",
+            "newEventUid"),
         { fail("should not fail") },
         onFailure)
     verify(timeout = 1000) { onFailure(any()) }

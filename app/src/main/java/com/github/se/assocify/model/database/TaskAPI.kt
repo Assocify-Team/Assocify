@@ -1,13 +1,12 @@
 package com.github.se.assocify.model.database
 
-import android.util.Log
 import com.github.se.assocify.model.entities.Task
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import java.time.OffsetDateTime
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.OffsetDateTime
 
 /**
  * API for interacting with the task table in the database.
@@ -35,7 +34,6 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
                 .decodeAs<SupabaseTask>()
         onSuccess(task.toTask())
       } catch (e: Exception) {
-        Log.e("TaskAPI", "Failed to get task", e)
         onFailure(e)
       }
     }
@@ -52,7 +50,6 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
         val tasks = db.from("task").select().decodeList<SupabaseTask>()
         onSuccess(tasks.map { it.toTask() })
       } catch (e: Exception) {
-        Log.e("TaskAPI", "Failed to get tasks", e)
         onFailure(e)
       }
     }
@@ -83,7 +80,6 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
 
         onSuccess()
       } catch (e: Exception) {
-        Log.e("TaskAPI", "Failed to add task", e)
         onFailure(e)
       }
     }
@@ -129,7 +125,6 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
         }
         onSuccess()
       } catch (e: Exception) {
-        Log.e("TaskAPI", "Failed to edit task", e)
         onFailure(e)
       }
     }
@@ -169,7 +164,6 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
         db.from("task").delete { filter { SupabaseTask::uid eq id } }
         onSuccess()
       } catch (e: Exception) {
-        Log.e("TaskAPI", "Failed to delete task", e)
         onFailure(e)
       }
     }
@@ -195,7 +189,6 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
                 .decodeList<SupabaseTask>()
         onSuccess(tasks.map { it.toTask() })
       } catch (e: Exception) {
-        Log.e("TaskAPI", "Failed to get tasks of event", e)
         onFailure(e)
       }
     }
