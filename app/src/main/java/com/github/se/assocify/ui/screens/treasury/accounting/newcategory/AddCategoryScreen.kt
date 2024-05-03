@@ -83,9 +83,7 @@ fun AddAccountingSubCategory(
       modifier = Modifier.testTag("addAccountingCategoryScreen"),
       topBar = {
         TopAppBar(
-            title = {
-              Text(modifier = Modifier.testTag("categoryTitle"), text = "New Category")
-            },
+            title = { Text(modifier = Modifier.testTag("categoryTitle"), text = "New Category") },
             navigationIcon = {
               BackButton(
                   contentDescription = "Cancel",
@@ -172,11 +170,11 @@ fun AddAccountingSubCategory(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCategoryDialog(
-  showDialog: Boolean,
-  onDismissRequest: () -> Unit,
-  onAddSubCategoryClick: () -> Unit,
-  newTagName: String,
-  onNewTagChange: (String) -> Unit
+    showDialog: Boolean,
+    onDismissRequest: () -> Unit,
+    onAddSubCategoryClick: () -> Unit,
+    newTagName: String,
+    onNewTagChange: (String) -> Unit
 ) {
   if (showDialog) {
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
