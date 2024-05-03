@@ -3,7 +3,9 @@ package com.github.se.assocify.ui.screens.event.tasktab.task
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.SupabaseClient
+import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
+import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
@@ -21,11 +23,11 @@ import kotlinx.coroutines.launch
 class TaskViewModel {
 
   private var taskApi: TaskAPI
+  private val eventApi: EventAPI
   private val isNewTask: Boolean
   private val NEW_TASK_TITLE = "New Task"
   private val EDIT_TASK_TITLE = "Edit Task"
 
-  // private val taskApi: TaskAPI
   private val navActions: NavigationActions
   private val taskUid: String
 
@@ -35,28 +37,36 @@ class TaskViewModel {
   constructor(
       navActions: NavigationActions,
       taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient),
+      eventApi: EventAPI = EventAPI(SupabaseClient.supabaseClient)
   ) {
     this.isNewTask = true
     this.navActions = navActions
     this.taskApi = taskApi
+    this.eventApi = eventApi
     this.taskUid = UUID.randomUUID().toString()
 
     _uiState = MutableStateFlow(TaskState(isNewTask = true, pageTitle = NEW_TASK_TITLE))
     uiState = _uiState
+
+    loadEvents()
   }
 
   constructor(
       taskUid: String,
       navActions: NavigationActions,
-      taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient)
+      taskApi: TaskAPI = TaskAPI(SupabaseClient.supabaseClient),
+      eventApi: EventAPI = EventAPI(SupabaseClient.supabaseClient)
   ) {
     this.isNewTask = false
     this.navActions = navActions
     this.taskApi = taskApi
+    this.eventApi = eventApi
     this.taskUid = taskUid
 
     _uiState = MutableStateFlow(TaskState(isNewTask = false, pageTitle = EDIT_TASK_TITLE))
     uiState = _uiState
+
+    loadEvents()
 
     taskApi.getTask(
         taskUid,
@@ -80,6 +90,21 @@ class TaskViewModel {
                 message = "Failed to load task", duration = SnackbarDuration.Short)
           }
         })
+  }
+
+  fun loadEvents() {
+    eventApi.getEvents(
+        { _uiState.value = _uiState.value.copy(eventList = it) },
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Failed to load events", duration = SnackbarDuration.Short)
+          }
+        })
+  }
+
+  fun setEvent(event: Event) {
+    _uiState.value = _uiState.value.copy(event = event)
   }
 
   fun setTitle(title: String) {
@@ -131,12 +156,24 @@ class TaskViewModel {
     setTitle(_uiState.value.title)
     setDate(DateUtil.toDate(_uiState.value.date))
     setTime(TimeUtil.toTime(_uiState.value.time))
+    setStaffNumber(_uiState.value.staffNumber)
 
-    if (_uiState.value.titleError != null || _uiState.value.dateError != null) {
+    if (_uiState.value.titleError != null ||
+        _uiState.value.dateError != null ||
+        _uiState.value.timeError != null ||
+        _uiState.value.staffNumberError != null) {
       return
     }
 
-    val eventUid = _uiState.value.eventUid ?: return
+    if (_uiState.value.event == null) {
+      CoroutineScope(Dispatchers.Main).launch {
+        _uiState.value.snackbarHostState.showSnackbar(
+            message = "Event is required", duration = SnackbarDuration.Short)
+      }
+      return
+    }
+
+    val event = _uiState.value.event ?: return
 
     val date = DateUtil.toDate(_uiState.value.date) ?: return
     val time = TimeUtil.toTime(_uiState.value.time) ?: return
@@ -154,7 +191,7 @@ class TaskViewModel {
             peopleNeeded = _uiState.value.staffNumber.toInt(),
             category = _uiState.value.category,
             location = "", // TODO: Add location
-            eventUid = eventUid,
+            eventUid = event.uid,
         )
 
     if (isNewTask) {
@@ -207,7 +244,8 @@ data class TaskState(
     val staffNumber: String = "",
     val date: String = "",
     val time: String = "",
-    val eventUid: String? = null,
+    val event: Event? = null,
+    val eventList: List<Event> = emptyList(),
     val titleError: String? = null,
     val staffNumberError: String? = null,
     val dateError: String? = null,

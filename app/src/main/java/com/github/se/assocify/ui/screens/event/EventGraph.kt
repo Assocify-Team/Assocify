@@ -18,5 +18,5 @@ fun NavGraphBuilder.eventGraph(
     val taskViewModel = EventTaskViewModel(taskAPI)
     EventScreen(navigationActions, EventScreenViewModel(eventAPI, taskViewModel), taskViewModel)
   }
-  taskGraph(navigationActions, taskAPI)
+  taskGraph(navigationActions, taskAPI, eventAPI)
 }
