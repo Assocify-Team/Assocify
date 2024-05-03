@@ -11,13 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -31,6 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.BackButton
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.TimePickerWithDialog
 
@@ -49,10 +46,7 @@ fun TaskScreen(
                   text = /*TODO title depending on edit or create*/ "New Task")
             },
             navigationIcon = {
-              IconButton(
-                  modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                  }
+              BackButton(contentDescription = "Back", onClick = { navActions.back() })
             })
       },
       contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),

@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
@@ -24,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -47,6 +45,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.BackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,39 +61,19 @@ fun AddAccountingSubCategory(
           AccountingCategory("Events"),
           AccountingCategory("Commission"),
           AccountingCategory("Fees"))
-
   var subCategoryTitle by remember { mutableStateOf("") }
   var selectedSubCategory by remember { mutableStateOf(categoryList.first().name) }
   var selectedValue by remember { mutableIntStateOf(0) }
-
   var newCategoryName by remember { mutableStateOf("") }
   var showAddCategoryDialog by remember { mutableStateOf(false) }
 
   // Show dialog to add category
-  if (showAddCategoryDialog) {
-    BasicAlertDialog(onDismissRequest = { showAddCategoryDialog = false }) {
-      Surface(
-          modifier = Modifier.wrapContentWidth().wrapContentHeight(),
-          shape = MaterialTheme.shapes.large,
-          tonalElevation = AlertDialogDefaults.TonalElevation) {
-            Column(modifier = Modifier.padding(16.dp)) {
-              Text(modifier = Modifier.testTag("categoryTitle"), text = "New Category")
-              OutlinedTextField(
-                  modifier = Modifier.testTag("newCategoryFieldPopup").fillMaxWidth(),
-                  value = newCategoryName,
-                  onValueChange = { newCategoryName = it },
-                  label = { Text("Category name") },
-                  supportingText = { /* TODO: Error management */})
-              Spacer(modifier = Modifier.height(24.dp))
-              TextButton(
-                  onClick = { showAddCategoryDialog = false },
-                  modifier = Modifier.align(Alignment.End)) {
-                    Text("Add Sub Category")
-                  }
-            }
-          }
-    }
-  }
+  AddCategoryDialog(
+      showDialog = showAddCategoryDialog,
+      onDismissRequest = { showAddCategoryDialog = false },
+      onAddSubCategoryClick = { /* TODO: Add sub category */},
+      newCategoryName = newCategoryName,
+      onNewCategoryNameChange = { newCategoryName = it })
 
   Scaffold(
       modifier = Modifier.testTag("addAccountingSubCategoryScreen"),
@@ -104,10 +83,7 @@ fun AddAccountingSubCategory(
               Text(modifier = Modifier.testTag("subCategoryTitle"), text = "New Sub Category")
             },
             navigationIcon = {
-              IconButton(
-                  modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                  }
+              BackButton(contentDescription = "Back", onClick = { navActions.back() })
             })
       },
       contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
@@ -178,5 +154,39 @@ fun AddAccountingSubCategory(
 
           Spacer(modifier = Modifier.weight(1.0f))
         }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddCategoryDialog(
+    showDialog: Boolean,
+    onDismissRequest: () -> Unit,
+    onAddSubCategoryClick: () -> Unit,
+    newCategoryName: String,
+    onNewCategoryNameChange: (String) -> Unit
+) {
+  if (showDialog) {
+    BasicAlertDialog(onDismissRequest = onDismissRequest) {
+      Surface(
+          modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+          shape = MaterialTheme.shapes.large,
+          tonalElevation = AlertDialogDefaults.TonalElevation) {
+            Column(modifier = Modifier.padding(16.dp)) {
+              Text(modifier = Modifier.testTag("categoryTitle"), text = "New Category")
+              OutlinedTextField(
+                  modifier = Modifier.testTag("newCategoryFieldPopup").fillMaxWidth(),
+                  value = newCategoryName,
+                  onValueChange = onNewCategoryNameChange,
+                  label = { Text("Category name") },
+                  supportingText = { /* TODO: Error management */})
+              Spacer(modifier = Modifier.height(24.dp))
+              TextButton(
+                  onClick = onAddSubCategoryClick, modifier = Modifier.align(Alignment.End)) {
+                    Text("Add Sub Category")
+                  }
+            }
+          }
+    }
   }
 }
