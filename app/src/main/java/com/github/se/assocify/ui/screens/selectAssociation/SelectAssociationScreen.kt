@@ -183,5 +183,5 @@ fun DisplayOrganization(organization: Association, viewModel: SelectAssociationV
       },
       modifier =
           Modifier.clickable { viewModel.selectAssoc(organization.uid) }
-              .testTag("DisplayOrganizationScreen-${organization.name}"))
+              .testTag("DisplayOrganizationScreen-${organization.uid}"))
 }

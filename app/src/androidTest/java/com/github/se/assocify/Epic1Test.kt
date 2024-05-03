@@ -79,15 +79,12 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
               onSuccessCallback.invoke(listOf(asso))
             }
-        // need to change that
         every { addAssociation(any(), any(), any()) } answers
             {
               CurrentUser.associationUid = asso.uid
               navActions.onLogin(true)
             }
       }
-
-  private var changedName = false
 
   private val userAPI =
       mockk<UserAPI>() {
@@ -102,7 +99,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               onSuccessCallback.invoke(bigList[0])
             }
 
-        every { setDisplayName("1", "antoine", any(), any()) } answers { changedName = true }
+        every { setDisplayName("1", "antoine", any(), any()) } answers {}
       }
 
   private val eventAPI = mockk<EventAPI>() { every { getEvents(any(), any()) } answers {} }
@@ -129,7 +126,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   fun epic1Test() {
     with(composeTestRule) {
       // register my association
-      onNodeWithTag("DisplayOrganizationScreen-Test").assertIsDisplayed()
+      onNodeWithTag("DisplayOrganizationScreen-aaa").assertIsDisplayed()
       onNodeWithTag("CreateNewOrganizationButton").assertIsDisplayed().performClick()
       val toCreateAsso = navController.currentBackStackEntry?.destination?.route
       assert(toCreateAsso == Destination.CreateAsso.route)
@@ -173,7 +170,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("confirmModifyButton").assertIsDisplayed().performClick()
 
       // verify that the name has been modified
-      assert(changedName)
+      verify { userAPI.setDisplayName("1", "antoine", any(), any()) }
       onNodeWithText("antoine").assertIsDisplayed()
     }
   }
