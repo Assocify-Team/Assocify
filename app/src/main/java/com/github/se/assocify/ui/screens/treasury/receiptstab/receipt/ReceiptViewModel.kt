@@ -66,11 +66,6 @@ class ReceiptViewModel {
                       amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
                       date = DateUtil.toString(receipt.date),
                       incoming = receipt.cents >= 0)
-              CoroutineScope(Dispatchers.Main).launch {
-                _uiState.value.snackbarHostState.showSnackbar(
-                    message = "Image loading unsupported for now",
-                    duration = SnackbarDuration.Short)
-              }
             }
           }
         },

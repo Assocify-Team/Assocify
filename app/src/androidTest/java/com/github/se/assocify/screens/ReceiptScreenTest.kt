@@ -280,7 +280,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   private val receiptsAPI =
       mockk<ReceiptAPI> {
         every { uploadReceipt(any(), any(), any(), any()) } answers { capturedReceipt = firstArg() }
-        every { getUserReceipts(any(), any()) } answers
+        every { getAllReceipts(any(), any()) } answers
             {
               firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
             }
@@ -314,7 +314,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     with(composeTestRule) {
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("receiptScreenTitle").assertIsDisplayed().assertTextContains("Edit Receipt")
-      verify { receiptsAPI.getUserReceipts(any(), any()) }
+      verify { receiptsAPI.getAllReceipts(any(), any()) }
       onNodeWithTag("titleField").assertTextContains("Edited Receipt")
       onNodeWithTag("amountField").assertTextContains("100.00")
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
