@@ -30,6 +30,7 @@ class TaskViewModel {
 
   private val navActions: NavigationActions
   private val taskUid: String
+  private var eventUid: String? = null
 
   private val _uiState: MutableStateFlow<TaskState>
   val uiState: StateFlow<TaskState>
@@ -73,16 +74,17 @@ class TaskViewModel {
         {
           val date = it.startTime.toLocalDate()
           val time = it.startTime.toLocalTime()
+          eventUid = it.eventUid
 
           _uiState.value =
               _uiState.value.copy(
+                  isNewTask = false,
                   title = it.title,
                   description = it.description,
                   category = it.category,
                   staffNumber = it.peopleNeeded.toString(),
                   date = DateUtil.toString(date),
-                  time = TimeUtil.toString(time),
-                  pageTitle = EDIT_TASK_TITLE)
+                  time = TimeUtil.toString(time))
         },
         {
           CoroutineScope(Dispatchers.Main).launch {
@@ -94,7 +96,15 @@ class TaskViewModel {
 
   fun loadEvents() {
     eventApi.getEvents(
-        { _uiState.value = _uiState.value.copy(eventList = it) },
+        {
+          _uiState.value = _uiState.value.copy(eventList = it)
+          _uiState.value =
+              _uiState.value.copy(
+                  event =
+                      _uiState.value.eventList.find { event ->
+                        eventUid == _uiState.value.event?.uid
+                      })
+        },
         {
           CoroutineScope(Dispatchers.Main).launch {
             _uiState.value.snackbarHostState.showSnackbar(
@@ -105,6 +115,7 @@ class TaskViewModel {
 
   fun setEvent(event: Event) {
     _uiState.value = _uiState.value.copy(event = event)
+    eventUid = event.uid
   }
 
   fun setTitle(title: String) {
