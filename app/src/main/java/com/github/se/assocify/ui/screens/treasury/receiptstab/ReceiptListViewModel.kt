@@ -73,7 +73,7 @@ class ReceiptListViewModel(
         },
         onError = {
           Log.e("ReceiptListViewModel", "Error fetching all receipts", it)
-          // TODO on sprint 4 with error API
+          // TODO Error message
         })
   }
 

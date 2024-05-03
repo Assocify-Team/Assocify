@@ -54,7 +54,7 @@ class ReceiptViewModel {
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
 
-    this.receiptApi.getUserReceipts(
+    this.receiptApi.getAllReceipts(
         onSuccess = { receipts ->
           receipts.forEach { receipt ->
             if (receipt.uid == receiptUid) {
@@ -66,6 +66,11 @@ class ReceiptViewModel {
                       amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
                       date = DateUtil.toString(receipt.date),
                       incoming = receipt.cents >= 0)
+              CoroutineScope(Dispatchers.Main).launch {
+                _uiState.value.snackbarHostState.showSnackbar(
+                    message = "Image loading unsupported for now",
+                    duration = SnackbarDuration.Short)
+              }
             }
           }
         },
