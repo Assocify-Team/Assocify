@@ -59,8 +59,7 @@ class DisplayOrganizationScreenTest(semanticsProvider: SemanticsNodeInteractions
     ComposeScreen<DisplayOrganizationScreenTest>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("DisplayOrganizationScreen") }) {
-  val organizationSelect: KNode = child { hasTestTag("SelectIcon") }
-  val node: KNode = onNode { hasTestTag("DisplayOrganizationScreen") }
+  val node: KNode = onNode { hasTestTag("DisplayOrganizationScreen-testAssociation") }
 }
 
 /** This class represents the SelectAssociationScreen */
@@ -173,7 +172,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun testNavigateToHomeByClickingOnAssoc() {
     val model = SelectAssociationViewModel(mockAssocAPI, mockUserAPI, mockNavActions)
     composeTestRule.setContent { DisplayOrganization(organization = testAssociation, model) }
-    composeTestRule.onNodeWithTag("DisplayOrganizationScreen").performClick()
+    composeTestRule.onNodeWithTag("DisplayOrganizationScreen-${testAssociation.uid}").performClick()
   }
 
   /* This test check if, when searching with the search bar the icons change */
