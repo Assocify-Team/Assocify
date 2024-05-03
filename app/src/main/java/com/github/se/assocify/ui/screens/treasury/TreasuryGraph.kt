@@ -6,6 +6,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.balanceDetailedGraph
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.budgetDetailedGraph
+import com.github.se.assocify.ui.screens.treasury.accounting.newcategory.addAccountingCategory
 import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGraph
 
 fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions) {
@@ -17,4 +18,5 @@ fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions) {
   receiptGraph(navigationActions)
   budgetDetailedGraph(navigationActions)
   balanceDetailedGraph(navigationActions)
+  addAccountingCategory(navigationActions)
 }

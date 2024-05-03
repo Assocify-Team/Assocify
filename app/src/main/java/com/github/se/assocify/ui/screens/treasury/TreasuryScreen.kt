@@ -90,6 +90,8 @@ fun TreasuryScreen(
             onClick = {
               if (pagerState.currentPage == TreasuryPageIndex.RECEIPT.ordinal) {
                 navActions.navigateTo(Destination.NewReceipt)
+              } else if (pagerState.currentPage == TreasuryPageIndex.BUDGET.ordinal) {
+                navActions.navigateTo(Destination.NewBalanceCategory)
               }
             }) {
               Icon(Icons.Outlined.Add, "Create")
