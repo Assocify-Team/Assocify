@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.event.tasktab.task
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,9 +14,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,11 +34,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.TimePickerWithDialog
@@ -68,6 +77,35 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                 Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
+              Box(
+                  modifier =
+                      Modifier.testTag("eventDropdownChip").padding(bottom = 5.dp).fillMaxWidth()) {
+                    var eventExpanded by remember { mutableStateOf(false) }
+                    FilterChip(
+                        modifier = Modifier.testTag("statusChip"),
+                        selected = false,
+                        onClick = { eventExpanded = !eventExpanded },
+                        label = { Text(taskState.event?.name ?: "Select Event") },
+                        trailingIcon = {
+                          Icon(
+                              imageVector = Icons.Filled.ArrowDropDown,
+                              contentDescription = "Expand")
+                        })
+                    DropdownMenu(
+                        modifier = Modifier.testTag("statusDropdownMenu"),
+                        expanded = eventExpanded,
+                        onDismissRequest = { eventExpanded = false },
+                        properties = PopupProperties(focusable = true)) {
+                          taskState.eventList.forEach { event ->
+                            DropdownMenuItem(
+                                text = { Text(event.name) },
+                                onClick = {
+                                  viewModel.setEvent(event)
+                                  eventExpanded = false
+                                })
+                          }
+                        }
+                  }
               OutlinedTextField(
                   modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = taskState.title,
@@ -109,6 +147,7 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                   value = taskState.time,
                   onTimeSelect = { viewModel.setTime(it) },
                   label = { Text("Time") },
+                  isError = taskState.timeError != null,
                   supportingText = { taskState.timeError?.let { Text(it) } })
               Column {
                 Button(
