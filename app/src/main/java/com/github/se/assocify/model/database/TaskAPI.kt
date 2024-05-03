@@ -3,10 +3,10 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Task
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import java.time.OffsetDateTime
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.OffsetDateTime
 
 /**
  * API for interacting with the task table in the database.
