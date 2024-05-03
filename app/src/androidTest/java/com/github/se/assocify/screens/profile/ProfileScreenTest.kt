@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -28,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -42,10 +44,14 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private var goRoles = false
 
   private val uid = "1"
-  private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true)
+  private val asso = Association("asso", "test", "test", LocalDate.EPOCH)
+  private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true) {
+    every { getAssociation(any(), any(), any()) } answers { asso }
+  }
   private val mockUserAPI =
       mockk<UserAPI>(relaxUnitFun = true) {
         every { getUser(any(), any(), any()) } answers { User("1", "jean") }
+        every { getCurrentUserAssociations(any(), any()) } answers { listOf(asso) }
       }
 
   private lateinit var mViewmodel: ProfileViewModel
@@ -84,7 +90,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
-      onAllNodesWithTag("associationDropdownItem").assertCountEquals(3) // depends on listAsso
+      println(mViewmodel.uiState.value.myAssociations)
+      onAllNodesWithTag("associationDropdownItem").assertCountEquals(1) // depends on listAsso
     }
   }
 
