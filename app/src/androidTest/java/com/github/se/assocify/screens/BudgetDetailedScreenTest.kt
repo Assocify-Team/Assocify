@@ -1,24 +1,31 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,20 +38,42 @@ class BudgetDetailedScreenTest :
   @get:Rule val mockkRule = MockKRule(this)
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
+
   val subCategory =
       AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
   val budgetItems =
       listOf(
           BudgetItem(
-              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", subCategory),
-          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory))
+              "1",
+              "pair of scissors",
+              5,
+              TVA.TVA_8,
+              "scissors for paper cutting",
+              subCategory,
+              2022),
+          BudgetItem(
+              "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory, 2023),
+          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory, 2023))
+
+  val mockBudgetAPI: BudgetAPI =
+      mockk<BudgetAPI>() {
+        every { getBudget(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
+              onSuccessCallback(budgetItems)
+            }
+      }
+
+  lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    composeTestRule.setContent { BudgetDetailedScreen("subcategoryuid", mockNavActions) }
+    budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, "subCategoryUid")
+    composeTestRule.setContent {
+      BudgetDetailedScreen("subCategoryUid", mockNavActions, mockBudgetAPI)
+    }
   }
 
   /** Tests if the nodes are displayed */
@@ -57,7 +86,42 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("totalItems").assertIsDisplayed()
       onNodeWithTag("yearListTag").assertIsDisplayed()
       onNodeWithTag("tvaListTag").assertIsDisplayed()
-      budgetItems.forEach { onNodeWithTag("displayItem${it.uid}").assertIsDisplayed() }
+    }
+  }
+
+  /** Tests if the items of 2023 are displayed (the default) */
+  @Test
+  fun testCorrectItemsAreDisplayed() {
+    with(composeTestRule) {
+      onNodeWithText("sweaters").assertIsDisplayed()
+      onNodeWithText("chairs").assertIsDisplayed()
+      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+    }
+
+    assert(
+        budgetItems.filter { it.year == 2023 } == budgetDetailedViewModel.uiState.value.budgetList)
+  }
+
+  /** Tests if go back to Treasury */
+  @Test
+  fun goBackTest() {
+    with(composeTestRule) {
+      onNodeWithTag("backButton").performClick()
+      verify { mockNavActions.back() }
+    }
+  }
+
+  /** Tests if the nodes of filter year are displayed */
+  @Test
+  fun testFilterByYear() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+
+      onNodeWithText("sweaters").assertDoesNotExist()
+      onNodeWithText("chairs").assertDoesNotExist()
+
+      onNodeWithText("pair of scissors").assertIsDisplayed()
     }
   }
 

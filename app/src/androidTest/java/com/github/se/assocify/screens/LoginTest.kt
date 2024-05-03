@@ -103,7 +103,7 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
       intended(toPackage("com.google.android.gms"))
 
-      verify { navActions.onAuthError() }
+      verify(timeout = 1000) { navActions.onAuthError() }
       confirmVerified(navActions)
       assert(authError)
     }
