@@ -67,14 +67,14 @@ class TaskViewModel {
     _uiState = MutableStateFlow(TaskState(isNewTask = false, pageTitle = EDIT_TASK_TITLE))
     uiState = _uiState
 
-    loadEvents()
-
     taskApi.getTask(
         taskUid,
         {
           val date = it.startTime.toLocalDate()
           val time = it.startTime.toLocalTime()
           eventUid = it.eventUid
+
+          loadEvents()
 
           _uiState.value =
               _uiState.value.copy(

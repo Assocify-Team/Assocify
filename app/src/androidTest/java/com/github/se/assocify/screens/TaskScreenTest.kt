@@ -304,6 +304,7 @@ class EditTaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       onNodeWithTag("taskScreen").assertIsDisplayed()
       onNodeWithTag("taskScreenTitle").assertIsDisplayed().assertTextContains("Edit Task")
       verify { taskAPI.getTask(task.uid, any(), any()) }
+      verify { eventAPI.getEvents(any(), any()) }
 
       onNodeWithTag("titleField").assertTextContains("testTask")
       onNodeWithTag("descriptionField").assertTextContains("Test Description")
