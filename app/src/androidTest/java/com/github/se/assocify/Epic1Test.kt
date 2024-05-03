@@ -36,6 +36,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * This test is an end-to-end test for the first epic :
+ *
+ * As the president of my association, I want to register myself, the association and its members in
+ * the application, and then go to my profile to modify my information
+ */
 @RunWith(AndroidJUnit4::class)
 class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
@@ -70,11 +76,12 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
               onSuccessCallback.invoke(listOf(asso))
             }
-          every { addAssociation(any(), any(), any()) } answers
-                  {
-                      val onSuccessCallback = secondArg<(Association) -> Unit>()
-                      onSuccessCallback.invoke(asso)
-                  }
+        every { addAssociation(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(Association) -> Unit>()
+              onSuccessCallback.invoke(asso)
+            }
+        // will need to init asso thing
       }
 
   private val userAPI =
@@ -84,7 +91,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = firstArg<(List<User>) -> Unit>()
               onSuccessCallback(bigList)
             }
-          every { getUser(any(), any(), any()) } answers
+        every { getUser(any() /*"1"?*/, any(), any()) } answers
             {
               val onSuccessCallback = secondArg<(User) -> Unit>()
               onSuccessCallback.invoke(bigList[0])
@@ -129,6 +136,23 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
       val toHome = navController.currentBackStackEntry?.destination?.route
       assert(toHome == Destination.Home.route)
+
+      onNodeWithTag("homeScreen").assertIsDisplayed()
+      onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
+
+      val toProfile = navController.currentBackStackEntry?.destination?.route
+      assert(toProfile == Destination.Profile.route)
+
+      onNodeWithTag("profileScreen").assertIsDisplayed()
+      onNodeWithTag("profileName").assertIsDisplayed()
+      // maybe see if the displayed name is Jean before modifying it
+
+      onNodeWithTag("editProfile").assertIsDisplayed().performClick()
+      onNodeWithTag("editName").performTextInput("antoine")
+      onNodeWithTag("confirmModifyButton").assertIsDisplayed().performClick()
+
+      // verify that the name has been modified
+
     }
   }
 }
