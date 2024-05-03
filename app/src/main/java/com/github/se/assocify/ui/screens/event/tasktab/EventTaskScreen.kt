@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.testTag
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
+import com.github.se.assocify.ui.util.TimeUtil
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
@@ -49,12 +50,7 @@ fun EventTaskScreen(
                       onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
                   )
                 },
-                overlineContent = {
-                  Text(
-                      it.startTime.toLocalTime().toString() +
-                          "   " +
-                          it.startTime.toLocalDate().toString())
-                })
+                overlineContent = { Text(TimeUtil.toString(it.startTime)) })
             HorizontalDivider()
           }
         }

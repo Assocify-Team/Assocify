@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.util
 
 import java.time.LocalTime
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 /** Utility class for date conversion. The date format is dd/MM/yyyy. */
@@ -17,6 +18,16 @@ object TimeUtil {
       return NULL_TIME_STRING
     }
     return time.format(DateTimeFormatter.ofPattern("HH:mm"))
+  }
+
+  /**
+   * Converts time to a string. If the time is null, it returns a string representing a null time.
+   */
+  fun toString(time: OffsetDateTime): String {
+    if (time == null) {
+      return NULL_TIME_STRING
+    }
+    return time.format(DateTimeFormatter.ofPattern("d-M-y HH:mm"))
   }
 
   /**
