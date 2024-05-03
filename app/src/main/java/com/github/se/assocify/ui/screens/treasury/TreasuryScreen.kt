@@ -82,8 +82,10 @@ fun TreasuryScreen(
             onClick = {
               when (pagerState.currentPage) {
                 TreasuryPageIndex.Receipts.ordinal -> navActions.navigateTo(Destination.NewReceipt)
-                TreasuryPageIndex.Budget.ordinal -> navActions.navigateTo(Destination.NewBalanceCategory)
-                TreasuryPageIndex.Balance.ordinal -> navActions.navigateTo(Destination.NewBalanceCategory)
+                TreasuryPageIndex.Budget.ordinal ->
+                    navActions.navigateTo(Destination.NewBalanceCategory)
+                TreasuryPageIndex.Balance.ordinal ->
+                    navActions.navigateTo(Destination.NewBalanceCategory)
               }
             }) {
               Icon(Icons.Outlined.Add, "Create")
