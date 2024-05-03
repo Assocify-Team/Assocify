@@ -98,12 +98,11 @@ class TaskViewModel {
     eventApi.getEvents(
         {
           _uiState.value = _uiState.value.copy(eventList = it)
-          _uiState.value =
-              _uiState.value.copy(
-                  event =
-                      _uiState.value.eventList.find { event ->
-                        eventUid == _uiState.value.event?.uid
-                      })
+          if (eventUid != null) {
+            _uiState.value =
+                _uiState.value.copy(
+                    event = _uiState.value.eventList.find { event -> eventUid == event.uid })
+          }
         },
         {
           CoroutineScope(Dispatchers.Main).launch {
