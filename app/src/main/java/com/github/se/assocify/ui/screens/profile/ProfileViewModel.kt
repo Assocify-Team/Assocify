@@ -22,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class ProfileViewModel(
     private val assoAPI: AssociationAPI,
@@ -39,11 +38,16 @@ class ProfileViewModel(
           _uiState.value = _uiState.value.copy(myName = user.name, modifyingName = user.name)
         },
         { _uiState.value = _uiState.value.copy(myName = "name not found") })
-      userAPI.getCurrentUserAssociations(
-          { associations ->
-            _uiState.value = _uiState.value.copy(myAssociations = associations)
-          },
-          { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
+    userAPI.getCurrentUserAssociations(
+        { associations -> _uiState.value = _uiState.value.copy(myAssociations = associations) },
+        { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
+
+    assoAPI.getAssociation(
+        CurrentUser.associationUid!!,
+        { association ->
+          _uiState.value = _uiState.value.copy(selectedAssociationName = association.name)
+        },
+        { _uiState.value = _uiState.value.copy(selectedAssociationName = "None") })
   }
 
   /**
@@ -62,6 +66,19 @@ class ProfileViewModel(
    */
   fun controlNameEdit(show: Boolean) {
     _uiState.value = _uiState.value.copy(openEdit = show)
+  }
+
+  /**
+   * This function is used to control the visibility of the association dropdown.
+   *
+   * @param show true if the association dropdown should be shown, false if should be hidden
+   */
+  fun controlAssociationDropdown(show: Boolean) {
+    _uiState.value = _uiState.value.copy(openAssociationDropdown = show)
+  }
+
+  fun setAssociation(association: String) {
+    _uiState.value = _uiState.value.copy(selectedAssociationName = association)
   }
 
   /**
@@ -122,14 +139,24 @@ class ProfileViewModel(
 }
 
 data class ProfileUIState(
+    // the name of the user
     val myName: String = "",
+    // the name of the user as they're editing it
     val modifyingName: String = myName,
+    // true if the name edit field should be shown, false if should be hidden
     val openEdit: Boolean = false,
+    // the snackbar host state
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    // true if the bottom sheet should be shown, false if should be hidden
     val showPicOptions: Boolean = false,
+    // the uri of the profile image
     val profileImageURI: Uri? = null,
+    // the associations of the user
     val myAssociations: List<Association> = emptyList(),
-    val openAssociationDropdown: Boolean = false
+    // true if the association dropdown should be shown, false if should be hidden
+    val openAssociationDropdown: Boolean = false,
+    // the selected (current) association - TODO not yet "functional"
+    val selectedAssociationName: String = ""
 )
 
 /**
