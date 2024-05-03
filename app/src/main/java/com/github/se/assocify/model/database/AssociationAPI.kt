@@ -13,6 +13,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 
 /**
  * API for interacting with the associations in the database
@@ -264,7 +265,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     db.from("invited")
         .insert(
             Json.decodeFromString<JsonElement>(
-                """{"user_id": "$userId","role_id": "${role.uid}", "association_id":  "${role.associationId}"}"""))
+                """{"user_id": "$userId","role_id": "${role.uid}", "association_id": "${role.associationId}"}"""))
   }
 
   /**
@@ -307,9 +308,31 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
       for (user in users) {
         inviteUserSus(user.user.uid, user.role)
+        // TODO: add the UI to accept invitations, remove this function
+        acceptInvitationSus(user.user.uid, user.role.associationId)
       }
       onSuccess()
     }
+  }
+
+  private suspend fun acceptInvitationSus(
+      userId: String,
+      associationId: String,
+  ) {
+    val invitation =
+        db.from("invited")
+            .delete {
+              filter {
+                eq("user_id", userId)
+                eq("association_id", associationId)
+              }
+              select()
+            }
+            .decodeSingle<JsonObject>()
+    db.from("member_of")
+        .insert(
+            Json.decodeFromString<JsonElement>(
+                """{"user_id": "$userId","role_id": ${invitation["role_id"]}}"""))
   }
 
   @Serializable

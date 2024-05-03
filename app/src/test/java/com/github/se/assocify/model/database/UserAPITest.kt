@@ -195,6 +195,15 @@ class UserAPITest {
   fun testAcceptInvitation() {
     val onSuccess: () -> Unit = mockk(relaxed = true)
 
+    response =
+        """
+      [{
+        "user_id": "${APITestUtils.USER.uid}",
+        "role_id": ${APITestUtils.PERMISSION_ROLE.uid},
+        "association_id": ${APITestUtils.ASSOCIATION.uid}
+      }]
+    """
+            .trimIndent()
     error = false
     userAPI.acceptInvitation(
         APITestUtils.ASSOCIATION.uid, onSuccess, { fail("Should not fail, failed with $it") })
