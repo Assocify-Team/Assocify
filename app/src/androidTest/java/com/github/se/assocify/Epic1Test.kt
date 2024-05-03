@@ -84,6 +84,12 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               CurrentUser.associationUid = asso.uid
               navActions.onLogin(true)
             }
+
+        every { getAssociation(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(Association) -> Unit>()
+              onSuccessCallback.invoke(asso)
+            }
       }
 
   private val userAPI =
