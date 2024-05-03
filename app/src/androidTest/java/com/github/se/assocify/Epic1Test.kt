@@ -101,11 +101,11 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
         every { setDisplayName("1", "antoine", any(), any()) } answers {}
 
-          every { getCurrentUserAssociations(any(), any()) } answers
-                  {
-                      val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
-                      onSuccessCallback.invoke(listOf(asso))
-                  }
+        every { getCurrentUserAssociations(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
+              onSuccessCallback.invoke(listOf(asso))
+            }
       }
 
   private val eventAPI = mockk<EventAPI>() { every { getEvents(any(), any()) } answers {} }
