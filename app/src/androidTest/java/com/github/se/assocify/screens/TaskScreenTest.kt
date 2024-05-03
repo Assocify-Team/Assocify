@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -24,11 +25,12 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.OffsetDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalTime
+import java.time.OffsetDateTime
 
 @RunWith(AndroidJUnit4::class)
 class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -178,4 +180,46 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
       verify { navActions.back() }
     }
   }
+
+  @Test
+  fun save() {
+    with(composeTestRule) {
+      onNodeWithTag("saveButton").performScrollTo().performClick()
+      onNodeWithTag("titleField").assertTextContains("Title cannot be empty")
+      onNodeWithTag("staffNumberField").assertTextContains("Staff number cannot be empty")
+      onNodeWithTag("dateField").assertTextContains("Date cannot be empty")
+      onNodeWithTag("timeField").assertTextContains("Time cannot be empty")
+
+      onNodeWithTag("titleField").performClick().performTextInput("Test Title")
+
+      onNodeWithTag("staffNumberField").performClick().performTextInput("100")
+
+      onNodeWithTag("dateField").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012021")
+      onNodeWithTag("datePickerDialogOk").performClick()
+      onNodeWithTag("dateField").assertTextContains("01/01/2021")
+
+      viewModel.setTime(LocalTime.now())
+
+      assert(viewModel.uiState.value.titleError == null)
+      assert(viewModel.uiState.value.staffNumberError == null)
+      assert(viewModel.uiState.value.dateError == null)
+      assert(viewModel.uiState.value.timeError == null)
+
+      onNodeWithTag("saveButton").performScrollTo().performClick()
+      onNodeWithText("Event is required", true).assertIsDisplayed()
+
+      onNodeWithTag("eventChip").assertTextContains("Select Event")
+      onNodeWithTag("eventChip").performScrollTo().performClick()
+      onNodeWithText("testEvent1", true).assertIsDisplayed()
+      onNodeWithText("testEvent2", true).assertIsDisplayed()
+      onNodeWithText("testEvent2", true).performClick()
+      onNodeWithTag("eventChip").assertTextContains("testEvent2")
+
+      viewModel.saveTask()
+      verify { taskAPI.addTask(any(), any(), any()) }
+    }
+  }
+
 }
