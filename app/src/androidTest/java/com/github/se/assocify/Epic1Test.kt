@@ -7,7 +7,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
@@ -65,7 +67,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val asso =
       Association(
-          uid = "1",
+          uid = "aaa",
           name = "Test",
           description = "Test description",
           creationDate = LocalDate.EPOCH)
@@ -77,13 +79,15 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
               onSuccessCallback.invoke(listOf(asso))
             }
+        // need to change that
         every { addAssociation(any(), any(), any()) } answers
             {
-              val onSuccessCallback = secondArg<(Association) -> Unit>()
-              onSuccessCallback.invoke(asso)
+              CurrentUser.associationUid = asso.uid
+              navActions.onLogin(true)
             }
-        // will need to init asso thing
       }
+
+  private var changedName = false
 
   private val userAPI =
       mockk<UserAPI>() {
@@ -97,6 +101,8 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = secondArg<(User) -> Unit>()
               onSuccessCallback.invoke(bigList[0])
             }
+
+        every { setDisplayName("1", "antoine", any(), any()) } answers { changedName = true }
       }
 
   private val eventAPI = mockk<EventAPI>() { every { getEvents(any(), any()) } answers {} }
@@ -133,7 +139,6 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("userDropdownItem-1").performClick() // jean
       onNodeWithTag("role-PRESIDENCY").assertIsDisplayed()
       onNodeWithTag("role-PRESIDENCY").performClick()
-      //        assert(bigView.uiState.value.editMember!!.role.type == RoleType.PRESIDENCY)
       onNodeWithTag("addMemberButton").performClick()
       onNodeWithTag("create").assertHasClickAction()
       onNodeWithTag("create").assertIsEnabled()
@@ -151,14 +156,16 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
       onNodeWithTag("profileScreen").assertIsDisplayed()
       onNodeWithTag("profileName").assertIsDisplayed()
-      // maybe see if the displayed name is Jean before modifying it
+      onNodeWithText("jean").assertIsDisplayed()
 
       onNodeWithTag("editProfile").assertIsDisplayed().performClick()
+      onNodeWithTag("editName").performTextClearance()
       onNodeWithTag("editName").performTextInput("antoine")
       onNodeWithTag("confirmModifyButton").assertIsDisplayed().performClick()
 
       // verify that the name has been modified
-
+      assert(changedName)
+      onNodeWithText("antoine").assertIsDisplayed()
     }
   }
 }
