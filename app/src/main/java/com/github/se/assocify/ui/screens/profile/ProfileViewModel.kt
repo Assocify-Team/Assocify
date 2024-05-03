@@ -24,6 +24,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * This ViewModel is used to manage the UI state of the profile screen. It is used to get the user's
+ * name, associations, and the current association. It is also used to modify the user's name and
+ * association. It will be used to manage the navigations between the different settings screens.
+ *
+ * @property assoAPI the association API
+ * @property userAPI the user API
+ * @property navActions the navigation actions
+ */
 class ProfileViewModel(
     private val assoAPI: AssociationAPI,
     private val userAPI: UserAPI,
@@ -82,7 +91,7 @@ class ProfileViewModel(
   /**
    * This function is used to set the association of the user.
    *
-   * @param association the name of the association
+   * @param association the association
    */
   fun setAssociation(association: Association) {
     CurrentUser.associationUid = association.uid
@@ -133,7 +142,7 @@ class ProfileViewModel(
     _uiState.value = _uiState.value.copy(profileImageURI = uri)
   }
 
-  /** This function is used to singal to the user that the camera permission was denied. */
+  /** This function is used to signal to the user that the camera permission was denied. */
   fun signalCameraPermissionDenied() {
     CoroutineScope(Dispatchers.Main).launch {
       _uiState.value.snackbarHostState.showSnackbar(
