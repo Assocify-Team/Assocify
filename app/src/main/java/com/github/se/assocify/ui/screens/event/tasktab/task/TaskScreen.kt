@@ -82,7 +82,7 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                       Modifier.testTag("eventDropdownChip").padding(bottom = 5.dp).fillMaxWidth()) {
                     var eventExpanded by remember { mutableStateOf(false) }
                     FilterChip(
-                        modifier = Modifier.testTag("statusChip"),
+                        modifier = Modifier.testTag("eventChip"),
                         selected = false,
                         onClick = { eventExpanded = !eventExpanded },
                         label = { Text(taskState.event?.name ?: "Select Event") },
@@ -92,7 +92,7 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                               contentDescription = "Expand")
                         })
                     DropdownMenu(
-                        modifier = Modifier.testTag("statusDropdownMenu"),
+                        modifier = Modifier.testTag("eventDropdownMenu"),
                         expanded = eventExpanded,
                         onDismissRequest = { eventExpanded = false },
                         properties = PopupProperties(focusable = true)) {
