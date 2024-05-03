@@ -71,8 +71,11 @@ fun rememberSupabaseAuthLauncher(
 }
 
 @Composable
-fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
-  val viewModel = LoginViewModel(userAPI, navActions)
+fun LoginScreen(
+    navActions: NavigationActions,
+    userAPI: UserAPI,
+    viewModel: LoginViewModel = LoginViewModel(navActions, userAPI)
+) {
 
   val launcher =
       rememberSupabaseAuthLauncher(
@@ -109,13 +112,14 @@ fun LoginScreen(navActions: NavigationActions, userAPI: UserAPI) {
                   .requestEmail()
                   .build()
           val googleSignInClient = GoogleSignIn.getClient(context, gso)
+          googleSignInClient.signOut()
           launcher.launch(googleSignInClient.signInIntent)
         },
         modifier =
             Modifier.border(
                     width = 1.dp,
                     color = Color(0xFFDADCE0),
-                    shape = RoundedCornerShape(size = 20.dp))
+                    shape = RoundedCornerShape(size = 30.dp))
                 .testTag("LoginButton")) {
           Row(
               verticalAlignment = Alignment.CenterVertically,

@@ -56,7 +56,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     CurrentUser.userUid = uid
     CurrentUser.associationUid = "asso"
 
-    mViewmodel = ProfileViewModel(mockAssocAPI, mockUserAPI)
+    mViewmodel = ProfileViewModel(mockAssocAPI, mockUserAPI, navActions)
 
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
     every { navActions.navigateTo(Destination.ProfileNotifications) } answers { goNotif = true }

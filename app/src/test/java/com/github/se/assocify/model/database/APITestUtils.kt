@@ -3,6 +3,9 @@ package com.github.se.assocify.model.database
 import android.util.Log
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.AssociationMember
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -14,12 +17,27 @@ import kotlinx.coroutines.test.setMain
 
 object APITestUtils {
   val USER = User("DEADBEEF-0000-0000-0000-000000000000", "API Test User", "test@example.com")
+  val USER_JSON = """{"uid":"${USER.uid}", "name": "${USER.name}}"""
   val ASSOCIATION =
       Association(
           "13379999-0000-0000-0000-000000000000",
           "API Test Association",
           "A test association",
           LocalDate.of(2020, 2, 20))
+  val ASSOCIATION_JSON =
+      """
+      {"uid": "${ASSOCIATION.uid}", "name": "${ASSOCIATION.name}", "description": "${ASSOCIATION.description}", "creation_date": "2020-02-20"}
+      """
+          .trimIndent()
+  val PERMISSION_ROLE =
+      PermissionRole("12345678-0000-0000-0000-000000000000", ASSOCIATION.uid, RoleType.PRESIDENCY)
+  val PERMISSION_JSON =
+      """
+      {"uid": "${PERMISSION_ROLE.uid}", "association_id": "${PERMISSION_ROLE.associationId}", "type": "${PERMISSION_ROLE.type.name.lowercase()}"}
+  """
+          .trimIndent()
+
+  val ASSOCIATION_MEMBER = AssociationMember(USER, ASSOCIATION, PERMISSION_ROLE)
 
   /**
    * Sets up various convenient mocks for API testing.

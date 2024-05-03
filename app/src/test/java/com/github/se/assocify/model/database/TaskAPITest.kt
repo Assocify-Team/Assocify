@@ -14,10 +14,6 @@ import io.mockk.verify
 import java.time.OffsetDateTime
 import java.util.UUID
 import junit.framework.TestCase.fail
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,10 +31,9 @@ class TaskAPITest {
 
   private lateinit var taskAPI: TaskAPI
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
-    Dispatchers.setMain(UnconfinedTestDispatcher())
+    APITestUtils.setup()
     taskAPI =
         TaskAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -62,7 +57,7 @@ class TaskAPITest {
     response =
         """  
         {
-          "id": "$uuid1"
+          "uid": "$uuid1"
           "title": "testName",
           "description": "description",
           "is_completed": false,
@@ -98,7 +93,7 @@ class TaskAPITest {
         """
         [
           {
-            "id": "$uuid1",
+            "uid": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
@@ -109,7 +104,7 @@ class TaskAPITest {
             "event_id": "eventUid"
           },
           {
-            "id": "$uuid2",
+            "uid": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,
@@ -216,7 +211,7 @@ class TaskAPITest {
         """
         [
           {
-            "id": "$uuid1",
+            "uid": "$uuid1",
             "title": "testName",
             "description": "description",
             "is_completed": false,
@@ -227,7 +222,7 @@ class TaskAPITest {
             "event_id": "eventUid"
           },
           {
-            "id": "$uuid2",
+            "uid": "$uuid2",
             "title": "testName2",
             "description": "description2",
             "is_completed": false,

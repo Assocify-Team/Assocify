@@ -213,6 +213,8 @@ dependencies {
     androidTestImplementation("io.mockk:mockk-android:$mockkVersion")
     androidTestImplementation("io.mockk:mockk-agent:$mockkVersion")
 
+    // OSMdroid
+    implementation("org.osmdroid:osmdroid-android:6.1.14")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {

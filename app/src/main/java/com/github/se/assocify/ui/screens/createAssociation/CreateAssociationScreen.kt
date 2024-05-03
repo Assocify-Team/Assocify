@@ -57,7 +57,8 @@ fun CreateAssociationScreen(
     navigationActions: NavigationActions,
     assoAPI: AssociationAPI,
     userAPI: UserAPI,
-    viewmodel: CreateAssociationViewmodel = CreateAssociationViewmodel(assoAPI, userAPI)
+    viewmodel: CreateAssociationViewmodel =
+        CreateAssociationViewmodel(assoAPI, userAPI, navigationActions)
 ) {
 
   val state by viewmodel.uiState.collectAsState()
@@ -110,16 +111,16 @@ fun CreateAssociationScreen(
                     ListItem(
                         modifier =
                             Modifier.clip(RoundedCornerShape(10.dp))
-                                .testTag("MemberListItem-${member.name}"),
-                        headlineContent = { Text(member.name) },
-                        overlineContent = { Text(member.name) },
+                                .testTag("MemberListItem-${member.user.name}"),
+                        headlineContent = { Text(member.user.name) },
+                        overlineContent = { Text(member.role.type.name) },
                         leadingContent = {
                           Icon(Icons.Default.Person, contentDescription = "Person")
                         },
                         trailingContent = {
                           IconButton(
                               onClick = { viewmodel.modifyMember(member) },
-                              modifier = Modifier.testTag("editMember-${member.name}")) {
+                              modifier = Modifier.testTag("editMember-${member.user.name}")) {
                                 Icon(Icons.Default.Edit, contentDescription = "Edit")
                               }
                         },
@@ -161,7 +162,7 @@ fun CreateAssociationScreen(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
                         searchValue = state.searchMember,
                         userList = state.searchMemberList,
-                        user = state.editMember,
+                        user = state.editMember?.user,
                         onUserSearch = { viewmodel.searchMember(it) },
                         onUserSelect = { viewmodel.selectMember(it) },
                         onUserDismiss = { viewmodel.dismissMemberSearch() },
@@ -177,10 +178,8 @@ fun CreateAssociationScreen(
                             trailingContent = {
                               RadioButton(
                                   modifier = Modifier.testTag("role-${role.name}"),
-                                  selected =
-                                      false, // state.editMember!!.hasRole(role.name), TODO: remake
-                                  // roles
-                                  onClick = { viewmodel.modifyMemberRole(role.name) })
+                                  selected = state.editMember!!.role.type == role,
+                                  onClick = { viewmodel.modifyMemberRole(role) })
                             },
                             modifier = Modifier.testTag("roleitem-${role.name}"))
                       }

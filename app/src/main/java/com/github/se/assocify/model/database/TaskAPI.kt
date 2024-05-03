@@ -4,7 +4,6 @@ import com.github.se.assocify.model.entities.Task
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import java.time.OffsetDateTime
-import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -22,20 +21,16 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getTask(id: String, onSuccess: (Task) -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val task =
-            db.from("task")
-                .select {
-                  filter { SupabaseTask::uid eq id }
-                  limit(1)
-                  single()
-                }
-                .decodeAs<SupabaseTask>()
-        onSuccess(task.toTask())
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure) {
+      val task =
+          db.from("task")
+              .select {
+                filter { SupabaseTask::uid eq id }
+                limit(1)
+                single()
+              }
+              .decodeAs<SupabaseTask>()
+      onSuccess(task.toTask())
     }
   }
   /**
@@ -45,13 +40,9 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getTasks(onSuccess: (List<Task>) -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val tasks = db.from("task").select().decodeList<SupabaseTask>()
-        onSuccess(tasks.map { it.toTask() })
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure) {
+      val tasks = db.from("task").select().decodeList<SupabaseTask>()
+      onSuccess(tasks.map { it.toTask() })
     }
   }
 
@@ -63,25 +54,21 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun addTask(task: Task, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        db.from("task")
-            .insert(
-                SupabaseTask(
-                    uid = task.uid,
-                    title = task.title,
-                    description = task.description,
-                    isCompleted = task.isCompleted,
-                    startTime = task.startTime.toString(),
-                    peopleNeeded = task.peopleNeeded,
-                    category = task.category,
-                    location = task.location,
-                    eventId = task.eventUid))
+    tryAsync(onFailure) {
+      db.from("task")
+          .insert(
+              SupabaseTask(
+                  uid = task.uid,
+                  title = task.title,
+                  description = task.description,
+                  isCompleted = task.isCompleted,
+                  startTime = task.startTime.toString(),
+                  peopleNeeded = task.peopleNeeded,
+                  category = task.category,
+                  location = task.location,
+                  eventId = task.eventUid))
 
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+      onSuccess()
     }
   }
 
@@ -110,23 +97,19 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    scope.launch {
-      try {
-        db.from("task").update({
-          SupabaseTask::title setTo title
-          SupabaseTask::description setTo description
-          SupabaseTask::isCompleted setTo isCompleted
-          SupabaseTask::startTime setTo startTime.toString()
-          SupabaseTask::peopleNeeded setTo peopleNeeded
-          SupabaseTask::category setTo category
-          SupabaseTask::location setTo location
-        }) {
-          filter { SupabaseTask::uid eq uid }
-        }
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
+    tryAsync(onFailure) {
+      db.from("task").update({
+        SupabaseTask::title setTo title
+        SupabaseTask::description setTo description
+        SupabaseTask::isCompleted setTo isCompleted
+        SupabaseTask::startTime setTo startTime.toString()
+        SupabaseTask::peopleNeeded setTo peopleNeeded
+        SupabaseTask::category setTo category
+        SupabaseTask::location setTo location
+      }) {
+        filter { SupabaseTask::uid eq uid }
       }
+      onSuccess()
     }
   }
 
@@ -159,13 +142,9 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun deleteTask(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        db.from("task").delete { filter { SupabaseTask::uid eq id } }
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure) {
+      db.from("task").delete { filter { SupabaseTask::uid eq id } }
+      onSuccess()
     }
   }
 
@@ -181,22 +160,18 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<Task>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    scope.launch {
-      try {
-        val tasks =
-            db.from("task")
-                .select { filter { SupabaseTask::eventId eq eventId } }
-                .decodeList<SupabaseTask>()
-        onSuccess(tasks.map { it.toTask() })
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure) {
+      val tasks =
+          db.from("task")
+              .select { filter { SupabaseTask::eventId eq eventId } }
+              .decodeList<SupabaseTask>()
+      onSuccess(tasks.map { it.toTask() })
     }
   }
 
   @Serializable
   private data class SupabaseTask(
-      @SerialName("id") val uid: String,
+      @SerialName("uid") val uid: String,
       @SerialName("title") val title: String,
       @SerialName("description") val description: String,
       @SerialName("is_completed") val isCompleted: Boolean,
