@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
@@ -14,6 +15,8 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -72,6 +75,12 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
               onSuccessCallback(listOf(asso1, asso2))
             }
         every { setDisplayName(any(), "newName", any(), any()) } answers {}
+
+        every { getCurrentUserRole(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+              onSuccessCallback(PermissionRole("1", "asso", RoleType.PRESIDENCY))
+            }
       }
 
   private lateinit var mViewmodel: ProfileViewModel
@@ -143,6 +152,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
   }
 
+  // test if you can change association
   @Test
   fun changeAssociation() {
     with(composeTestRule) {
@@ -153,6 +163,16 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
   }
 
+  // test if correct role is displayed
+  @Test
+  fun correctRole() {
+    with(composeTestRule) {
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("PRESIDENCY").assertIsDisplayed()
+    }
+  }
+
+  // test if you can navigate to sub screens (settings)
   @Test
   fun navigateToSubScreen() {
     with(composeTestRule) {
@@ -173,6 +193,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     }
   }
 
+  // test if you can navigate in the main tabs
   @Test
   fun navigate() {
     with(composeTestRule) {

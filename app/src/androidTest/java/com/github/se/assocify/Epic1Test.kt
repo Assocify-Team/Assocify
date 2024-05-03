@@ -22,6 +22,8 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
@@ -111,6 +113,12 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
             {
               val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
               onSuccessCallback.invoke(listOf(asso))
+            }
+
+        every { getCurrentUserRole(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+              onSuccessCallback.invoke(PermissionRole("1", "aaa", RoleType.PRESIDENCY))
             }
       }
 
