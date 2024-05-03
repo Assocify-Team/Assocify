@@ -12,7 +12,7 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGra
 
 fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions, budgetAPI: BudgetAPI) {
   composable(
-    route = Destination.Treasury.route,
+      route = Destination.Treasury.route,
   ) {
     TreasuryScreen(navigationActions)
   }
