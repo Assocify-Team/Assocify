@@ -128,17 +128,24 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   @Test
   fun epic1Test() {
     with(composeTestRule) {
+      // register my association
       onNodeWithTag("DisplayOrganizationScreen-Test").assertIsDisplayed()
       onNodeWithTag("CreateNewOrganizationButton").assertIsDisplayed().performClick()
       val toCreateAsso = navController.currentBackStackEntry?.destination?.route
       assert(toCreateAsso == Destination.CreateAsso.route)
 
+      // create my association with its members
       onNodeWithTag("name").performTextInput("assoName")
       onNodeWithTag("addMember").performClick()
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       onNodeWithTag("userDropdownItem-1").performClick() // jean
       onNodeWithTag("role-PRESIDENCY").assertIsDisplayed()
       onNodeWithTag("role-PRESIDENCY").performClick()
+      onNodeWithTag("addMemberButton").performClick()
+      onNodeWithTag("addMember").performClick()
+      onNodeWithTag("memberSearchField").performClick().performTextInput("seb")
+      onNodeWithTag("userDropdownItem-10").performClick() // jean
+      onNodeWithTag("role-TREASURY").assertIsDisplayed().performClick()
       onNodeWithTag("addMemberButton").performClick()
       onNodeWithTag("create").assertHasClickAction()
       onNodeWithTag("create").assertIsEnabled()
@@ -151,6 +158,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("homeScreen").assertIsDisplayed()
       onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
 
+      // go to my profile
       val toProfile = navController.currentBackStackEntry?.destination?.route
       assert(toProfile == Destination.Profile.route)
 
@@ -158,6 +166,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("profileName").assertIsDisplayed()
       onNodeWithText("jean").assertIsDisplayed()
 
+      // edit my name
       onNodeWithTag("editProfile").assertIsDisplayed().performClick()
       onNodeWithTag("editName").performTextClearance()
       onNodeWithTag("editName").performTextInput("antoine")
