@@ -76,15 +76,15 @@ fun AddAccountingSubCategory(
       showDialog = showAddCategoryDialog,
       onDismissRequest = { showAddCategoryDialog = false },
       onAddSubCategoryClick = { /* TODO: Add sub category */},
-      newCategoryName = newCategoryName,
-      onNewCategoryNameChange = { newCategoryName = it })
+      newTagName = newCategoryName,
+      onNewTagChange = { newCategoryName = it })
 
   Scaffold(
-      modifier = Modifier.testTag("addAccountingSubCategoryScreen"),
+      modifier = Modifier.testTag("addAccountingCategoryScreen"),
       topBar = {
         TopAppBar(
             title = {
-              Text(modifier = Modifier.testTag("subCategoryTitle"), text = "New Sub Category")
+              Text(modifier = Modifier.testTag("categoryTitle"), text = "New Category")
             },
             navigationIcon = {
               BackButton(
@@ -98,7 +98,7 @@ fun AddAccountingSubCategory(
               top = VerticalPadding,
               left = HorizontalPadding,
               bottom = VerticalPadding,
-              right = 0.dp)) { paddingValues ->
+              right = HorizontalPadding)) { paddingValues ->
         Column(
             modifier =
                 Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
@@ -130,7 +130,7 @@ fun AddAccountingSubCategory(
                     TextField(
                         value = selectedSubCategory,
                         onValueChange = {},
-                        label = { Text("Category") },
+                        label = { Text("Tag") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
@@ -149,10 +149,10 @@ fun AddAccountingSubCategory(
 
               // Add category button
               OutlinedButton(
-                  modifier = Modifier.testTag("addSubCategoryButton").fillMaxWidth(),
+                  modifier = Modifier.testTag("addTagButton").fillMaxWidth(),
                   onClick = { showAddCategoryDialog = true },
                   content = {
-                    Icon(Icons.Outlined.Edit, contentDescription = "Add sub category")
+                    Icon(Icons.Outlined.Edit, contentDescription = "Create new tag")
                     Text(" Add sub category")
                   })
               Spacer(modifier = Modifier.height(16.dp))
@@ -172,11 +172,11 @@ fun AddAccountingSubCategory(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCategoryDialog(
-    showDialog: Boolean,
-    onDismissRequest: () -> Unit,
-    onAddSubCategoryClick: () -> Unit,
-    newCategoryName: String,
-    onNewCategoryNameChange: (String) -> Unit
+  showDialog: Boolean,
+  onDismissRequest: () -> Unit,
+  onAddSubCategoryClick: () -> Unit,
+  newTagName: String,
+  onNewTagChange: (String) -> Unit
 ) {
   if (showDialog) {
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
@@ -185,17 +185,17 @@ fun AddCategoryDialog(
           shape = MaterialTheme.shapes.large,
           tonalElevation = AlertDialogDefaults.TonalElevation) {
             Column(modifier = Modifier.padding(16.dp)) {
-              Text(modifier = Modifier.testTag("categoryTitle"), text = "New Category")
+              Text(modifier = Modifier.testTag("tagName"), text = "New Tag")
               OutlinedTextField(
-                  modifier = Modifier.testTag("newCategoryFieldPopup").fillMaxWidth(),
-                  value = newCategoryName,
-                  onValueChange = onNewCategoryNameChange,
-                  label = { Text("Category name") },
+                  modifier = Modifier.testTag("newTagFieldPopup").fillMaxWidth(),
+                  value = newTagName,
+                  onValueChange = onNewTagChange,
+                  label = { Text("Tag name") },
                   supportingText = { /* TODO: Error management */})
               Spacer(modifier = Modifier.height(24.dp))
               TextButton(
                   onClick = onAddSubCategoryClick, modifier = Modifier.align(Alignment.End)) {
-                    Text("Add Sub Category")
+                    Text("Create new tag")
                   }
             }
           }

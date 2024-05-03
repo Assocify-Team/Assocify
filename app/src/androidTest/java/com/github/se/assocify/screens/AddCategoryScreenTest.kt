@@ -33,15 +33,15 @@ class AddCategoryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @Test
   fun testDisplay() {
     with(composeTestRule) {
-      onNodeWithTag("addAccountingSubCategoryScreen").assertIsDisplayed()
-      onNodeWithTag("subCategoryTitle").assertIsDisplayed()
+      onNodeWithTag("addAccountingCategoryScreen").assertIsDisplayed()
+      onNodeWithTag("categoryTitle").assertIsDisplayed()
       onNodeWithTag("cancelButton").assertIsDisplayed()
 
       onNodeWithTag("categoryDropdown").assertIsDisplayed()
       onNodeWithTag("categoryNameField").assertIsDisplayed()
       onNodeWithTag("valueField").assertIsDisplayed()
 
-      onNodeWithTag("addSubCategoryButton").assertIsDisplayed()
+      onNodeWithTag("addTagButton").assertIsDisplayed()
       onNodeWithTag("createButton").assertIsDisplayed()
     }
   }
@@ -61,10 +61,10 @@ class AddCategoryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   @Test
   fun testAddCategory() {
     with(composeTestRule) {
-      onNodeWithTag("addSubCategoryButton").performClick()
+      onNodeWithTag("addTagButton").performClick()
 
-      onNodeWithTag("categoryTitle").assertIsDisplayed()
-      onNodeWithTag("newCategoryFieldPopup").assertIsDisplayed()
+      onNodeWithTag("tagName").assertIsDisplayed()
+      onNodeWithTag("newTagFieldPopup").assertIsDisplayed()
     }
   }
 }
