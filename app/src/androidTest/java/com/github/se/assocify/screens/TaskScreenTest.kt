@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.tasktab.task.TaskScreen
+import com.github.se.assocify.ui.screens.event.tasktab.task.TaskViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -24,11 +25,13 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
 
+  private val viewmodel: TaskViewModel = mockk(relaxUnitFun = true)
+
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    composeTestRule.setContent { TaskScreen(navActions = navActions) }
+    composeTestRule.setContent { TaskScreen(navActions = navActions, viewmodel) }
   }
 
   @Test
