@@ -83,7 +83,10 @@ fun AddAccountingSubCategory(
               Text(modifier = Modifier.testTag("subCategoryTitle"), text = "New Sub Category")
             },
             navigationIcon = {
-              BackButton(contentDescription = "Back", onClick = { navActions.back() })
+              BackButton(
+                  contentDescription = "Back",
+                  onClick = { navActions.back() },
+                  modifier = Modifier.testTag("backButton"))
             })
       },
       contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),

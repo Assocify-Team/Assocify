@@ -46,7 +46,10 @@ fun TaskScreen(
                   text = /*TODO title depending on edit or create*/ "New Task")
             },
             navigationIcon = {
-              BackButton(contentDescription = "Back", onClick = { navActions.back() })
+              BackButton(
+                  contentDescription = "Back",
+                  onClick = { navActions.back() },
+                  modifier = Modifier.testTag("backButton"))
             })
       },
       contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
