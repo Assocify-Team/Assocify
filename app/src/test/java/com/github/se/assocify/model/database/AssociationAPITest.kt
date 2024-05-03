@@ -319,6 +319,15 @@ class AssociationAPITest {
     // Coverage test
     val onSuccess: () -> Unit = mockk(relaxed = true)
 
+    response =
+        """
+      [{
+        "user_id": "${APITestUtils.USER.uid}",
+        "role_id": ${APITestUtils.PERMISSION_ROLE.uid},
+        "association_id": ${APITestUtils.ASSOCIATION.uid}
+      }]
+    """
+            .trimIndent()
     assoAPI.initAssociation(
         listOf(APITestUtils.PERMISSION_ROLE),
         listOf(APITestUtils.ASSOCIATION_MEMBER),

@@ -13,6 +13,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 
 /**
  * API for interacting with the users in the database
@@ -119,12 +120,20 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.from("invited").delete {
-        filter {
-          eq("user_id", CurrentUser.userUid!!)
-          eq("association_id", associationId)
-        }
-      }
+      val invitation =
+          db.from("invited")
+              .delete {
+                filter {
+                  eq("user_id", CurrentUser.userUid!!)
+                  eq("association_id", associationId)
+                }
+                select()
+              }
+              .decodeSingle<JsonObject>()
+      db.from("member_of")
+          .insert(
+              Json.decodeFromString<JsonElement>(
+                  """{"user_id": "${CurrentUser.userUid}","role_id": ${invitation["role_id"]}}"""))
       onSuccess()
     }
   }
