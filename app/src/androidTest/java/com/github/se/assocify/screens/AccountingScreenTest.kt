@@ -3,21 +3,25 @@ package com.github.se.assocify.screens
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
-import com.github.se.assocify.ui.screens.treasury.accounting.FilterBar
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,7 +46,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     composeTestRule.setContent {
-      FilterBar()
+      AccountingFilterBar()
       AccountingScreen(AccountingPage.BUDGET, list, mockNavActions)
     }
   }
@@ -86,6 +90,15 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     with(composeTestRule) {
       onNodeWithTag("filterRow").assertIsDisplayed()
       onNodeWithTag("filterRow").performTouchInput { swipeLeft() }
+    }
+  }
+
+  /** Tests navigate to budget detailed screen */
+  @Test
+  fun testNavigateToDetailedScreen() {
+    with(composeTestRule) {
+      onNodeWithText("Administration Pole").performClick()
+      verify { mockNavActions.navigateTo(Destination.BudgetDetailed("Administration Pole")) }
     }
   }
 }
