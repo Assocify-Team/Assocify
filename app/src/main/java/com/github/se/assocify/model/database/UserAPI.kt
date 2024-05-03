@@ -199,6 +199,27 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Gets the current user's role in the current association
+   *
+   * @param onSuccess called on success with the current user's role in the association
+   * @param onFailure called on failure
+   */
+  fun getCurrentUserRole(onSuccess: (PermissionRole) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      val membership =
+          db.from("member_role_association_view")
+              .select {
+                filter {
+                  Membership::userId eq CurrentUser.userUid!!
+                  Membership::associationId eq CurrentUser.associationUid!!
+                }
+              }
+              .decodeSingle<Membership>()
+      onSuccess(membership.getRole())
+    }
+  }
+
   @Serializable
   private data class Membership(
       @SerialName("user_id") val userId: String,
