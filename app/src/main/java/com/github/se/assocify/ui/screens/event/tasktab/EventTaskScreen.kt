@@ -74,10 +74,11 @@ fun EventTaskScreen(
                     onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
                 )
               },
-              overlineContent = { 
-                Text(DateUtil.toString(it.startTime.toLocalDate()) +
-                          " " +
-                          TimeUtil.toString(it.startTime.toLocalTime()))
+              overlineContent = {
+                Text(
+                    DateUtil.toString(it.startTime.toLocalDate()) +
+                        " " +
+                        TimeUtil.toString(it.startTime.toLocalTime()))
               })
           HorizontalDivider()
         }
