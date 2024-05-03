@@ -13,9 +13,9 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
-import com.github.se.assocify.ui.screens.treasury.accounting.FilterBar
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -46,7 +46,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     composeTestRule.setContent {
-      FilterBar()
+      AccountingFilterBar()
       AccountingScreen(AccountingPage.BUDGET, list, mockNavActions)
     }
   }

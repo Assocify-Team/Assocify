@@ -3,7 +3,9 @@ package com.github.se.assocify.screens
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -61,9 +63,9 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       onNodeWithTag("balanceTab").performClick()
       onNodeWithTag("balanceTab").assertIsSelected()
 
-      onNodeWithTag("myReceiptsTab").assertIsDisplayed()
-      onNodeWithTag("myReceiptsTab").performClick()
-      onNodeWithTag("myReceiptsTab").assertIsSelected()
+      onNodeWithTag("receiptsTab").assertIsDisplayed()
+      onNodeWithTag("receiptsTab").performClick()
+      onNodeWithTag("receiptsTab").assertIsSelected()
     }
   }
 
@@ -87,15 +89,16 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   fun searchBar() = run {
     with(composeTestRule) {
       // First open the search bar
-      onNodeWithTag("receiptSearch").assertIsNotDisplayed()
+      onNodeWithTag("searchBar").assertIsNotDisplayed()
       onNodeWithTag("searchIconButton").performClick()
-      onNodeWithTag("receiptSearch").assertIsDisplayed()
-      onNodeWithTag("receiptSearch").performTextInput("salut cest bob lennon")
-      // onNodeWithTag("receiptSearch").assertTextEquals("salut cest bob lennon")
-      onNodeWithTag("receiptSearch").performClick()
-      onNodeWithTag("backIconButton").performClick()
-      onNodeWithTag("receiptSearch").assertIsNotDisplayed()
-      // onNodeWithTag("receiptSearch").assert("")
+      onNodeWithTag("searchBar").assertIsDisplayed()
+      onNodeWithTag("searchBar").onChild().assertIsDisplayed()
+      onNodeWithTag("searchBar").onChild().performTextInput("salut cest bob lennon")
+      onNodeWithTag("searchBar").onChild().assertTextContains("salut cest bob lennon")
+      onNodeWithTag("searchClearButton").performClick()
+      onNodeWithTag("searchBar").onChild().assertTextContains("")
+      onNodeWithTag("searchBackButton").performClick()
+      onNodeWithTag("searchBar").assertIsNotDisplayed()
     }
   }
 }
