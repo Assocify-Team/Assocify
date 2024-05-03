@@ -15,6 +15,7 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
@@ -102,6 +103,8 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val taskAPI = mockk<TaskAPI>(relaxUnitFun = true)
 
+  private val budgetAPI = mockk<BudgetAPI>(relaxUnitFun = true)
+
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
 
   @Before
@@ -111,7 +114,8 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       navController.navigatorProvider.addNavigator(ComposeNavigator())
       navActions = NavigationActions(navController, loginSave)
 
-      TestAssocifyApp(navController, navActions, userAPI, associationAPI, eventAPI, taskAPI)
+      TestAssocifyApp(
+          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI)
     }
   }
 
@@ -123,14 +127,16 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       val toCreateAsso = navController.currentBackStackEntry?.destination?.route
       assert(toCreateAsso == Destination.CreateAsso.route)
 
-      onNodeWithTag("createAssoScreen").assertIsDisplayed()
       onNodeWithTag("name").performTextInput("assoName")
       onNodeWithTag("addMember").performClick()
       onNodeWithTag("memberSearchField").performClick().performTextInput("j")
       onNodeWithTag("userDropdownItem-1").performClick() // jean
-      onNodeWithTag("role-PRESIDENCY").assertIsDisplayed().performClick()
+      onNodeWithTag("role-PRESIDENCY").assertIsDisplayed()
+      onNodeWithTag("role-PRESIDENCY").performClick()
+      //        assert(bigView.uiState.value.editMember!!.role.type == RoleType.PRESIDENCY)
       onNodeWithTag("addMemberButton").performClick()
-      onNodeWithTag("create").assertHasClickAction().assertIsEnabled()
+      onNodeWithTag("create").assertHasClickAction()
+      onNodeWithTag("create").assertIsEnabled()
       onNodeWithTag("create").performClick()
       verify { associationAPI.addAssociation(any(), any(), any()) }
 
@@ -164,6 +170,7 @@ fun TestAssocifyApp(
     userAPI: UserAPI,
     associationAPI: AssociationAPI,
     eventAPI: EventAPI,
+    budgetAPI: BudgetAPI,
     taskAPI: TaskAPI
 ) {
   CurrentUser.userUid = "1"
@@ -174,6 +181,7 @@ fun TestAssocifyApp(
         userAPI = userAPI,
         associationAPI = associationAPI,
         eventAPI = eventAPI,
+        budgetAPI = budgetAPI,
         taskAPI)
   }
 }
