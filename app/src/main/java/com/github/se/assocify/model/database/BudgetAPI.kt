@@ -1,6 +1,5 @@
 package com.github.se.assocify.model.database
 
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
@@ -128,7 +127,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
           description = description,
           year = year,
           // TODO: Implement the accounting sub category deserialize and serialize
-          category = AccountingSubCategory("", "", AccountingCategory(""), 0),
+          category = AccountingSubCategory("", "", 0),
           tva = TVA.floatToTVA(tva))
     }
   }
