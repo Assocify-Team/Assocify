@@ -10,6 +10,14 @@ class AccountingCategoriesAPI(val db: SupabaseClient) : SupabaseApi() {
 
   val collection_name_category = "accounting_category"
 
+  /**
+   * Get the categories of an association
+   *
+   * @param associationUID the unique identifier of the association
+   * @param onSuccess the callback to be called when the categories are retrieved
+   * @param onFailure the callback to be called when the categories could not be retrieved
+   * @return the list of categories
+   */
   fun getCategories(
       associationUID: String,
       onSuccess: (List<AccountingCategory>) -> Unit,
@@ -25,6 +33,14 @@ class AccountingCategoriesAPI(val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Add a category
+   *
+   * @param associationUID the unique identifier of the association
+   * @param category the category to add
+   * @param onSuccess the callback to be called when the category is added
+   * @param onFailure the callback to be called when the category could not be added
+   */
   fun addCategory(
       associationUID: String,
       category: AccountingCategory,
@@ -41,6 +57,14 @@ class AccountingCategoriesAPI(val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Update a category
+   *
+   * @param associationUID the unique identifier of the association
+   * @param category the category to update
+   * @param onSuccess the callback to be called when the category is updated
+   * @param onFailure the callback to be called when the category could not be updated
+   */
   fun updateCategory(
       associationUID: String,
       category: AccountingCategory,
@@ -60,6 +84,13 @@ class AccountingCategoriesAPI(val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Delete a category in cascade
+   *
+   * @param category the category to delete
+   * @param onSuccess the callback to be called when the category is deleted
+   * @param onFailure the callback to be called when the category could not be deleted
+   */
   fun deleteCategory(
       category: AccountingCategory,
       onSuccess: () -> Unit,
@@ -74,6 +105,7 @@ class AccountingCategoriesAPI(val db: SupabaseClient) : SupabaseApi() {
   }
 }
 
+/** A representation of a category in the database */
 @Serializable
 data class SupabaseAccountingCategory(
     @SerialName("uid") val uid: String,
