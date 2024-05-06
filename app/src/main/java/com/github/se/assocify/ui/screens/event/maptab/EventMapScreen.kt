@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -29,9 +31,6 @@ fun EventMapScreen() {
   Column(
       modifier =
           Modifier.fillMaxWidth()
-              // TODO : padding is used to avoid a bug where the map
-              //        overlaps the top bar. Has to be changed later on.
-              .padding(top = 80.dp)
               .testTag("OSMMapScreen")) {
         EventMapView()
       }
@@ -81,9 +80,37 @@ private fun initMapView(context: Context): MapView {
   val tileProvider = MapTileProviderBasic(context, campusTileSource)
   val tilesOverlay = TilesOverlay(tileProvider, context)
   mapView.overlays.add(tilesOverlay)
+  mapView.clipToOutline = true
 
   return mapView
 }
+
+/*-------*/
+
+
+@Composable
+fun RememberMapViewWithLifecycle() : MapView {
+  val context = LocalContext.current
+  val mapView = remember {
+    MapView(context).apply {
+      clipToOutline = true
+
+      setTileSource(DEFAULT_TILE_SOURCE)
+      val campusTileSource = CampusTileSource(0)
+      val tileProvider = MapTileProviderBasic(context, campusTileSource)
+      val tilesOverlay = TilesOverlay(tileProvider, context)
+      overlays.add(tilesOverlay)
+    }
+  }
+  return mapView
+}
+
+
+
+
+
+
+/*_------*/
 
 /**
  * The custom tile source from the EPFL plan API.
