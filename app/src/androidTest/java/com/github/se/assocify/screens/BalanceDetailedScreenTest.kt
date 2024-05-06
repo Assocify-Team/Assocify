@@ -39,7 +39,7 @@ class BalanceDetailedScreenTest :
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
   val subCategory =
-      AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
+      AccountingSubCategory("subCategoryUid", "Logistics Pole", 1205)
   val receipt =
       Receipt(
           "1",

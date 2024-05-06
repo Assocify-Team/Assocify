@@ -34,12 +34,12 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   val list =
       listOf(
-          AccountingSubCategory("1", "Administration Pole", AccountingCategory("Pole"), 2000),
-          AccountingSubCategory("2", "Presidency Pole", AccountingCategory("Pole"), -400),
-          AccountingSubCategory("3", "Balelec", AccountingCategory("Events"), 1000),
-          AccountingSubCategory("4", "Champachelor", AccountingCategory("Events"), 5000),
-          AccountingSubCategory("5", "OGJ", AccountingCategory("Commission"), 6000),
-          AccountingSubCategory("6", "Communication Fees", AccountingCategory("Fees"), 3000))
+          AccountingSubCategory("1", "Administration Pole", 2000),
+          AccountingSubCategory("2", "Presidency Pole", -400),
+          AccountingSubCategory("3", "Balelec", 1000),
+          AccountingSubCategory("4", "Champachelor", 5000),
+          AccountingSubCategory("5", "OGJ", 6000),
+          AccountingSubCategory("6", "Communication Fees", 3000))
 
   @Before
   fun setup() {
