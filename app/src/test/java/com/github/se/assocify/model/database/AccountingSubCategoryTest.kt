@@ -17,39 +17,38 @@ import org.junit.Test
 
 class AccountingSubCategoryTest {
 
-    @get:Rule
-    val mockkRule = MockKRule(this)
-    lateinit var api: AccountingSubCategoryAPI
-    private var error = false
-    private var response = ""
-    private var responseHeaders = Headers.Empty
+  @get:Rule val mockkRule = MockKRule(this)
+  lateinit var api: AccountingSubCategoryAPI
+  private var error = false
+  private var response = ""
+  private var responseHeaders = Headers.Empty
 
-    @Before
-    fun setUp() {
-        APITestUtils.setup()
-        api =
-            AccountingSubCategoryAPI(
-                createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-                    install(Postgrest)
-                    httpEngine = MockEngine {
-                        if (!error) {
-                            respond(response, headers = responseHeaders)
-                        } else {
-                            respondBadRequest()
-                        }
-                    }
-                })
-    }
+  @Before
+  fun setUp() {
+    APITestUtils.setup()
+    api =
+        AccountingSubCategoryAPI(
+            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+              install(Postgrest)
+              httpEngine = MockEngine {
+                if (!error) {
+                  respond(response, headers = responseHeaders)
+                } else {
+                  respondBadRequest()
+                }
+              }
+            })
+  }
 
-    @Test
-    fun testGetAccountingSubCategory() {
+  @Test
+  fun testGetAccountingSubCategory() {
 
-        val onSuccess: (List<AccountingSubCategory>) -> Unit = mockk(relaxed = true)
-        val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    val onSuccess: (List<AccountingSubCategory>) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-        error = false
-        response =
-            """
+    error = false
+    response =
+        """
                 [
                     {
                         "uid": "13379999-0000-0000-0000-000000000000",
@@ -58,48 +57,58 @@ class AccountingSubCategoryTest {
                         "amount": 1
                     }
                 ]
-            """.trimIndent()
+            """
+            .trimIndent()
 
+    api.getSubCategories("cb7b1079-cb62-40b9-9f35-7667fea4748d", onSuccess, onFailure)
 
-        api.getSubCategories("cb7b1079-cb62-40b9-9f35-7667fea4748d", onSuccess, onFailure)
+    verify(timeout = 400) { onSuccess(any()) }
+  }
 
-        verify(timeout = 400) { onSuccess(any()) }
+  @Test
+  fun testAddAccountingSubCategory() {
 
-    }
-    @Test
-    fun testAddAccountingSubCategory() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-        val onSuccess: () -> Unit = mockk(relaxed = true)
-        val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
+    response = ""
+    api.addSubCategory(
+        "cb7b1079-cb62-40b9-9f35-7667fea4748d",
+        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        onSuccess,
+        onFailure)
+    verify(timeout = 400) { onSuccess() }
+  }
 
-        error = false
-        response = ""
-        api.addSubCategory("cb7b1079-cb62-40b9-9f35-7667fea4748d", AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1), onSuccess, onFailure)
-        verify(timeout=400){onSuccess()}
-    }
+  @Test
+  fun testDeleteAccountingSubCategory() {
 
-    @Test
-    fun testDeleteAccountingSubCategory() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-        val onSuccess: () -> Unit = mockk(relaxed = true)
-        val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
+    response = ""
+    api.deleteSubCategory(
+        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        onSuccess,
+        onFailure)
+    verify(timeout = 400) { onSuccess() }
+  }
 
-        error = false
-        response = ""
-        api.deleteSubCategory(AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1), onSuccess, onFailure)
-        verify(timeout=400){onSuccess()}
-    }
+  @Test
+  fun testUpdateAccountingSubCategory() {
 
-    @Test
-    fun testUpdateAccountingSubCategory() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-        val onSuccess: () -> Unit = mockk(relaxed = true)
-        val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-
-        error = false
-        response = ""
-        api.updateSubCategory("cb7b1079-cb62-40b9-9f35-7667fea4748d", AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1), onSuccess, onFailure)
-        verify(timeout=400){onSuccess()}
-    }
-
+    error = false
+    response = ""
+    api.updateSubCategory(
+        "cb7b1079-cb62-40b9-9f35-7667fea4748d",
+        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        onSuccess,
+        onFailure)
+    verify(timeout = 400) { onSuccess() }
+  }
 }

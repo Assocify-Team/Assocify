@@ -6,9 +6,21 @@ import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * API to interact with the accounting subcategories in the database
+ *
+ * @property db the Supabase client
+ */
 class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
   val collection = "accounting_subcategory"
 
+  /**
+   * Get the subcategories of a category
+   *
+   * @param categoryUID the unique identifier of the category
+   * @param onSuccess the callback to be called when the subcategories are retrieved
+   * @param onFailure the callback to be called when the subcategories could not be retrieved
+   */
   fun getSubCategories(
       categoryUID: String,
       onSuccess: (List<AccountingSubCategory>) -> Unit,
@@ -24,6 +36,14 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Add a subcategory to a category
+   *
+   * @param categoryUID the unique identifier of the category
+   * @param subCategory the subcategory to add
+   * @param onSuccess the callback to be called when the subcategory is added
+   * @param onFailure the callback to be called when the subcategory could not be added
+   */
   fun addSubCategory(
       categoryUID: String,
       subCategory: AccountingSubCategory,
@@ -43,6 +63,14 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Update a subcategory
+   *
+   * @param categoryUID the unique identifier of the category
+   * @param subCategory the subcategory to update
+   * @param onSuccess the callback to be called when the subcategory is updated
+   * @param onFailure the callback to be called when the subcategory could not be updated
+   */
   fun updateSubCategory(
       categoryUID: String,
       subCategory: AccountingSubCategory,
@@ -63,6 +91,13 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  /**
+   * Delete a subcategory
+   *
+   * @param subCategory the subcategory to delete
+   * @param onSuccess the callback to be called when the subcategory is deleted
+   * @param onFailure the callback to be called when the subcategory could not be deleted
+   */
   fun deleteSubCategory(
       subCategory: AccountingSubCategory,
       onSuccess: () -> Unit,
@@ -77,6 +112,7 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
   }
 }
 
+/** A subcategory of an accounting category representation in the database */
 @Serializable
 data class SupabaseAccountingSubCategory(
     @SerialName("uid") val uid: String,
