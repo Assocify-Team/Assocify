@@ -59,11 +59,11 @@ fun AddAccountingSubCategory(
   // Temporary here while we don't have the viewmodel
   val categoryList =
       listOf(
-          AccountingCategory("","Global"),
-          AccountingCategory("","Pole"),
-          AccountingCategory("","Events"),
-          AccountingCategory("","Commission"),
-          AccountingCategory("","Fees"))
+          AccountingCategory("", "Global"),
+          AccountingCategory("", "Pole"),
+          AccountingCategory("", "Events"),
+          AccountingCategory("", "Commission"),
+          AccountingCategory("", "Fees"))
   var subCategoryTitle by remember { mutableStateOf("") }
   var selectedSubCategory by remember { mutableStateOf(categoryList.first().name) }
   var selectedValue by remember { mutableIntStateOf(0) }
