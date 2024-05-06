@@ -14,10 +14,6 @@ import io.mockk.verify
 import java.time.OffsetDateTime
 import java.util.UUID
 import junit.framework.TestCase.fail
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,10 +31,9 @@ class TaskAPITest {
 
   private lateinit var taskAPI: TaskAPI
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
-    Dispatchers.setMain(UnconfinedTestDispatcher())
+    APITestUtils.setup()
     taskAPI =
         TaskAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -140,7 +135,17 @@ class TaskAPITest {
     val onSuccess: () -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    val task = Task()
+    val task =
+        Task(
+            uuid1.toString(),
+            "testName",
+            "description",
+            false,
+            OffsetDateTime.now(),
+            0,
+            "Committee",
+            "Here",
+            "eventUid")
 
     error = false
     response = ""
@@ -171,7 +176,8 @@ class TaskAPITest {
             OffsetDateTime.now(),
             2,
             "newCategory",
-            "newLocation"),
+            "newLocation",
+            "newEventUid"),
         onSuccess) {
           fail("should not fail")
         }
@@ -187,7 +193,8 @@ class TaskAPITest {
             OffsetDateTime.now(),
             2,
             "newCategory",
-            "newLocation"),
+            "newLocation",
+            "newEventUid"),
         { fail("should not fail") },
         onFailure)
     verify(timeout = 1000) { onFailure(any()) }

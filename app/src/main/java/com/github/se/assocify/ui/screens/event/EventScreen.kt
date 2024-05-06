@@ -71,7 +71,7 @@ fun EventScreen(
             onClick = {
               when (state.value.currentTab) {
                 EventPageIndex.TASKS -> {
-                  navActions.navigateTo(Destination.NewTask)
+                  navActions.navigateTo(Destination.NewTask) // TODO : event uid
                 }
                 EventPageIndex.MAP -> {
                   /*TODO: implement for map screen*/

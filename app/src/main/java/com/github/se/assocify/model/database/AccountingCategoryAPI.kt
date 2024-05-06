@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 class AccountingCategoriesAPI(val db: SupabaseClient) : SupabaseApi() {
 
-  val collection_name_category = "accounting_category"
+  private val collection_name_category = "accounting_category"
 
   /**
    * Get the categories of an association
