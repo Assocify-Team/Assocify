@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
@@ -61,8 +60,7 @@ fun AccountingDetailedScreen(
     navigationActions: NavigationActions
 ) {
   // TODO: get subcategory from db
-  val subCategory =
-      AccountingSubCategory(subCategoryUid, "Logistics Pole", AccountingCategory("Pole"), 1205)
+  val subCategory = AccountingSubCategory(subCategoryUid, "Logistics Pole", 1205)
   // TODO: fetch from db
   val receipt =
       Receipt(

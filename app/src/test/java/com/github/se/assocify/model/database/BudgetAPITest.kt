@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
@@ -37,8 +36,7 @@ class BudgetAPITest {
           TVA.TVA_2,
           "lala",
           year = 2022,
-          category =
-              AccountingSubCategory("subCategoryUID", "name", AccountingCategory("categoryUID"), 1))
+          category = AccountingSubCategory("subCategoryUID", "name", 1))
 
   lateinit var budgetAPI: BudgetAPI
 
