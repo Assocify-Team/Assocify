@@ -33,6 +33,8 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -108,6 +110,7 @@ fun EventScreen(
           Column(modifier = Modifier.padding(it).fillMaxHeight()) {
             val pagerState = rememberPagerState(pageCount = { EventPageIndex.NUMBER_OF_PAGES })
             val coroutineRoute = rememberCoroutineScope()
+            val userScroll = remember { mutableStateOf(true) }
 
             EventFilterBar(eventScreenViewModel)
             TabRow(selectedTabIndex = pagerState.currentPage) {
@@ -120,6 +123,7 @@ fun EventScreen(
                       pagerState.animateScrollToPage(EventPageIndex.TASKS.index)
                       eventScreenViewModel.switchTab(EventPageIndex.TASKS)
                     }
+                    userScroll.value = true
                   })
               EventTab(
                   text = "Map",
@@ -130,6 +134,7 @@ fun EventScreen(
                       pagerState.animateScrollToPage(EventPageIndex.MAP.index)
                       eventScreenViewModel.switchTab(EventPageIndex.MAP)
                     }
+                    userScroll.value = false
                   })
               EventTab(
                   text = "Schedule",
@@ -140,13 +145,17 @@ fun EventScreen(
                       pagerState.animateScrollToPage(EventPageIndex.SCHEDULE.index)
                       eventScreenViewModel.switchTab(EventPageIndex.SCHEDULE)
                     }
+                    userScroll.value = true
                   })
             }
-            HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
+
+            HorizontalPager(state = pagerState, userScrollEnabled = userScroll.value) { page ->
               when (page) {
                 EventPageIndex.TASKS.index ->
                     EventTaskScreen(eventScreenViewModel, taskListViewModel, navActions)
-                EventPageIndex.MAP.index -> EventMapScreen()
+                EventPageIndex.MAP.index -> {
+                  EventMapScreen()
+                }
                 EventPageIndex.SCHEDULE.index -> EventScheduleScreen()
               }
             }
