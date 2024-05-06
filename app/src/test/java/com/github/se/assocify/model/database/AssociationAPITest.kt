@@ -246,4 +246,105 @@ class AssociationAPITest {
 
     verify(timeout = 1000) { onFailure(any()) }
   }
+
+  @Test
+  fun testGetRoles() {
+    val onSuccess: (List<PermissionRole>) -> Unit = mockk(relaxed = true)
+
+    response =
+        """
+            [
+            ${APITestUtils.PERMISSION_JSON},
+            ${APITestUtils.PERMISSION_JSON}
+            ]
+        """
+            .trimIndent()
+
+    assoAPI.getRoles(uuid1.toString(), onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) {
+      onSuccess(listOf(APITestUtils.PERMISSION_ROLE, APITestUtils.PERMISSION_ROLE))
+    }
+
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
+
+    assoAPI.getRoles(uuid1.toString(), { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testAddRole() {
+    // Coverage test
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+
+    assoAPI.addRole(APITestUtils.PERMISSION_ROLE, onSuccess, { fail("Should not fail") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+
+    error = true
+    assoAPI.addRole(APITestUtils.PERMISSION_ROLE, { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testInviteUser() {
+    // Coverage test
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+
+    assoAPI.inviteUser(
+        uuid1.toString(), APITestUtils.PERMISSION_ROLE, onSuccess, { fail("Should not fail") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    assoAPI.inviteUser(APITestUtils.ASSOCIATION_MEMBER, onSuccess, { fail("Should not fail") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+
+    error = true
+    assoAPI.inviteUser(
+        uuid1.toString(), APITestUtils.PERMISSION_ROLE, { fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testInitAssociation() {
+    // Coverage test
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+
+    response =
+        """
+      [{
+        "user_id": "${APITestUtils.USER.uid}",
+        "role_id": ${APITestUtils.PERMISSION_ROLE.uid},
+        "association_id": ${APITestUtils.ASSOCIATION.uid}
+      }]
+    """
+            .trimIndent()
+    assoAPI.initAssociation(
+        listOf(APITestUtils.PERMISSION_ROLE),
+        listOf(APITestUtils.ASSOCIATION_MEMBER),
+        onSuccess,
+        { fail("Should not fail") })
+
+    verify(timeout = 1000) { onSuccess() }
+
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
+
+    error = true
+    assoAPI.initAssociation(
+        listOf(APITestUtils.PERMISSION_ROLE),
+        listOf(APITestUtils.ASSOCIATION_MEMBER),
+        { fail("Should not succeed") },
+        onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+  }
 }

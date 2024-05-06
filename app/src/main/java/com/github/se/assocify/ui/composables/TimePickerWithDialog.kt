@@ -111,7 +111,7 @@ fun TimePickerWithDialog(
           Box(Modifier.fillMaxSize().semantics { isTraversalGroup = true }) {
             IconButton(
                 modifier =
-                    Modifier
+                    Modifier.testTag("timePickerDialogToggle")
                         // This is a workaround so that the Icon comes up first
                         // in the talkback traversal order. So that users of a11y
                         // services can use the text input. When talkback traversal

@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
@@ -43,6 +44,7 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import java.time.LocalDate
 
 /**
@@ -51,17 +53,22 @@ import java.time.LocalDate
  * @param page: The page to display (either "budget" or "balance")
  * @param subCategoryUid: The unique identifier of the subcategory
  * @param navigationActions: The navigation actions
+ * @param budgetDetailedViewModel: The view model for the budget detailed screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountingDetailedScreen(
     page: AccountingPage,
     subCategoryUid: String,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
-  // TODO: get subcategory from db
-  val subCategory = AccountingSubCategory(subCategoryUid, "Logistics Pole", 1205)
-  // TODO: fetch from db
+
+  val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
+  val subCategory =
+      AccountingSubCategory(subCategoryUid, subCategoryUid, 1205)
+
+  // TODO: fetch from balance detailed view model
   val receipt =
       Receipt(
           "1",
@@ -71,19 +78,6 @@ fun AccountingDetailedScreen(
           100,
           Status.Pending,
           MaybeRemotePhoto.Remote("path"))
-  val budgetItems =
-      listOf(
-          BudgetItem(
-              "1",
-              "pair of scissors",
-              5,
-              TVA.TVA_8,
-              "scissors for paper cutting",
-              subCategory,
-              2022),
-          BudgetItem(
-              "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory, 2023),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory, 2022))
   val balanceItems =
       listOf(
           BalanceItem(
@@ -124,9 +118,8 @@ fun AccountingDetailedScreen(
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
-  var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedStatus by remember { mutableStateOf(statusList.first()) }
-  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+
   val filteredBalanceList =
       if (selectedStatus == statusList.first()) // display everything under the status category
        balanceItems
@@ -134,7 +127,7 @@ fun AccountingDetailedScreen(
 
   val totalAmount =
       when (page) {
-        AccountingPage.BUDGET -> budgetItems.sumOf { it.amount }
+        AccountingPage.BUDGET -> budgetModel.budgetList.sumOf { it.amount }
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
       }
 
@@ -167,7 +160,9 @@ fun AccountingDetailedScreen(
         ) {
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
-              DropdownFilterChip(yearList.first(), yearList, "yearListTag") { selectedYear = it }
+              DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
+                budgetDetailedViewModel.onYearFilter(it.toInt())
+              }
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                   selectedStatus = it
@@ -175,7 +170,9 @@ fun AccountingDetailedScreen(
               }
 
               // TODO: change amount given TVA
-              DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
+              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+                // TODO: budgetDetailedViewModel.onTVAFilter(it)
+              }
             }
           }
           if (page == AccountingPage.BALANCE) {
@@ -184,7 +181,7 @@ fun AccountingDetailedScreen(
               HorizontalDivider(Modifier.fillMaxWidth())
             }
           } else if (page == AccountingPage.BUDGET) {
-            items(budgetItems) {
+            items(budgetModel.budgetList) {
               DisplayBudgetItem(it, "displayItem${it.uid}")
               HorizontalDivider(Modifier.fillMaxWidth())
             }
@@ -247,7 +244,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
           Icon(
-              Icons.AutoMirrored.Filled.Help,
+              balanceItem.receipt!!.status.getIcon(),
               contentDescription = "Create") // TODO: add logo depending on the phase
         }
       },

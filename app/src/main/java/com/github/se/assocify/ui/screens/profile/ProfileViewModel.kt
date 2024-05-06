@@ -14,14 +14,27 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * This ViewModel is used to manage the UI state of the profile screen. It is used to get the user's
+ * name, associations, and the current association. It is also used to modify the user's name and
+ * association. It will be used to manage the navigations between the different settings screens.
+ *
+ * @property assoAPI the association API
+ * @property userAPI the user API
+ * @property navActions the navigation actions
+ */
 class ProfileViewModel(
     private val assoAPI: AssociationAPI,
     private val userAPI: UserAPI,
@@ -33,8 +46,23 @@ class ProfileViewModel(
   init {
     userAPI.getUser(
         CurrentUser.userUid!!,
-        { user -> _uiState.value = _uiState.value.copy(myName = user.name) },
+        { user ->
+          _uiState.value = _uiState.value.copy(myName = user.name, modifyingName = user.name)
+        },
         { _uiState.value = _uiState.value.copy(myName = "name not found") })
+    userAPI.getCurrentUserAssociations(
+        { associations -> _uiState.value = _uiState.value.copy(myAssociations = associations) },
+        { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
+
+    assoAPI.getAssociation(
+        CurrentUser.associationUid!!,
+        { association -> _uiState.value = _uiState.value.copy(selectedAssociation = association) },
+        {
+          _uiState.value =
+              _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
+        })
+    userAPI.getCurrentUserRole(
+        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
   }
 
   /**
@@ -56,34 +84,46 @@ class ProfileViewModel(
   }
 
   /**
+   * This function is used to control the visibility of the association dropdown.
+   *
+   * @param show true if the association dropdown should be shown, false if should be hidden
+   */
+  fun controlAssociationDropdown(show: Boolean) {
+    _uiState.value = _uiState.value.copy(openAssociationDropdown = show)
+  }
+
+  /**
+   * This function is used to set the association of the user.
+   *
+   * @param association the association
+   */
+  fun setAssociation(association: Association) {
+    CurrentUser.associationUid = association.uid
+    _uiState.value = _uiState.value.copy(selectedAssociation = association)
+    userAPI.getCurrentUserRole(
+        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
+  }
+
+  /**
    * This function is used to confirm the name change of the user. It updates the user's name in the
    * database. It shows a snackbar if the name change was successful or not.
    */
   fun confirmModifyName() {
     _uiState.value = _uiState.value.copy(openEdit = false, myName = _uiState.value.modifyingName)
     CurrentUser.userUid?.let { uid ->
-      userAPI.getUser(
+      userAPI.setDisplayName(
           uid,
-          { user ->
-            userAPI.addUser(
-                user.copy(name = _uiState.value.modifyingName),
-                {
-                  CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.value.snackbarHostState.showSnackbar(
-                        message = "Name changed !", duration = SnackbarDuration.Short)
-                  }
-                },
-                {
-                  CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.value.snackbarHostState.showSnackbar(
-                        message = "Couldn't change name", duration = SnackbarDuration.Short)
-                  }
-                })
+          _uiState.value.modifyingName,
+          {
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarHostState.showSnackbar(
+                  message = "Name changed !", duration = SnackbarDuration.Short)
+            }
           },
           {
             CoroutineScope(Dispatchers.Main).launch {
               _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Current user not found", duration = SnackbarDuration.Short)
+                  message = "Couldn't change name", duration = SnackbarDuration.Short)
             }
           })
     }
@@ -108,7 +148,7 @@ class ProfileViewModel(
     _uiState.value = _uiState.value.copy(profileImageURI = uri)
   }
 
-  /** This function is used to singal to the user that the camera permission was denied. */
+  /** This function is used to signal to the user that the camera permission was denied. */
   fun signalCameraPermissionDenied() {
     CoroutineScope(Dispatchers.Main).launch {
       _uiState.value.snackbarHostState.showSnackbar(
@@ -122,12 +162,27 @@ class ProfileViewModel(
 }
 
 data class ProfileUIState(
+    // the name of the user
     val myName: String = "",
+    // the name of the user as they're editing it
     val modifyingName: String = myName,
+    // true if the name edit field should be shown, false if should be hidden
     val openEdit: Boolean = false,
+    // the snackbar host state
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    // true if the bottom sheet should be shown, false if should be hidden
     val showPicOptions: Boolean = false,
-    val profileImageURI: Uri? = null
+    // the uri of the profile image
+    val profileImageURI: Uri? = null,
+    // the associations of the user
+    val myAssociations: List<Association> = emptyList(),
+    // true if the association dropdown should be shown, false if should be hidden
+    val openAssociationDropdown: Boolean = false,
+    // the selected (current) association - TODO idk what to do with the temporary association
+    val selectedAssociation: Association = Association("none", "", "none", LocalDate.now()),
+    // current role of the user in the association
+    val currentRole: PermissionRole =
+        PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)
 )
 
 /**
