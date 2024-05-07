@@ -34,11 +34,13 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
           ENCODED_KEYSTORE: ${{ secrets.KEYSTORE_FILE }}
           ENCODED_PASSWORDS: ${{ secrets.KEYSTORE_PASSWORDS }}
+          ENCODED_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
 
         run: |
           echo $GOOGLE_SERVICES_JSON | base64 -di > ./app/google-services.json
           echo $ENCODED_KEYSTORE | base64 -di > keystore.jks
           echo $ENCODED_PASSWORDS | base64 -di > keystore.properties
+          echo $ENCODED_PROPERTIES | base64 -di > local.properties
 
       - name: Build Release apk
         run: |
