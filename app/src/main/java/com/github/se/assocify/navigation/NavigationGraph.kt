@@ -1,6 +1,8 @@
 package com.github.se.assocify.navigation
 
 import androidx.navigation.NavGraphBuilder
+import com.github.se.assocify.model.database.AccountingCategoriesAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
@@ -21,10 +23,12 @@ fun NavGraphBuilder.mainNavGraph(
     associationAPI: AssociationAPI,
     eventAPI: EventAPI,
     budgetAPI: BudgetAPI,
-    taskAPI: TaskAPI
+    taskAPI: TaskAPI,
+    accountingCategoriesAPI: AccountingCategoriesAPI,
+    accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
   homeGraph(navActions)
-  treasuryGraph(navActions, budgetAPI)
+  treasuryGraph(navActions, budgetAPI, accountingCategoriesAPI, accountingSubCategoryAPI)
   eventGraph(navActions, eventAPI, taskAPI)
   chatGraph(navActions)
   profileGraph(navActions, userAPI, associationAPI)

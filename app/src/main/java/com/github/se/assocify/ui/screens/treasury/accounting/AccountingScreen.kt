@@ -18,6 +18,7 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -35,12 +36,12 @@ enum class AccountingPage {
 @Composable
 fun AccountingScreen(
     page: AccountingPage,
-    subCategoryList: List<AccountingSubCategory>,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    budgetViewModel: BudgetViewModel
 ) { // TODO: fetch all these list from viewmodel
   val yearList =
       listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
-
+    val subCategoryList = emptyList<AccountingSubCategory>()
   val categoryList =
       listOf(
           AccountingCategory("", "Global"),
@@ -78,8 +79,7 @@ fun AccountingScreen(
 
 @Composable
 fun AccountingFilterBar() {
-  val yearList =
-      listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
+  //val yearList = listOf("2023", "2022", "2021")// TODO: start from 2021 until current year (dynamically)
   /*
   val categoryList =
       listOf(
@@ -104,7 +104,7 @@ fun AccountingFilterBar() {
     }
     // TODO: change amount given TVA
     DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
-  }*/
+  }
 }
 
 /**
@@ -159,4 +159,6 @@ fun DisplayLine(
               }
               .testTag(testTag),
   )
+  */
+
 }

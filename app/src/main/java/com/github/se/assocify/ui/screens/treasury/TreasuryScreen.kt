@@ -30,6 +30,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.database.AccountingCategoriesAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -58,6 +60,8 @@ enum class TreasuryPageIndex {
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
+    accountingCategoriesAPI: AccountingCategoriesAPI,
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
     receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions),
     treasuryViewModel: TreasuryViewModel =
         TreasuryViewModel(navActions = navActions, receiptListViewModel = receiptListViewModel)
@@ -133,7 +137,7 @@ fun TreasuryScreen(
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.Receipts.ordinal -> ReceiptListScreen(receiptListViewModel)
-              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions)
+              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions, accountingCategoriesAPI, accountingSubCategoryAPI)
               TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions)
             }
           }
