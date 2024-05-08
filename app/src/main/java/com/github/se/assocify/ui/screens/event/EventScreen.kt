@@ -57,20 +57,19 @@ fun EventScreen(
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
       topBar = {
-          MainTopBar(
-              title = "Event",
-              optInSearchBar = true,
-              query = state.searchQuery,
-              onQueryChange = { eventScreenViewModel.modifySearchQuery(it) },
-              onSearch = { eventScreenViewModel.searchTaskLists() },
-              page = state.currentTab.ordinal
-          )
+        MainTopBar(
+            title = "Event",
+            optInSearchBar = true,
+            query = state.searchQuery,
+            onQueryChange = { eventScreenViewModel.modifySearchQuery(it) },
+            onSearch = { eventScreenViewModel.searchTaskLists() },
+            page = state.currentTab.ordinal)
       },
       bottomBar = {
-          MainNavigationBar(
-              onTabSelect = { navActions.navigateToMainTab(it) },
-              tabList = MAIN_TABS_LIST,
-              selectedTab = Destination.Event)
+        MainNavigationBar(
+            onTabSelect = { navActions.navigateToMainTab(it) },
+            tabList = MAIN_TABS_LIST,
+            selectedTab = Destination.Event)
       },
       floatingActionButton = {
         FloatingActionButton(
@@ -91,32 +90,27 @@ fun EventScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
       },
-      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)
-      ) {
+      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) {
+        Column(modifier = Modifier.padding(it).fillMaxHeight()) {
+          val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
 
-          Column(modifier = Modifier.padding(it).fillMaxHeight()) {
+          EventFilterBar(eventScreenViewModel)
 
-            val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
-
-            EventFilterBar(eventScreenViewModel)
-
-            InnerTabRow(
+          InnerTabRow(
               tabList = EventPageIndex.entries,
               pagerState = pagerState,
-              switchTab = { tab ->  eventScreenViewModel.switchTab(tab)  }
-            )
+              switchTab = { tab -> eventScreenViewModel.switchTab(tab) })
 
-            HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
-              when (page) {
-                EventPageIndex.Tasks.ordinal ->
-                    EventTaskScreen(eventScreenViewModel, taskListViewModel, navActions)
-                EventPageIndex.Map.ordinal -> EventMapScreen()
-                EventPageIndex.Schedule.ordinal -> EventScheduleScreen()
-              }
+          HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
+            when (page) {
+              EventPageIndex.Tasks.ordinal ->
+                  EventTaskScreen(eventScreenViewModel, taskListViewModel, navActions)
+              EventPageIndex.Map.ordinal -> EventMapScreen()
+              EventPageIndex.Schedule.ordinal -> EventScheduleScreen()
             }
           }
         }
-
+      }
 }
 
 /**
@@ -129,42 +123,35 @@ fun EventFilterBar(eventScreenViewModel: EventScreenViewModel) {
 
   val state by eventScreenViewModel.uiState.collectAsState()
 
-    if (state.error) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .testTag("errorText"),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-            Text(state.errorText)
+  if (state.error) {
+    Column(
+        modifier = Modifier.fillMaxSize().testTag("errorText"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+          Text(state.errorText)
         }
-    } else {
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-
-            state.events.forEach {
-                item {
-                    FilterChip(
-                        modifier = Modifier.testTag("filterChipTestEvent"),
-                        label = { Text(text = it.name) },
-                        leadingIcon = {
-                            if (eventScreenViewModel.isEventSelected(it)) {
-                                Icon(
-                                    modifier = Modifier
-                                        .size(FilterChipDefaults.IconSize),
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = "Selected"
-                                )
-                            }
-                        },
-                        selected = eventScreenViewModel.isEventSelected(it),
-                        onClick = {
-                            eventScreenViewModel.setEventSelection(
-                                it,
-                                !eventScreenViewModel.isEventSelected(it)
-                            )
-                        })
+  } else {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      state.events.forEach {
+        item {
+          FilterChip(
+              modifier = Modifier.testTag("filterChipTestEvent"),
+              label = { Text(text = it.name) },
+              leadingIcon = {
+                if (eventScreenViewModel.isEventSelected(it)) {
+                  Icon(
+                      modifier = Modifier.size(FilterChipDefaults.IconSize),
+                      imageVector = Icons.Filled.Check,
+                      contentDescription = "Selected")
                 }
-            }
+              },
+              selected = eventScreenViewModel.isEventSelected(it),
+              onClick = {
+                eventScreenViewModel.setEventSelection(
+                    it, !eventScreenViewModel.isEventSelected(it))
+              })
         }
+      }
     }
+  }
 }

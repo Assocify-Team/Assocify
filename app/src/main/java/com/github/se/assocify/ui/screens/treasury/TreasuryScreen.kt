@@ -57,13 +57,14 @@ fun TreasuryScreen(
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = {
-          MainTopBar(
-              title = "Treasury",
-              optInSearchBar = true,
-              query = treasuryState.searchQuery,
-              onQueryChange = { treasuryViewModel.setSearchQuery(it) },
-              onSearch = { treasuryViewModel.onSearch(pagerState.currentPage) },
-              page = pagerState.currentPage) },
+        MainTopBar(
+            title = "Treasury",
+            optInSearchBar = true,
+            query = treasuryState.searchQuery,
+            onQueryChange = { treasuryViewModel.setSearchQuery(it) },
+            onSearch = { treasuryViewModel.onSearch(pagerState.currentPage) },
+            page = pagerState.currentPage)
+      },
       bottomBar = {
         MainNavigationBar(
             onTabSelect = { navActions.navigateToMainTab(it) },
@@ -88,30 +89,26 @@ fun TreasuryScreen(
             }
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
+        Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+          InnerTabRow(
+              tabList = TreasuryPageIndex.entries,
+              pagerState = pagerState,
+              switchTab = { /*tab ->  treasuryViewModel.switchTab(tab)*/})
 
-        InnerTabRow(
-            tabList = TreasuryPageIndex.entries,
-            pagerState = pagerState,
-            switchTab = { /*tab ->  treasuryViewModel.switchTab(tab)*/  }
-        )
+          when (pagerState.currentPage) {
+            TreasuryPageIndex.Receipts.ordinal -> {}
+            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar()
+            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar()
+          }
 
-      when (pagerState.currentPage) {
-        TreasuryPageIndex.Receipts.ordinal -> {}
-        TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar()
-        TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar()
-      }
-
-      // Pages content
-      HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
-        when (page) {
-          TreasuryPageIndex.Receipts.ordinal -> ReceiptListScreen(receiptListViewModel)
-          TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions)
-          TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions)
-        }
-      }
+          // Pages content
+          HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
+            when (page) {
+              TreasuryPageIndex.Receipts.ordinal -> ReceiptListScreen(receiptListViewModel)
+              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions)
+              TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions)
+            }
+          }
         }
       }
 }

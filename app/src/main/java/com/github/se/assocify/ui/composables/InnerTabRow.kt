@@ -31,27 +31,28 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun <T : Enum<*>> InnerTabRow(tabList: List<T>, pagerState: PagerState, switchTab: (T) -> Unit) {
-    val coroutineRoute = rememberCoroutineScope()
+  val coroutineRoute = rememberCoroutineScope()
 
-    TabRow(
-        selectedTabIndex = pagerState.currentPage,
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.primary,
-        divider = {},
-        indicator = { TabIndicator(it, pagerState) },){
-        tabList.forEach { tab ->
-            InnerTab(
-                text = tab.name,
-                modifier = Modifier.testTag(tab.name.lowercase() + "Tab"),
-                selected = pagerState.currentPage == tab.ordinal,
-                onClick = {
-                    coroutineRoute.launch {
-                        pagerState.animateScrollToPage(tab.ordinal)
-                        switchTab(tab)
-                    }
-                })
-        }
+  TabRow(
+      selectedTabIndex = pagerState.currentPage,
+      containerColor = MaterialTheme.colorScheme.background,
+      contentColor = MaterialTheme.colorScheme.primary,
+      divider = {},
+      indicator = { TabIndicator(it, pagerState) },
+  ) {
+    tabList.forEach { tab ->
+      InnerTab(
+          text = tab.name,
+          modifier = Modifier.testTag(tab.name.lowercase() + "Tab"),
+          selected = pagerState.currentPage == tab.ordinal,
+          onClick = {
+            coroutineRoute.launch {
+              pagerState.animateScrollToPage(tab.ordinal)
+              switchTab(tab)
+            }
+          })
     }
+  }
 }
 
 /**
@@ -64,16 +65,17 @@ fun <T : Enum<*>> InnerTabRow(tabList: List<T>, pagerState: PagerState, switchTa
  */
 @Composable
 fun InnerTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
-    Tab(
-        modifier = modifier,
-        selected = selected,
-        onClick = onClick,
-        text = {
-            Text(text = text,
-                color =
+  Tab(
+      modifier = modifier,
+      selected = selected,
+      onClick = onClick,
+      text = {
+        Text(
+            text = text,
+            color =
                 if (selected) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.primary.copy(alpha = 0.7f))
-        })
+      })
 }
 
 /**
@@ -85,14 +87,11 @@ fun InnerTab(selected: Boolean, onClick: () -> Unit, text: String, modifier: Mod
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TabIndicator(tabPositions: List<TabPosition>, pagerState: PagerState) {
-    Box(
-        modifier =
-        Modifier
-            .fillMaxSize()
-            .tabIndicatorOffset(tabPositions[pagerState.currentPage])
-            .size(width = 10.dp, height = 3.dp)
-            .background(
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(8.dp))
-    )
+  Box(
+      modifier =
+          Modifier.fillMaxSize()
+              .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+              .size(width = 10.dp, height = 3.dp)
+              .background(
+                  color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp)))
 }
