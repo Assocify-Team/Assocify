@@ -26,16 +26,12 @@ import com.github.se.assocify.model.entities.User
  * A Composable that displays a search text field with dropdown menu for user selection.
  *
  * @param modifier The modifier to be applied to the composable.
- * @param searchValue The current search text value.
- * @param userList The list of users to be displayed in the dropdown menu.
- * @param user The selected user, if any.
+ * @param label The label to be displayed above the text field, if any.
+ * @param state The state of the UserSearchTextField (search text, user list, selected user, error
+ *   text).
  * @param onUserSearch Callback function invoked when the search text changes.
  * @param onUserSelect Callback function invoked when a user is selected from the dropdown menu.
  * @param onUserDismiss Callback function invoked when the selected user is dismissed.
- * @param expanded Whether the dropdown menu is expanded or not.
- * @param label The label to be displayed above the text field, if any.
- * @param isError Whether the text field is in an error state.
- * @param supportingText Additional supporting text to be displayed below the text field, if any.
  */
 @Composable
 fun UserSearchTextField(
@@ -81,6 +77,14 @@ fun UserSearchTextField(
   }
 }
 
+/**
+ * State of the UserSearchTextField.
+ *
+ * @param searchValue The current search text value.
+ * @param userList The list of users to be displayed in the dropdown menu.
+ * @param user The selected user, if any.
+ * @param errorText The error text to be displayed, if any.
+ */
 data class UserSearchState(
     val searchValue: String,
     val userList: List<User>,
