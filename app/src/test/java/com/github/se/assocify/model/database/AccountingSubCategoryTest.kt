@@ -76,7 +76,11 @@ class AccountingSubCategoryTest {
     api.addSubCategory(
         "cb7b1079-cb62-40b9-9f35-7667fea4748d",
         "cb7b1079-cb62-40b9-9f35-7667fea4748d",
-        AccountingSubCategory("13379999-0000-0000-0000-000000000000","13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        AccountingSubCategory(
+            "13379999-0000-0000-0000-000000000000",
+            "13379999-0000-0000-0000-000000000000",
+            "Test SubCategory",
+            1),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
@@ -107,7 +111,11 @@ class AccountingSubCategoryTest {
     response = ""
     api.updateSubCategory(
         "cb7b1079-cb62-40b9-9f35-7667fea4748d",
-        AccountingSubCategory("cb7b1079-cb62-40b9-9f35-7667fea4748d","13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        AccountingSubCategory(
+            "cb7b1079-cb62-40b9-9f35-7667fea4748d",
+            "13379999-0000-0000-0000-000000000000",
+            "Test SubCategory",
+            1),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
