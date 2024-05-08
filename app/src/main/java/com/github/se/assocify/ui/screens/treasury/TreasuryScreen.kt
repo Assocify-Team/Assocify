@@ -1,5 +1,7 @@
 package com.github.se.assocify.ui.screens.treasury
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,8 +32,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoriesAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.entities.AccountingCategory
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -40,9 +45,11 @@ import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 // Index of each tag for navigation
 enum class TreasuryPageIndex {
@@ -68,6 +75,7 @@ fun TreasuryScreen(
 ) {
 
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.NUMBER_OF_PAGES })
+    val budgetViewModel = BudgetViewModel(accountingCategoriesAPI, accountingSubCategoryAPI)
 
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
@@ -96,12 +104,16 @@ fun TreasuryScreen(
             }
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()) {
           val coroutineRoute = rememberCoroutineScope()
 
           // Tabs
           TabRow(
-              modifier = Modifier.height(48.dp).testTag("tabRows"),
+              modifier = Modifier
+                  .height(48.dp)
+                  .testTag("tabRows"),
               selectedTabIndex = pagerState.currentPage,
               containerColor = MaterialTheme.colorScheme.background,
               contentColor = MaterialTheme.colorScheme.primary,
@@ -109,12 +121,14 @@ fun TreasuryScreen(
               indicator = { tabPositions ->
                 Box(
                     modifier =
-                        Modifier.fillMaxSize()
-                            .tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                            .size(width = 10.dp, height = 3.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = RoundedCornerShape(8.dp)))
+                    Modifier
+                        .fillMaxSize()
+                        .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                        .size(width = 10.dp, height = 3.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(8.dp)
+                        ))
               }) {
                 TreasuryPageIndex.entries.forEach {
                   TreasuryTab(
@@ -126,18 +140,17 @@ fun TreasuryScreen(
                       modifier = Modifier.testTag(it.name.lowercase() + "Tab"))
                 }
               }
-
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar()
-            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar()
+            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(budgetViewModel)
+            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(budgetViewModel)
           }
 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.Receipts.ordinal -> ReceiptListScreen(receiptListViewModel)
-              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions, accountingCategoriesAPI, accountingSubCategoryAPI)
+              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions, budgetViewModel)
               TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions)
             }
           }
