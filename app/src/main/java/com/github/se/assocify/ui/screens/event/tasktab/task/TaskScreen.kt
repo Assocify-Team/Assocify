@@ -146,8 +146,7 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                   value = taskState.time,
                   onTimeSelect = { viewModel.setTime(it) },
                   label = { Text("Time") },
-                  isError = taskState.timeError != null,
-                  supportingText = { taskState.timeError?.let { Text(it) } })
+                  errorText = taskState.timeError?.let { { Text(it) } })
               Column {
                 Button(
                     modifier = Modifier.testTag("saveButton").fillMaxWidth(),

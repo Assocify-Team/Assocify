@@ -49,6 +49,7 @@ import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.UserSearchState
 import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -160,16 +161,16 @@ fun CreateAssociationScreen(
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
-                        searchValue = state.searchMember,
-                        userList = state.searchMemberList,
-                        user = state.editMember?.user,
+                        state =
+                            UserSearchState(
+                                searchValue = state.searchMember,
+                                userList = state.searchMemberList,
+                                user = state.editMember?.user,
+                                errorText = state.memberError?.let { { Text(it) } }),
                         onUserSearch = { viewmodel.searchMember(it) },
                         onUserSelect = { viewmodel.selectMember(it) },
                         onUserDismiss = { viewmodel.dismissMemberSearch() },
-                        expanded = state.searchMemberList.isNotEmpty(),
-                        label = { Text("Name") },
-                        isError = (state.memberError != null),
-                        supportingText = state.memberError?.let { { Text(it) } })
+                        label = { Text("Name") })
                     if (state.editMember != null) {
                       // can't select role before selecting member
                       RoleType.entries.forEach { role ->
