@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,51 +47,12 @@ import com.github.se.assocify.ui.composables.DropdownWithSetOptions
 fun ProfilePreferencesScreen(navActions: NavigationActions) {
   // temporary values for the theme, text size, language and currency, waiting for the viewmodel
   val themeOptions = listOf("Light", "Dark", "System")
-  var themeSelectedIndex by remember { mutableStateOf(0) }
+  var themeSelectedIndex by remember { mutableIntStateOf(0) }
 
   var sliderPosition by remember { mutableFloatStateOf(15f) }
 
   var openLanguageDropdown by remember { mutableStateOf(false) }
-  val languageOptions =
-      listOf(
-          "English",
-          "French",
-          "German",
-          "Spanish",
-          "Italian",
-          "Portuguese",
-          "Russian",
-          "Chinese",
-          "Japanese",
-          "Korean",
-          "Arabic",
-          "Hindi",
-          "Turkish",
-          "Dutch",
-          "Polish",
-          "Swedish",
-          "Danish",
-          "Norwegian",
-          "Finnish",
-          "Greek",
-          "Czech",
-          "Hungarian",
-          "Romanian",
-          "Bulgarian",
-          "Croatian",
-          "Slovak",
-          "Slovenian",
-          "Lithuanian",
-          "Latvian",
-          "Estonian",
-          "Maltese",
-          "Irish",
-          "Luxembourgish")
-  var selectedLanguage by remember { mutableStateOf(languageOptions[0]) }
-
-  var openCurrencyDropdown by remember { mutableStateOf(false) }
-  val currencyOptions = listOf("CHF", "USD", "EUR")
-  var selectedCurrency by remember { mutableStateOf(currencyOptions[0]) }
+  var selectedLanguage by remember { mutableStateOf("English") }
 
   Scaffold(
       modifier = Modifier.testTag("preferencesScreen"),
@@ -155,23 +117,12 @@ fun ProfilePreferencesScreen(navActions: NavigationActions) {
           Text(text = "Language", style = MaterialTheme.typography.titleMedium)
 
           DropdownWithSetOptions(
-              options = languageOptions.map { DropdownOption(it, it) },
+              options = emptyList(),
               selectedOption = DropdownOption(selectedLanguage, selectedLanguage),
               opened = openLanguageDropdown,
               onOpenedChange = { openLanguageDropdown = it },
               onSelectOption = { selectedLanguage = it.name },
               modifier = Modifier.testTag("languageDropdown").align(CenterHorizontally))
-
-          // The currency options : default is CHF
-          Text(text = "Currency", style = MaterialTheme.typography.titleMedium)
-
-          DropdownWithSetOptions(
-              options = currencyOptions.map { DropdownOption(it, it) },
-              selectedOption = DropdownOption(selectedCurrency, selectedCurrency),
-              opened = openCurrencyDropdown,
-              onOpenedChange = { openCurrencyDropdown = it },
-              onSelectOption = { selectedCurrency = it.name },
-              modifier = Modifier.testTag("currencyDropdown").align(CenterHorizontally))
         }
       }
 }

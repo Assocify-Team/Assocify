@@ -11,8 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 
 /**
- * A dropdown with a list of given options, readOnly text field
+ * A dropdown with a list of given options, with a readOnly text field displaying the selected
+ * option If the list of options is empty, the dropdown is disabled
  *
+ * @param modifier: The modifier (alignment, testTag...)
  * @param options: The list of options
  * @param selectedOption: The currently selected option
  * @param opened: The state of the dropdown
@@ -29,16 +31,21 @@ fun DropdownWithSetOptions(
     opened: Boolean,
     onOpenedChange: (Boolean) -> Unit,
     onSelectOption: (DropdownOption) -> Unit,
-    leadIcon: (@Composable () -> Unit)? = null
+    leadIcon: (@Composable () -> Unit)? = null,
 ) {
 
   ExposedDropdownMenuBox(
-      expanded = opened, onExpandedChange = { onOpenedChange(true) }, modifier = modifier) {
+      expanded = opened,
+      onExpandedChange = { if (options.isNotEmpty()) onOpenedChange(true) },
+      modifier = modifier) {
         OutlinedTextField(
+            enabled = options.isNotEmpty(),
             value = selectedOption.name,
             onValueChange = {},
             readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened) },
+            trailingIcon = {
+              if (options.isNotEmpty()) ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened)
+            },
             modifier = Modifier.menuAnchor(),
             leadingIcon = leadIcon)
 
@@ -57,4 +64,5 @@ fun DropdownWithSetOptions(
       }
 }
 
+/** An option for the dropdown : has a name (displayed) and a uid (for uniqueness) */
 data class DropdownOption(val name: String, val uid: String)
