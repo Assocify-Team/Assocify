@@ -64,7 +64,7 @@ fun AccountingDetailedScreen(
 ) {
 
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
-  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, 1205)
+  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "",1205)
 
   // TODO: fetch from balance detailed view model
   val receipt =
