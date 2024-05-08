@@ -11,10 +11,10 @@ import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
-import java.time.LocalDate
-import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import java.util.UUID
 
 class CreateAssociationViewmodel(
     private val assoAPI: AssociationAPI,
@@ -100,7 +100,7 @@ class CreateAssociationViewmodel(
    */
   fun searchMember(searchMember: String) {
     _uiState.value = _uiState.value.copy(searchMember = searchMember)
-    if (searchMember.isNotBlank()) {
+
       userAPI.getAllUsers(
           onSuccess = { userList ->
             _uiState.value =
@@ -110,7 +110,9 @@ class CreateAssociationViewmodel(
                             .filterNot { user ->
                               _uiState.value.members.any { us -> us.user.uid == user.uid }
                             }
-                            .filter { it.name.lowercase().contains(searchMember.lowercase()) })
+                            .filter { it.name.lowercase().contains(searchMember.lowercase()) }
+                            .take(4)
+                )
             if (_uiState.value.searchMemberList.isEmpty()) {
               _uiState.value = _uiState.value.copy(memberError = "No users found")
             } else {
@@ -120,9 +122,6 @@ class CreateAssociationViewmodel(
           onFailure = { exception ->
             Log.e("CreateAssoViewModel", "Failed to get users:${exception.message}")
           })
-    } else {
-      _uiState.value = _uiState.value.copy(memberError = null)
-    }
   }
 
   /*

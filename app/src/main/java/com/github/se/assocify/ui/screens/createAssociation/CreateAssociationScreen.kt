@@ -161,12 +161,12 @@ fun CreateAssociationScreen(
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
-                        state = UserSearchState(
-                            searchValue = state.searchMember,
-                            userList = state.searchMemberList,
-                            user = state.editMember?.user,
-                            errorText = state.memberError?.let { { Text(it) } }
-                        ),
+                        state =
+                            UserSearchState(
+                                searchValue = state.searchMember,
+                                userList = state.searchMemberList,
+                                user = state.editMember?.user,
+                                errorText = state.memberError?.let { { Text(it) } }),
                         onUserSearch = { viewmodel.searchMember(it) },
                         onUserSelect = { viewmodel.selectMember(it) },
                         onUserDismiss = { viewmodel.dismissMemberSearch() },
