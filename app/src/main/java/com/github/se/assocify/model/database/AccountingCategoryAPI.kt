@@ -6,7 +6,7 @@ import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-class AccountingCategoriesAPI(val db: SupabaseClient) : SupabaseApi() {
+class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
 
   val collection_name_category = "accounting_category"
 

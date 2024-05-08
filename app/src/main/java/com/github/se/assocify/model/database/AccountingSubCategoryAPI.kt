@@ -12,17 +12,17 @@ import kotlinx.serialization.Serializable
  * @property db the Supabase client
  */
 class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
-  val collection = "accounting_subcategory"
+  private val collection = "accounting_subcategory"
 
   /**
-   * Get the subcategories of a category
+   * Get the subcategories of an association
    *
    * @param categoryUID the unique identifier of the category
    * @param onSuccess the callback to be called when the subcategories are retrieved
    * @param onFailure the callback to be called when the subcategories could not be retrieved
    */
   fun getSubCategories(
-      categoryUID: String,
+      associationUID: String,
       onSuccess: (List<AccountingSubCategory>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
@@ -30,7 +30,7 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       val subCategories =
           db.postgrest
               .from(collection)
-              .select { filter { SupabaseAccountingSubCategory::categoryUID eq categoryUID } }
+              .select { filter { SupabaseAccountingSubCategory::associationUID eq associationUID } }
               .decodeList<SupabaseAccountingSubCategory>()
       onSuccess(subCategories.map { it.toAccountingSubCategory() })
     }
@@ -39,12 +39,14 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
   /**
    * Add a subcategory to a category
    *
+   * @param associationUID the unique identifier of the association
    * @param categoryUID the unique identifier of the category
    * @param subCategory the subcategory to add
    * @param onSuccess the callback to be called when the subcategory is added
    * @param onFailure the callback to be called when the subcategory could not be added
    */
   fun addSubCategory(
+      associationUID: String,
       categoryUID: String,
       subCategory: AccountingSubCategory,
       onSuccess: () -> Unit,
@@ -57,8 +59,10 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
               SupabaseAccountingSubCategory(
                   uid = subCategory.uid,
                   categoryUID = categoryUID,
+                  associationUID = associationUID,
                   name = subCategory.name,
                   amount = subCategory.amount))
+
       onSuccess()
     }
   }
@@ -117,10 +121,11 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
 data class SupabaseAccountingSubCategory(
     @SerialName("uid") val uid: String,
     @SerialName("category_uid") val categoryUID: String,
+    @SerialName("association_uid") val associationUID: String,
     @SerialName("name") val name: String,
     @SerialName("amount") val amount: Int
 ) {
   fun toAccountingSubCategory(): AccountingSubCategory {
-    return AccountingSubCategory(uid = uid, name = name, amount = amount)
+    return AccountingSubCategory(uid = uid, name = name, amount = amount, categoryUID = categoryUID)
   }
 }

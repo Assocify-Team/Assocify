@@ -44,20 +44,11 @@ class EventScreenViewModel(
   }
 
   /**
-   * Display or hide the search bar
-   *
-   * @param searching display the searchbar or not
-   */
-  fun modifySearchingState(searching: Boolean) {
-    _uiState.value = _uiState.value.copy(stateBarDisplay = searching)
-  }
-
-  /**
    * Modify the current search query
    *
    * @param query the new query
    */
-  fun modifySearchQuery(query: String) {
+  fun setSearchQuery(query: String) {
     _uiState.value = _uiState.value.copy(searchQuery = query)
   }
 
@@ -67,7 +58,6 @@ class EventScreenViewModel(
    * @param tab the tab we want to switch to
    */
   fun switchTab(tab: EventPageIndex) {
-    deactivateSearch()
     _uiState.value = _uiState.value.copy(currentTab = tab)
   }
 
@@ -97,51 +87,19 @@ class EventScreenViewModel(
     return _uiState.value.selectedEvents.contains(event)
   }
 
-  /** Stop performing the search and hide the searchbar */
-  fun deactivateSearch() {
-    when (_uiState.value.currentTab) {
-      EventPageIndex.TASKS -> {
-        taskListViewModel.search("")
-        _uiState.value = _uiState.value.copy(searchQuery = "")
-        modifySearchingState(false)
-      }
-      EventPageIndex.MAP -> {
-        /*TODO: implement for map screen*/
-      }
-      EventPageIndex.SCHEDULE -> {
-        /*TODO: implement for schedule screen*/
-      }
-    }
-  }
-
   /** Filter the elements from the current tab depending on the current search query */
   fun searchTaskLists() {
     when (_uiState.value.currentTab) {
-      EventPageIndex.TASKS -> {
+      EventPageIndex.Tasks -> {
         taskListViewModel.search(_uiState.value.searchQuery)
       }
-      EventPageIndex.MAP -> {
+      EventPageIndex.Map -> {
         /*TODO: implement for map screen*/
       }
-      EventPageIndex.SCHEDULE -> {
+      EventPageIndex.Schedule -> {
         /*TODO: implement for schedule screen*/
       }
     }
-  }
-}
-
-/**
- * The page index of the current event
- *
- * @param index the index of the event
- */
-enum class EventPageIndex(val index: Int) {
-  TASKS(0),
-  MAP(1),
-  SCHEDULE(2);
-
-  companion object {
-    val NUMBER_OF_PAGES: Int = entries.size
   }
 }
 
@@ -161,7 +119,14 @@ data class EventScreenState(
     val stateBarDisplay: Boolean = false,
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
-    val currentTab: EventPageIndex = EventPageIndex.TASKS,
+    val currentTab: EventPageIndex = EventPageIndex.Tasks,
     val error: Boolean = false,
     val errorText: String = ""
 )
+
+/** Event tabs */
+enum class EventPageIndex {
+  Tasks,
+  Map,
+  Schedule
+}

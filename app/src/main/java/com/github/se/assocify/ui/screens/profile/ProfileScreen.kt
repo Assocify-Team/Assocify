@@ -19,12 +19,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,6 +56,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.MainNavigationBar
+import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
 /**
@@ -81,17 +80,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
             tabList = MAIN_TABS_LIST,
             selectedTab = Destination.Profile)
       },
-      topBar = {
-        CenterAlignedTopAppBar(
-            title = { Text("Profile") },
-            navigationIcon = {
-              IconButton(onClick = { /* TODO onAssoClick ?? */}) {
-                Icon(
-                    imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = "Association Profile Icon")
-              }
-            })
-      },
+      topBar = { MainTopBar(title = "Profile", optInSearchBar = false) },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp),
       snackbarHost = {
         SnackbarHost(

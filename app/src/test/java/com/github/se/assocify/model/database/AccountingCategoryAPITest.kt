@@ -20,7 +20,7 @@ import org.junit.Test
 class AccountingCategoryAPITest {
 
   @get:Rule val mockkRule = MockKRule(this)
-  lateinit var api: AccountingCategoriesAPI
+  lateinit var api: AccountingCategoryAPI
   private var error = false
   private var response = ""
   private var responseHeaders = Headers.Empty
@@ -29,7 +29,7 @@ class AccountingCategoryAPITest {
   fun setUp() {
     APITestUtils.setup()
     api =
-        AccountingCategoriesAPI(
+        AccountingCategoryAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
 

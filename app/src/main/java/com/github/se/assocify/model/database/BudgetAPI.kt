@@ -127,7 +127,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
           description = description,
           year = year,
           // TODO: Implement the accounting sub category deserialize and serialize
-          category = AccountingSubCategory("", "", 0),
+          category = AccountingSubCategory("", "", "", 0),
           tva = TVA.floatToTVA(tva))
     }
   }

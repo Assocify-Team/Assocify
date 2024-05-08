@@ -2,7 +2,7 @@ package com.github.se.assocify.ui.screens.treasury
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.github.se.assocify.model.database.AccountingCategoriesAPI
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.navigation.Destination
@@ -15,7 +15,7 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGra
 fun NavGraphBuilder.treasuryGraph(
     navigationActions: NavigationActions,
     budgetAPI: BudgetAPI,
-    accountingCategoriesAPI: AccountingCategoriesAPI,
+    accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
   composable(

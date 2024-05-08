@@ -2,7 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.database.AccountingCategoriesAPI
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @param accountingSubCategoryAPI the accounting subcategory api
  */
 class BudgetViewModel(
-    private var accountingCategoryAPI: AccountingCategoriesAPI,
+    private var accountingCategoryAPI: AccountingCategoryAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) : ViewModel() {
 
@@ -38,23 +38,39 @@ class BudgetViewModel(
         {})
 
     // Sets the subcategory list in the state from the database if a category is selected
-    if (_uiState.value.selectedCatUid != "") {
-      accountingSubCategoryAPI.getSubCategories(
-          _uiState.value.selectedCatUid,
-          { subCategoryList ->
+    accountingSubCategoryAPI.getSubCategories(
+        CurrentUser.associationUid!!,
+        { subCategoryList ->
+          // If the global category is selected, display all subcategories
+          if (_uiState.value.globalSelected) {
             _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
-          },
-          {})
-    }
+          } else {
+            _uiState.value =
+                _uiState.value.copy(
+                    subCategoryList =
+                        subCategoryList.filter { it.categoryUID == _uiState.value.selectedCatUid })
+          }
+        },
+        {})
   }
 
-  /** Function to update the subcategories list when a category is selected */
+  /**
+   * Function to update the subcategories list when a category is selected
+   *
+   * @param categoryName: The name of the selected category
+   */
   fun onSelectedCategory(categoryName: String) {
-    if (categoryName == "Global") {}
-
-    val category = _uiState.value.categoryList.find { it.name == categoryName } ?: return
-    _uiState.value = _uiState.value.copy(selectedCatUid = category.uid)
-    updateDatabaseValues()
+    // if the category is global, display all subcategories
+    if (categoryName == "Global") {
+      _uiState.value = _uiState.value.copy(globalSelected = true)
+      updateDatabaseValues()
+    } else {
+      _uiState.value = _uiState.value.copy(globalSelected = false)
+      _uiState.value =
+          _uiState.value.copy(
+              selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid)
+      updateDatabaseValues()
+    }
   }
 }
 
@@ -64,9 +80,11 @@ class BudgetViewModel(
  * @param categoryList: The list of accounting categories
  * @param selectedCatUid: The selected category unique identifier
  * @param subCategoryList: The list of accounting subcategories
+ * @param globalSelected: Whether the global category is selected
  */
 data class BudgetState(
     val categoryList: List<AccountingCategory> = emptyList(),
     val selectedCatUid: String = "",
-    val subCategoryList: List<AccountingSubCategory> = emptyList()
+    val subCategoryList: List<AccountingSubCategory> = emptyList(),
+    val globalSelected: Boolean = true,
 )
