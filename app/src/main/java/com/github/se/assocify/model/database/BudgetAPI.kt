@@ -1,9 +1,17 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.entities.AccountingCategory
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.from
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
+
+  val collectionName = "budget_item"
   /**
    * Get the budget of an association
    *
@@ -16,7 +24,13 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<BudgetItem>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    // TODO("Not yet implemented")
+    tryAsync(onFailure) {
+      val response =
+          db.from(collectionName)
+              .select { filter { SupabaseBudgetItem::associationUID eq associationUID } }
+              .decodeList<SupabaseBudgetItem>()
+      onSuccess(response.map { it.toBudgetItem() })
+    }
   }
 
   /**
@@ -30,7 +44,20 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    // TODO("Not yet implemented")
+    tryAsync(onFailure) {
+      db.from(collectionName)
+          .insert(
+              SupabaseBudgetItem(
+                  itemUID = budgetItem.uid,
+                  associationUID = associationUID,
+                  name = budgetItem.nameItem,
+                  description = budgetItem.description,
+                  amount = budgetItem.amount,
+                  year = budgetItem.year,
+                  tva = budgetItem.tva.rate,
+                  category = budgetItem.category.name))
+      onSuccess()
+    }
   }
   /**
    * Update a budget item
@@ -46,7 +73,23 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    // TODO("Not yet implemented")
+    tryAsync(onFailure) {
+      db.from(collectionName).update({
+        BudgetAPI.SupabaseBudgetItem::name setTo budgetItem.nameItem
+        BudgetAPI.SupabaseBudgetItem::description setTo budgetItem.description
+        BudgetAPI.SupabaseBudgetItem::amount setTo budgetItem.amount
+        BudgetAPI.SupabaseBudgetItem::year setTo budgetItem.year
+        BudgetAPI.SupabaseBudgetItem::tva setTo budgetItem.tva.rate
+        // TODO : Implement the category well when it's possible
+        BudgetAPI.SupabaseBudgetItem::category setTo budgetItem.category.name
+      }) {
+        filter {
+          BudgetAPI.SupabaseBudgetItem::associationUID eq associationUID
+          SupabaseBudgetItem::itemUID eq budgetItem.uid
+        }
+      }
+      onSuccess()
+    }
   }
   /**
    * Delete a budget item
@@ -60,6 +103,33 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    // TODO("Not yet implemented")
+    tryAsync(onFailure) {
+      db.from(collectionName).delete { filter { SupabaseBudgetItem::itemUID eq budgetItemUID } }
+      onSuccess()
+    }
+  }
+
+  @Serializable
+  data class SupabaseBudgetItem(
+      @SerialName("item_uid") val itemUID: String,
+      @SerialName("association_uid") val associationUID: String,
+      val name: String,
+      val description: String,
+      val amount: Int,
+      val year: Int,
+      val tva: Float,
+      val category: String
+  ) {
+    fun toBudgetItem(): BudgetItem {
+      return BudgetItem(
+          uid = itemUID,
+          nameItem = name,
+          amount = amount,
+          description = description,
+          year = year,
+          // TODO: Implement the accounting sub category deserialize and serialize
+          category = AccountingSubCategory("", "", AccountingCategory(""), 0),
+          tva = TVA.floatToTVA(tva))
+    }
   }
 }
