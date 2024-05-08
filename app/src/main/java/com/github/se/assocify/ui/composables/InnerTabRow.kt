@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
@@ -28,7 +27,7 @@ import kotlinx.coroutines.launch
  * @param pagerState The state of the pager.
  * @param switchTab The action to perform when the tab is switched.
  */
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun <T : Enum<*>> InnerTabRow(tabList: List<T>, pagerState: PagerState, switchTab: (T) -> Unit) {
   val coroutineRoute = rememberCoroutineScope()

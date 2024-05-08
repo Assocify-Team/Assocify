@@ -21,7 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 
-/** Main tab top bar */
+/** Main tab top bar
+ *
+ * @param title The title of the top bar
+ * @param optInSearchBar Whether to include a search bar
+ * @param query The search query
+ * @param onQueryChange The action to perform when the query changes
+ * @param onSearch The action to perform when the search is performed
+ * @param page The current page
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
