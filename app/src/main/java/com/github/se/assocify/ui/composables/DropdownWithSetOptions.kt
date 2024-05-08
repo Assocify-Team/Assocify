@@ -36,15 +36,15 @@ fun DropdownWithSetOptions(
 
   ExposedDropdownMenuBox(
       expanded = opened,
-      onExpandedChange = { if (options.isNotEmpty()) onOpenedChange(true) },
+      onExpandedChange = { if (options.size > 1) onOpenedChange(true) },
       modifier = modifier) {
         OutlinedTextField(
-            enabled = options.isNotEmpty(),
+            enabled = options.size > 1,
             value = selectedOption.name,
             onValueChange = {},
             readOnly = true,
             trailingIcon = {
-              if (options.isNotEmpty()) ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened)
+              if (options.size > 1) ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened)
             },
             modifier = Modifier.menuAnchor(),
             leadingIcon = leadIcon)

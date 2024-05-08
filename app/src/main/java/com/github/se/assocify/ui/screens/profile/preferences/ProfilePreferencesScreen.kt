@@ -52,6 +52,7 @@ fun ProfilePreferencesScreen(navActions: NavigationActions) {
   var sliderPosition by remember { mutableFloatStateOf(15f) }
 
   var openLanguageDropdown by remember { mutableStateOf(false) }
+  val languageOptions = listOf(DropdownOption("English", "English"))
   var selectedLanguage by remember { mutableStateOf("English") }
 
   Scaffold(
@@ -117,7 +118,7 @@ fun ProfilePreferencesScreen(navActions: NavigationActions) {
           Text(text = "Language", style = MaterialTheme.typography.titleMedium)
 
           DropdownWithSetOptions(
-              options = emptyList(),
+              options = languageOptions,
               selectedOption = DropdownOption(selectedLanguage, selectedLanguage),
               opened = openLanguageDropdown,
               onOpenedChange = { openLanguageDropdown = it },
