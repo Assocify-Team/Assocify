@@ -53,13 +53,13 @@ class AccountingSubCategoryTest {
                     {
                         "uid": "13379999-0000-0000-0000-000000000000",
                         "category_uid": "13379999-0000-0000-0000-000000000000",
+                        "association_uid": "cb7b1079-cb62-40b9-9f35-7667fea4748d",
                         "name": "Test SubCategory",
                         "amount": 1
                     }
                 ]
             """
             .trimIndent()
-
     api.getSubCategories("cb7b1079-cb62-40b9-9f35-7667fea4748d", onSuccess, onFailure)
 
     verify(timeout = 400) { onSuccess(any()) }
@@ -75,7 +75,8 @@ class AccountingSubCategoryTest {
     response = ""
     api.addSubCategory(
         "cb7b1079-cb62-40b9-9f35-7667fea4748d",
-        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        "cb7b1079-cb62-40b9-9f35-7667fea4748d",
+        AccountingSubCategory("13379999-0000-0000-0000-000000000000","13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
@@ -90,7 +91,7 @@ class AccountingSubCategoryTest {
     error = false
     response = ""
     api.deleteSubCategory(
-        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", "", 2),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
@@ -106,7 +107,7 @@ class AccountingSubCategoryTest {
     response = ""
     api.updateSubCategory(
         "cb7b1079-cb62-40b9-9f35-7667fea4748d",
-        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
+        AccountingSubCategory("cb7b1079-cb62-40b9-9f35-7667fea4748d","13379999-0000-0000-0000-000000000000", "Test SubCategory", 1),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
