@@ -22,6 +22,15 @@ class TreasuryViewModel(
     _uiState.value = _uiState.value.copy(searchQuery = query)
   }
 
+  /**
+   * Switch to a different tab
+   *
+   * @param tab the tab we want to switch to
+   */
+  fun switchTab(tab: TreasuryPageIndex) {
+    _uiState.value = _uiState.value.copy(currentTab = tab)
+  }
+
   fun onSearch(currentPage: Int) {
     when (currentPage) {
       TreasuryPageIndex.Receipts.ordinal -> {
@@ -33,6 +42,21 @@ class TreasuryViewModel(
   }
 }
 
+/**
+ * Treasury screen UI state
+ *
+ * @param searchQuery the current search query
+ */
 data class TreasuryUIState(
     val searchQuery: String = "",
+    val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts
 )
+
+/**
+ * Treasury tabs
+ */
+enum class TreasuryPageIndex {
+  Receipts,
+  Budget,
+  Balance
+}

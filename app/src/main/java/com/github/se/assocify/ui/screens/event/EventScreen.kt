@@ -61,7 +61,7 @@ fun EventScreen(
             title = "Event",
             optInSearchBar = true,
             query = state.searchQuery,
-            onQueryChange = { eventScreenViewModel.modifySearchQuery(it) },
+            onQueryChange = { eventScreenViewModel.setSearchQuery(it) },
             onSearch = { eventScreenViewModel.searchTaskLists() },
             page = state.currentTab.ordinal)
       },
