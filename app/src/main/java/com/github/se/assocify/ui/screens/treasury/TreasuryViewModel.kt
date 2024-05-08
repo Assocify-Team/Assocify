@@ -52,9 +52,7 @@ data class TreasuryUIState(
     val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts
 )
 
-/**
- * Treasury tabs
- */
+/** Treasury tabs */
 enum class TreasuryPageIndex {
   Receipts,
   Budget,

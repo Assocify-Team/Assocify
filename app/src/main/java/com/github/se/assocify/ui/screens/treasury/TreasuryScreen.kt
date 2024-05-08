@@ -89,7 +89,7 @@ fun TreasuryScreen(
           InnerTabRow(
               tabList = TreasuryPageIndex.entries,
               pagerState = pagerState,
-              switchTab = { tab ->  treasuryViewModel.switchTab(tab) })
+              switchTab = { tab -> treasuryViewModel.switchTab(tab) })
 
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}

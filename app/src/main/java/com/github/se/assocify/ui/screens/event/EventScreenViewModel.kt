@@ -124,10 +124,7 @@ data class EventScreenState(
     val errorText: String = ""
 )
 
-/**
- * Event tabs
- *
- */
+/** Event tabs */
 enum class EventPageIndex {
   Tasks,
   Map,
