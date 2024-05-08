@@ -100,15 +100,15 @@ class EventScreenViewModel(
   /** Stop performing the search and hide the searchbar */
   fun deactivateSearch() {
     when (_uiState.value.currentTab) {
-      EventPageIndex.TASKS -> {
+      EventPageIndex.Tasks -> {
         taskListViewModel.search("")
         _uiState.value = _uiState.value.copy(searchQuery = "")
         modifySearchingState(false)
       }
-      EventPageIndex.MAP -> {
+      EventPageIndex.Map -> {
         /*TODO: implement for map screen*/
       }
-      EventPageIndex.SCHEDULE -> {
+      EventPageIndex.Schedule -> {
         /*TODO: implement for schedule screen*/
       }
     }
@@ -117,13 +117,13 @@ class EventScreenViewModel(
   /** Filter the elements from the current tab depending on the current search query */
   fun searchTaskLists() {
     when (_uiState.value.currentTab) {
-      EventPageIndex.TASKS -> {
+      EventPageIndex.Tasks -> {
         taskListViewModel.search(_uiState.value.searchQuery)
       }
-      EventPageIndex.MAP -> {
+      EventPageIndex.Map -> {
         /*TODO: implement for map screen*/
       }
-      EventPageIndex.SCHEDULE -> {
+      EventPageIndex.Schedule -> {
         /*TODO: implement for schedule screen*/
       }
     }
@@ -135,14 +135,10 @@ class EventScreenViewModel(
  *
  * @param index the index of the event
  */
-enum class EventPageIndex(val index: Int) {
-  TASKS(0),
-  MAP(1),
-  SCHEDULE(2);
-
-  companion object {
-    val NUMBER_OF_PAGES: Int = entries.size
-  }
+enum class EventPageIndex {
+  Tasks,
+  Map,
+  Schedule
 }
 
 /**
@@ -161,7 +157,7 @@ data class EventScreenState(
     val stateBarDisplay: Boolean = false,
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
-    val currentTab: EventPageIndex = EventPageIndex.TASKS,
+    val currentTab: EventPageIndex = EventPageIndex.Tasks,
     val error: Boolean = false,
     val errorText: String = ""
 )
