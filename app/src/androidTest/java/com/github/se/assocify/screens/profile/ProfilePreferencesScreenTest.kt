@@ -1,7 +1,7 @@
 package com.github.se.assocify.screens.profile
 
-import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelectable
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -58,11 +58,8 @@ class ProfilePreferencesScreenTest :
 
       onNodeWithText("Language").assertIsDisplayed()
       onNodeWithTag("languageDropdown").assertIsDisplayed()
-      onNodeWithText("English").assertIsDisplayed().assertHasClickAction()
-
-      onNodeWithText("Currency").assertIsDisplayed()
-      onNodeWithTag("currencyDropdown").assertIsDisplayed()
-      onNodeWithText("CHF").assertIsDisplayed().assertHasClickAction()
+      // Default value of language, only one implemented for now :
+      onNodeWithText("English").assertIsNotEnabled()
     }
   }
 
