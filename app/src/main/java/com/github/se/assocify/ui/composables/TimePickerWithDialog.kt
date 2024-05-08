@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
@@ -67,8 +66,7 @@ fun TimePickerWithDialog(
     onTimeSelect: (LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
-    isError: Boolean = false,
-    supportingText: @Composable (() -> Unit)? = null
+    errorText: @Composable (() -> Unit)? = null
 ) {
   var showDialog by remember { mutableStateOf(false) }
   val timePickerState = rememberTimePickerState(initialHour = 8, initialMinute = 0, is24Hour = true)
@@ -82,91 +80,98 @@ fun TimePickerWithDialog(
         readOnly = true,
         label = label,
         placeholder = { Text(TimeUtil.NULL_TIME_STRING) },
-        isError = isError,
-        supportingText = supportingText)
+        isError = errorText != null,
+        supportingText = errorText)
     Box(modifier = Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
   }
 
   val showingPicker = remember { mutableStateOf(true) }
 
-  if (showDialog) {
-    Dialog(
-        onDismissRequest = { showDialog = false },
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+  if (!showDialog) {
+    return
+  }
+
+  Dialog(
+      onDismissRequest = { showDialog = false },
+      properties = DialogProperties(usePlatformDefaultWidth = false),
+  ) {
+    Surface(
+        shape = MaterialTheme.shapes.extraLarge,
+        tonalElevation = 6.dp,
+        modifier =
+            Modifier.testTag("timePickerDialog")
+                .width(IntrinsicSize.Min)
+                .height(IntrinsicSize.Min)
+                .background(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.surface),
     ) {
-      Surface(
-          shape = MaterialTheme.shapes.extraLarge,
-          tonalElevation = 6.dp,
-          modifier =
-              Modifier.testTag("timePickerDialog")
-                  .width(IntrinsicSize.Min)
-                  .height(IntrinsicSize.Min)
-                  .background(
-                      shape = MaterialTheme.shapes.extraLarge,
-                      color = MaterialTheme.colorScheme.surface),
-      ) {
-        if (LocalConfiguration.current.screenHeightDp > 400) {
-          // Make this take the entire viewport. This will guarantee that Screen readers
-          // focus the toggle first.
-          Box(Modifier.fillMaxSize().semantics { isTraversalGroup = true }) {
-            IconButton(
-                modifier =
-                    Modifier.testTag("timePickerDialogToggle")
-                        // This is a workaround so that the Icon comes up first
-                        // in the talkback traversal order. So that users of a11y
-                        // services can use the text input. When talkback traversal
-                        // order is customizable we can remove this.
-                        .size(64.dp, 72.dp)
-                        .align(Alignment.BottomStart)
-                        .zIndex(5f),
-                onClick = { showingPicker.value = !showingPicker.value }) {
-                  val icon =
-                      if (showingPicker.value) {
-                        Icons.Outlined.Keyboard
-                      } else {
-                        Icons.Outlined.Schedule
-                      }
-                  Icon(
-                      icon,
-                      contentDescription =
-                          if (showingPicker.value) {
-                            "Switch to Text Input"
-                          } else {
-                            "Switch to Touch Input"
-                          })
-                }
-          }
-        }
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(
-                  modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
-                  text = "Select time",
-                  style = MaterialTheme.typography.labelMedium)
-              if (showingPicker.value && LocalConfiguration.current.screenHeightDp > 400) {
-                TimePicker(state = timePickerState)
-              } else {
-                TimeInput(state = timePickerState)
-              }
-              Row(modifier = Modifier.height(40.dp).fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(1f))
-                TextButton(
-                    modifier = Modifier.testTag("timePickerDialogCancel"),
-                    onClick = { showDialog = false }) {
-                      Text("Cancel")
-                    }
-                TextButton(
-                    modifier = Modifier.testTag("timePickerDialogOK"),
-                    onClick = {
-                      onTimeSelect(selectedTime)
-                      showDialog = false
-                    }) {
-                      Text("OK")
-                    }
-              }
+      TimePickerToggle(
+          showingPicker = showingPicker.value,
+          onToggle = { showingPicker.value = !showingPicker.value })
+      Column(
+          modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+                text = "Select time",
+                style = MaterialTheme.typography.labelMedium)
+
+            if (showingPicker.value) {
+              TimePicker(state = timePickerState)
+            } else {
+              TimeInput(state = timePickerState)
             }
-      }
+            Row(modifier = Modifier.height(40.dp).fillMaxWidth()) {
+              Spacer(modifier = Modifier.weight(1f))
+              TextButton(
+                  modifier = Modifier.testTag("timePickerDialogCancel"),
+                  onClick = { showDialog = false }) {
+                    Text("Cancel")
+                  }
+              TextButton(
+                  modifier = Modifier.testTag("timePickerDialogOK"),
+                  onClick = {
+                    onTimeSelect(selectedTime)
+                    showDialog = false
+                  }) {
+                    Text("OK")
+                  }
+            }
+          }
     }
+  }
+}
+
+@Composable
+fun TimePickerToggle(showingPicker: Boolean, onToggle: () -> Unit) {
+
+  val description =
+      if (showingPicker) {
+        "Switch to Text Input"
+      } else {
+        "Switch to Touch Input"
+      }
+
+  val icon =
+      if (showingPicker) {
+        Icons.Outlined.Keyboard
+      } else {
+        Icons.Outlined.Schedule
+      }
+
+  Box(Modifier.fillMaxSize().semantics { isTraversalGroup = true }) {
+    IconButton(
+        modifier =
+            Modifier.testTag("timePickerDialogToggle")
+                // This is a workaround so that the Icon comes up first
+                // in the talkback traversal order. So that users of a11y
+                // services can use the text input. When talkback traversal
+                // order is customizable we can remove this.
+                .size(64.dp, 72.dp)
+                .align(Alignment.BottomStart)
+                .zIndex(5f),
+        onClick = onToggle) {
+          Icon(icon, contentDescription = description)
+        }
   }
 }
