@@ -33,9 +33,18 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.composables.DropdownWithSetOptions
 
+/**
+ * The screen for the user to change the theme, text size, language and currency Accessed from the
+ * profile screen
+ *
+ * will change the param to only have a viewmodel once implemented :
+ *
+ * @param navActions: The navigation actions
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileThemeScreen(navActions: NavigationActions) {
+  // temporary values for the theme, text size, language and currency, waiting for the viewmodel
   val themeOptions = listOf("Light", "Dark", "System")
   var themeSelectedIndex by remember { mutableStateOf(0) }
 
@@ -99,6 +108,7 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
       },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) {
         Column(modifier = Modifier.padding(it), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+          // The theme options : color scheme of the app
           Text(
               text = "Theme",
               style = MaterialTheme.typography.titleMedium,
@@ -119,6 +129,7 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
                 }
               }
 
+          // The text size options : change the font size, from 12 to 20
           Text(
               text = "Size of text",
               style = MaterialTheme.typography.titleMedium,
@@ -140,6 +151,7 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
                     modifier = Modifier.align(Alignment.CenterVertically).weight(0.1f))
               }
 
+          // The language options : default is English, the only one supported currently
           Text(text = "Language", style = MaterialTheme.typography.titleMedium)
 
           DropdownWithSetOptions(
@@ -150,6 +162,7 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
               onSelectOption = { selectedLanguage = it.name },
               modifier = Modifier.testTag("languageDropdown").align(CenterHorizontally))
 
+          // The currency options : default is CHF
           Text(text = "Currency", style = MaterialTheme.typography.titleMedium)
 
           DropdownWithSetOptions(
