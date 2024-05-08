@@ -26,8 +26,8 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
   val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
   val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
-    val accountingCategoriesAPI = AccountingCategoriesAPI(SupabaseClient.supabaseClient)
-    val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
+  val accountingCategoriesAPI = AccountingCategoriesAPI(SupabaseClient.supabaseClient)
+  val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
   loginSaver.loadUserInfo()
 
   val firstDest =

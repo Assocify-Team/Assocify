@@ -6,5 +6,4 @@ package com.github.se.assocify.model.entities
  * @param uid unique identifier of the category
  * @param name name of the category (ex: Pole)
  */
-
 data class AccountingCategory(val uid: String, val name: String) {}

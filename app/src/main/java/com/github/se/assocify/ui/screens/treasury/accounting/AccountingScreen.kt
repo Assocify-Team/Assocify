@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
@@ -22,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -48,66 +46,58 @@ fun AccountingScreen(
     navigationActions: NavigationActions,
     budgetViewModel: BudgetViewModel
 ) {
-    val budgetModel  by  budgetViewModel.uiState.collectAsState()
-    val subCategoryList = budgetModel.subCategoryList
+  val budgetModel by budgetViewModel.uiState.collectAsState()
+  val subCategoryList = budgetModel.subCategoryList
 
-  LazyColumn(modifier = Modifier
-      .fillMaxWidth()
-      .testTag("AccountingScreen")) {
+  LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
 
-      //list of subcategories
+    // list of subcategories
     items(subCategoryList) {
-        if(subCategoryList.isEmpty()){
-            Text(text = "No categories for the tag chosen")
-        } else {
-            DisplayLine(it, "displayLine${it.name}", page, navigationActions)
-            HorizontalDivider(Modifier.fillMaxWidth())
-        }
+      if (subCategoryList.isEmpty()) {
+        Text(text = "No categories for the tag chosen")
+      } else {
+        DisplayLine(it, "displayLine${it.name}", page, navigationActions)
+        HorizontalDivider(Modifier.fillMaxWidth())
+      }
     }
 
-      //display total amount of the budget
-      if(subCategoryList.isNotEmpty()) {
-          item {
-              TotalLine(totalAmount = subCategoryList.sumOf { it.amount })
-          }
-      }
+    // display total amount of the budget
+    if (subCategoryList.isNotEmpty()) {
+      item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
+    }
   }
 }
 
 /**
  * The filter bar of the accounting screen
+ *
  * @param budgetViewModel: The view model for the budget screen
  */
 @Composable
 fun AccountingFilterBar(budgetViewModel: BudgetViewModel) {
-    val model by budgetViewModel.uiState.collectAsState()
+  val model by budgetViewModel.uiState.collectAsState()
 
-    //filter bar lists
+  // filter bar lists
   val yearList = listOf("2023", "2022", "2021")
   val tvaList: List<String> = listOf("TTC", "HT")
-    val categoryList = model.categoryList.map { it.name }
+  val categoryList = model.categoryList.map { it.name }
 
-    //selected filters
-    var selectedYear by remember { mutableStateOf(yearList.first()) }
+  // selected filters
+  var selectedYear by remember { mutableStateOf(yearList.first()) }
   var selectedCategory by remember { mutableStateOf(categoryList.first()) }
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
-    //Row of dropdown filters
-  Row(
-      Modifier
-          .testTag("filterRow")
-          .horizontalScroll(rememberScrollState())) {
-        DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") { selectedYear = it }
-      DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
-              selectedCategory = it
-              budgetViewModel.onSelectedCategory(selectedCategory)
-          }
-          // TODO: change amount given TVA
-          DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { selectedTVA = it }
-      }
-
+  // Row of dropdown filters
+  Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
+    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") { selectedYear = it }
+    DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
+      selectedCategory = it
+      budgetViewModel.onSelectedCategory(selectedCategory)
+    }
+    // TODO: change amount given TVA
+    DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { selectedTVA = it }
+  }
 }
-
 
 /**
  * A line displaying the total amount of the budget
@@ -117,9 +107,7 @@ fun AccountingFilterBar(budgetViewModel: BudgetViewModel) {
 @Composable
 fun TotalLine(totalAmount: Int) {
   ListItem(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("totalLine"),
+      modifier = Modifier.fillMaxWidth().testTag("totalLine"),
       headlineContent = {
         Text(
             text = "Total",
@@ -154,16 +142,13 @@ fun DisplayLine(
       modifier =
           // TODO: change category.name to category.uid when AccountingSubCategoryAPI will be
           // implemented
-      Modifier
-          .clickable {
-              if (page == AccountingPage.BUDGET) {
+          Modifier.clickable {
+                if (page == AccountingPage.BUDGET) {
                   navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
-              } else {
+                } else {
                   navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
+                }
               }
-          }
-          .testTag(testTag),
+              .testTag(testTag),
   )
-
-
 }
