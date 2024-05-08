@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
@@ -51,19 +52,20 @@ fun AccountingScreen(
 
   LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
 
-    // list of subcategories
-    items(subCategoryList) {
-      if (subCategoryList.isEmpty()) {
-        Text(text = "No categories for the tag chosen")
-      } else {
-        DisplayLine(it, "displayLine${it.name}", page, navigationActions)
-        HorizontalDivider(Modifier.fillMaxWidth())
-      }
-    }
-
-    // display total amount of the budget
+    //display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
+        items(subCategoryList) {
+            DisplayLine(it, "displayLine${it.name}", page, navigationActions)
+            HorizontalDivider(Modifier.fillMaxWidth())
+        }
       item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
+    } else {
+        item {
+            Text(
+                text = "No data available with this tag",
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+        }
+
     }
   }
 }
@@ -80,7 +82,7 @@ fun AccountingFilterBar(budgetViewModel: BudgetViewModel) {
   // filter bar lists
   val yearList = listOf("2023", "2022", "2021")
   val tvaList: List<String> = listOf("TTC", "HT")
-  val categoryList = model.categoryList.map { it.name }
+  val categoryList = listOf("Global") + model.categoryList.map { it.name }
 
   // selected filters
   var selectedYear by remember { mutableStateOf(yearList.first()) }
