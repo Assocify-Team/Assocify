@@ -81,7 +81,7 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
 
   var openCurrencyDropdown by remember { mutableStateOf(false) }
   val currencyOptions = listOf("CHF", "USD", "EUR")
-  var selectedCurrency by remember { mutableStateOf(currencyOptions[1]) }
+  var selectedCurrency by remember { mutableStateOf(currencyOptions[0]) }
 
   Scaffold(
       modifier = Modifier.testTag("themeScreen"),
@@ -99,7 +99,10 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
       },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) {
         Column(modifier = Modifier.padding(it), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-          Text(text = "Theme", style = MaterialTheme.typography.titleMedium)
+          Text(
+              text = "Theme",
+              style = MaterialTheme.typography.titleMedium,
+              modifier = Modifier.testTag("themeTitle"))
 
           SingleChoiceSegmentedButtonRow(
               modifier = Modifier.testTag("themeSegmentedButtonRow").align(CenterHorizontally)) {
@@ -109,9 +112,10 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
                           SegmentedButtonDefaults.itemShape(
                               index = index, count = themeOptions.size),
                       onClick = { themeSelectedIndex = index },
-                      selected = index == themeSelectedIndex) {
-                        Text(label)
-                      }
+                      selected = index == themeSelectedIndex,
+                  ) {
+                    Text(label)
+                  }
                 }
               }
 

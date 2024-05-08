@@ -57,8 +57,4 @@ fun DropdownWithSetOptions(
       }
 }
 
-data class DropdownOption(val name: String, val uid: String) {
-  override fun toString(): String {
-    return name
-  }
-}
+data class DropdownOption(val name: String, val uid: String)

@@ -1,8 +1,12 @@
 package com.github.se.assocify.screens.profile
 
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelectable
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
@@ -37,7 +41,28 @@ class ProfileThemeScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
   @Test
   fun display() {
-    with(composeTestRule) { onNodeWithTag("themeScreen").assertIsDisplayed() }
+    with(composeTestRule) {
+      onNodeWithTag("themeScreen").assertIsDisplayed()
+
+      onNodeWithTag("themeTitle").assertIsDisplayed()
+      onNodeWithTag("themeSegmentedButtonRow").assertIsDisplayed()
+      listOf("Light", "Dark", "System").forEach {
+        onNodeWithText(text = it).assertIsDisplayed().assertIsSelectable()
+      }
+      onNodeWithText(text = "Light").assertIsSelected()
+
+      onNodeWithTag("textSize").assertIsDisplayed()
+      onNodeWithTag("textSizeSlider").assertIsDisplayed()
+      onNodeWithText("15").assertIsDisplayed() // Default value of text size
+
+      onNodeWithText("Language").assertIsDisplayed()
+      onNodeWithTag("languageDropdown").assertIsDisplayed()
+      onNodeWithText("English").assertIsDisplayed().assertHasClickAction()
+
+      onNodeWithText("Currency").assertIsDisplayed()
+      onNodeWithTag("currencyDropdown").assertIsDisplayed()
+      onNodeWithText("CHF").assertIsDisplayed().assertHasClickAction()
+    }
   }
 
   @Test
