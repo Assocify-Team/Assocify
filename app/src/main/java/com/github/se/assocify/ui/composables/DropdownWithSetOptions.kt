@@ -51,7 +51,7 @@ fun DropdownWithSetOptions(
                   onOpenedChange(false)
                 },
                 leadingIcon = leadIcon,
-                modifier = Modifier.testTag("DropdownItem-${item}"))
+                modifier = Modifier.testTag("DropdownItem-${item.uid}"))
           }
         }
       }

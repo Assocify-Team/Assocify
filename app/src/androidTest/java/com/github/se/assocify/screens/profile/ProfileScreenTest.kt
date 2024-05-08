@@ -119,8 +119,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
-      onNodeWithTag("associationDropdownItem-${asso1.uid}").assertIsDisplayed()
-      onNodeWithTag("associationDropdownItem-${asso2.uid}").assertIsDisplayed()
+      onNodeWithTag("DropdownItem-${asso1.uid}").assertIsDisplayed()
+      onNodeWithTag("DropdownItem-${asso2.uid}").assertIsDisplayed()
     }
   }
 
@@ -157,8 +157,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   fun changeAssociation() {
     with(composeTestRule) {
       onNodeWithTag("associationDropdown").assertIsDisplayed().performClick()
-      onNodeWithTag("associationDropdownItem-${asso2.uid}").performClick()
-      assert(mViewmodel.uiState.value.selectedAssociation == asso2)
+      onNodeWithTag("DropdownItem-${asso2.uid}").performClick()
+      assert(mViewmodel.uiState.value.selectedAssociation.name == asso2.name)
       assert(CurrentUser.associationUid == asso2.uid)
     }
   }
