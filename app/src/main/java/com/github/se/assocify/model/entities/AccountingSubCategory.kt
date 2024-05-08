@@ -8,4 +8,7 @@ package com.github.se.assocify.model.entities
  * @param name name of the subcategory (ex: Logistics Pole)
  * @param amount total amount of the subcategory
  */
-data class AccountingSubCategory(val uid: String, val name: String, val amount: Int)
+data class AccountingSubCategory(val uid: String,
+                                 val categoryUID:String,
+                                 val name: String,
+                                 val amount: Int)
