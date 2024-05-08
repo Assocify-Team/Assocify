@@ -42,7 +42,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private var tabSelected = false
   private var goNotif = false
   private var goSecu = false
-  private var goTheme = false
+  private var goPref = false
   private var goMembers = false
   private var goRoles = false
 
@@ -96,7 +96,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
     every { navActions.navigateTo(Destination.ProfileNotifications) } answers { goNotif = true }
     every { navActions.navigateTo(Destination.ProfileSecurityPrivacy) } answers { goSecu = true }
-    every { navActions.navigateTo(Destination.ProfileTheme) } answers { goTheme = true }
+    every { navActions.navigateTo(Destination.ProfilePreferences) } answers { goPref = true }
     every { navActions.navigateTo(Destination.ProfileMembers) } answers { goMembers = true }
     every { navActions.navigateTo(Destination.ProfileRoles) } answers { goRoles = true }
 
@@ -112,7 +112,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("profileRole").assertIsDisplayed()
       onNodeWithTag("editProfile").assertIsDisplayed()
       onNodeWithTag("associationDropdown").assertIsDisplayed()
-      onNodeWithTag("Theme").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Preferences").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Members").performScrollTo().assertIsDisplayed()
@@ -176,8 +176,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun navigateToSubScreen() {
     with(composeTestRule) {
-      onNodeWithTag("Theme").performClick()
-      assert(goTheme)
+      onNodeWithTag("Preferences").performClick()
+      assert(goPref)
 
       onNodeWithTag("Privacy").performClick()
       assert(goSecu)

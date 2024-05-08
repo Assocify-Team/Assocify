@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.profile.theme
+package com.github.se.assocify.ui.screens.profile.preferences
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,7 +43,7 @@ import com.github.se.assocify.ui.composables.DropdownWithSetOptions
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileThemeScreen(navActions: NavigationActions) {
+fun ProfilePreferencesScreen(navActions: NavigationActions) {
   // temporary values for the theme, text size, language and currency, waiting for the viewmodel
   val themeOptions = listOf("Light", "Dark", "System")
   var themeSelectedIndex by remember { mutableStateOf(0) }
@@ -93,7 +93,7 @@ fun ProfileThemeScreen(navActions: NavigationActions) {
   var selectedCurrency by remember { mutableStateOf(currencyOptions[0]) }
 
   Scaffold(
-      modifier = Modifier.testTag("themeScreen"),
+      modifier = Modifier.testTag("preferencesScreen"),
       topBar = {
         CenterAlignedTopAppBar(
             title = { Text("Preferences settings") },

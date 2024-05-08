@@ -197,13 +197,13 @@ data class ProfileUIState(
  * icon corresponding to the setting.
  */
 enum class MySettings {
-  Theme,
+  Preferences,
   Privacy,
   Notifications;
 
   fun getIcon(): ImageVector {
     return when (this) {
-      Theme -> Icons.Default.LightMode
+      Preferences -> Icons.Default.LightMode
       Privacy -> Icons.Default.Lock
       Notifications -> Icons.Default.Notifications
     }
@@ -211,7 +211,7 @@ enum class MySettings {
 
   fun getDestination(): Destination {
     return when (this) {
-      Theme -> Destination.ProfileTheme
+      Preferences -> Destination.ProfilePreferences
       Privacy -> Destination.ProfileSecurityPrivacy
       Notifications -> Destination.ProfileNotifications
     }

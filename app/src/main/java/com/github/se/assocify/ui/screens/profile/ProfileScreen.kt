@@ -61,8 +61,8 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
 /**
  * Profile screen that displays the user's information, a way to change your current association and
- * settings : personal settings (theme, privacy/security, notifications) which lead to other pages
- * and association's settings (if admin).
+ * settings : personal settings (preferences, privacy/security, notifications) which lead to other
+ * pages and association's settings (if admin).
  *
  * @param navActions: NavigationActions object that contains the navigation actions.
  * @param viewmodel: ProfileViewModel object that contains the logic of the profile screen.

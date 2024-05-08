@@ -11,7 +11,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.profile.theme.ProfileThemeScreen
+import com.github.se.assocify.ui.screens.profile.preferences.ProfilePreferencesScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -23,7 +23,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ProfileThemeScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class ProfilePreferencesScreenTest :
+    TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
   private val navActions = mockk<NavigationActions>()
@@ -36,13 +37,13 @@ class ProfileThemeScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
     every { navActions.back() } answers { goBack = true }
 
-    composeTestRule.setContent { ProfileThemeScreen(navActions = navActions) }
+    composeTestRule.setContent { ProfilePreferencesScreen(navActions = navActions) }
   }
 
   @Test
   fun display() {
     with(composeTestRule) {
-      onNodeWithTag("themeScreen").assertIsDisplayed()
+      onNodeWithTag("preferencesScreen").assertIsDisplayed()
 
       onNodeWithTag("themeTitle").assertIsDisplayed()
       onNodeWithTag("themeSegmentedButtonRow").assertIsDisplayed()
