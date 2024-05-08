@@ -30,10 +30,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoriesAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -46,7 +44,6 @@ import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewMo
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 // Index of each tag for navigation
 enum class TreasuryPageIndex {

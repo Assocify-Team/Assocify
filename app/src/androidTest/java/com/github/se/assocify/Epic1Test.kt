@@ -132,8 +132,9 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
 
-    private val accountingCategoriesAPI = mockk<AccountingCategoriesAPI>(relaxUnitFun = true)
-    private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
+  private val accountingCategoriesAPI = mockk<AccountingCategoriesAPI>(relaxUnitFun = true)
+  private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
+
   @Before
   fun testSetup() {
     composeTestRule.setContent {
@@ -142,7 +143,15 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       navActions = NavigationActions(navController, loginSave)
 
       TestAssocifyApp(
-          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI, accountingCategoriesAPI, accountingSubCategoryAPI)
+          navController,
+          navActions,
+          userAPI,
+          associationAPI,
+          eventAPI,
+          budgetAPI,
+          taskAPI,
+          accountingCategoriesAPI,
+          accountingSubCategoryAPI)
     }
   }
 
@@ -211,7 +220,6 @@ fun TestAssocifyApp(
     taskAPI: TaskAPI,
     accountingCategoriesAPI: AccountingCategoriesAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
-
 ) {
   CurrentUser.userUid = "1"
 

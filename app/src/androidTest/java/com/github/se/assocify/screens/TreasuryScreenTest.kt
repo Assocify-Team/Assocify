@@ -13,7 +13,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoriesAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
-import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -33,10 +32,8 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
 
   private val navActions = mockk<NavigationActions>()
   private var tabSelected = false
-  @RelaxedMockK
-  lateinit var mockAccountingCategoriesAPI: AccountingCategoriesAPI
-  @RelaxedMockK
-  lateinit var mockAccountingSubCategoriesAPI: AccountingSubCategoryAPI
+  @RelaxedMockK lateinit var mockAccountingCategoriesAPI: AccountingCategoriesAPI
+  @RelaxedMockK lateinit var mockAccountingSubCategoriesAPI: AccountingSubCategoryAPI
 
   @Before
   fun testSetup() {
@@ -44,7 +41,9 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     every { navActions.navigateTo(any()) } answers {}
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    composeTestRule.setContent { TreasuryScreen(navActions, mockAccountingCategoriesAPI, mockAccountingSubCategoriesAPI) }
+    composeTestRule.setContent {
+      TreasuryScreen(navActions, mockAccountingCategoriesAPI, mockAccountingSubCategoriesAPI)
+    }
   }
 
   @Test

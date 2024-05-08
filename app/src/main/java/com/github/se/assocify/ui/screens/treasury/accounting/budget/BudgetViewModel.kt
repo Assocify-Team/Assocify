@@ -38,36 +38,39 @@ class BudgetViewModel(
         {})
 
     // Sets the subcategory list in the state from the database if a category is selected
-      accountingSubCategoryAPI.getSubCategories(
-          CurrentUser.associationUid!!,
-          { subCategoryList ->
-              // If the global category is selected, display all subcategories
-              if(_uiState.value.globalSelected) {
-                  _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
-              } else {
-                  _uiState.value = _uiState.value.copy(
-                      subCategoryList = subCategoryList.filter { it.categoryUID == _uiState.value.selectedCatUid }
-                  )
-              }
-          },
-          {})
-    }
+    accountingSubCategoryAPI.getSubCategories(
+        CurrentUser.associationUid!!,
+        { subCategoryList ->
+          // If the global category is selected, display all subcategories
+          if (_uiState.value.globalSelected) {
+            _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
+          } else {
+            _uiState.value =
+                _uiState.value.copy(
+                    subCategoryList =
+                        subCategoryList.filter { it.categoryUID == _uiState.value.selectedCatUid })
+          }
+        },
+        {})
+  }
 
-  /** Function to update the subcategories list when a category is selected
+  /**
+   * Function to update the subcategories list when a category is selected
+   *
    * @param categoryName: The name of the selected category
-   * */
+   */
   fun onSelectedCategory(categoryName: String) {
-      //if the category is global, display all subcategories
-      if (categoryName == "Global") {
-          _uiState.value = _uiState.value.copy(globalSelected = true)
-          updateDatabaseValues()
-      } else {
-          _uiState.value = _uiState.value.copy(globalSelected = false)
-          _uiState.value = _uiState.value.copy(
-              selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid
-          )
-          updateDatabaseValues()
-      }
+    // if the category is global, display all subcategories
+    if (categoryName == "Global") {
+      _uiState.value = _uiState.value.copy(globalSelected = true)
+      updateDatabaseValues()
+    } else {
+      _uiState.value = _uiState.value.copy(globalSelected = false)
+      _uiState.value =
+          _uiState.value.copy(
+              selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid)
+      updateDatabaseValues()
+    }
   }
 }
 

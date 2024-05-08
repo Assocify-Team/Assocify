@@ -11,16 +11,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoriesAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
-import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
-import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -41,11 +38,12 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @get:Rule val mockkRule = MockKRule(this)
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  val categoryList = listOf(
-        AccountingCategory("1", "Events"),
-        AccountingCategory("2", "Pole"),
-        AccountingCategory("3", "Commissions"),
-  )
+  val categoryList =
+      listOf(
+          AccountingCategory("1", "Events"),
+          AccountingCategory("2", "Pole"),
+          AccountingCategory("3", "Commissions"),
+      )
   val subCategoryList =
       listOf(
           AccountingSubCategory("4", "2", "Administration", 30),
@@ -56,28 +54,30 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           AccountingSubCategory("9", "3", "Game*", 3000))
 
   val mockAccountingCategoryAPI: AccountingCategoriesAPI =
-    mockk<AccountingCategoriesAPI>() {
-      every { getCategories(any(), any(), any()) } answers
-              {
-                val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
-                onSuccessCallback(categoryList)
-              }
-    }
+      mockk<AccountingCategoriesAPI>() {
+        every { getCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
+              onSuccessCallback(categoryList)
+            }
+      }
 
   val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
-    mockk<AccountingSubCategoryAPI>() {
-      every { getSubCategories(any(), any(), any()) } answers
-              {
-                val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
-                onSuccessCallback(subCategoryList)
-              }
-    }
+      mockk<AccountingSubCategoryAPI>() {
+        every { getSubCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
+              onSuccessCallback(subCategoryList)
+            }
+      }
 
   lateinit var budgetViewModel: BudgetViewModel
+
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
+    budgetViewModel = BudgetViewModel(mockAccountingCategoryAPI, mockAccountingSubCategoryAPI)
     composeTestRule.setContent {
       AccountingFilterBar(budgetViewModel)
       AccountingScreen(AccountingPage.BUDGET, mockNavActions, budgetViewModel)
@@ -87,35 +87,26 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   /** Tests if the nodes are displayed */
   @Test
   fun testDisplay() {
-    // Test the accounting screen
     with(composeTestRule) {
       onNodeWithTag("AccountingScreen").assertIsDisplayed()
       onNodeWithTag("filterRow").assertIsDisplayed()
       onNodeWithTag("totalLine").assertIsDisplayed()
       onNodeWithTag("yearFilterChip").assertIsDisplayed()
       onNodeWithTag("categoryFilterChip").assertIsDisplayed()
-      //.forEach { onNodeWithTag("displayLine${it.name}").assertIsDisplayed() }
     }
   }
 
-  /**
-   * Tests if the lines are filtered according to the category
-   *
-   * @Test fun testCategoryFiltering() { with(composeTestRule) { // Initially, select the "Category"
-   *   filter to change its value to "Events" onNodeWithTag("categoryFilterChip").performClick()
-   *   onNodeWithText("Events").performClick()
-   *
-   * // Assert that only the budget lines under "Events" category are shown
-   * onNodeWithText("Balelec").assertIsDisplayed()
-   * onNodeWithText("Champachelor").assertIsDisplayed()
-   *
-   * // Assert that budget lines not under "Events" are not shown onNodeWithText("Logistic
-   * Category").assertDoesNotExist() onNodeWithText("Communication Category").assertDoesNotExist()
-   * onNodeWithText("Game*").assertDoesNotExist()
-   *
-   * // Verify the total is recalculated correctly val expectedTotal = 6000 // Sum of amounts for
-   * "Champachelor" and "Balelec" onNodeWithText("$expectedTotal").assertIsDisplayed() } }
-   */
+  /** Tests if the lines are filtered according to the category */
+  @Test
+  fun testAllSubCategoriesAreDisplayedUnderGlobal() {
+    with(composeTestRule) {
+      onNodeWithTag("categoryFilterChip").performClick()
+      onNodeWithText("Global").performClick()
+
+      // Assert that all subcategories are shown under the global
+      subCategoryList.forEach() { onNodeWithText(it.name).assertIsDisplayed() }
+    }
+  }
 
   /** Tests if filter row is scrollable */
   @Test
@@ -130,8 +121,9 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @Test
   fun testNavigateToDetailedScreen() {
     with(composeTestRule) {
-      onNodeWithText("Administration Pole").performClick()
-      verify { mockNavActions.navigateTo(Destination.BudgetDetailed("Administration Pole")) }
+      val cat = subCategoryList.filter { it.name == "Administration" }
+      onNodeWithText(cat.first().name).performClick()
+      verify { mockNavActions.navigateTo(Destination.BudgetDetailed(cat.first().uid)) }
     }
   }
 }
