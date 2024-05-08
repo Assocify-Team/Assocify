@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
@@ -61,8 +62,9 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
                   categoryUID = categoryUID,
                   associationUID = associationUID,
                   name = subCategory.name,
-                  amount = subCategory.amount))
+                  amount = subCategory.amount
 
+                  ))
       onSuccess()
     }
   }
