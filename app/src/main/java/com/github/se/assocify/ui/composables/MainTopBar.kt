@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
  * @param query The search query
  * @param onQueryChange The action to perform when the query changes
  * @param onSearch The action to perform when the search is performed
- * @param page The current page
+ * @param page The current page. This is used to hide the search bar when the page is changed
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
