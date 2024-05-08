@@ -25,11 +25,8 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -57,6 +54,8 @@ import coil.compose.AsyncImage
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.DropdownOption
+import com.github.se.assocify.ui.composables.DropdownWithSetOptions
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
@@ -153,45 +152,19 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   }
 
               // Change_association dropdown
-              ExposedDropdownMenuBox(
-                  expanded = state.openAssociationDropdown,
-                  onExpandedChange = { viewmodel.controlAssociationDropdown(true) },
+              DropdownWithSetOptions(
+                  options = state.myAssociations,
+                  selectedOption =
+                      DropdownOption(state.selectedAssociation.name, state.selectedAssociation.uid),
+                  opened = state.openAssociationDropdown,
+                  onOpenedChange = { viewmodel.controlAssociationDropdown(it) },
+                  onSelectOption = { viewmodel.setAssociation(it) },
+                  leadIcon = {
+                    Icon(
+                        imageVector = Icons.Default.People, contentDescription = "Association Logo")
+                  },
                   modifier =
-                      Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally)) {
-                    OutlinedTextField(
-                        value = state.selectedAssociation.name,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(
-                              expanded = state.openAssociationDropdown)
-                        },
-                        modifier = Modifier.menuAnchor(),
-                        leadingIcon = {
-                          Icon(
-                              imageVector = Icons.Default.People, // todo get current asso logo
-                              contentDescription = "Association Logo")
-                        })
-
-                    ExposedDropdownMenu(
-                        expanded = state.openAssociationDropdown,
-                        onDismissRequest = { viewmodel.controlAssociationDropdown(false) }) {
-                          state.myAssociations.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item.name) },
-                                onClick = {
-                                  viewmodel.setAssociation(item)
-                                  viewmodel.controlAssociationDropdown(false)
-                                },
-                                leadingIcon = {
-                                  Icon(
-                                      imageVector = Icons.Default.People, // todo associations logos
-                                      contentDescription = "Association Logo")
-                                },
-                                modifier = Modifier.testTag("associationDropdownItem-${item.uid}"))
-                          }
-                        }
-                  }
+                      Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally))
 
               Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
 
