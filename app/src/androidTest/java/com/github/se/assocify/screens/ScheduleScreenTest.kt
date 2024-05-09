@@ -16,22 +16,20 @@ import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Before
-    fun testSetup() {
-        composeTestRule.setContent { EventScheduleScreen() }
+  @Before
+  fun testSetup() {
+    composeTestRule.setContent { EventScheduleScreen() }
+  }
+
+  @Test
+  fun testSideBar() {
+    with(composeTestRule) {
+      for (i in 0..23) {
+        onNodeWithText(LocalTime.of(i, 0).format(DateTimeFormatter.ofPattern("HH:mm")))
+            .assertExists()
+      }
     }
-
-    @Test
-    fun testSideBar() {
-        with(composeTestRule) {
-            for (i in 0..23) {
-                onNodeWithText(LocalTime.of(i, 0).format(DateTimeFormatter.ofPattern("HH:mm")))
-                    .assertExists()
-            }
-        }
-    }
-
+  }
 }
