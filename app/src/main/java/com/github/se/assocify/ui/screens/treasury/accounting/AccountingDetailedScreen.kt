@@ -169,7 +169,7 @@ fun AccountingDetailedScreen(
       },
       content = { innerPadding ->
         if (budgetModel.editing) {
-          DisplayEditBalance()
+          DisplayEditBalance(budgetDetailedViewModel)
         }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
@@ -271,6 +271,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
 
 @Composable
 fun DisplayEditBalance(budgetViewModel: BudgetDetailedViewModel){
+  val budgetModel by budgetViewModel.uiState.collectAsState()
   var categoryString by remember { mutableStateOf("") }
   var amountString by remember { mutableStateOf("") }
   
@@ -301,13 +302,13 @@ fun DisplayEditBalance(budgetViewModel: BudgetDetailedViewModel){
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Button(
-            onClick = { /*TODO: close dialog*/},
+            onClick = { budgetViewModel.cancelEditing()},
             modifier = Modifier.padding(15.dp),
           ) {
             Text("Dismiss")
           }
           Button(
-            onClick = { budgetViewModel.saveEditing()},
+            onClick = { budgetViewModel.saveEditing(BudgetItem())},
             modifier = Modifier.padding(15.dp),
           ) {
             Text("Confirm")
@@ -318,8 +319,4 @@ fun DisplayEditBalance(budgetViewModel: BudgetDetailedViewModel){
   }
 }
 
-@Preview
-@Composable
-fun DisplayEditPreview() {
-  DisplayEditBalance()
-}
+

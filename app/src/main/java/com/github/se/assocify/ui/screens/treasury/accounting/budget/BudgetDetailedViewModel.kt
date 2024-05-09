@@ -66,5 +66,6 @@ class BudgetDetailedViewModel(
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
     val yearFilter: Int = 2023,
-    val editing: Boolean = false
+    val editing: Boolean = false,
+    val editedBudgetItem: BudgetItem? = null
 )
