@@ -7,12 +7,12 @@ import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
