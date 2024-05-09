@@ -70,7 +70,7 @@ fun SelectAssociation(
             },
             navigationIcon = {
               IconButton(
-                  onClick = { navActions.navigateTo(Destination.Login) },
+                  onClick = { navActions.back() },
                   modifier = Modifier.testTag("GoBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,

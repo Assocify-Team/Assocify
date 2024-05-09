@@ -120,10 +120,15 @@ class ProfileViewModel(
 
   /**
    * This function is used to set the association of the user.
+   * It goes to selectAssociation screen if the user wants to join an other association.
    *
    * @param association the association
    */
   fun setAssociation(association: DropdownOption) {
+    if (association.uid == "join") {
+      navActions.navigateTo(Destination.SelectAsso)
+      return
+    }
     CurrentUser.associationUid = association.uid
     _uiState.value = _uiState.value.copy(selectedAssociation = association)
     userAPI.getCurrentUserRole(
