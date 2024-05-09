@@ -1,5 +1,6 @@
 package com.github.se.assocify.navigation
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -62,5 +63,18 @@ class NavigationActions(
       return (it == Destination.Profile.route)
     }
     return false
+  }
+
+  @SuppressLint("RestrictedApi")
+  fun goBackFromCreateAsso() {
+    val maybeProfile = navController.currentBackStack.value.findLast {
+        it.destination.route == Destination.Profile.route
+      }
+
+    if (maybeProfile != null) {
+        navController.popBackStack(maybeProfile.destination.id, false)
+    } else {
+      onLogin(true)
+    }
   }
 }
