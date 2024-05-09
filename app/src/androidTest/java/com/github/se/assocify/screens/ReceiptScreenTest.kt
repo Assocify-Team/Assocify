@@ -25,10 +25,13 @@ import com.github.se.assocify.ui.util.DateUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
+import java.io.File
 import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
@@ -68,7 +71,9 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     every { UUID.randomUUID() } returns UUID.fromString("08a11dc8-975c-4da1-93a6-865c20c7adec")
   }
 
-  private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptAPI)
+  private val viewModel =
+      ReceiptViewModel(
+          navActions = navActions, receiptApi = receiptAPI, cacheDir = File("cache").toPath())
 
   @Before
   fun testSetup() {
@@ -272,18 +277,17 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           photo = null,
       )
 
-  private var receiptList = listOf(expectedReceipt)
-
   private var capturedReceipt: Receipt? = null
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
   private val receiptsAPI =
       mockk<ReceiptAPI> {
         every { uploadReceipt(any(), any(), any(), any()) } answers { capturedReceipt = firstArg() }
-        every { getAllReceipts(any(), any()) } answers
+        every { getReceipt(any(), any(), any()) } answers
             {
-              firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
+              secondArg<(Receipt) -> Unit>()(expectedReceipt)
             }
+        every { getReceiptImage(any(), any(), any()) } just Runs
       }
 
   init {
@@ -295,7 +299,8 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       ReceiptViewModel(
           receiptUid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
           navActions = navActions,
-          receiptApi = receiptsAPI)
+          receiptApi = receiptsAPI,
+          cacheDir = File("cache").toPath())
 
   @Before
   fun testSetup() {
@@ -314,7 +319,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     with(composeTestRule) {
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("receiptScreenTitle").assertIsDisplayed().assertTextContains("Edit Receipt")
-      verify { receiptsAPI.getAllReceipts(any(), any()) }
+      verify { receiptsAPI.getReceipt(any(), any(), any()) }
       onNodeWithTag("titleField").assertTextContains("Edited Receipt")
       onNodeWithTag("amountField").assertTextContains("100.00")
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
