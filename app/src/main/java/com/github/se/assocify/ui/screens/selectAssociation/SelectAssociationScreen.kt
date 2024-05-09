@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.selectAssociation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,12 +50,13 @@ import kotlin.math.min
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(
+fun SelectAssociationScreen(
     navActions: NavigationActions,
     associationAPI: AssociationAPI,
-    userAPI: UserAPI
+    userAPI: UserAPI,
+    model: SelectAssociationViewModel =
+        SelectAssociationViewModel(associationAPI, userAPI, navActions)
 ) {
-  val model = SelectAssociationViewModel(associationAPI, userAPI, navActions)
   val state = model.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
 
@@ -69,14 +71,15 @@ fun SelectAssociation(
                   style = MaterialTheme.typography.headlineSmall)
             },
             navigationIcon = {
-              IconButton(
-                  onClick = { navActions.back() },
-                  modifier = Modifier.testTag("GoBackButton")) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back arrow",
-                    )
-                  }
+              if (navActions.backFromSelectAsso()) {
+                IconButton(
+                    onClick = { navActions.back() }, modifier = Modifier.testTag("GoBackButton")) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                          contentDescription = "Back arrow",
+                      )
+                    }
+              }
             })
       },
       bottomBar = {
@@ -91,78 +94,80 @@ fun SelectAssociation(
                     containerColor = MaterialTheme.colorScheme.primary))
       },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) { innerPadding ->
-        SearchBar(
-            modifier = Modifier.testTag("SearchOrganization").padding(innerPadding),
-            query = query,
-            onQueryChange = { query = it },
-            onSearch = { model.updateSearchQuery(query, true) },
-            onActiveChange = {},
-            active = state.value.searchState,
-            placeholder = { Text(text = "Search an association") },
-            trailingIcon = {
-              Icon(
-                  imageVector = Icons.Default.Clear,
-                  contentDescription = null,
-                  modifier =
-                      Modifier.clickable(
-                          onClick = {
-                            model.updateSearchQuery("", false)
-                            query = ""
-                          }))
-            },
-            leadingIcon = {
-              if (state.value.searchState) {
+        Column(modifier = Modifier.padding(innerPadding)) {
+          SearchBar(
+              modifier = Modifier.testTag("SearchOrganization"),
+              query = query,
+              onQueryChange = { query = it },
+              onSearch = { model.updateSearchQuery(query, true) },
+              onActiveChange = {},
+              active = state.value.searchState,
+              placeholder = { Text(text = "Search an association") },
+              trailingIcon = {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.Default.Clear,
                     contentDescription = null,
                     modifier =
                         Modifier.clickable(
-                                onClick = {
-                                  model.updateSearchQuery("", false)
-                                  query = ""
-                                })
-                            .testTag("ArrowBackButton"))
-              } else {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    modifier =
-                        Modifier.clickable(onClick = { model.updateSearchQuery(query, true) })
-                            .testTag("SOB"))
+                            onClick = {
+                              model.updateSearchQuery("", false)
+                              query = ""
+                            }))
+              },
+              leadingIcon = {
+                if (state.value.searchState) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                      contentDescription = null,
+                      modifier =
+                          Modifier.clickable(
+                                  onClick = {
+                                    model.updateSearchQuery("", false)
+                                    query = ""
+                                  })
+                              .testTag("ArrowBackButton"))
+                } else {
+                  Icon(
+                      imageVector = Icons.Default.Search,
+                      contentDescription = null,
+                      modifier =
+                          Modifier.clickable(onClick = { model.updateSearchQuery(query, true) })
+                              .testTag("SOB"))
+                }
+              }) {
+                if (state.value.searchState) {
+                  val filteredAssos =
+                      state.value.associations.filter { ass ->
+                        val min = min(ass.name.length, state.value.searchQuery.length)
+                        ass.name.take(min).lowercase() ==
+                            state.value.searchQuery.take(min).lowercase()
+                      }
+                  filteredAssos.map { ass -> DisplayOrganization(ass, model) }
+                } else {
+                  state.value.associations
+                }
               }
-            }) {
-              if (state.value.searchState) {
-                val filteredAssos =
-                    state.value.associations.filter { ass ->
-                      val min = min(ass.name.length, state.value.searchQuery.length)
-                      ass.name.take(min).lowercase() ==
-                          state.value.searchQuery.take(min).lowercase()
-                    }
-                filteredAssos.map { ass -> DisplayOrganization(ass, model) }
-              } else {
-                state.value.associations
-              }
-            }
 
-        LazyColumn(
-            contentPadding = innerPadding,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier =
-                Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")) {
-              // Display only registered organization
-              val registeredAssociation = state.value.associations
-              if (registeredAssociation.isEmpty()) {
-                item { Text(text = "There are no organizations to display.") }
-              } else {
-                itemsIndexed(registeredAssociation) { index, organization ->
-                  DisplayOrganization(organization, model)
-                  // Add a Divider for each organization except the last one
-                  if (index < registeredAssociation.size - 1) {
-                    HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))
+          LazyColumn(
+              //            contentPadding = innerPadding,
+              verticalArrangement = Arrangement.spacedBy(4.dp),
+              modifier =
+                  Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")) {
+                // Display only registered organization
+                val registeredAssociation = state.value.associations
+                if (registeredAssociation.isEmpty()) {
+                  item { Text(text = "There are no organizations to display.") }
+                } else {
+                  itemsIndexed(registeredAssociation) { index, organization ->
+                    DisplayOrganization(organization, model)
+                    // Add a Divider for each organization except the last one
+                    if (index < registeredAssociation.size - 1) {
+                      HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))
+                    }
                   }
                 }
               }
-            }
+        }
       }
 }
 
