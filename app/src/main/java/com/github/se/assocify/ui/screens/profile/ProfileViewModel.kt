@@ -119,8 +119,8 @@ class ProfileViewModel(
   }
 
   /**
-   * This function is used to set the association of the user.
-   * It goes to selectAssociation screen if the user wants to join an other association.
+   * This function is used to set the association of the user. It goes to selectAssociation screen
+   * if the user wants to join an other association.
    *
    * @param association the association
    */

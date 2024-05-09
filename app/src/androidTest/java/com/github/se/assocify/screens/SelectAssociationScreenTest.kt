@@ -16,7 +16,7 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssociation.DisplayOrganization
-import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociation
+import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociationScreen
 import com.github.se.assocify.ui.screens.selectAssociation.SelectAssociationViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -92,7 +92,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the "Create new organization" button is displayed */
   @Test
   fun testCreateNewOrganizationButton() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociationScreen(mockNavActions, mockAssocAPI, mockUserAPI)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       createOrgaButton {
         assertIsDisplayed()
@@ -110,7 +112,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun testSearchOrganization() {
     CurrentUser.userUid = "testId"
     CurrentUser.associationUid = "testAssocId"
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociationScreen(mockNavActions, mockAssocAPI, mockUserAPI)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       searchOrganization { assertIsDisplayed() }
     }
@@ -119,7 +123,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /** This test checks if the registered organization list is correctly displayed */
   @Test
   fun testRegisteredOrganizationList() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociationScreen(mockNavActions, mockAssocAPI, mockUserAPI)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       registeredList {
         assertIsDisplayed()
@@ -142,7 +148,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           val associations = emptyList<Association>()
           onSuccessCallback(associations)
         }
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociationScreen(mockNavActions, mockAssocAPI, mockUserAPI)
+    }
     // Find the text node with the expected message and assert it is displayed
     composeTestRule.onNodeWithText("There are no organizations to display.").assertIsDisplayed()
   }
@@ -178,7 +186,9 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   /* This test check if, when searching with the search bar the icons change */
   @Test
   fun testSearchBarWorksWithNoResult() {
-    composeTestRule.setContent { SelectAssociation(mockNavActions, mockAssocAPI, mockUserAPI) }
+    composeTestRule.setContent {
+      SelectAssociationScreen(mockNavActions, mockAssocAPI, mockUserAPI)
+    }
     ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
       // Checking initial state
       searchOrgaButton { assertIsDisplayed() }
