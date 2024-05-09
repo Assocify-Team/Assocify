@@ -176,7 +176,7 @@ class ReceiptsAPITest {
   fun getReceipt() {
     val successMock = mockk<(Receipt) -> Unit>(relaxed = true)
 
-    response = remoteJson
+    response = "[$remoteJson]"
 
     api.getReceipt("successful_rid", successMock, { fail("Should not fail, failed with $it") })
 
