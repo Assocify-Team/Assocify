@@ -2,7 +2,7 @@ package com.github.se.assocify.ui.screens.selectAssociation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,9 +16,11 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -60,79 +61,89 @@ fun SelectAssociation(
   Scaffold(
       modifier = Modifier.testTag("SelectAssociationScreen"),
       topBar = {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        CenterAlignedTopAppBar(
+            title = {
               Text(
                   modifier = Modifier.testTag("HelloText"),
                   text = "Hello " + state.value.user.name + " !!",
                   style = MaterialTheme.typography.headlineSmall)
-              SearchBar(
-                  modifier = Modifier.testTag("SearchOrganization"),
-                  query = query,
-                  onQueryChange = { query = it },
-                  onSearch = { model.updateSearchQuery(query, true) },
-                  onActiveChange = {},
-                  active = state.value.searchState,
-                  placeholder = { Text(text = "Search an organization") },
-                  trailingIcon = {
+            },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navActions.navigateTo(Destination.Login) },
+                  modifier = Modifier.testTag("GoBackButton")) {
                     Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = null,
-                        modifier =
-                            Modifier.clickable(
-                                onClick = {
-                                  model.updateSearchQuery("", false)
-                                  query = ""
-                                }))
-                  },
-                  leadingIcon = {
-                    if (state.value.searchState) {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                          contentDescription = null,
-                          modifier =
-                              Modifier.clickable(
-                                      onClick = {
-                                        model.updateSearchQuery("", false)
-                                        query = ""
-                                      })
-                                  .testTag("ArrowBackButton"))
-                    } else {
-                      Icon(
-                          imageVector = Icons.Default.Search,
-                          contentDescription = null,
-                          modifier =
-                              Modifier.clickable(onClick = { model.updateSearchQuery(query, true) })
-                                  .testTag("SOB"))
-                    }
-                  }) {
-                    if (state.value.searchState) {
-                      val filteredAssos =
-                          state.value.associations.filter { ass ->
-                            val min = min(ass.name.length, state.value.searchQuery.length)
-                            ass.name.take(min).lowercase() ==
-                                state.value.searchQuery.take(min).lowercase()
-                          }
-                      filteredAssos.map { ass -> DisplayOrganization(ass, model) }
-                    } else {
-                      state.value.associations
-                    }
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back arrow",
+                    )
                   }
-            }
+            })
       },
       bottomBar = {
         Button(
             onClick = { navActions.navigateTo(Destination.CreateAsso) },
             modifier =
                 Modifier.fillMaxWidth().padding(16.dp).testTag("CreateNewOrganizationButton"),
-            content = { Text(text = "Create new organization") },
+            content = { Text(text = "Create new association") },
             colors =
                 ButtonDefaults.buttonColors(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     containerColor = MaterialTheme.colorScheme.primary))
-      }) { innerPadding ->
+      },
+      contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) { innerPadding ->
+        SearchBar(
+            modifier = Modifier.testTag("SearchOrganization").padding(innerPadding),
+            query = query,
+            onQueryChange = { query = it },
+            onSearch = { model.updateSearchQuery(query, true) },
+            onActiveChange = {},
+            active = state.value.searchState,
+            placeholder = { Text(text = "Search an association") },
+            trailingIcon = {
+              Icon(
+                  imageVector = Icons.Default.Clear,
+                  contentDescription = null,
+                  modifier =
+                      Modifier.clickable(
+                          onClick = {
+                            model.updateSearchQuery("", false)
+                            query = ""
+                          }))
+            },
+            leadingIcon = {
+              if (state.value.searchState) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    modifier =
+                        Modifier.clickable(
+                                onClick = {
+                                  model.updateSearchQuery("", false)
+                                  query = ""
+                                })
+                            .testTag("ArrowBackButton"))
+              } else {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    modifier =
+                        Modifier.clickable(onClick = { model.updateSearchQuery(query, true) })
+                            .testTag("SOB"))
+              }
+            }) {
+              if (state.value.searchState) {
+                val filteredAssos =
+                    state.value.associations.filter { ass ->
+                      val min = min(ass.name.length, state.value.searchQuery.length)
+                      ass.name.take(min).lowercase() ==
+                          state.value.searchQuery.take(min).lowercase()
+                    }
+                filteredAssos.map { ass -> DisplayOrganization(ass, model) }
+              } else {
+                state.value.associations
+              }
+            }
+
         LazyColumn(
             contentPadding = innerPadding,
             verticalArrangement = Arrangement.spacedBy(4.dp),
