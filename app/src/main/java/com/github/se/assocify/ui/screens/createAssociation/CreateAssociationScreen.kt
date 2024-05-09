@@ -47,7 +47,6 @@ import com.github.se.assocify.R
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.RoleType
-import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.UserSearchState
 import com.github.se.assocify.ui.composables.UserSearchTextField
@@ -141,10 +140,7 @@ fun CreateAssociationScreen(
                       Text("Add members")
                     }
                 Button(
-                    onClick = {
-                      viewmodel.saveAsso()
-                      navigationActions.navigateToMainTab(Destination.Home)
-                    },
+                    onClick = { viewmodel.saveAsso() },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
                     enabled = state.savable) {
                       Text("Create")
