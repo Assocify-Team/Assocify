@@ -48,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -57,17 +58,19 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
+import java.nio.file.Path
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReceiptScreen(
     navActions: NavigationActions,
     receiptUid: String = "",
+    cacheDir: Path = LocalContext.current.cacheDir.toPath(),
     viewModel: ReceiptViewModel =
         if (receiptUid.isEmpty()) {
-          ReceiptViewModel(navActions)
+          ReceiptViewModel(navActions, cacheDir)
         } else {
-          ReceiptViewModel(receiptUid = receiptUid, navActions = navActions)
+          ReceiptViewModel(receiptUid = receiptUid, navActions = navActions, cacheDir)
         }
 ) {
 

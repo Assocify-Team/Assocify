@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import android.net.Uri
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -7,14 +8,15 @@ import com.github.se.assocify.model.entities.Status
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.downloadAuthenticatedTo
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.upload
+import java.nio.file.Path
 import java.time.LocalDate
-import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
+class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : SupabaseApi() {
   private val bucket = db.storage["receipt"]
 
   private val columns =
@@ -46,33 +48,46 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
       onReceiptUploadSuccess: () -> Unit,
       onFailure: (Boolean, Exception) -> Unit
   ) {
-    scope.launch {
-      try {
-        receipt.photo?.let {
-          when (it) {
-            is MaybeRemotePhoto.LocalFile -> {
-              bucket.upload(receipt.uid, it.uri, upsert = true)
-              onPhotoUploadSuccess(true)
-            }
-            is MaybeRemotePhoto.Remote -> {
-              onPhotoUploadSuccess(false)
-            }
+    tryAsync({ onFailure(false, it) }) {
+      receipt.photo?.let {
+        when (it) {
+          is MaybeRemotePhoto.LocalFile -> {
+            bucket.upload(receipt.uid, it.uri, upsert = true)
+            onPhotoUploadSuccess(true)
           }
-        } ?: onPhotoUploadSuccess(false)
-      } catch (e: Exception) {
-        onFailure(false, e)
-      }
+          is MaybeRemotePhoto.Remote -> {
+            onPhotoUploadSuccess(false)
+          }
+        }
+      } ?: onPhotoUploadSuccess(false)
     }
 
-    scope.launch {
-      try {
-        val sreceipt = SupabaseReceipt.fromReceipt(receipt)
-        db.from("receipt").upsert(sreceipt)
-        db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
-        onReceiptUploadSuccess()
-      } catch (e: Exception) {
-        onFailure(true, e)
-      }
+    tryAsync({ onFailure(true, it) }) {
+      val sreceipt = SupabaseReceipt.fromReceipt(receipt)
+      db.from("receipt").upsert(sreceipt)
+      db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
+      onReceiptUploadSuccess()
+    }
+  }
+
+  /**
+   * Fetches the image of a receipt. If the image is not cached, it will be downloaded from the
+   * network, and stored in disk cache. TODO: limit the size of the cache
+   *
+   * @param receipt the receipt to fetch the image of
+   * @param onSuccess called when the image is fetched successfully with the URI of the image
+   * @param onFailure called when the fetch fails with the exception that occurred
+   */
+  fun getReceiptImage(receipt: Receipt, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
+    val imageCachePath = cachePath.resolve(receipt.uid + ".jpg")
+    if (imageCachePath.toFile().exists()) {
+      onSuccess(Uri.fromFile(imageCachePath.toFile()))
+      return
+    }
+
+    tryAsync(onFailure) {
+      bucket.downloadAuthenticatedTo(receipt.uid, imageCachePath)
+      onSuccess(Uri.fromFile(imageCachePath.toFile()))
     }
   }
 
@@ -80,19 +95,15 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
    * Gets all receipts created by the current user.
    *
    * @param onSuccess called when the fetch succeeds with the list of receipts
-   * @param onError called when the fetch fails with the exception that occurred
+   * @param onFailure called when the fetch fails with the exception that occurred
    */
-  fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        onSuccess(
-            db.from("receipt")
-                .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
-                .decodeList<SupabaseReceipt>()
-                .map { it.toReceipt() })
-      } catch (e: Exception) {
-        onError(e)
-      }
+  fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      onSuccess(
+          db.from("receipt")
+              .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
+              .decodeList<SupabaseReceipt>()
+              .map { it.toReceipt() })
     }
   }
 
@@ -101,20 +112,16 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
    *
    * @param id the ID of the receipt to get
    * @param onSuccess called when the receipt is fetched successfully
-   * @param onError called when the fetch fails with the exception that occurred
+   * @param onFailure called when the fetch fails with the exception that occurred
    */
-  fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onError: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val receipt =
-            db.from("receipt")
-                .select { filter { SupabaseReceipt::uid eq id } }
-                .decodeAs<SupabaseReceipt>()
-                .toReceipt()
-        onSuccess(receipt)
-      } catch (e: Exception) {
-        onError(e)
-      }
+  fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      val receipt =
+          db.from("receipt")
+              .select(columns) { filter { SupabaseReceipt::uid eq id } }
+              .decodeSingle<SupabaseReceipt>()
+              .toReceipt()
+      onSuccess(receipt)
     }
   }
 
@@ -122,16 +129,12 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
    * Gets *all* receipts created by *all* users, if the current user has permissions to do so.
    *
    * @param onSuccess called whenever the fetch is successful with the list of receipts
-   * @param onError called whenever an error has occurred with the exception that occurred
+   * @param onFailure called whenever an error has occurred with the exception that occurred
    */
-  fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onError: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val select = db.from("receipt").select(columns)
-        onSuccess(select.decodeList<SupabaseReceipt>().map { it.toReceipt() })
-      } catch (e: Exception) {
-        onError(e)
-      }
+  fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      val select = db.from("receipt").select(columns)
+      onSuccess(select.decodeList<SupabaseReceipt>().map { it.toReceipt() })
     }
   }
 
@@ -143,13 +146,9 @@ class ReceiptAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called when the deletion fails with the exception that occurred
    */
   fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        db.from("receipt").delete { filter { SupabaseReceipt::uid eq id } }
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure) {
+      db.from("receipt").delete { filter { SupabaseReceipt::uid eq id } }
+      onSuccess()
     }
   }
 

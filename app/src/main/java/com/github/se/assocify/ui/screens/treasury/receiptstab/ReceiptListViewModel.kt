@@ -9,6 +9,7 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import java.nio.file.Path
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -20,7 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class ReceiptListViewModel(
     private val navActions: NavigationActions,
-    private val receiptsDatabase: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
+    cacheDir: Path,
+    private val receiptsDatabase: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient, cacheDir)
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
@@ -53,7 +55,7 @@ class ReceiptListViewModel(
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
         },
-        onError = {
+        onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching user receipts", it)
           // TODO Error message
         })
@@ -71,7 +73,7 @@ class ReceiptListViewModel(
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
         },
-        onError = {
+        onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching all receipts", it)
           // TODO Error message
         })

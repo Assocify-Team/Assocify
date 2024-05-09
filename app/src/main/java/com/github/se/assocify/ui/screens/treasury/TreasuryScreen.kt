@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.navigation.Destination
@@ -30,6 +31,7 @@ import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScre
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
+import java.nio.file.Path
 
 /**
  * Treasury screen that displays the receipts, budget, and balance tabs of the association.
@@ -42,7 +44,8 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions),
+    cacheDir: Path = LocalContext.current.cacheDir.toPath(),
+    receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions, cacheDir),
     treasuryViewModel: TreasuryViewModel =
         TreasuryViewModel(navActions = navActions, receiptListViewModel = receiptListViewModel)
 ) {
