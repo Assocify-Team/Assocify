@@ -57,18 +57,15 @@ class ProfileViewModel(
           _uiState.value =
               _uiState.value.copy(
                   myAssociations =
-                          associations.map {
-                            DropdownOption(
-                                it.name,
-                                it.uid,
-                                /* TODO fetch association logo, else by default :*/
-                                {
-                                  Icon(
-                                      imageVector = Icons.Default.People,
-                                      contentDescription = "Association Logo")
-                                })
-                          }
-                          + _uiState.value.myAssociations)
+                      associations.map {
+                        DropdownOption(it.name, it.uid)
+                        /* TODO fetch association logo, else by default :*/
+                        {
+                          Icon(
+                              imageVector = Icons.Default.People,
+                              contentDescription = "Association Logo")
+                        }
+                      } + _uiState.value.myAssociations)
         },
         { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
 
@@ -78,15 +75,13 @@ class ProfileViewModel(
           _uiState.value =
               _uiState.value.copy(
                   selectedAssociation =
-                      DropdownOption(
-                          association.name,
-                          association.uid,
-                          /* TODO fetch association logo */
-                          {
-                            Icon(
-                                imageVector = Icons.Default.People,
-                                contentDescription = "Association Logo")
-                          }))
+                      DropdownOption(association.name, association.uid)
+                      /* TODO fetch association logo */
+                      {
+                        Icon(
+                            imageVector = Icons.Default.People,
+                            contentDescription = "Association Logo")
+                      })
         },
         {
           _uiState.value =
