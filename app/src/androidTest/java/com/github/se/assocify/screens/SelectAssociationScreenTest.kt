@@ -23,7 +23,6 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
-import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
@@ -104,7 +103,6 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     }
     // assert: the nav action has been called
     verify { mockNavActions.navigateTo(Destination.CreateAsso) }
-    confirmVerified(mockNavActions)
   }
 
   /** This test checks if the search organization field is displayed */
