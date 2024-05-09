@@ -2,16 +2,24 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -21,8 +29,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,7 +43,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
@@ -154,6 +168,9 @@ fun AccountingDetailedScreen(
             }
       },
       content = { innerPadding ->
+        if (budgetModel.editing) {
+          DisplayEditBalance()
+        }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
@@ -226,7 +243,7 @@ fun DisplayBudgetItem(budgetItem: BudgetItem, testTag: String) {
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
-      modifier = Modifier.clickable { /*TODO: edit and view details*/}.testTag(testTag))
+      modifier = Modifier.clickable {}.testTag(testTag))
 }
 
 /**
@@ -250,4 +267,59 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
       modifier = Modifier.clickable { /*TODO: edit and view details*/}.testTag(testTag))
+}
+
+@Composable
+fun DisplayEditBalance(budgetViewModel: BudgetDetailedViewModel){
+  var categoryString by remember { mutableStateOf("") }
+  var amountString by remember { mutableStateOf("") }
+  
+  Dialog(onDismissRequest = { /*TODO: close dialog*/}) {
+    Card(
+      modifier = Modifier
+        .padding(16.dp),
+      shape = RoundedCornerShape(16.dp),
+    ) {
+      Column() {
+        Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+        OutlinedTextField(
+            modifier = Modifier.padding(8.dp),
+            value = categoryString,
+            onValueChange = { categoryString = it},
+            label = { Text("Category") },
+            supportingText = {})
+        OutlinedTextField(
+            modifier = Modifier.padding(8.dp),
+            value = amountString,
+            onValueChange = { amountString = it},
+            label = { Text("Amount") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+            supportingText = {})
+        Row(
+          modifier = Modifier
+            .fillMaxWidth().padding(15.dp),
+          horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+          Button(
+            onClick = { /*TODO: close dialog*/},
+            modifier = Modifier.padding(15.dp),
+          ) {
+            Text("Dismiss")
+          }
+          Button(
+            onClick = { budgetViewModel.saveEditing()},
+            modifier = Modifier.padding(15.dp),
+          ) {
+            Text("Confirm")
+          }
+        }
+      }
+    }
+  }
+}
+
+@Preview
+@Composable
+fun DisplayEditPreview() {
+  DisplayEditBalance()
 }

@@ -48,9 +48,23 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
     updateDatabaseValues()
   }
+
+  fun startEditing(budgetItem: BudgetItem) {
+    _uiState.value = _uiState.value.copy(editing = true)
+  }
+
+  fun saveEditing(budgetItem: BudgetItem) {
+    /* TODO: add to the database */
+    _uiState.value = _uiState.value.copy(editing = false, budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid} + budgetItem)
+  }
+
+  fun cancelEditing() {
+    _uiState.value = _uiState.value.copy(editing = false)
+  }
 }
 
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
-    val yearFilter: Int = 2023
+    val yearFilter: Int = 2023,
+    val editing: Boolean = false
 )
