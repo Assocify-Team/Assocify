@@ -31,7 +31,6 @@ fun DropdownWithSetOptions(
     opened: Boolean,
     onOpenedChange: (Boolean) -> Unit,
     onSelectOption: (DropdownOption) -> Unit,
-    leadIcon: (@Composable () -> Unit)? = null,
 ) {
 
   ExposedDropdownMenuBox(
@@ -47,7 +46,7 @@ fun DropdownWithSetOptions(
               if (options.size > 1) ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened)
             },
             modifier = Modifier.menuAnchor(),
-            leadingIcon = leadIcon)
+            leadingIcon = selectedOption.leadIcon)
 
         ExposedDropdownMenu(expanded = opened, onDismissRequest = { onOpenedChange(false) }) {
           options.forEach { item ->
@@ -57,7 +56,7 @@ fun DropdownWithSetOptions(
                   onSelectOption(item)
                   onOpenedChange(false)
                 },
-                leadingIcon = leadIcon,
+                leadingIcon = item.leadIcon,
                 modifier = Modifier.testTag("DropdownItem-${item.uid}"))
           }
         }
@@ -65,4 +64,8 @@ fun DropdownWithSetOptions(
 }
 
 /** An option for the dropdown : has a name (displayed) and a uid (for uniqueness) */
-data class DropdownOption(val name: String, val uid: String)
+data class DropdownOption(
+    val name: String,
+    val uid: String,
+    val leadIcon: (@Composable () -> Unit)? = null
+)
