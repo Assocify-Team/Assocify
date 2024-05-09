@@ -52,4 +52,15 @@ class NavigationActions(
   fun back() {
     navController.popBackStack()
   }
+
+  /**
+   * Checks when the user is coming back from the select association screen if the previous screen
+   * was the profile screen
+   */
+  fun backFromSelectAsso(): Boolean {
+    navController.previousBackStackEntry?.destination?.route?.let {
+      return (it == Destination.Profile.route)
+    }
+    return false
+  }
 }
