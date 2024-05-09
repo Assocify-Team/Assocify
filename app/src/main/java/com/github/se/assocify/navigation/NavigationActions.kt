@@ -65,14 +65,20 @@ class NavigationActions(
     return false
   }
 
+  /**
+   * Navigation from the create association screen
+   *
+   * Goes either to home if it's after login or back to profile
+   */
   @SuppressLint("RestrictedApi")
-  fun goBackFromCreateAsso() {
-    val maybeProfile = navController.currentBackStack.value.findLast {
-        it.destination.route == Destination.Profile.route
-      }
+  fun goFromCreateAsso() {
+    val maybeProfile =
+        navController.currentBackStack.value.findLast {
+          it.destination.route == Destination.Profile.route
+        }
 
     if (maybeProfile != null) {
-        navController.popBackStack(maybeProfile.destination.id, false)
+      navController.popBackStack(maybeProfile.destination.id, false)
     } else {
       onLogin(true)
     }
