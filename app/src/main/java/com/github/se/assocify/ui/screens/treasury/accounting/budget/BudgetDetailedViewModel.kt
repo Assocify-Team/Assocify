@@ -55,7 +55,10 @@ class BudgetDetailedViewModel(
 
   fun saveEditing(budgetItem: BudgetItem) {
     /* TODO: add to the database */
-    _uiState.value = _uiState.value.copy(editing = false, budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid} + budgetItem)
+    _uiState.value =
+        _uiState.value.copy(
+            editing = false,
+            budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem)
   }
 
   fun cancelEditing() {
