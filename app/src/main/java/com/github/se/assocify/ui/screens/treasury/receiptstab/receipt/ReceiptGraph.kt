@@ -13,7 +13,9 @@ fun NavGraphBuilder.receiptGraph(navigationActions: NavigationActions) {
   }
   composable(Destination.EditReceipt("{receiptUid}").route) { backStackEntry ->
     backStackEntry.arguments?.getString("receiptUid")?.let {
-      val receiptViewModel = remember { ReceiptViewModel(receiptUid = it, navActions = navigationActions) }
+      val receiptViewModel = remember {
+        ReceiptViewModel(receiptUid = it, navActions = navigationActions)
+      }
       ReceiptScreen(receiptViewModel)
     }
   }

@@ -85,7 +85,6 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             hostState = receiptState.snackbarHostState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
-
         if (receiptState.loading) {
           CenteredCircularIndicator()
           return@Scaffold

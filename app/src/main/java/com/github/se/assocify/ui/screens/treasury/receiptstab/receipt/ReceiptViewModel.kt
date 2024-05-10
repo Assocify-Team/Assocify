@@ -11,14 +11,14 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
+import java.time.LocalDate
+import java.util.UUID
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.util.UUID
-import kotlin.math.absoluteValue
 
 class ReceiptViewModel {
 
@@ -56,28 +56,28 @@ class ReceiptViewModel {
     loadReceipt()
   }
 
-    fun loadReceipt() {
-        _uiState.value = _uiState.value.copy(loading = true, error = null)
-        this.receiptApi.getAllReceipts(
-            onSuccess = { receipts ->
-                receipts.forEach { receipt ->
-                    if (receipt.uid == receiptUid) {
-                        _uiState.value =
-                            _uiState.value.copy(
-                                status = receipt.status,
-                                title = receipt.title,
-                                description = receipt.description,
-                                amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
-                                date = DateUtil.toString(receipt.date),
-                                incoming = receipt.cents >= 0)
-                    }
-                }
-                _uiState.value = _uiState.value.copy(loading = false, error = null)
-            },
-            onError = {
-                _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
-            })
-    }
+  fun loadReceipt() {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+    this.receiptApi.getAllReceipts(
+        onSuccess = { receipts ->
+          receipts.forEach { receipt ->
+            if (receipt.uid == receiptUid) {
+              _uiState.value =
+                  _uiState.value.copy(
+                      status = receipt.status,
+                      title = receipt.title,
+                      description = receipt.description,
+                      amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
+                      date = DateUtil.toString(receipt.date),
+                      incoming = receipt.cents >= 0)
+            }
+          }
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
+        },
+        onError = {
+          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
+        })
+  }
 
   fun setStatus(status: Status) {
     _uiState.value = _uiState.value.copy(status = status)
