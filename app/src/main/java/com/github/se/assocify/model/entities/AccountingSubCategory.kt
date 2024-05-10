@@ -5,8 +5,8 @@ package com.github.se.assocify.model.entities
  * Logistic Pole is a subcategory of the Pole category
  *
  * @param uid uid of the subcategory
- * @param name name of the subcategory (ex: Logistics Pole)
- * @param category category of the subcategory (ex: Pole)
+ * @param categoryUID uid of the category that the subcategory is related to (ex: Pole)
+ * @param name name of the subcategory (ex: Logistic Pole)
  * @param amount total amount of the subcategory
  */
 data class AccountingSubCategory(
