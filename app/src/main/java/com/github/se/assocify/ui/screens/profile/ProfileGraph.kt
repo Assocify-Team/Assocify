@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.profile
 
+import androidx.compose.runtime.remember
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.se.assocify.model.database.AssociationAPI
@@ -20,7 +21,8 @@ fun NavGraphBuilder.profileGraph(
   composable(
       route = Destination.Profile.route,
   ) {
-    ProfileScreen(navigationActions, ProfileViewModel(associationAPI, userAPI, navigationActions))
+    val profileViewModel = remember { ProfileViewModel(associationAPI, userAPI, navigationActions) }
+    ProfileScreen(navigationActions, profileViewModel)
   }
 
   profileNotificationsGraph(navigationActions)

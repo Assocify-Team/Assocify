@@ -25,9 +25,7 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
           _uiState.value = _uiState.value.copy(tasks = tasks)
           filterTasks()
         },
-        {
-          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks")
-        })
+        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks") })
   }
 
   /**

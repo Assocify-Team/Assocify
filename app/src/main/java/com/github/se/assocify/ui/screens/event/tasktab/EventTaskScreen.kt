@@ -40,13 +40,13 @@ fun EventTaskScreen(
   val state by eventTaskViewModel.uiState.collectAsState()
 
   if (state.loading) {
-      CenteredCircularIndicator()
-      return
+    CenteredCircularIndicator()
+    return
   }
 
   if (state.error != null) {
-      ErrorMessage(errorMessage = state.error) { eventTaskViewModel.updateTasks() }
-      return
+    ErrorMessage(errorMessage = state.error) { eventTaskViewModel.updateTasks() }
+    return
   }
 
   val visibleTasks =

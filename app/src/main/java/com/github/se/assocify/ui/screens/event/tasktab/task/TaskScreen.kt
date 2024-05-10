@@ -73,7 +73,6 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
             hostState = taskState.snackbarHostState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
-
         if (taskState.loading) {
           CenteredCircularIndicator()
           return@Scaffold

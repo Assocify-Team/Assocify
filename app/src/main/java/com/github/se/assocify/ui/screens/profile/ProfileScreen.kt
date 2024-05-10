@@ -52,8 +52,10 @@ import coil.compose.AsyncImage
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.composables.DropdownWithSetOptions
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
@@ -86,6 +88,16 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
             hostState = state.snackbarHostState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { innerPadding ->
+        if (state.loading) {
+          CenteredCircularIndicator()
+          return@Scaffold
+        }
+
+        if (state.error != null) {
+          ErrorMessage(errorMessage = state.error) { viewmodel.loadProfile() }
+          return@Scaffold
+        }
+
         Column(
             modifier =
                 Modifier.padding(innerPadding).verticalScroll(rememberScrollState()).fillMaxWidth(),

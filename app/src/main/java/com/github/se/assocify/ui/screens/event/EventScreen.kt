@@ -98,8 +98,8 @@ fun EventScreen(
 
         if (state.error != null) {
           ErrorMessage(errorMessage = state.error) {
-              eventScreenViewModel.fetchEvents()
-              taskListViewModel.updateTasks()
+            eventScreenViewModel.fetchEvents()
+            taskListViewModel.updateTasks()
           }
           return@Scaffold
         }

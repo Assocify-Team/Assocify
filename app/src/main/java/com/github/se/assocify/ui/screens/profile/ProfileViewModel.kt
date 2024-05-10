@@ -42,34 +42,79 @@ class ProfileViewModel(
   private val _uiState = MutableStateFlow(ProfileUIState())
   val uiState: StateFlow<ProfileUIState> = _uiState
 
+  private var loadCounter = 0 // number of things loading
+
   init {
+    loadProfile()
+  }
+
+  /**
+   * This function is used to start loading. It increments the load counter.
+   *
+   * @param num the number of things to load
+   */
+  private fun startLoading(num: Int = 1) {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+    loadCounter += num
+  }
+
+  /**
+   * This function is used to end loading. It decrements the load counter.
+   *
+   * @param error the error message, if any
+   */
+  private fun endLoading(error: String? = null) {
+    if (error != null) {
+      if (_uiState.value.error == null) {
+        _uiState.value = _uiState.value.copy(loading = false, error = error)
+      }
+      loadCounter = 0
+    } else if (--loadCounter == 0) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+    }
+  }
+
+  fun loadProfile() {
+    startLoading(4)
     userAPI.getUser(
         CurrentUser.userUid!!,
         { user ->
           _uiState.value = _uiState.value.copy(myName = user.name, modifyingName = user.name)
+          endLoading()
         },
-        { _uiState.value = _uiState.value.copy(myName = "name not found") })
+        { endLoading("Error loading profile") })
     userAPI.getCurrentUserAssociations(
         { associations ->
           _uiState.value =
               _uiState.value.copy(
                   myAssociations = associations.map { DropdownOption(it.name, it.uid) })
+          endLoading()
         },
-        { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
-
+        {
+          _uiState.value = _uiState.value.copy(myAssociations = emptyList())
+          endLoading("Error loading your associations")
+        })
     assoAPI.getAssociation(
         CurrentUser.associationUid!!,
         { association ->
           _uiState.value =
               _uiState.value.copy(
                   selectedAssociation = DropdownOption(association.name, association.uid))
+          endLoading()
         },
         {
-          _uiState.value =
-              _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
+          if (_uiState.value.myAssociations.isNotEmpty()) {
+            _uiState.value =
+                _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
+          }
+          endLoading("Error loading current association")
         })
     userAPI.getCurrentUserRole(
-        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
+        { role ->
+          _uiState.value = _uiState.value.copy(currentRole = role)
+          endLoading()
+        },
+        { endLoading("Error loading role") })
   }
 
   /**
@@ -105,10 +150,21 @@ class ProfileViewModel(
    * @param association the association
    */
   fun setAssociation(association: DropdownOption) {
+    val oldAssociationUid = CurrentUser.associationUid
     CurrentUser.associationUid = association.uid
-    _uiState.value = _uiState.value.copy(selectedAssociation = association)
     userAPI.getCurrentUserRole(
-        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
+        { role ->
+          _uiState.value = _uiState.value.copy(selectedAssociation = association)
+          _uiState.value = _uiState.value.copy(currentRole = role)
+          endLoading()
+        },
+        {
+          CurrentUser.associationUid = oldAssociationUid
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Couldn't switch association", duration = SnackbarDuration.Short)
+          }
+        })
   }
 
   /**
@@ -116,18 +172,16 @@ class ProfileViewModel(
    * database. It shows a snackbar if the name change was successful or not.
    */
   fun confirmModifyName() {
-    _uiState.value = _uiState.value.copy(openEdit = false, myName = _uiState.value.modifyingName)
     CurrentUser.userUid?.let { uid ->
       userAPI.setDisplayName(
           uid,
           _uiState.value.modifyingName,
           {
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Name changed !", duration = SnackbarDuration.Short)
-            }
+            _uiState.value =
+                _uiState.value.copy(openEdit = false, myName = _uiState.value.modifyingName)
           },
           {
+            _uiState.value = _uiState.value.copy(openEdit = false)
             CoroutineScope(Dispatchers.Main).launch {
               _uiState.value.snackbarHostState.showSnackbar(
                   message = "Couldn't change name", duration = SnackbarDuration.Short)
@@ -169,6 +223,10 @@ class ProfileViewModel(
 }
 
 data class ProfileUIState(
+    // wether the screen in loading
+    val loading: Boolean = false,
+    // the error message, if any
+    val error: String? = null,
     // the name of the user
     val myName: String = "",
     // the name of the user as they're editing it
