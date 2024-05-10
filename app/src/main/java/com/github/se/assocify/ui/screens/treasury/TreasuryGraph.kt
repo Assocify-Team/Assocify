@@ -10,6 +10,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.balanceDetailedGraph
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.budgetDetailedGraph
 import com.github.se.assocify.ui.screens.treasury.accounting.newcategory.addAccountingCategory
+import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGraph
 
 fun NavGraphBuilder.treasuryGraph(
@@ -21,7 +22,12 @@ fun NavGraphBuilder.treasuryGraph(
   composable(
       route = Destination.Treasury.route,
   ) {
-    TreasuryScreen(navigationActions, accountingCategoriesAPI, accountingSubCategoryAPI)
+    val receiptListViewModel = ReceiptListViewModel(navigationActions)
+    TreasuryScreen(
+        navigationActions,
+        receiptListViewModel,
+        TreasuryViewModel(
+            navActions = navigationActions, accountingCategoriesAPI, accountingSubCategoryAPI, receiptListViewModel = receiptListViewModel))
   }
   receiptGraph(navigationActions)
   budgetDetailedGraph(navigationActions, budgetAPI)

@@ -47,9 +47,8 @@ fun TreasuryScreen(
     navActions: NavigationActions,
     accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI,
-    receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions),
-    treasuryViewModel: TreasuryViewModel =
-        TreasuryViewModel(navActions = navActions, receiptListViewModel = receiptListViewModel)
+    receiptListViewModel: ReceiptListViewModel,
+    treasuryViewModel: TreasuryViewModel
 ) {
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()

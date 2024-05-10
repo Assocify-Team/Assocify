@@ -40,6 +40,7 @@ class AssociationAPITest {
   @Before
   fun setup() {
     APITestUtils.setup()
+    error = true
     assoAPI =
         AssociationAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -52,6 +53,7 @@ class AssociationAPITest {
                 }
               }
             })
+    error = false
   }
 
   @Test
@@ -59,34 +61,11 @@ class AssociationAPITest {
     val onSuccess: (Association) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    error = false
-    response =
-        """
-      {
-        "uid": "$uuid1",
-        "name": "Test",
-        "description": "Test",
-        "creation_date": "2022-01-01"
-      }
-    """
-            .trimIndent()
-
-    assoAPI.getAssociation(uuid1.toString(), onSuccess, onFailure)
-
-    verify(timeout = 1000) { onSuccess(any()) }
-    verify(exactly = 0) { onFailure(any()) }
-
     // Test failure
     error = true
     assoAPI.getAssociation(uuid1.toString(), { fail("should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
-  }
-
-  @Test
-  fun testGetAllAssociations() {
-    val onSuccess: (List<Association>) -> Unit = mockk(relaxed = true)
-    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
     error = false
     response =
@@ -105,16 +84,54 @@ class AssociationAPITest {
     """
             .trimIndent()
 
-    assoAPI.getAssociations(onSuccess, onFailure)
+    assoAPI.getAssociation(
+        uuid1.toString(), onSuccess, { fail("should not fail, failed with $it") })
 
-    verify(timeout = 100) { onSuccess(any()) }
-    verify(exactly = 0) { onFailure(any()) }
+    verify(timeout = 1000) { onSuccess(any()) }
+
+    // Test cache
+    assoAPI.getAssociation(
+        uuid1.toString(), onSuccess, { fail("should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(any()) }
+  }
+
+  @Test
+  fun testGetAllAssociations() {
+    val onSuccess: (List<Association>) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
     // Test failure
     error = true
     assoAPI.getAssociations({ fail("should not succeed") }, onFailure)
 
     verify(timeout = 100) { onFailure(any()) }
+
+    error = false
+    response =
+        """
+      [{
+        "uid": "$uuid1",
+        "name": "Test",
+        "description": "Test",
+        "creation_date": "2022-01-01"
+      }, {
+        "uid": "$uuid2",
+        "name": "Test2",
+        "description": "Test2",
+        "creation_date": "2022-01-02"
+      }]
+    """
+            .trimIndent()
+
+    assoAPI.getAssociations(onSuccess, { fail("should not fail, failed with $it") })
+
+    verify(timeout = 100) { onSuccess(any()) }
+
+    // Test cache
+    assoAPI.getAssociations(onSuccess, { fail("should not fail, failed with $it") })
+
+    verify(timeout = 100) { onSuccess(any()) }
   }
 
   @Test
