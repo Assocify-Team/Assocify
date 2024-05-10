@@ -9,12 +9,16 @@ import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetail
 
 fun NavGraphBuilder.balanceDetailedGraph(
     navigationActions: NavigationActions,
-    budgetAPI: BudgetAPI
+    budgetAPI: BudgetAPI,
+    balanceAPI: BalanceAPI
 ) {
   composable(Destination.BalanceDetailed("{subCategoryUid}").route) { backStackEntry ->
     backStackEntry.arguments?.getString("subCategoryUid")?.let {
       BalanceDetailedScreen(
-          subCategoryUid = it, navigationActions, BudgetDetailedViewModel(budgetAPI, it))
+          subCategoryUid = it,
+          navigationActions,
+          BudgetDetailedViewModel(budgetAPI, it),
+          BalanceDetailedViewModel(balanceAPI, it))
     }
   }
 }

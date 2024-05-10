@@ -11,7 +11,11 @@ import com.github.se.assocify.ui.screens.treasury.accounting.newcategory.addAcco
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGraph
 
-fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions, budgetAPI: BudgetAPI) {
+fun NavGraphBuilder.treasuryGraph(
+    navigationActions: NavigationActions,
+    budgetAPI: BudgetAPI,
+    balanceAPI: BalanceAPI
+) {
   composable(
       route = Destination.Treasury.route,
   ) {
@@ -23,7 +27,7 @@ fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions, budgetAP
             navActions = navigationActions, receiptListViewModel = receiptListViewModel))
   }
   receiptGraph(navigationActions)
-  budgetDetailedGraph(navigationActions, budgetAPI)
-  balanceDetailedGraph(navigationActions, budgetAPI)
+  budgetDetailedGraph(navigationActions, budgetAPI, balanceAPI)
+  balanceDetailedGraph(navigationActions, budgetAPI, balanceAPI)
   addAccountingCategory(navigationActions)
 }

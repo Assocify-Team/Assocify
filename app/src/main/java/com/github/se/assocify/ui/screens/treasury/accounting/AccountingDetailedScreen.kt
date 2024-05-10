@@ -66,7 +66,7 @@ fun AccountingDetailedScreen(
     balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
-    val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
+  val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
   val subCategory =
       AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
 
@@ -162,21 +162,20 @@ fun AccountingDetailedScreen(
         ) {
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
-                // Year filter
+              // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
-                  when(page) {
-                      AccountingPage.BALANCE -> budgetDetailedViewModel.onYearFilter(it.toInt())
-                      AccountingPage.BUDGET -> balanceDetailedViewModel.onYearFilter(it.toInt())
-                  }
+                when (page) {
+                  AccountingPage.BALANCE -> budgetDetailedViewModel.onYearFilter(it.toInt())
+                  AccountingPage.BUDGET -> balanceDetailedViewModel.onYearFilter(it.toInt())
+                }
               }
-                //Status filter for balance Items
+              // Status filter for balance Items
               if (page == AccountingPage.BALANCE) {
-                    DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
-                        balanceDetailedViewModel.onStatusFilter(
-                            balanceModel.balanceList.first {
-                                balanceItem -> balanceItem.status.toString() == it
-                            }.status
-                        )
+                DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
+                  balanceDetailedViewModel.onStatusFilter(
+                      balanceModel.balanceList
+                          .first { balanceItem -> balanceItem.status.toString() == it }
+                          .status)
                 }
               }
 

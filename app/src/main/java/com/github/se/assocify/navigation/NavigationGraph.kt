@@ -21,10 +21,11 @@ fun NavGraphBuilder.mainNavGraph(
     associationAPI: AssociationAPI,
     eventAPI: EventAPI,
     budgetAPI: BudgetAPI,
+    balanceAPI: BalanceAPI,
     taskAPI: TaskAPI
 ) {
   homeGraph(navActions)
-  treasuryGraph(navActions, budgetAPI)
+  treasuryGraph(navActions, budgetAPI, balanceAPI)
   eventGraph(navActions, eventAPI, taskAPI)
   chatGraph(navActions)
   profileGraph(navActions, userAPI, associationAPI)
