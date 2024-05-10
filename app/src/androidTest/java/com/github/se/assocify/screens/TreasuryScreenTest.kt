@@ -13,6 +13,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
+import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
+import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -36,7 +38,9 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     every { navActions.navigateTo(any()) } answers {}
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    composeTestRule.setContent { TreasuryScreen(navActions) }
+    val receiptListViewModel = ReceiptListViewModel(navActions)
+    val viewModel = TreasuryViewModel(navActions, receiptListViewModel)
+    composeTestRule.setContent { TreasuryScreen(navActions, receiptListViewModel, viewModel) }
   }
 
   @Test

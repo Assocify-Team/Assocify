@@ -36,8 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -50,14 +48,8 @@ import kotlin.math.min
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociationScreen(
-    navActions: NavigationActions,
-    associationAPI: AssociationAPI,
-    userAPI: UserAPI,
-    model: SelectAssociationViewModel =
-        SelectAssociationViewModel(associationAPI, userAPI, navActions)
-) {
-  val state = model.uiState.collectAsState()
+fun SelectAssociationScreen(navActions: NavigationActions, viewModel: SelectAssociationViewModel) {
+  val state = viewModel.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
 
   Scaffold(
@@ -99,7 +91,7 @@ fun SelectAssociationScreen(
               modifier = Modifier.testTag("SearchOrganization"),
               query = query,
               onQueryChange = { query = it },
-              onSearch = { model.updateSearchQuery(query, true) },
+              onSearch = { viewModel.updateSearchQuery(query, true) },
               onActiveChange = {},
               active = state.value.searchState,
               placeholder = { Text(text = "Search an association") },
@@ -110,7 +102,7 @@ fun SelectAssociationScreen(
                     modifier =
                         Modifier.clickable(
                             onClick = {
-                              model.updateSearchQuery("", false)
+                              viewModel.updateSearchQuery("", false)
                               query = ""
                             }))
               },
@@ -122,7 +114,7 @@ fun SelectAssociationScreen(
                       modifier =
                           Modifier.clickable(
                                   onClick = {
-                                    model.updateSearchQuery("", false)
+                                    viewModel.updateSearchQuery("", false)
                                     query = ""
                                   })
                               .testTag("ArrowBackButton"))
@@ -131,7 +123,8 @@ fun SelectAssociationScreen(
                       imageVector = Icons.Default.Search,
                       contentDescription = null,
                       modifier =
-                          Modifier.clickable(onClick = { model.updateSearchQuery(query, true) })
+                          Modifier.clickable(
+                                      onClick = { viewModel.updateSearchQuery(query, true) })
                               .testTag("SOB"))
                 }
               }) {
@@ -142,7 +135,7 @@ fun SelectAssociationScreen(
                         ass.name.take(min).lowercase() ==
                             state.value.searchQuery.take(min).lowercase()
                       }
-                  filteredAssos.map { ass -> DisplayOrganization(ass, model) }
+                  filteredAssos.map { ass -> DisplayOrganization(ass, viewModel) }
                 } else {
                   state.value.associations
                 }
@@ -159,7 +152,7 @@ fun SelectAssociationScreen(
                   item { Text(text = "There are no associations to display.") }
                 } else {
                   itemsIndexed(registeredAssociation) { index, organization ->
-                    DisplayOrganization(organization, model)
+                    DisplayOrganization(organization, viewModel)
                     // Add a Divider for each organization except the last one
                     if (index < registeredAssociation.size - 1) {
                       HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp))

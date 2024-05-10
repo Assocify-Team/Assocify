@@ -8,7 +8,6 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
-import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -21,6 +20,20 @@ import kotlinx.serialization.json.JsonObject
  * @property db the Supabase client
  */
 class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
+  private var associationCache = mapOf<String, Association>()
+
+  private fun fillCache(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure, tag = "fillCache") {
+      val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
+      associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
+      onSuccess()
+    }
+  }
+
+  init {
+    fillCache({}, {}) // Try and fill the cache as quickly as possible
+  }
+
   /**
    * Gets an association from the database
    *
@@ -30,20 +43,19 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @return the association with the given id
    */
   fun getAssociation(id: String, onSuccess: (Association) -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val assoc =
-            db.from("association")
-                .select {
-                  filter { SupabaseAssociation::uid eq id }
-                  limit(1)
-                  single()
-                }
-                .decodeAs<SupabaseAssociation>()
-        onSuccess(assoc.toAssociation())
-      } catch (e: Exception) {
-        onFailure(e)
+    val getFromCache = {
+      val value = associationCache[id]
+      if (value != null) {
+        onSuccess(value)
+      } else {
+        onFailure(Exception("Association not found"))
       }
+    }
+
+    if (associationCache.isNotEmpty()) {
+      getFromCache()
+    } else {
+      fillCache(getFromCache, onFailure)
     }
   }
 
@@ -55,13 +67,10 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @return a list of all associations
    */
   fun getAssociations(onSuccess: (List<Association>) -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
-        onSuccess(assoc.map { it.toAssociation() })
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    if (associationCache.isNotEmpty()) {
+      onSuccess(associationCache.values.toList())
+    } else {
+      fillCache({ onSuccess(associationCache.values.toList()) }, onFailure)
     }
   }
 
@@ -77,19 +86,15 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit = {},
       onFailure: (Exception) -> Unit
   ) {
-    scope.launch {
-      try {
-        db.from("association")
-            .insert(
-                SupabaseAssociation(
-                    association.uid,
-                    association.name,
-                    association.description,
-                    association.creationDate.toString()))
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure, tag = "addAssociation") {
+      db.from("association")
+          .insert(
+              SupabaseAssociation(
+                  association.uid,
+                  association.name,
+                  association.description,
+                  association.creationDate.toString()))
+      onSuccess()
     }
   }
 
@@ -109,18 +114,14 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    scope.launch {
-      try {
-        db.from("association").update({
-          SupabaseAssociation::name setTo name
-          SupabaseAssociation::description setTo description
-        }) {
-          filter { SupabaseAssociation::uid eq uid }
-        }
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
+    tryAsync(onFailure, tag = "editAssociation") {
+      db.from("association").update({
+        SupabaseAssociation::name setTo name
+        SupabaseAssociation::description setTo description
+      }) {
+        filter { SupabaseAssociation::uid eq uid }
       }
+      onSuccess()
     }
   }
 
@@ -132,18 +133,14 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun deleteAssociation(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        db.from("association").delete { filter { SupabaseAssociation::uid eq id } }
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure, tag = "deleteAssociation") {
+      db.from("association").delete { filter { SupabaseAssociation::uid eq id } }
+      onSuccess()
     }
   }
 
   /**
-   * Gets a list of applicants to an association.
+   * Gets a list of applicants to an association. Not cached, as it is currently not used.
    *
    * @param associationId the association to get applicants for
    * @param onSuccess called on success with the list of applicants
@@ -154,7 +151,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<User>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
+    tryAsync(onFailure, tag = "getApplicants") {
       val applicants =
           db.from("applicant")
               .select(
@@ -189,7 +186,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
+    tryAsync(onFailure, tag = "acceptUser") {
       if (db.from("applicant")
           .delete {
             filter {
@@ -211,7 +208,8 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   /**
-   * Gets the roles of an association.
+   * Gets the roles of an association. Not cached, because it is currently only requested once per
+   * association.
    *
    * @param associationId the association to get the roles for
    * @param onSuccess called on success with the list of roles
@@ -222,7 +220,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<PermissionRole>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
+    tryAsync(onFailure, tag = "getRoles") {
       val roles =
           db.from("role")
               .select { filter { PermissionRole::associationId eq associationId } }
