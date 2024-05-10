@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.entities
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 /**
  * Represents an item in the balance sheet. For example some sweater in the category Logistics Pole
@@ -18,7 +17,7 @@ import java.time.LocalDateTime
 data class BalanceItem(
     val uid: String,
     val nameItem: String,
-    val categoryUID : String,
+    val categoryUID: String,
     val amount: Int, // unsigned: can be positive or negative
     val tva: TVA,
     val description: String,

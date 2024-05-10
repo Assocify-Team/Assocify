@@ -77,35 +77,35 @@ fun AccountingDetailedScreen(
           100,
           Status.Pending,
           MaybeRemotePhoto.Remote("path"))
-    val balanceItems =
-        listOf(
-            BalanceItem(
-                "1",
-                "pair of scissors",
-                5,
-                TVA.TVA_8,
-                "scissors for paper cutting",
-                LocalDate.of(2024, 4, 14),
-                "François Théron",
-                Status.Pending),
-            BalanceItem(
-                "2",
-                "sweaters",
-                1000,
-                TVA.TVA_8,
-                "order for 1000 sweaters",
-                LocalDate.of(2024, 3, 11),
-                "Rayan Boucheny",
-                Status.Archived),
-            BalanceItem(
-                "3",
-                "chairs",
-                200,
-                TVA.TVA_8,
-                "order for 200 chairs",
-                LocalDate.of(2024, 1, 14),
-                "Sidonie Bouthors",
-                Status.Reimbursed))
+  val balanceItems =
+      listOf(
+          BalanceItem(
+              "1",
+              "pair of scissors",
+              5,
+              TVA.TVA_8,
+              "scissors for paper cutting",
+              LocalDate.of(2024, 4, 14),
+              "François Théron",
+              Status.Pending),
+          BalanceItem(
+              "2",
+              "sweaters",
+              1000,
+              TVA.TVA_8,
+              "order for 1000 sweaters",
+              LocalDate.of(2024, 3, 11),
+              "Rayan Boucheny",
+              Status.Archived),
+          BalanceItem(
+              "3",
+              "chairs",
+              200,
+              TVA.TVA_8,
+              "order for 200 chairs",
+              LocalDate.of(2024, 1, 14),
+              "Sidonie Bouthors",
+              Status.Reimbursed))
 
   val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
@@ -236,7 +236,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
-            /* TODO update according to new db changes
+          /* TODO update according to new db changes
           Icon(
 
               balanceItem.receipt!!.status.getIcon(),

@@ -1,16 +1,13 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.model.entities.BalanceItem
-import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import java.time.OffsetDateTime
+import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
 
@@ -22,13 +19,13 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ): List<BalanceItem> {
 
-      tryAsync(onFailure) {
-        val response =
-            db.from(collectionName)
-                .select { filter { SupabaseBalanceItem::associationUID eq associationUID } }
-                .decodeList<SupabaseBalanceItem>()
-        onSuccess(response.map { it.toBalanceItem() })
-      }
+    tryAsync(onFailure) {
+      val response =
+          db.from(collectionName)
+              .select { filter { SupabaseBalanceItem::associationUID eq associationUID } }
+              .decodeList<SupabaseBalanceItem>()
+      onSuccess(response.map { it.toBalanceItem() })
+    }
 
     return listOf()
   }
@@ -41,11 +38,13 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-      tryAsync(onFailure) {
-        db.from(collectionName)
-            .insert(SupabaseBalanceItem.fromBalanceItem(balanceItem, associationUID, receiptUID, categoryUID))
-        onSuccess()
-      }
+    tryAsync(onFailure) {
+      db.from(collectionName)
+          .insert(
+              SupabaseBalanceItem.fromBalanceItem(
+                  balanceItem, associationUID, receiptUID, categoryUID))
+      onSuccess()
+    }
   }
 
   fun updateBalance(
@@ -59,7 +58,8 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
     tryAsync(onFailure) {
       db.from(collectionName)
           .update(
-              SupabaseBalanceItem.fromBalanceItem(balanceItem, associationUID, receiptUID, categoryUID))
+              SupabaseBalanceItem.fromBalanceItem(
+                  balanceItem, associationUID, receiptUID, categoryUID))
       onSuccess()
     }
   }
@@ -96,23 +96,27 @@ data class SupabaseBalanceItem(
         date = LocalDate.parse(date),
         assignee = assignee,
         status = status,
-        )
+    )
   }
-    companion object {
-        fun fromBalanceItem(balanceItem: BalanceItem, associationUID: String, receiptUID: String, categoryUID: String) =
-            SupabaseBalanceItem(
-                uid = balanceItem.uid,
-                nameItem = balanceItem.nameItem,
-                amount = balanceItem.amount,
-                tva = balanceItem.tva,
-                description = balanceItem.description,
-                date = balanceItem.date.toString(),
-                assignee = balanceItem.assignee,
-                status = balanceItem.status,
-                associationUID = associationUID,
-                receiptUID = receiptUID,
-                categoryUID = categoryUID
-            )
-    }
 
+  companion object {
+    fun fromBalanceItem(
+        balanceItem: BalanceItem,
+        associationUID: String,
+        receiptUID: String,
+        categoryUID: String
+    ) =
+        SupabaseBalanceItem(
+            uid = balanceItem.uid,
+            nameItem = balanceItem.nameItem,
+            amount = balanceItem.amount,
+            tva = balanceItem.tva,
+            description = balanceItem.description,
+            date = balanceItem.date.toString(),
+            assignee = balanceItem.assignee,
+            status = balanceItem.status,
+            associationUID = associationUID,
+            receiptUID = receiptUID,
+            categoryUID = categoryUID)
+  }
 }
