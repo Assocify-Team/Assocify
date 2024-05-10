@@ -146,7 +146,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     val model = SelectAssociationViewModel(mockAssocAPI, mockUserAPI, mockNavActions)
     composeTestRule.setContent { SelectAssociationScreen(mockNavActions, model) }
     // Find the text node with the expected message and assert it is displayed
-    composeTestRule.onNodeWithText("There are no organizations to display.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("There are no associations to display.").assertIsDisplayed()
   }
 
   /**
