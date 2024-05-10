@@ -42,7 +42,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private var tabSelected = false
   private var goNotif = false
   private var goSecu = false
-  private var goTheme = false
+  private var goPref = false
   private var goMembers = false
   private var goRoles = false
 
@@ -96,7 +96,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
     every { navActions.navigateTo(Destination.ProfileNotifications) } answers { goNotif = true }
     every { navActions.navigateTo(Destination.ProfileSecurityPrivacy) } answers { goSecu = true }
-    every { navActions.navigateTo(Destination.ProfileTheme) } answers { goTheme = true }
+    every { navActions.navigateTo(Destination.ProfilePreferences) } answers { goPref = true }
     every { navActions.navigateTo(Destination.ProfileMembers) } answers { goMembers = true }
     every { navActions.navigateTo(Destination.ProfileRoles) } answers { goRoles = true }
 
@@ -112,15 +112,15 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("profileRole").assertIsDisplayed()
       onNodeWithTag("editProfile").assertIsDisplayed()
       onNodeWithTag("associationDropdown").assertIsDisplayed()
-      onNodeWithTag("Theme").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Preferences").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Members").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
-      onNodeWithTag("associationDropdownItem-${asso1.uid}").assertIsDisplayed()
-      onNodeWithTag("associationDropdownItem-${asso2.uid}").assertIsDisplayed()
+      onNodeWithTag("DropdownItem-${asso1.uid}").assertIsDisplayed()
+      onNodeWithTag("DropdownItem-${asso2.uid}").assertIsDisplayed()
     }
   }
 
@@ -157,8 +157,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   fun changeAssociation() {
     with(composeTestRule) {
       onNodeWithTag("associationDropdown").assertIsDisplayed().performClick()
-      onNodeWithTag("associationDropdownItem-${asso2.uid}").performClick()
-      assert(mViewmodel.uiState.value.selectedAssociation == asso2)
+      onNodeWithTag("DropdownItem-${asso2.uid}").performClick()
+      assert(mViewmodel.uiState.value.selectedAssociation.name == asso2.name)
       assert(CurrentUser.associationUid == asso2.uid)
     }
   }
@@ -176,8 +176,8 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun navigateToSubScreen() {
     with(composeTestRule) {
-      onNodeWithTag("Theme").performClick()
-      assert(goTheme)
+      onNodeWithTag("Preferences").performClick()
+      assert(goPref)
 
       onNodeWithTag("Privacy").performClick()
       assert(goSecu)
