@@ -30,22 +30,22 @@ class ReceiptListViewModel(
     uiState = _uiState
   }
 
-    fun updateReceipts() {
-        loadCounter = 2
-        _uiState.value = _uiState.value.copy(loading = true)
-        updateUserReceipts()
-        updateAllReceipts()
-    }
+  fun updateReceipts() {
+    loadCounter = 2
+    _uiState.value = _uiState.value.copy(loading = true)
+    updateUserReceipts()
+    updateAllReceipts()
+  }
 
-    private fun endLoading() {
-        if (--loadCounter == 0) {
-            _uiState.value = _uiState.value.copy(loading = false, error = null)
-        }
+  private fun endLoading() {
+    if (--loadCounter == 0) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
     }
+  }
 
-    private fun loadingError() {
-        _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipts")
-    }
+  private fun loadingError() {
+    _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipts")
+  }
 
   /** Update the user's receipts */
   private fun updateUserReceipts() {
@@ -57,7 +57,7 @@ class ReceiptListViewModel(
                       receipts.filter {
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
-            endLoading()
+          endLoading()
         },
         onError = {
           Log.e("ReceiptListViewModel", "Error fetching user receipts", it)

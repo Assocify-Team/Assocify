@@ -10,22 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ErrorMessage(
-    errorMessage: String?,
-    onRetry: (() -> Unit)? = null
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        errorMessage?.let {
-            Text(text = it)
-        }
-        onRetry?.let {
-            Button(onClick = it) {
-                Text(text = "Retry")
-            }
-        }
-    }
+fun ErrorMessage(errorMessage: String?, onRetry: (() -> Unit)? = null) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
+      modifier = Modifier.fillMaxSize()) {
+        errorMessage?.let { Text(text = it) }
+        onRetry?.let { Button(onClick = it) { Text(text = "Retry") } }
+      }
 }

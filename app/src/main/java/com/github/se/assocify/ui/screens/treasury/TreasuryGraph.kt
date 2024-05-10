@@ -19,11 +19,7 @@ fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions, budgetAP
   ) {
     val receiptListViewModel = remember { ReceiptListViewModel(navigationActions) }
     val treasuryViewModel = remember { TreasuryViewModel(navigationActions, receiptListViewModel) }
-    TreasuryScreen(
-        navigationActions,
-        receiptListViewModel,
-        treasuryViewModel
-    )
+    TreasuryScreen(navigationActions, receiptListViewModel, treasuryViewModel)
   }
   receiptGraph(navigationActions)
   budgetDetailedGraph(navigationActions, budgetAPI)
