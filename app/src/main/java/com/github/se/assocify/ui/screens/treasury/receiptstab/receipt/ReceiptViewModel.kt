@@ -218,6 +218,10 @@ class ReceiptViewModel {
           })
     }
   }
+
+  fun back() {
+    navActions.back()
+  }
 }
 
 data class ReceiptState(
