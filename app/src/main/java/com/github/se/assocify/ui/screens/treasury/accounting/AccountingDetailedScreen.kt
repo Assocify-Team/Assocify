@@ -243,7 +243,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
           Icon(
               balanceItem.receipt!!.status.getIcon(),
-              contentDescription = "Create") // TODO: add logo depending on the phase
+              contentDescription = "Create")
         }
       },
       supportingContent = { Text(balanceItem.assignee) },
