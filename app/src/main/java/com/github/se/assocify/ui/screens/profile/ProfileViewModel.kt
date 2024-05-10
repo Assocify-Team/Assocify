@@ -2,11 +2,13 @@ package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -87,8 +89,17 @@ class ProfileViewModel(
         { associations ->
           _uiState.value =
               _uiState.value.copy(
-                  myAssociations = associations.map { DropdownOption(it.name, it.uid) })
-          endLoading()
+                  myAssociations =
+                      associations.map {
+                        DropdownOption(it.name, it.uid)
+                        /* TODO fetch association logo, else by default :*/
+                        {
+                          Icon(
+                              imageVector = Icons.Default.People,
+                              contentDescription = "Association Logo")
+                        }
+                      } + _uiState.value.myAssociations)
+           endLoading()
         },
         {
           _uiState.value = _uiState.value.copy(myAssociations = emptyList())
@@ -99,7 +110,14 @@ class ProfileViewModel(
         { association ->
           _uiState.value =
               _uiState.value.copy(
-                  selectedAssociation = DropdownOption(association.name, association.uid))
+                  selectedAssociation =
+                      DropdownOption(association.name, association.uid)
+                      /* TODO fetch association logo */
+                      {
+                        Icon(
+                            imageVector = Icons.Default.People,
+                            contentDescription = "Association Logo")
+                      })
           endLoading()
         },
         {
@@ -145,11 +163,16 @@ class ProfileViewModel(
   }
 
   /**
-   * This function is used to set the association of the user.
+   * This function is used to set the association of the user. It goes to selectAssociation screen
+   * if the user wants to join an other association.
    *
    * @param association the association
    */
   fun setAssociation(association: DropdownOption) {
+    if (association.uid == "join") {
+      navActions.navigateTo(Destination.SelectAsso)
+      return
+    }
     val oldAssociationUid = CurrentUser.associationUid
     CurrentUser.associationUid = association.uid
     userAPI.getCurrentUserRole(
@@ -240,11 +263,20 @@ data class ProfileUIState(
     // the uri of the profile image
     val profileImageURI: Uri? = null,
     // the associations of the user
-    val myAssociations: List<DropdownOption> = emptyList(),
+    val myAssociations: List<DropdownOption> =
+        listOf(
+            DropdownOption(
+                "Add association",
+                "join",
+                {
+                  Icon(
+                      imageVector = Icons.Default.GroupAdd,
+                      contentDescription = "Join an other association")
+                })),
     // true if the association dropdown should be shown, false if should be hidden
     val openAssociationDropdown: Boolean = false,
-    // the selected (current) association - TODO idk what to do with the temporary association
-    val selectedAssociation: DropdownOption = DropdownOption("", "temp"),
+    // the selected (current) association
+    val selectedAssociation: DropdownOption = myAssociations[0],
     // current role of the user in the association
     val currentRole: PermissionRole =
         PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)
