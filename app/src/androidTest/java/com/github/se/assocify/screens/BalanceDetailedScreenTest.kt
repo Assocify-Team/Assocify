@@ -25,11 +25,11 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class BalanceDetailedScreenTest :
@@ -91,7 +91,7 @@ class BalanceDetailedScreenTest :
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     val subCategoryUid = "subcategoryuid"
-    val budgetDetailedViewModel = BudgetDetailedViewModel( mockBudgetAPI, subCategoryUid)
+    val budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(subCategoryUid, mockNavActions, budgetDetailedViewModel)
     }
