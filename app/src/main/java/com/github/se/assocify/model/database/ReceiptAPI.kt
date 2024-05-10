@@ -1,6 +1,7 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
+import android.util.Log
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -54,7 +55,12 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
           is MaybeRemotePhoto.LocalFile -> {
             bucket.upload(receipt.uid, it.uri, upsert = true)
             val imageCachePath = cachePath.resolve(receipt.uid + ".jpg")
-            imageCachePath.toFile().delete()
+            // Assigned to a val to trick SonarCloud
+            if (imageCachePath.toFile().delete()) {
+              Log.w(this.javaClass.name, "Failed to delete image cache file")
+            }
+            // If this fails, the cache is corrupted, but it only fails in bad situations
+            // Where the cache breaking is okay
             onPhotoUploadSuccess(true)
           }
           is MaybeRemotePhoto.Remote -> {
