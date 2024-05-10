@@ -29,11 +29,11 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -74,7 +74,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    composeTestRule.setContent { ReceiptScreen(navActions = navActions, viewModel = viewModel) }
+    composeTestRule.setContent { ReceiptScreen(viewModel = viewModel) }
   }
 
   @Test
@@ -303,8 +303,6 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     CurrentUser.associationUid = "testUser"
     composeTestRule.setContent {
       ReceiptScreen(
-          receiptUid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
-          navActions = navActions,
           viewModel = viewModel)
     }
   }

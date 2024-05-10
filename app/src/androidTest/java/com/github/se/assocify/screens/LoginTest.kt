@@ -27,11 +27,11 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -69,7 +69,7 @@ class LoginTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           val onSuccess = firstArg<(List<User>) -> Unit>()
           onSuccess(listOf()) // instantiate with a empty list: just to test login
         }
-    composeTestRule.setContent { LoginScreen(navActions, userAPI, viewmodel) }
+    composeTestRule.setContent { LoginScreen(navActions, viewmodel) }
   }
 
   @Test

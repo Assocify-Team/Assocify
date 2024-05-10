@@ -63,7 +63,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   fun setup() {
     CurrentUser.userUid = "1"
     composeTestRule.setContent {
-      CreateAssociationScreen(mockNavActions, mockAssocAPI, mockUserAPI, bigView)
+      CreateAssociationScreen(mockNavActions, bigView)
     }
   }
 
