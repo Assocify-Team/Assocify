@@ -1,12 +1,19 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,10 +21,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -29,82 +37,66 @@ enum class AccountingPage {
  * The accounting screen displaying the budget or the balance of the association
  *
  * @param page: The page to display (either "budget" or "balance")
- * @param subCategoryList: The list of subcategories to display
  * @param navigationActions: The navigation actions
+ * @param budgetViewModel: The view model for the budget screen
  */
 @Composable
 fun AccountingScreen(
     page: AccountingPage,
-    subCategoryList: List<AccountingSubCategory>,
-    navigationActions: NavigationActions
-) { // TODO: fetch all these list from viewmodel
-  val yearList =
-      listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
+    navigationActions: NavigationActions,
+    budgetViewModel: BudgetViewModel
+) {
+  val budgetModel by budgetViewModel.uiState.collectAsState()
+  val subCategoryList = budgetModel.subCategoryList
 
-  val categoryList =
-      listOf(
-          AccountingCategory("", "Global"),
-          AccountingCategory("", "Pole"),
-          AccountingCategory("", "Events"),
-          AccountingCategory("", "Commission"),
-          AccountingCategory("", "Fees"))
-
-  val tvaList: List<String> = listOf("TTC", "HT")
-
-  var selectedYear by remember { mutableStateOf(yearList.first()) }
-  var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
-  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
-
-  val filteredSubCategoryList =
-      if (selectedCategory == "Global") { // display everything under the global category
-        subCategoryList
-      } else {
-        // else subCategoryList.filter { it.category.name == selectedCategory }
-      }
-
-  /*
   LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
-    items(filteredSubCategoryList) {
-      DisplayLine(it, "displayLine${it.name}", page, navigationActions)
-      HorizontalDivider(Modifier.fillMaxWidth())
-    }
 
-    item {
-      val totalAmount = filteredSubCategoryList.sumOf { it.amount }
-      TotalLine(totalAmount = totalAmount)
+    // display the subcategory if list is not empty
+    if (subCategoryList.isNotEmpty()) {
+      items(subCategoryList) {
+        DisplayLine(it, "displayLine${it.name}", page, navigationActions)
+        HorizontalDivider(Modifier.fillMaxWidth())
+      }
+      item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
+    } else {
+      item {
+        Text(
+            text = "No data available with this tag",
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+      }
     }
-  }*/
+  }
 }
 
+/**
+ * The filter bar of the accounting screen
+ *
+ * @param budgetViewModel: The view model for the budget screen
+ */
 @Composable
-fun AccountingFilterBar() {
-  val yearList =
-      listOf("2023", "2022", "2021") // TODO: start from 2021 until current year (dynamically)
-  /*
-  val categoryList =
-      listOf(
-          AccountingCategory("Global"),
-          AccountingCategory("Pole"),
-          AccountingCategory("Events"),
-          AccountingCategory("Commission"),
-          AccountingCategory("Fees"))
+fun AccountingFilterBar(budgetViewModel: BudgetViewModel) {
+  val model by budgetViewModel.uiState.collectAsState()
 
-
-
+  // filter bar lists
+  val yearList = listOf("2023", "2022", "2021")
   val tvaList: List<String> = listOf("TTC", "HT")
+  val categoryList = listOf("Global") + model.categoryList.map { it.name }
 
+  // selected filters
   var selectedYear by remember { mutableStateOf(yearList.first()) }
-  var selectedCategory by remember { mutableStateOf(categoryList.first().name) }
+  var selectedCategory by remember { mutableStateOf(categoryList.first()) }
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
+  // Row of dropdown filters
   Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
-    DropdownFilterChip(selectedYear, yearList, "yearFilterChip") { selectedYear = it }
-    DropdownFilterChip(selectedCategory, categoryList.map { it.name }, "categoryFilterChip") {
+    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") { selectedYear = it }
+    DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
       selectedCategory = it
+      budgetViewModel.onSelectedCategory(selectedCategory)
     }
     // TODO: change amount given TVA
-    DropdownFilterChip(selectedTVA, tvaList, "tvaListTag") { selectedTVA = it }
-  }*/
+    DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { selectedTVA = it }
+  }
 }
 
 /**
@@ -148,13 +140,11 @@ fun DisplayLine(
       headlineContent = { Text(category.name) },
       trailingContent = { Text("${category.amount}") },
       modifier =
-          // TODO: change category.name to category.uid when AccountingSubCategoryAPI will be
-          // implemented
           Modifier.clickable {
                 if (page == AccountingPage.BUDGET) {
-                  navigationActions.navigateTo(Destination.BudgetDetailed(category.name))
+                  navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
                 } else {
-                  navigationActions.navigateTo(Destination.BalanceDetailed(category.name))
+                  navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
                 }
               }
               .testTag(testTag),

@@ -3,6 +3,7 @@ package com.github.se.assocify.model.entities
 /**
  * Represents the category of an accounting item.
  *
+ * @param uid uid of the category
  * @param name name of the category (ex: Pole)
  */
 
