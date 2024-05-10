@@ -42,9 +42,8 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions),
-    treasuryViewModel: TreasuryViewModel =
-        TreasuryViewModel(navActions = navActions, receiptListViewModel = receiptListViewModel)
+    receiptListViewModel: ReceiptListViewModel,
+    treasuryViewModel: TreasuryViewModel
 ) {
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
