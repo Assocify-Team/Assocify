@@ -13,6 +13,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
+import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE
@@ -41,6 +42,9 @@ fun EventMapScreen() {
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
   val context = LocalContext.current
+
+  // Update OSM configuration, for some reason
+  Configuration.getInstance().userAgentValue = context.packageName
 
   // Initialise the map view
   val mapView = remember {
@@ -86,7 +90,6 @@ fun rememberLifecycleObserver(mapView: MapView): LifecycleObserver =
         when (event) {
           Lifecycle.Event.ON_RESUME -> mapView.onResume()
           Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-          Lifecycle.Event.ON_DESTROY -> mapView.onPause()
           else -> {}
         }
       }
@@ -96,7 +99,6 @@ fun rememberLifecycleObserver(mapView: MapView): LifecycleObserver =
 @Composable
 fun EPFLMapView(modifier: Modifier, onLoad: ((map: MapView) -> Unit)? = null) {
   val mapViewState = rememberMapViewWithLifecycle()
-
   AndroidView(
       factory = { mapViewState }, modifier = modifier, update = { view -> onLoad?.invoke(view) })
 }
