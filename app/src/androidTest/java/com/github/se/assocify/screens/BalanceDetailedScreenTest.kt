@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
@@ -38,6 +39,7 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
+  @RelaxedMockK lateinit var mockAccountingSubCategoryAPI: AccountingSubCategoryAPI
   val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
   val receipt =
       Receipt(
@@ -89,7 +91,7 @@ class BalanceDetailedScreenTest :
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     val subCategoryUid = "subcategoryuid"
-    val budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, subCategoryUid)
+    val budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(subCategoryUid, mockNavActions, budgetDetailedViewModel)
     }

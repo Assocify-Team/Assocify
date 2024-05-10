@@ -14,6 +14,8 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
@@ -140,6 +142,10 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val budgetAPI = mockk<BudgetAPI>(relaxUnitFun = true)
 
+    private val subCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
+
+    private val categoryAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
+
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
 
   @Before
@@ -150,7 +156,7 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       navActions = NavigationActions(navController, loginSave)
 
       TestAssocifyApp(
-          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI)
+          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI, categoryAPI, subCategoryAPI)
     }
   }
 

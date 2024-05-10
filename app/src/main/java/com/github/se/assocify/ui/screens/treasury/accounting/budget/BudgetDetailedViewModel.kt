@@ -47,7 +47,7 @@ class BudgetDetailedViewModel(
           // Filter the budgetList to only include items with the matching subCategoryUid
           val filteredList =
               budgetList.filter { budgetItem -> budgetItem.year == _uiState.value.yearFilter
-                      && budgetItem.uid == subCategoryUid}
+                      && budgetItem.category.uid == subCategoryUid}
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(budgetList = filteredList)
