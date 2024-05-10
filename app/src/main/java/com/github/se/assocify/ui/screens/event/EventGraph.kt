@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.event
 
+import androidx.compose.runtime.remember
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.se.assocify.model.database.EventAPI
@@ -15,8 +16,9 @@ fun NavGraphBuilder.eventGraph(
     taskAPI: TaskAPI
 ) {
   composable(route = Destination.Event.route) {
-    val taskViewModel = EventTaskViewModel(taskAPI)
-    EventScreen(navigationActions, EventScreenViewModel(eventAPI, taskViewModel), taskViewModel)
+    val taskViewModel = remember { EventTaskViewModel(taskAPI) }
+    val eventScreenViewModel = remember { EventScreenViewModel(eventAPI, taskViewModel) }
+    EventScreen(navigationActions, eventScreenViewModel, taskViewModel)
   }
   taskGraph(navigationActions, taskAPI, eventAPI)
 }

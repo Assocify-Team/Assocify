@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -23,13 +22,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.InnerTabRow
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
@@ -91,6 +91,16 @@ fun EventScreen(
             }
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) {
+        if (state.loading) {
+          CenteredCircularIndicator()
+          return@Scaffold
+        }
+
+        if (state.error != null) {
+          ErrorMessage(errorMessage = state.error) { eventScreenViewModel.fetchEvents() }
+          return@Scaffold
+        }
+
         Column(modifier = Modifier.padding(it).fillMaxHeight()) {
           val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
 
@@ -123,34 +133,24 @@ fun EventFilterBar(eventScreenViewModel: EventScreenViewModel) {
 
   val state by eventScreenViewModel.uiState.collectAsState()
 
-  if (state.error) {
-    Column(
-        modifier = Modifier.fillMaxSize().testTag("errorText"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-          Text(state.errorText)
-        }
-  } else {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      state.events.forEach {
-        item {
-          FilterChip(
-              modifier = Modifier.testTag("filterChipTestEvent"),
-              label = { Text(text = it.name) },
-              leadingIcon = {
-                if (eventScreenViewModel.isEventSelected(it)) {
-                  Icon(
-                      modifier = Modifier.size(FilterChipDefaults.IconSize),
-                      imageVector = Icons.Filled.Check,
-                      contentDescription = "Selected")
-                }
-              },
-              selected = eventScreenViewModel.isEventSelected(it),
-              onClick = {
-                eventScreenViewModel.setEventSelection(
-                    it, !eventScreenViewModel.isEventSelected(it))
-              })
-        }
+  LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    state.events.forEach {
+      item {
+        FilterChip(
+            modifier = Modifier.testTag("filterChipTestEvent"),
+            label = { Text(text = it.name) },
+            leadingIcon = {
+              if (eventScreenViewModel.isEventSelected(it)) {
+                Icon(
+                    modifier = Modifier.size(FilterChipDefaults.IconSize),
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = "Selected")
+              }
+            },
+            selected = eventScreenViewModel.isEventSelected(it),
+            onClick = {
+              eventScreenViewModel.setEventSelection(it, !eventScreenViewModel.isEventSelected(it))
+            })
       }
     }
   }

@@ -22,20 +22,19 @@ class EventScreenViewModel(
 
   init {
     uiState = _uiState
-    updateEventsFromDb()
+    fetchEvents()
   }
 
   /** Fetch the events from the database */
-  private fun updateEventsFromDb() {
+  fun fetchEvents() {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
     db.getEvents(
         { events ->
           updateFilteredEvents(events)
           _uiState.value = _uiState.value.copy(events = events)
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
         },
-        {
-          _uiState.value = _uiState.value.copy(error = true)
-          _uiState.value = _uiState.value.copy(errorText = it.message ?: "An error occurred")
-        })
+        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading events") })
   }
 
   /** Setup the filtered events depending on the current filters */
@@ -115,13 +114,13 @@ class EventScreenViewModel(
  * @param errorText the error message
  */
 data class EventScreenState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val searchQuery: String = "",
     val stateBarDisplay: Boolean = false,
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
-    val currentTab: EventPageIndex = EventPageIndex.Tasks,
-    val error: Boolean = false,
-    val errorText: String = ""
+    val currentTab: EventPageIndex = EventPageIndex.Tasks
 )
 
 /** Event tabs */
