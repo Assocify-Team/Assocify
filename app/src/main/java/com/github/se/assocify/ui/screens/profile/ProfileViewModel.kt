@@ -99,7 +99,7 @@ class ProfileViewModel(
                               contentDescription = "Association Logo")
                         }
                       } + _uiState.value.myAssociations)
-           endLoading()
+          endLoading()
         },
         {
           _uiState.value = _uiState.value.copy(myAssociations = emptyList())
