@@ -1,5 +1,6 @@
 package com.github.se.assocify.navigation
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -51,5 +52,35 @@ class NavigationActions(
 
   fun back() {
     navController.popBackStack()
+  }
+
+  /**
+   * Checks when the user is coming back from the select association screen if the previous screen
+   * was the profile screen
+   */
+  fun backFromSelectAsso(): Boolean {
+    navController.previousBackStackEntry?.destination?.route?.let {
+      return (it == Destination.Profile.route)
+    }
+    return false
+  }
+
+  /**
+   * Navigation from the create association screen
+   *
+   * Goes either to home if it's after login or back to profile
+   */
+  @SuppressLint("RestrictedApi")
+  fun goFromCreateAsso() {
+    val maybeProfile =
+        navController.currentBackStack.value.findLast {
+          it.destination.route == Destination.Profile.route
+        }
+
+    if (maybeProfile != null) {
+      navController.popBackStack(maybeProfile.destination.id, false)
+    } else {
+      onLogin(true)
+    }
   }
 }
