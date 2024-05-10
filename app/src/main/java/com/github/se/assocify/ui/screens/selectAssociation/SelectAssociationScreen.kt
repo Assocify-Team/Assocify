@@ -46,10 +46,7 @@ import kotlin.math.min
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectAssociation(
-    navActions: NavigationActions,
-    viewModel: SelectAssociationViewModel
-) {
+fun SelectAssociation(navActions: NavigationActions, viewModel: SelectAssociationViewModel) {
   val state = viewModel.uiState.collectAsState()
   var query by remember { mutableStateOf("") }
 
@@ -100,7 +97,8 @@ fun SelectAssociation(
                           imageVector = Icons.Default.Search,
                           contentDescription = null,
                           modifier =
-                              Modifier.clickable(onClick = { viewModel.updateSearchQuery(query, true) })
+                              Modifier.clickable(
+                                      onClick = { viewModel.updateSearchQuery(query, true) })
                                   .testTag("SOB"))
                     }
                   }) {

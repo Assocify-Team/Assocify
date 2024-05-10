@@ -55,7 +55,6 @@ import com.github.se.assocify.ui.composables.UserSearchTextField
 fun CreateAssociationScreen(
     navigationActions: NavigationActions,
     viewmodel: CreateAssociationViewmodel
-
 ) {
 
   val state by viewmodel.uiState.collectAsState()

@@ -14,8 +14,6 @@ fun NavGraphBuilder.createAssociationGraph(
 ) {
   composable(route = Destination.CreateAsso.route) {
     CreateAssociationScreen(
-        navigationActions,
-        CreateAssociationViewmodel(associationAPI, userAPI, navigationActions)
-    )
+        navigationActions, CreateAssociationViewmodel(associationAPI, userAPI, navigationActions))
   }
 }

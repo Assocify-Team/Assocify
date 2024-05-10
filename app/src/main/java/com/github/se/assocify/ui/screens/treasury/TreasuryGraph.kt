@@ -16,9 +16,11 @@ fun NavGraphBuilder.treasuryGraph(navigationActions: NavigationActions, budgetAP
       route = Destination.Treasury.route,
   ) {
     val receiptListViewModel = ReceiptListViewModel(navigationActions)
-    TreasuryScreen(navigationActions,
-      receiptListViewModel,
-      TreasuryViewModel(navActions = navigationActions, receiptListViewModel = receiptListViewModel))
+    TreasuryScreen(
+        navigationActions,
+        receiptListViewModel,
+        TreasuryViewModel(
+            navActions = navigationActions, receiptListViewModel = receiptListViewModel))
   }
   receiptGraph(navigationActions)
   budgetDetailedGraph(navigationActions, budgetAPI)

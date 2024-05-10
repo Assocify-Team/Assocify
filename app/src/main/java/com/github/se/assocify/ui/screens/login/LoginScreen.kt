@@ -70,10 +70,7 @@ fun rememberSupabaseAuthLauncher(
 }
 
 @Composable
-fun LoginScreen(
-    navActions: NavigationActions,
-    viewModel: LoginViewModel
-) {
+fun LoginScreen(navActions: NavigationActions, viewModel: LoginViewModel) {
 
   val launcher =
       rememberSupabaseAuthLauncher(

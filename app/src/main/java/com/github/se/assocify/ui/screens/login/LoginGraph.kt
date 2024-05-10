@@ -11,6 +11,6 @@ fun NavGraphBuilder.loginGraph(
     userAPI: UserAPI,
 ) {
   composable(route = Destination.Login.route) {
-      LoginScreen(navigationActions, LoginViewModel(navigationActions, userAPI))
+    LoginScreen(navigationActions, LoginViewModel(navigationActions, userAPI))
   }
 }
