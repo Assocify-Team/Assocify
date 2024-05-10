@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedCard
@@ -144,14 +143,13 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
               DropdownWithSetOptions(
                   options = state.myAssociations,
                   selectedOption =
-                      DropdownOption(state.selectedAssociation.name, state.selectedAssociation.uid),
+                      DropdownOption(
+                          state.selectedAssociation.name,
+                          state.selectedAssociation.uid,
+                          state.selectedAssociation.leadIcon),
                   opened = state.openAssociationDropdown,
                   onOpenedChange = { viewmodel.controlAssociationDropdown(it) },
                   onSelectOption = { viewmodel.setAssociation(it) },
-                  leadIcon = {
-                    Icon(
-                        imageVector = Icons.Default.People, contentDescription = "Association Logo")
-                  },
                   modifier =
                       Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally))
 

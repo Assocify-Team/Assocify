@@ -61,4 +61,12 @@ class NavigationActionsTest {
 
     verify { navController.popBackStack() }
   }
+
+  @Test
+  fun `navigate back from SelectAsso to Profile`() {
+    navigationActions.navigateTo(Destination.Profile)
+    navigationActions.navigateTo(Destination.SelectAsso)
+    navigationActions.backFromSelectAsso()
+    verify { navController.navigate(Destination.Profile.route) }
+  }
 }
