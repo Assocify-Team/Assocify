@@ -20,6 +20,7 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
+import java.io.File
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +39,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     every { navActions.navigateTo(any()) } answers {}
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    val receiptListViewModel = ReceiptListViewModel(navActions)
+    val receiptListViewModel = ReceiptListViewModel(navActions, File("cacheDir").toPath())
     val viewModel = TreasuryViewModel(navActions, receiptListViewModel)
     composeTestRule.setContent { TreasuryScreen(navActions, receiptListViewModel, viewModel) }
   }
