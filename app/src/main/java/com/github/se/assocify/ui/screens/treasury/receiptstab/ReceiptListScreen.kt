@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 
@@ -32,8 +34,22 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
   // Good practice to re-collect it as the page changes
   val viewmodelState by viewModel.uiState.collectAsState()
 
+  if (viewmodelState.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (viewmodelState.error != null) {
+    ErrorMessage(errorMessage = viewmodelState.error) {
+      viewModel.updateReceipts()
+    }
+    return
+  }
+
   LazyColumn(
-      modifier = Modifier.testTag("ReceiptList").fillMaxSize(),
+      modifier = Modifier
+          .testTag("ReceiptList")
+          .fillMaxSize(),
       verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
       horizontalAlignment = Alignment.CenterHorizontally) {
         // Header for the user receipts
@@ -41,7 +57,9 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
           Text(
               text = "My Receipts",
               style = MaterialTheme.typography.titleMedium,
-              modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(vertical = 16.dp))
           HorizontalDivider()
         }
 
@@ -71,7 +89,9 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
             Text(
                 text = "All Receipts",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp))
             HorizontalDivider()
           }
           // Second list of receipts
@@ -89,7 +109,9 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
 @Composable
 private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
   ListItem(
-      modifier = Modifier.clickable { viewModel.onReceiptClick(receipt) }.fillMaxWidth(),
+      modifier = Modifier
+          .clickable { viewModel.onReceiptClick(receipt) }
+          .fillMaxWidth(),
       headlineContent = {
         Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
       },
@@ -118,7 +140,9 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
                   style = MaterialTheme.typography.bodyMedium)
               Spacer(modifier = Modifier.width(8.dp))
               Icon(
-                  modifier = Modifier.testTag("statusIcon").size(30.dp),
+                  modifier = Modifier
+                      .testTag("statusIcon")
+                      .size(30.dp),
                   imageVector = receipt.status.getIcon(),
                   contentDescription = "status icon")
             }
