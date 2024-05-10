@@ -44,6 +44,7 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import java.time.LocalDate
 
@@ -61,9 +62,11 @@ fun AccountingDetailedScreen(
     page: AccountingPage,
     subCategoryUid: String,
     navigationActions: NavigationActions,
-    budgetDetailedViewModel: BudgetDetailedViewModel
+    budgetDetailedViewModel: BudgetDetailedViewModel,
+    balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
+    val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
   val subCategory =
       AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
 
@@ -159,12 +162,21 @@ fun AccountingDetailedScreen(
         ) {
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+                // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
-                budgetDetailedViewModel.onYearFilter(it.toInt())
+                  when(page) {
+                      AccountingPage.BALANCE -> budgetDetailedViewModel.onYearFilter(it.toInt())
+                      AccountingPage.BUDGET -> balanceDetailedViewModel.onYearFilter(it.toInt())
+                  }
               }
+                //Status filter for balance Items
               if (page == AccountingPage.BALANCE) {
-                DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
-                  selectedStatus = it
+                    DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
+                        balanceDetailedViewModel.onStatusFilter(
+                            balanceModel.balanceList.first {
+                                balanceItem -> balanceItem.status.toString() == it
+                            }.status
+                        )
                 }
               }
 
