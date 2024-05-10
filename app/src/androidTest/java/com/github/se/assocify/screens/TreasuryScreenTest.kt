@@ -18,6 +18,7 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -68,7 +69,10 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     CurrentUser.associationUid = "testAssociation"
     val receiptListViewModel = ReceiptListViewModel(navActions)
     val viewModel = TreasuryViewModel(navActions, receiptListViewModel)
-    composeTestRule.setContent { TreasuryScreen(navActions, mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI, receiptListViewModel, viewModel) }
+    val budgetViewModel = BudgetViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
+    composeTestRule.setContent {
+      TreasuryScreen(navActions, budgetViewModel, receiptListViewModel, viewModel)
+    }
   }
 
   @Test

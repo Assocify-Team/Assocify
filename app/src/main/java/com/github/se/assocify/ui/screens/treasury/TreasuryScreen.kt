@@ -19,8 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.database.AccountingCategoryAPI
-import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -45,15 +43,13 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    accountingCategoriesAPI: AccountingCategoryAPI,
-    accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    budgetViewModel: BudgetViewModel,
     receiptListViewModel: ReceiptListViewModel,
     treasuryViewModel: TreasuryViewModel
 ) {
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
-  val budgetViewModel = BudgetViewModel(accountingCategoriesAPI, accountingSubCategoryAPI)
 
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
