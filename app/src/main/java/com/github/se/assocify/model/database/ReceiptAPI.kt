@@ -53,6 +53,8 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
         when (it) {
           is MaybeRemotePhoto.LocalFile -> {
             bucket.upload(receipt.uid, it.uri, upsert = true)
+            val imageCachePath = cachePath.resolve(receipt.uid + ".jpg")
+            imageCachePath.toFile().delete()
             onPhotoUploadSuccess(true)
           }
           is MaybeRemotePhoto.Remote -> {
@@ -72,7 +74,8 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
 
   /**
    * Fetches the image of a receipt. If the image is not cached, it will be downloaded from the
-   * network, and stored in disk cache. TODO: limit the size of the cache
+   * network, and stored in disk cache. TODO: limit the size of the cache NOTE: If the *same* image
+   * is requested twice at the same time, the second request will return immediately, *incorrectly*!
    *
    * @param receipt the receipt to fetch the image of
    * @param onSuccess called when the image is fetched successfully with the URI of the image
