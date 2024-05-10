@@ -43,22 +43,19 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @return the association with the given id
    */
   fun getAssociation(id: String, onSuccess: (Association) -> Unit, onFailure: (Exception) -> Unit) {
-    if (associationCache.isNotEmpty()) {
-      if (associationCache.containsKey(id)) {
-        onSuccess(associationCache[id]!!)
+    val getFromCache = {
+      val value = associationCache[id]
+      if (value != null) {
+        onSuccess(value)
       } else {
         onFailure(Exception("Association not found"))
       }
+    }
+
+    if (associationCache.isNotEmpty()) {
+      getFromCache()
     } else {
-      fillCache(
-          {
-            if (associationCache.containsKey(id)) {
-              onSuccess(associationCache[id]!!)
-            } else {
-              onFailure(Exception("Association not found"))
-            }
-          },
-          onFailure)
+      fillCache(getFromCache, onFailure)
     }
   }
 
