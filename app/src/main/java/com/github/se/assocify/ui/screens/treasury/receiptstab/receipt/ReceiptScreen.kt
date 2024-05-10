@@ -54,22 +54,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
 import com.github.se.assocify.model.entities.Status
-import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReceiptScreen(
-    navActions: NavigationActions,
-    receiptUid: String = "",
-    viewModel: ReceiptViewModel =
-        if (receiptUid.isEmpty()) {
-          ReceiptViewModel(navActions)
-        } else {
-          ReceiptViewModel(receiptUid = receiptUid, navActions = navActions)
-        }
-) {
+fun ReceiptScreen(viewModel: ReceiptViewModel) {
 
   val receiptState by viewModel.uiState.collectAsState()
 
@@ -82,7 +72,7 @@ fun ReceiptScreen(
             },
             navigationIcon = {
               IconButton(
-                  modifier = Modifier.testTag("backButton"), onClick = { navActions.back() }) {
+                  modifier = Modifier.testTag("backButton"), onClick = { viewModel.back() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                   }
             })

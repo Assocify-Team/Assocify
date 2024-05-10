@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.assocify.R
 import com.github.se.assocify.model.SupabaseClient
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -71,11 +70,7 @@ fun rememberSupabaseAuthLauncher(
 }
 
 @Composable
-fun LoginScreen(
-    navActions: NavigationActions,
-    userAPI: UserAPI,
-    viewModel: LoginViewModel = LoginViewModel(navActions, userAPI)
-) {
+fun LoginScreen(navActions: NavigationActions, viewModel: LoginViewModel) {
 
   val launcher =
       rememberSupabaseAuthLauncher(

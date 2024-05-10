@@ -70,7 +70,7 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, "subCategoryUid")
     composeTestRule.setContent {
-      BudgetDetailedScreen("subCategoryUid", mockNavActions, mockBudgetAPI)
+      BudgetDetailedScreen("subCategoryUid", mockNavActions, budgetDetailedViewModel)
     }
   }
 

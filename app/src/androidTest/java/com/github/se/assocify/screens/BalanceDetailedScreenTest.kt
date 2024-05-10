@@ -18,6 +18,7 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -87,8 +88,10 @@ class BalanceDetailedScreenTest :
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
+    val subCategoryUid = "subcategoryuid"
+    val budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, subCategoryUid)
     composeTestRule.setContent {
-      BalanceDetailedScreen("subcategoryuid", mockNavActions, mockBudgetAPI)
+      BalanceDetailedScreen(subCategoryUid, mockNavActions, budgetDetailedViewModel)
     }
   }
 
