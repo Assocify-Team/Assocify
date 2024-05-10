@@ -44,8 +44,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
-import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -56,10 +54,8 @@ import com.github.se.assocify.ui.composables.UserSearchTextField
 @Composable
 fun CreateAssociationScreen(
     navigationActions: NavigationActions,
-    assoAPI: AssociationAPI,
-    userAPI: UserAPI,
-    viewmodel: CreateAssociationViewmodel =
-        CreateAssociationViewmodel(assoAPI, userAPI, navigationActions)
+    viewmodel: CreateAssociationViewmodel
+
 ) {
 
   val state by viewmodel.uiState.collectAsState()
