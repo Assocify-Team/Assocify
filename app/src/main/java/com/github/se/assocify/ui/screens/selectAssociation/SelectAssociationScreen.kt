@@ -156,7 +156,7 @@ fun SelectAssociationScreen(
                 // Display only registered organization
                 val registeredAssociation = state.value.associations
                 if (registeredAssociation.isEmpty()) {
-                  item { Text(text = "There are no organizations to display.") }
+                  item { Text(text = "There are no associations to display.") }
                 } else {
                   itemsIndexed(registeredAssociation) { index, organization ->
                     DisplayOrganization(organization, model)
