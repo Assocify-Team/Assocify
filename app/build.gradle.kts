@@ -70,6 +70,7 @@ android {
             )
         }
         debug {
+            signingConfig = signingConfigs.getByName("release")
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
