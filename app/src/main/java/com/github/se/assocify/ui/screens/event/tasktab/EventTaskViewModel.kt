@@ -17,13 +17,17 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
   }
 
   /** Updates the list of tasks in the UI. */
-  private fun updateTasks() {
+  fun updateTasks() {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
     db.getTasks(
         { tasks ->
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
           _uiState.value = _uiState.value.copy(tasks = tasks)
           filterTasks()
         },
-        {})
+        {
+          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks")
+        })
   }
 
   /**
@@ -88,6 +92,8 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
  * @param filter the filter string
  */
 data class EventTaskState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val tasks: List<Task> = emptyList(),
     val filteredTasks: List<Task> = emptyList(),
     val filteredEvents: List<Event> = emptyList(),
