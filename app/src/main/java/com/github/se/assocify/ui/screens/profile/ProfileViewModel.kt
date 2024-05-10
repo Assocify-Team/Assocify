@@ -209,7 +209,7 @@ data class ProfileUIState(
     val myAssociations: List<DropdownOption> =
         listOf(
             DropdownOption(
-                "Join an other",
+                "Add association",
                 "join",
                 {
                   Icon(
