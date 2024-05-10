@@ -50,7 +50,7 @@ class BudgetDetailedViewModel(
   }
 
   fun startEditing(budgetItem: BudgetItem) {
-    _uiState.value = _uiState.value.copy(editing = true)
+    _uiState.value = _uiState.value.copy(editing = true, editedBudgetItem = budgetItem)
   }
 
   fun saveEditing(budgetItem: BudgetItem) {
@@ -58,11 +58,12 @@ class BudgetDetailedViewModel(
     _uiState.value =
         _uiState.value.copy(
             editing = false,
-            budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem)
+            budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem,
+            editedBudgetItem = null)
   }
 
   fun cancelEditing() {
-    _uiState.value = _uiState.value.copy(editing = false)
+    _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
 }
 

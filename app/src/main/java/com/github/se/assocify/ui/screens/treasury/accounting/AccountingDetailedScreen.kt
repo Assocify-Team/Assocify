@@ -3,11 +3,13 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -15,11 +17,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -44,6 +50,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
@@ -276,6 +283,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   val budget = budgetModel.editedBudgetItem!!
   var nameString by remember { mutableStateOf(budget.nameItem) }
   var amountString by remember { mutableStateOf(budget.amount.toString()) }
+  var tvaTypeString by remember { mutableStateOf(budget.tva.toString()) }
   var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(budget.description) }
   var yearString by remember { mutableStateOf(budget.year.toString()) }
@@ -294,19 +302,38 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             label = { Text("Name") },
             supportingText = {})
         OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(50.dp),
             value = amountString,
             onValueChange = { amountString = it },
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
-        OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = tvaString,
-            onValueChange = { tvaString = it },
-            label = { Text("TVA") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-            supportingText = {})
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+          var tvaExtended by remember { mutableStateOf(false) }
+          FilterChip(
+              modifier = Modifier.fillMaxWidth().size(12.dp),
+              selected = tvaExtended,
+              onClick = { tvaExtended = !tvaExtended },
+              label = { Text(tvaTypeString) },
+              trailingIcon = {
+                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+              })
+          DropdownMenu(
+              modifier = Modifier,
+              expanded = tvaExtended,
+              onDismissRequest = { tvaExtended = false },
+              properties = PopupProperties(focusable = true)) {
+                TVA.entries.forEach { tva ->
+                  DropdownMenuItem(
+                      text = { Text(tva.toString()) },
+                      onClick = {
+                        tvaTypeString = tva.toString()
+                        tvaString = tva.rate.toString()
+                        tvaExtended = false
+                      })
+                }
+              }
+        }
         OutlinedTextField(
             modifier = Modifier.padding(8.dp),
             value = descriptionString,
