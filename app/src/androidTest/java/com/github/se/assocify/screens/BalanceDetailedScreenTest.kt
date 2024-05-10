@@ -50,41 +50,38 @@ class BalanceDetailedScreenTest :
           100,
           Status.Pending,
           MaybeRemotePhoto.Remote("path"))
-  val balanceItems =
-      listOf(
-          BalanceItem(
-              "1",
-              "pair of scissors",
-              5,
-              TVA.TVA_8,
-              "scissors for paper cutting",
-              subCategory,
-              LocalDate.of(2024, 4, 14),
-              receipt,
-              "François Théron",
-              Status.Pending),
-          BalanceItem(
-              "2",
-              "sweaters",
-              1000,
-              TVA.TVA_8,
-              "order for 1000 sweaters",
-              subCategory,
-              LocalDate.of(2024, 3, 11),
-              receipt,
-              "Rayan Boucheny",
-              Status.Archived),
-          BalanceItem(
-              "3",
-              "chairs",
-              200,
-              TVA.TVA_8,
-              "order for 200 chairs",
-              subCategory,
-              LocalDate.of(2024, 1, 14),
-              receipt,
-              "Sidonie Bouthors",
-              Status.Reimbursed))
+    val balanceItems =
+        listOf(
+            BalanceItem(
+                "1",
+                "pair of scissors",
+                "",
+                5,
+                TVA.TVA_8,
+                "scissors for paper cutting",
+                LocalDate.of(2024, 4, 14),
+                "François Théron",
+                Status.Pending),
+            BalanceItem(
+                "2",
+                "sweaters",
+                "",
+                1000,
+                TVA.TVA_8,
+                "order for 1000 sweaters",
+                LocalDate.of(2024, 3, 11),
+                "Rayan Boucheny",
+                Status.Archived),
+            BalanceItem(
+                "3",
+                "chairs",
+                "",
+                200,
+                TVA.TVA_8,
+                "order for 200 chairs",
+                LocalDate.of(2024, 1, 14),
+                "Sidonie Bouthors",
+                Status.Reimbursed))
 
   @Before
   fun setup() {
