@@ -100,29 +100,27 @@ class CreateAssociationViewmodel(
    */
   fun searchMember(searchMember: String) {
     _uiState.value = _uiState.value.copy(searchMember = searchMember)
-    if (searchMember.isNotBlank()) {
-      userAPI.getAllUsers(
-          onSuccess = { userList ->
-            _uiState.value =
-                _uiState.value.copy(
-                    searchMemberList =
-                        userList
-                            .filterNot { user ->
-                              _uiState.value.members.any { us -> us.user.uid == user.uid }
-                            }
-                            .filter { it.name.lowercase().contains(searchMember.lowercase()) })
-            if (_uiState.value.searchMemberList.isEmpty()) {
-              _uiState.value = _uiState.value.copy(memberError = "No users found")
-            } else {
-              _uiState.value = _uiState.value.copy(memberError = null)
-            }
-          },
-          onFailure = { exception ->
-            Log.e("CreateAssoViewModel", "Failed to get users:${exception.message}")
-          })
-    } else {
-      _uiState.value = _uiState.value.copy(memberError = null)
-    }
+
+    userAPI.getAllUsers(
+        onSuccess = { userList ->
+          _uiState.value =
+              _uiState.value.copy(
+                  searchMemberList =
+                      userList
+                          .filterNot { user ->
+                            _uiState.value.members.any { us -> us.user.uid == user.uid }
+                          }
+                          .filter { it.name.lowercase().contains(searchMember.lowercase()) }
+                          .take(4))
+          if (_uiState.value.searchMemberList.isEmpty()) {
+            _uiState.value = _uiState.value.copy(memberError = "No users found")
+          } else {
+            _uiState.value = _uiState.value.copy(memberError = null)
+          }
+        },
+        onFailure = { exception ->
+          Log.e("CreateAssoViewModel", "Failed to get users:${exception.message}")
+        })
   }
 
   /*
@@ -177,7 +175,7 @@ class CreateAssociationViewmodel(
         onSuccess = {
           assoAPI.initAssociation(roles.values, _uiState.value.members, {}, {})
           CurrentUser.associationUid = association.uid
-          navActions.onLogin(true)
+          navActions.goFromCreateAsso()
         },
         onFailure = { exception ->
           Log.e("CreateAssoViewModel", "Failed to add asso: ${exception.message}")
