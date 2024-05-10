@@ -14,12 +14,11 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import java.time.LocalDate
+import com.github.se.assocify.ui.composables.DropdownOption
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,12 +50,20 @@ class ProfileViewModel(
         },
         { _uiState.value = _uiState.value.copy(myName = "name not found") })
     userAPI.getCurrentUserAssociations(
-        { associations -> _uiState.value = _uiState.value.copy(myAssociations = associations) },
+        { associations ->
+          _uiState.value =
+              _uiState.value.copy(
+                  myAssociations = associations.map { DropdownOption(it.name, it.uid) })
+        },
         { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
 
     assoAPI.getAssociation(
         CurrentUser.associationUid!!,
-        { association -> _uiState.value = _uiState.value.copy(selectedAssociation = association) },
+        { association ->
+          _uiState.value =
+              _uiState.value.copy(
+                  selectedAssociation = DropdownOption(association.name, association.uid))
+        },
         {
           _uiState.value =
               _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
@@ -97,7 +104,7 @@ class ProfileViewModel(
    *
    * @param association the association
    */
-  fun setAssociation(association: Association) {
+  fun setAssociation(association: DropdownOption) {
     CurrentUser.associationUid = association.uid
     _uiState.value = _uiState.value.copy(selectedAssociation = association)
     userAPI.getCurrentUserRole(
@@ -175,11 +182,11 @@ data class ProfileUIState(
     // the uri of the profile image
     val profileImageURI: Uri? = null,
     // the associations of the user
-    val myAssociations: List<Association> = emptyList(),
+    val myAssociations: List<DropdownOption> = emptyList(),
     // true if the association dropdown should be shown, false if should be hidden
     val openAssociationDropdown: Boolean = false,
     // the selected (current) association - TODO idk what to do with the temporary association
-    val selectedAssociation: Association = Association("none", "", "none", LocalDate.now()),
+    val selectedAssociation: DropdownOption = DropdownOption("", "temp"),
     // current role of the user in the association
     val currentRole: PermissionRole =
         PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)
@@ -190,13 +197,13 @@ data class ProfileUIState(
  * icon corresponding to the setting.
  */
 enum class MySettings {
-  Theme,
+  Preferences,
   Privacy,
   Notifications;
 
   fun getIcon(): ImageVector {
     return when (this) {
-      Theme -> Icons.Default.LightMode
+      Preferences -> Icons.Default.LightMode
       Privacy -> Icons.Default.Lock
       Notifications -> Icons.Default.Notifications
     }
@@ -204,7 +211,7 @@ enum class MySettings {
 
   fun getDestination(): Destination {
     return when (this) {
-      Theme -> Destination.ProfileTheme
+      Preferences -> Destination.ProfilePreferences
       Privacy -> Destination.ProfileSecurityPrivacy
       Notifications -> Destination.ProfileNotifications
     }
