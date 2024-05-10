@@ -43,7 +43,8 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           AccountingCategory("1", "Events"),
           AccountingCategory("2", "Pole"),
           AccountingCategory("3", "Commissions"),
-      )
+          AccountingCategory("4", "Sponsorship"))
+
   val subCategoryList =
       listOf(
           AccountingSubCategory("4", "2", "Administration", 30),
@@ -79,8 +80,8 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     CurrentUser.associationUid = "associationId"
     budgetViewModel = BudgetViewModel(mockAccountingCategoryAPI, mockAccountingSubCategoryAPI)
     composeTestRule.setContent {
-      AccountingFilterBar(budgetViewModel)
       AccountingScreen(AccountingPage.BUDGET, mockNavActions, budgetViewModel)
+      AccountingFilterBar(budgetViewModel = budgetViewModel)
     }
   }
 
@@ -98,13 +99,31 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   /** Tests if the lines are filtered according to the category */
   @Test
-  fun testAllSubCategoriesAreDisplayedUnderGlobal() {
+  fun testFiltering() {
     with(composeTestRule) {
       onNodeWithTag("categoryFilterChip").performClick()
-      onNodeWithText("Global").performClick()
 
-      // Assert that all subcategories are shown under the global
+      // Tests if the lines are filtered according to the category
+      onNodeWithText("Events").performClick()
+      subCategoryList
+          .filter { it.categoryUID == "1" }
+          .forEach() { onNodeWithText(it.name).assertIsDisplayed() }
+      assert(!budgetViewModel.uiState.value.globalSelected)
+      assert(
+          budgetViewModel.uiState.value.subCategoryList ==
+              subCategoryList.filter { it.categoryUID == "1" })
+
+      // Tests if the lines are displayed when the global category is selected
+      onNodeWithTag("categoryFilterChip").performClick()
+      onNodeWithText("Global").performClick()
       subCategoryList.forEach() { onNodeWithText(it.name).assertIsDisplayed() }
+      assert(budgetViewModel.uiState.value.globalSelected)
+      assert(budgetViewModel.uiState.value.subCategoryList == subCategoryList)
+
+      // Tests if a message is shown when no subCategory
+      onNodeWithTag("categoryFilterChip").performClick()
+      onNodeWithText("Sponsorship").performClick()
+      onNodeWithText("No data available with this tag").assertIsDisplayed()
     }
   }
 

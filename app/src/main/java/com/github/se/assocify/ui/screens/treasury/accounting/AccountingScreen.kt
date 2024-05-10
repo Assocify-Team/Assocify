@@ -140,8 +140,6 @@ fun DisplayLine(
       headlineContent = { Text(category.name) },
       trailingContent = { Text("${category.amount}") },
       modifier =
-          // TODO: change category.name to category.uid when AccountingSubCategoryAPI will be
-          // implemented
           Modifier.clickable {
                 if (page == AccountingPage.BUDGET) {
                   navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
