@@ -1,4 +1,4 @@
-package com.github.se.assocify
+package com.github.se.assocify.epics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
