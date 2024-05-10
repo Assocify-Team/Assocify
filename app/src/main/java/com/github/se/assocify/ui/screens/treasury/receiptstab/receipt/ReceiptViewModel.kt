@@ -11,14 +11,14 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
-import java.time.LocalDate
-import java.util.UUID
-import kotlin.math.absoluteValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.UUID
+import kotlin.math.absoluteValue
 
 class ReceiptViewModel {
 
@@ -218,6 +218,10 @@ class ReceiptViewModel {
           })
     }
   }
+
+    fun back() {
+        navActions.back()
+    }
 }
 
 data class ReceiptState(
