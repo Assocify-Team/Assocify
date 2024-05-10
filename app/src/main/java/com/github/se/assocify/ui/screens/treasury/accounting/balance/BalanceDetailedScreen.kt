@@ -1,7 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
 import androidx.compose.runtime.Composable
-import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
@@ -18,11 +17,11 @@ import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetail
 fun BalanceDetailedScreen(
     subCategoryUid: String,
     navigationActions: NavigationActions,
-    budgetAPI: BudgetAPI
+    budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
   AccountingDetailedScreen(
       page = AccountingPage.BALANCE,
       subCategoryUid = subCategoryUid,
       navigationActions = navigationActions,
-      budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryUid))
+      budgetDetailedViewModel = budgetDetailedViewModel)
 }
