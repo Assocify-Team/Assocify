@@ -50,7 +50,6 @@ import java.time.LocalDate
  * The detailed screen of a subcategory in the accounting screen
  *
  * @param page: The page to display (either "budget" or "balance")
- * @param subCategoryUid: The unique identifier of the subcategory
  * @param navigationActions: The navigation actions
  * @param budgetDetailedViewModel: The view model for the budget detailed screen
  */
@@ -58,7 +57,6 @@ import java.time.LocalDate
 @Composable
 fun AccountingDetailedScreen(
     page: AccountingPage,
-    subCategoryUid: String,
     navigationActions: NavigationActions,
     budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
@@ -156,23 +154,26 @@ fun AccountingDetailedScreen(
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
-          item {
-            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
-              DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
-                budgetDetailedViewModel.onYearFilter(it.toInt())
-              }
-              if (page == AccountingPage.BALANCE) {
-                DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
-                  selectedStatus = it
-                }
-              }
+            //Display the filter chips
+            item {
+                Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+                  DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
+                    budgetDetailedViewModel.onYearFilter(it.toInt())
+                  }
+                  if (page == AccountingPage.BALANCE) {
+                    DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
+                      selectedStatus = it
+                    }
+                  }
 
-              // TODO: change amount given TVA
-              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-                // TODO: budgetDetailedViewModel.onTVAFilter(it)
-              }
+                  // TODO: change amount given TVA
+                  DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+                    // TODO: budgetDetailedViewModel.onTVAFilter(it)
+                  }
+                }
             }
-          }
+
+            //Display the items
           if (page == AccountingPage.BALANCE) {
             items(filteredBalanceList) {
               DisplayBalanceItem(it, "displayItem${it.uid}")
@@ -185,7 +186,13 @@ fun AccountingDetailedScreen(
             }
           }
 
-          item { TotalItems(totalAmount) }
+            //Display the total amount of the subcategory if list is not empty
+            if(budgetModel.budgetList.isNotEmpty()){
+                item { TotalItems(totalAmount) }
+            } else {
+                item { Text("No items for the ${subCategory.name} sheet") }
+            }
+
         }
       })
 }

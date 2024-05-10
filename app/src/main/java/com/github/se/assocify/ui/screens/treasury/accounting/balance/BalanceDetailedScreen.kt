@@ -21,7 +21,6 @@ fun BalanceDetailedScreen(
 ) {
   AccountingDetailedScreen(
       page = AccountingPage.BALANCE,
-      subCategoryUid = subCategoryUid,
       navigationActions = navigationActions,
       budgetDetailedViewModel = budgetDetailedViewModel)
 }

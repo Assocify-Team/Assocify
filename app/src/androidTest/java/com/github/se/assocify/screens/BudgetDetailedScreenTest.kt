@@ -124,6 +124,18 @@ class BudgetDetailedScreenTest :
     }
   }
 
+    /** Tests if amount is not shown when empty list*/
+    @Test
+    fun testEmptyList() {
+        with(composeTestRule) {
+            onNodeWithTag("yearListTag").performClick()
+            onNodeWithText("2021").performClick()
+            onNodeWithTag("totalItems").assertIsNotDisplayed()
+            onNodeWithText("No items for the ${subCategoryList.first().name} sheet").assertIsDisplayed()
+
+        }
+    }
+
   /** Tests if go back to Treasury */
   @Test
   fun goBackTest() {

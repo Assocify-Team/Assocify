@@ -20,5 +20,5 @@ fun BudgetDetailedScreen(
     budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
   AccountingDetailedScreen(
-      AccountingPage.BUDGET, subCategoryUid, navigationActions, budgetDetailedViewModel)
+      AccountingPage.BUDGET, navigationActions, budgetDetailedViewModel)
 }
