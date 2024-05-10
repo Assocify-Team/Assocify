@@ -123,8 +123,7 @@ fun SelectAssociationScreen(navActions: NavigationActions, viewModel: SelectAsso
                       imageVector = Icons.Default.Search,
                       contentDescription = null,
                       modifier =
-                          Modifier.clickable(
-                                      onClick = { viewModel.updateSearchQuery(query, true) })
+                          Modifier.clickable(onClick = { viewModel.updateSearchQuery(query, true) })
                               .testTag("SOB"))
                 }
               }) {
