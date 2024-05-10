@@ -19,6 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -28,6 +30,7 @@ import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 
@@ -42,6 +45,8 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
+    accountingCategoriesAPI: AccountingCategoryAPI,
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
     receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions),
     treasuryViewModel: TreasuryViewModel =
         TreasuryViewModel(navActions = navActions, receiptListViewModel = receiptListViewModel)
@@ -49,6 +54,7 @@ fun TreasuryScreen(
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
+  val budgetViewModel = BudgetViewModel(accountingCategoriesAPI, accountingSubCategoryAPI)
 
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
@@ -93,15 +99,15 @@ fun TreasuryScreen(
 
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar()
-            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar()
+            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(budgetViewModel)
+            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(budgetViewModel)
           }
 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.Receipts.ordinal -> ReceiptListScreen(receiptListViewModel)
-              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions)
+              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions, budgetViewModel)
               TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions)
             }
           }
