@@ -141,7 +141,6 @@ fun SelectAssociationScreen(navActions: NavigationActions, viewModel: SelectAsso
               }
 
           LazyColumn(
-              //            contentPadding = innerPadding,
               verticalArrangement = Arrangement.spacedBy(4.dp),
               modifier =
                   Modifier.fillMaxSize().fillMaxWidth().padding(16.dp).testTag("RegisteredList")) {

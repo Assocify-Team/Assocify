@@ -63,7 +63,10 @@ fun DropdownWithSetOptions(
       }
 }
 
-/** An option for the dropdown : has a name (displayed) and a uid (for uniqueness) */
+/**
+ * An option for the dropdown : a name (displayed), a uid (for uniqueness), a leading icon
+ * (optional, usually `{ Icon(...) }`, null by default)
+ */
 data class DropdownOption(
     val name: String,
     val uid: String,

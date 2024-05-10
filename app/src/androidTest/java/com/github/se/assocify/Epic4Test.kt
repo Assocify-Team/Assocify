@@ -38,8 +38,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * This test is an end-to-end test for the fourth epic :
+ *
+ * As a president of 2 associations, I want to register both in the app and chose in which one I
+ * currently want to work
+ */
 @RunWith(AndroidJUnit4::class)
-class EpicPrezTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var navController: TestNavHostController
@@ -149,7 +155,7 @@ class EpicPrezTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSu
   }
 
   @Test
-  fun EpicPrezTest() {
+  fun Epic4Test() {
     with(composeTestRule) {
       // After login as uid "1", the user is in selectAsso :
       // check it's well displayed (no back arrow, no asso yet...)
