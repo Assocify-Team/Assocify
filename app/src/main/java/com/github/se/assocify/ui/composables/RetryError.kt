@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun ErrorMessage(errorMessage: String?, onRetry: (() -> Unit)? = null) {
@@ -15,7 +16,7 @@ fun ErrorMessage(errorMessage: String?, onRetry: (() -> Unit)? = null) {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
       modifier = Modifier.fillMaxSize()) {
-        errorMessage?.let { Text(text = it) }
+        errorMessage?.let { Text(text = it, modifier = Modifier.testTag("errorMessage")) }
         onRetry?.let { Button(onClick = it) { Text(text = "Retry") } }
       }
 }
