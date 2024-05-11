@@ -291,9 +291,9 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   var descriptionString by remember { mutableStateOf(budget.description) }
   var yearString by remember { mutableStateOf(budget.year.toString()) }
 
-  Dialog(onDismissRequest = { /*TODO: close dialog*/}) {
+  Dialog(onDismissRequest = { budgetViewModel.cancelEditing()}) {
     Card(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
@@ -356,7 +356,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
         ) {
           Button(
               onClick = { budgetViewModel.cancelEditing() },
-              modifier = Modifier.padding(15.dp),
+              modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
           ) {
             Text("Dismiss")
           }

@@ -144,4 +144,13 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
     }
   }
+
+    fun testEditDismissWorks() {
+        with(composeTestRule) {
+            onNodeWithText("pair of scissors").performClick()
+            onNodeWithTag("editDialogBox").assertIsDisplayed()
+            onNodeWithTag("editDismissButton").performClick()
+            onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+        }
+    }
 }
