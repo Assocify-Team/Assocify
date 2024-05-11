@@ -7,6 +7,8 @@ import java.time.LocalDate
  *
  * @param uid unique identifier of the item
  * @param nameItem name of the item (for example: sweater)
+ * @param categoryUID unique identifier of the category of the item
+ * @param receiptUID unique identifier of the receipt of the item
  * @param amount amount of the item
  * @param tva TVA of the item
  * @param description description of the item
@@ -18,6 +20,7 @@ data class BalanceItem(
     val uid: String,
     val nameItem: String,
     val categoryUID: String,
+    val receiptUID:String,
     val amount: Int, // unsigned: can be positive or negative
     val tva: TVA,
     val description: String,

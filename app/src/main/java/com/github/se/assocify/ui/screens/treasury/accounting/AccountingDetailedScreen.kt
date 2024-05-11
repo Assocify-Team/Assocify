@@ -83,6 +83,7 @@ fun AccountingDetailedScreen(
               "1",
               "pair of scissors",
               "",
+              "00000000-0000-0000-0000-000000000000",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
@@ -93,6 +94,7 @@ fun AccountingDetailedScreen(
               "2",
               "sweaters",
               "",
+              "00000000-0000-0000-0000-000000000000",
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
@@ -103,6 +105,7 @@ fun AccountingDetailedScreen(
               "3",
               "chairs",
               "",
+              "00000000-0000-0000-0000-000000000000",
               200,
               TVA.TVA_8,
               "order for 200 chairs",
@@ -192,7 +195,6 @@ fun AccountingDetailedScreen(
  * A line displaying the total amount of the subcategory
  *
  * @param totalAmount: The total amount of the subcategory
- * @param page: The page to which the total amount belongs
  */
 @Composable
 fun TotalItems(totalAmount: Int) {

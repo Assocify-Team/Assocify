@@ -91,6 +91,7 @@ data class SupabaseBalanceItem(
         uid = uid,
         nameItem = nameItem,
         categoryUID = categoryUID,
+        receiptUID = receiptUID,
         amount = amount,
         tva = tva,
         description = description,
