@@ -146,7 +146,8 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
     }
   }
-  @Test 
+
+  @Test
   fun testEditDismissWorks() {
     with(composeTestRule) {
       onNodeWithText("pair of scissors").performClick()
@@ -159,6 +160,7 @@ class BudgetDetailedScreenTest :
       onNodeWithText("scotch").assertIsNotDisplayed()
     }
   }
+
   @Test
   fun testEditModifyWorks() {
     with(composeTestRule) {
