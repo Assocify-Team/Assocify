@@ -194,7 +194,6 @@ fun AccountingDetailedScreen(
  * A line displaying the total amount of the subcategory
  *
  * @param totalAmount: The total amount of the subcategory
- * @param page: The page to which the total amount belongs
  */
 @Composable
 fun TotalItems(totalAmount: Int) {
