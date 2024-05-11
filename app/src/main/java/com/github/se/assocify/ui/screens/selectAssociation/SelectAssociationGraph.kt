@@ -13,7 +13,7 @@ fun NavGraphBuilder.selectAssociationGraph(
     associationAPI: AssociationAPI,
 ) {
   composable(route = Destination.SelectAsso.route) {
-    SelectAssociation(
-        navActions = navigationActions, associationAPI = associationAPI, userAPI = userAPI)
+    SelectAssociationScreen(
+        navigationActions, SelectAssociationViewModel(associationAPI, userAPI, navigationActions))
   }
 }

@@ -1,14 +1,18 @@
 package com.github.se.assocify.ui.screens.event.maptab
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
@@ -26,63 +30,77 @@ private const val INITIAL_ZOOM = 15.0
 /** A screen that displays a map of the event: location with the associated tasks. */
 @Composable
 fun EventMapScreen() {
-  Column(
-      modifier =
-          Modifier.fillMaxWidth()
-              // TODO : padding is used to avoid a bug where the map
-              //        overlaps the top bar. Has to be changed later on.
-              .padding(top = 80.dp)
-              .testTag("OSMMapScreen")) {
-        EventMapView()
-      }
+  Column(modifier = Modifier.fillMaxWidth().testTag("OSMMapScreen")) {
+    // EventMapView()
+    EPFLMapView(modifier = Modifier.fillMaxWidth())
+  }
 }
 
+/**
+ * Initialize the map view with the EPFL plan tiles and it's lifecycle in order to save its state
+ */
 @Composable
-fun EventMapView() {
-  AndroidView(
-      factory = { context ->
-        val mapView = createMapView(context)
-        mapView
-      },
-      modifier = Modifier.testTag("EPFLMapView").fillMaxWidth(),
-      update = { view ->
-        // TODO : viewmodel stuff will be here
-      })
-}
+fun rememberMapViewWithLifecycle(): MapView {
+  val context = LocalContext.current
 
-/**
- * Creates a new MapView with the default configuration
- *
- * @param context the context of the application
- */
-private fun createMapView(context: Context): MapView {
-  // For some reason, required for OSMdroid
+  // Update OSM configuration, for some reason
   Configuration.getInstance().userAgentValue = context.packageName
-  return initMapView(context)
-}
 
-/**
- * Initializes the MapView with the desired configuration
- *
- * @param context the context of the application
- */
-private fun initMapView(context: Context): MapView {
-  val mapView = MapView(context)
-  mapView.setTileSource(DEFAULT_TILE_SOURCE)
-  // Zoom buttons only appears on touch and then fade out
-  mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
-  // Enable pinch to zoom
-  mapView.setMultiTouchControls(true)
-  // Initial settings
-  mapView.controller.setZoom(INITIAL_ZOOM)
-  mapView.controller.setCenter(INITIAL_POSITION)
-  // Sets the tile source ot the EPFL plan tiles
-  val campusTileSource = CampusTileSource(0)
-  val tileProvider = MapTileProviderBasic(context, campusTileSource)
-  val tilesOverlay = TilesOverlay(tileProvider, context)
-  mapView.overlays.add(tilesOverlay)
+  // Initialise the map view
+  val mapView = remember {
+    MapView(context).apply {
+      setTileSource(DEFAULT_TILE_SOURCE)
+      // Zoom buttons only appears on touch and then fade out
+      zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
+      // Enable pinch to zoom
+      setMultiTouchControls(true)
+      // Initial settings
+      controller.setZoom(INITIAL_ZOOM)
+      controller.setCenter(INITIAL_POSITION)
+      // Sets the tile source ot the EPFL plan tiles
+      val campusTileSource = CampusTileSource(0)
+      val tileProvider = MapTileProviderBasic(context, campusTileSource)
+      val tilesOverlay = TilesOverlay(tileProvider, context)
+      overlays.add(tilesOverlay)
+      clipToOutline = true
+    }
+  }
+
+  // Make the mapview live as long as the composable
+  val lifecycleObserver = rememberLifecycleObserver(mapView)
+  val lifecycle = LocalLifecycleOwner.current.lifecycle
+  DisposableEffect(lifecycle) {
+    lifecycle.addObserver(lifecycleObserver)
+    onDispose { lifecycle.removeObserver(lifecycleObserver) }
+  }
 
   return mapView
+}
+
+/**
+ * Observer in order to manage events of the map Useful to save the map, its components and its
+ * state
+ *
+ * @param mapView the map view to observe
+ */
+@Composable
+fun rememberLifecycleObserver(mapView: MapView): LifecycleObserver =
+    remember(mapView) {
+      LifecycleEventObserver { _, event ->
+        when (event) {
+          Lifecycle.Event.ON_RESUME -> mapView.onResume()
+          Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+          else -> {}
+        }
+      }
+    }
+
+/** A composable that displays a map view. */
+@Composable
+fun EPFLMapView(modifier: Modifier, onLoad: ((map: MapView) -> Unit)? = null) {
+  val mapViewState = rememberMapViewWithLifecycle()
+  AndroidView(
+      factory = { mapViewState }, modifier = modifier, update = { view -> onLoad?.invoke(view) })
 }
 
 /**

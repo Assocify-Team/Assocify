@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -31,7 +32,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,21 +44,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
-import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.RoleType
-import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.UserSearchState
 import com.github.se.assocify.ui.composables.UserSearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAssociationScreen(
     navigationActions: NavigationActions,
-    assoAPI: AssociationAPI,
-    userAPI: UserAPI,
-    viewmodel: CreateAssociationViewmodel =
-        CreateAssociationViewmodel(assoAPI, userAPI, navigationActions)
+    viewmodel: CreateAssociationViewmodel
 ) {
 
   val state by viewmodel.uiState.collectAsState()
@@ -66,7 +61,7 @@ fun CreateAssociationScreen(
   Scaffold(
       modifier = Modifier.testTag("createAssoScreen"),
       topBar = {
-        TopAppBar(
+        CenterAlignedTopAppBar(
             modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
               IconButton(
@@ -140,10 +135,7 @@ fun CreateAssociationScreen(
                       Text("Add members")
                     }
                 Button(
-                    onClick = {
-                      viewmodel.saveAsso()
-                      navigationActions.navigateToMainTab(Destination.Home)
-                    },
+                    onClick = { viewmodel.saveAsso() },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
                     enabled = state.savable) {
                       Text("Create")
@@ -160,16 +152,16 @@ fun CreateAssociationScreen(
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     UserSearchTextField(
                         modifier = Modifier.testTag("memberSearchField").fillMaxWidth(),
-                        searchValue = state.searchMember,
-                        userList = state.searchMemberList,
-                        user = state.editMember?.user,
+                        state =
+                            UserSearchState(
+                                searchValue = state.searchMember,
+                                userList = state.searchMemberList,
+                                user = state.editMember?.user,
+                                errorText = state.memberError?.let { { Text(it) } }),
                         onUserSearch = { viewmodel.searchMember(it) },
                         onUserSelect = { viewmodel.selectMember(it) },
                         onUserDismiss = { viewmodel.dismissMemberSearch() },
-                        expanded = state.searchMemberList.isNotEmpty(),
-                        label = { Text("Name") },
-                        isError = (state.memberError != null),
-                        supportingText = state.memberError?.let { { Text(it) } })
+                        label = { Text("Name") })
                     if (state.editMember != null) {
                       // can't select role before selecting member
                       RoleType.entries.forEach { role ->

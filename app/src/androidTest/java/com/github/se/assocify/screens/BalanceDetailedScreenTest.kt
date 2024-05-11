@@ -19,6 +19,7 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -54,34 +55,34 @@ class BalanceDetailedScreenTest :
           BalanceItem(
               "1",
               "pair of scissors",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategory,
               LocalDate.of(2024, 4, 14),
-              receipt,
               "François Théron",
               Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              subCategory,
               LocalDate.of(2024, 3, 11),
-              receipt,
               "Rayan Boucheny",
               Status.Archived),
           BalanceItem(
               "3",
               "chairs",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               200,
               TVA.TVA_8,
               "order for 200 chairs",
-              subCategory,
               LocalDate.of(2024, 1, 14),
-              receipt,
               "Sidonie Bouthors",
               Status.Reimbursed))
 
@@ -89,8 +90,10 @@ class BalanceDetailedScreenTest :
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
+    val subCategoryUid = "subcategoryuid"
+    val budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, subCategoryUid)
     composeTestRule.setContent {
-      BalanceDetailedScreen("subcategoryuid", mockNavActions, mockBudgetAPI)
+      BalanceDetailedScreen(subCategoryUid, mockNavActions, budgetDetailedViewModel)
     }
   }
 
