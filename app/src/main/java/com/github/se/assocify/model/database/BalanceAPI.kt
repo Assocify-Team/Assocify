@@ -97,7 +97,6 @@ data class SupabaseBalanceItem(
         date = LocalDate.parse(date),
         assignee = assignee,
         status = status,
-
     )
   }
 
