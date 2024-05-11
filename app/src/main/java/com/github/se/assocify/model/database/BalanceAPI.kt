@@ -90,12 +90,14 @@ data class SupabaseBalanceItem(
     return BalanceItem(
         uid = uid,
         nameItem = nameItem,
+        categoryUID = categoryUID,
         amount = amount,
         tva = tva,
         description = description,
         date = LocalDate.parse(date),
         assignee = assignee,
         status = status,
+
     )
   }
 

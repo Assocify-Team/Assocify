@@ -82,6 +82,7 @@ fun AccountingDetailedScreen(
           BalanceItem(
               "1",
               "pair of scissors",
+              "",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
@@ -91,6 +92,7 @@ fun AccountingDetailedScreen(
           BalanceItem(
               "2",
               "sweaters",
+              "",
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
@@ -100,6 +102,7 @@ fun AccountingDetailedScreen(
           BalanceItem(
               "3",
               "chairs",
+              "",
               200,
               TVA.TVA_8,
               "order for 200 chairs",
