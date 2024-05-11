@@ -35,7 +35,7 @@ class BalanceDetailedViewModel(
           // Filter the balanceList to only include items with the matching subCategoryUid
           val filteredList =
               balanceList.filter { balanceItem ->
-                balanceItem.year == _uiState.value.year &&
+                balanceItem.date.year == _uiState.value.year &&
                     balanceItem.subCategory.uid == subCategoryUid &&
                     balanceItem.status == _uiState.value.status
               }
