@@ -150,6 +150,8 @@ class BudgetDetailedScreenTest :
   @Test
   fun testEditDismissWorks() {
     with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
       onNodeWithText("pair of scissors").performClick()
       onNodeWithTag("editDialogBox").assertIsDisplayed()
       onNodeWithTag("editNameBox").performTextClearance()
@@ -164,6 +166,8 @@ class BudgetDetailedScreenTest :
   @Test
   fun testEditModifyWorks() {
     with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
       onNodeWithText("pair of scissors").performClick()
       onNodeWithTag("editDialogBox").assertIsDisplayed()
       onNodeWithTag("editNameBox").performTextClearance()
