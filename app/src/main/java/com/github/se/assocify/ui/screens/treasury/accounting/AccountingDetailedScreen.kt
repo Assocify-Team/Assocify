@@ -291,7 +291,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   var descriptionString by remember { mutableStateOf(budget.description) }
   var yearString by remember { mutableStateOf(budget.year.toString()) }
 
-  Dialog(onDismissRequest = { budgetViewModel.cancelEditing()}) {
+  Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
     Card(
         modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
@@ -299,7 +299,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
       Column() {
         Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp).testTag("editNameBox"),
             value = nameString,
             onValueChange = { nameString = it },
             label = { Text("Name") },
@@ -372,7 +372,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
                         category = budget.category,
                         year = yearString.toInt()))
               },
-              modifier = Modifier.padding(15.dp),
+              modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
           ) {
             Text("Confirm")
           }

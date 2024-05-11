@@ -6,6 +6,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -145,12 +147,29 @@ class BudgetDetailedScreenTest :
     }
   }
 
-    fun testEditDismissWorks() {
-        with(composeTestRule) {
-            onNodeWithText("pair of scissors").performClick()
-            onNodeWithTag("editDialogBox").assertIsDisplayed()
-            onNodeWithTag("editDismissButton").performClick()
-            onNodeWithTag("editDialogBox").assertIsNotDisplayed()
-        }
+  fun testEditDismissWorks() {
+    with(composeTestRule) {
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("scotch")
+      onNodeWithTag("editDismissButton").performClick()
+      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("scotch").assertIsNotDisplayed()
     }
+  }
+
+  fun testEditModifyWorks() {
+    with(composeTestRule) {
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("scotch")
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors ").assertIsNotDisplayed()
+      onNodeWithText("scotch").assertIsDisplayed()
+    }
+  }
 }
