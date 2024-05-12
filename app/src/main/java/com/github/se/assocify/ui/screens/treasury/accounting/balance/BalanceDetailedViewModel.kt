@@ -36,7 +36,7 @@ class BalanceDetailedViewModel(
           val filteredList =
               balanceList.filter { balanceItem ->
                 balanceItem.date.year == _uiState.value.year &&
-                    balanceItem.subCategory.uid == subCategoryUid &&
+                    balanceItem.categoryUID == subCategoryUid &&
                     balanceItem.status == _uiState.value.status
               }
 
