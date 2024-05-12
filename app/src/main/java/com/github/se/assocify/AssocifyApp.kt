@@ -5,6 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.SupabaseClient
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
@@ -24,6 +26,8 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
   val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
   val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
+  val accountingCategoriesAPI = AccountingCategoryAPI(SupabaseClient.supabaseClient)
+  val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
   loginSaver.loadUserInfo()
 
   val firstDest =
@@ -40,6 +44,8 @@ fun AssocifyApp(loginSaver: LoginSave) {
         associationAPI = associationAPI,
         eventAPI = eventAPI,
         budgetAPI = budgetAPI,
-        taskAPI = taskAPI)
+        taskAPI = taskAPI,
+        accountingCategoriesAPI = accountingCategoriesAPI,
+        accountingSubCategoryAPI = accountingSubCategoryAPI)
   }
 }

@@ -16,6 +16,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
@@ -130,6 +132,9 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
 
+  private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
+  private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
+
   @Before
   fun testSetup() {
     composeTestRule.setContent {
@@ -138,7 +143,15 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       navActions = NavigationActions(navController, loginSave)
 
       TestAssocifyApp(
-          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI)
+          navController,
+          navActions,
+          userAPI,
+          associationAPI,
+          eventAPI,
+          budgetAPI,
+          taskAPI,
+          accountingCategoriesAPI,
+          accountingSubCategoryAPI)
     }
   }
 
@@ -204,7 +217,9 @@ fun TestAssocifyApp(
     associationAPI: AssociationAPI,
     eventAPI: EventAPI,
     budgetAPI: BudgetAPI,
-    taskAPI: TaskAPI
+    taskAPI: TaskAPI,
+    accountingCategoriesAPI: AccountingCategoryAPI,
+    accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
   CurrentUser.userUid = "1"
 
@@ -215,6 +230,8 @@ fun TestAssocifyApp(
         associationAPI = associationAPI,
         eventAPI = eventAPI,
         budgetAPI = budgetAPI,
-        taskAPI)
+        taskAPI = taskAPI,
+        accountingCategoriesAPI = accountingCategoriesAPI,
+        accountingSubCategoryAPI = accountingSubCategoryAPI)
   }
 }

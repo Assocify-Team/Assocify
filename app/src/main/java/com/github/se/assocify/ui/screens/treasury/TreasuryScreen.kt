@@ -28,6 +28,7 @@ import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 
@@ -42,6 +43,7 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
+    budgetViewModel: BudgetViewModel,
     receiptListViewModel: ReceiptListViewModel,
     treasuryViewModel: TreasuryViewModel
 ) {
@@ -92,15 +94,15 @@ fun TreasuryScreen(
 
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar()
-            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar()
+            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(budgetViewModel)
+            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(budgetViewModel)
           }
 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.Receipts.ordinal -> ReceiptListScreen(receiptListViewModel)
-              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions)
+              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions, budgetViewModel)
               TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions)
             }
           }
