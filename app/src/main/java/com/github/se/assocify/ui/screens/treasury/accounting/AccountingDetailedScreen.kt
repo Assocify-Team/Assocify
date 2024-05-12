@@ -61,6 +61,7 @@ import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.TVAFilter
 import java.time.LocalDate
 
 /**
@@ -142,7 +143,7 @@ fun AccountingDetailedScreen(
 
   val totalAmount =
       when (page) {
-        AccountingPage.BUDGET -> budgetModel.budgetList.sumOf { it.amount }
+        AccountingPage.BUDGET -> if (budgetModel.currentTVAFilter == TVAFilter.TVA_HT) budgetModel.budgetList.sumOf { it.amount } else budgetModel.budgetList.sumOf { it.amount /*TODO: amount if the TVA is applicable*/}
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
       }
 
@@ -188,7 +189,7 @@ fun AccountingDetailedScreen(
               }
               // TODO: change amount given TVA
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-                // TODO: budgetDetailedViewModel.onTVAFilter(it)
+                budgetDetailedViewModel.modifyTVAFilter(TVAFilter.valueOf(it))
               }
             }
           }
