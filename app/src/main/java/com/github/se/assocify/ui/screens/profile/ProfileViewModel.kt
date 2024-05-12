@@ -52,12 +52,10 @@ class ProfileViewModel(
 
   /**
    * This function is used to start loading. It increments the load counter.
-   *
-   * @param num the number of things to load
    */
-  private fun startLoading(num: Int = 1) {
+  private fun startLoading() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
-    loadCounter += num
+    loadCounter += 4
   }
 
   /**
@@ -76,8 +74,13 @@ class ProfileViewModel(
     }
   }
 
+    /**
+     * This function is used to load the profile of the user.
+     * It gets the user's name, associations and the current association.
+     * It also gets the user's role in the association.
+     */
   fun loadProfile() {
-    startLoading(4)
+    startLoading()
     userAPI.getUser(
         CurrentUser.userUid!!,
         { user ->

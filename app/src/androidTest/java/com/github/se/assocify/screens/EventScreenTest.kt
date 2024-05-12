@@ -249,6 +249,6 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
           EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
           EventTaskViewModel(mockTaskAPI))
     }
-    with(composeTestRule) { onNodeWithTag("errorText").assertIsDisplayed() }
+    with(composeTestRule) { onNodeWithTag("errorMessage").assertIsDisplayed() }
   }
 }
