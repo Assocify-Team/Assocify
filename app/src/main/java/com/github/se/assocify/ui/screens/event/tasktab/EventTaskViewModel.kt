@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.event.tasktab
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
@@ -44,9 +45,9 @@ class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : 
                       _uiState.value.tasks.map {
                         if (it.uid != task.uid) it else it.copy(isCompleted = checked)
                       })
+          filterTasks()
         },
         { showSnackbar("Couldn't update task state") })
-    filterTasks()
   }
 
   /**
