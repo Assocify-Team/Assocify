@@ -62,6 +62,10 @@ class BudgetDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
               onSuccessCallback(budgetItems)
             }
+        every { updateBudgetItem(any(), any(), any(), any()) } answers
+                {
+                  
+                }
       }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
