@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
@@ -80,9 +79,9 @@ fun AccountingDetailedScreen(
     navigationActions: NavigationActions,
     budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
+
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
-  val subCategory =
-      AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
+  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "", 1205)
 
   // TODO: fetch from balance detailed view model
   val receipt =
@@ -201,7 +200,7 @@ fun AccountingDetailedScreen(
             }
           } else if (page == AccountingPage.BUDGET) {
             items(budgetModel.budgetList) {
-              DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")
+              DisplayBudgetItem(it, "displayItem${it.uid}")
               HorizontalDivider(Modifier.fillMaxWidth())
             }
           }
@@ -240,17 +239,12 @@ fun TotalItems(totalAmount: Int) {
  * @param testTag: The test tag of the item
  */
 @Composable
-fun DisplayBudgetItem(
-    budgetDetailedViewModel: BudgetDetailedViewModel,
-    budgetItem: BudgetItem,
-    testTag: String
-) {
+fun DisplayBudgetItem(budgetItem: BudgetItem, testTag: String) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
-      modifier =
-          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
+      modifier = Modifier.clickable { /*TODO: edit and view details*/}.testTag(testTag))
 }
 
 /**

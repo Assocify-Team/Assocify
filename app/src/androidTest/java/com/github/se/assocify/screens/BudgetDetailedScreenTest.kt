@@ -13,7 +13,6 @@ import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
@@ -41,8 +40,7 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  val subCategory =
-      AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
+  val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
   val budgetItems =
       listOf(
           BudgetItem(
