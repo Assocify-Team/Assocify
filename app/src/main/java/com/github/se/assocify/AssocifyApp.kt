@@ -10,6 +10,7 @@ import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.localsave.LoginSave
@@ -25,6 +26,7 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
   val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
+  val receiptsAPI = ReceiptAPI(SupabaseClient.supabaseClient)
   val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
   val accountingCategoriesAPI = AccountingCategoryAPI(SupabaseClient.supabaseClient)
   val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
@@ -45,6 +47,7 @@ fun AssocifyApp(loginSaver: LoginSave) {
         eventAPI = eventAPI,
         budgetAPI = budgetAPI,
         taskAPI = taskAPI,
+        receiptsAPI = receiptsAPI,
         accountingCategoriesAPI = accountingCategoriesAPI,
         accountingSubCategoryAPI = accountingSubCategoryAPI)
   }
