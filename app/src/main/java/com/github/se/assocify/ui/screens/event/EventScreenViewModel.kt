@@ -1,34 +1,42 @@
 package com.github.se.assocify.ui.screens.event
 
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * A ViewModel of the global Event Screen, to manage the filter chips and the search bar
  *
- * @param db the Event database to fetch the events
+ * @param eventAPI the Event database to fetch the events
  * @param taskListViewModel a viewmodel of the screen of the task list
  */
 class EventScreenViewModel(
-    private var db: EventAPI,
-    private val taskListViewModel: EventTaskViewModel
+    private var eventAPI: EventAPI,
+    private var taskAPI: TaskAPI,
 ) : ViewModel() {
+
+  val taskListViewModel: EventTaskViewModel = EventTaskViewModel(taskAPI) { showSnackbar(it) }
+
   private val _uiState: MutableStateFlow<EventScreenState> = MutableStateFlow(EventScreenState())
-  val uiState: StateFlow<EventScreenState>
+  val uiState: StateFlow<EventScreenState> = _uiState
 
   init {
-    uiState = _uiState
     fetchEvents()
   }
 
   /** Fetch the events from the database */
   fun fetchEvents() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
-    db.getEvents(
+    eventAPI.getEvents(
         { events ->
           updateFilteredEvents(events)
           _uiState.value = _uiState.value.copy(events = events)
@@ -100,6 +108,13 @@ class EventScreenViewModel(
       }
     }
   }
+
+  fun showSnackbar(message: String) {
+    CoroutineScope(Dispatchers.Main).launch {
+      _uiState.value.snackbarHostState.showSnackbar(
+          message = message, duration = SnackbarDuration.Short)
+    }
+  }
 }
 
 /**
@@ -116,6 +131,7 @@ class EventScreenViewModel(
 data class EventScreenState(
     val loading: Boolean = false,
     val error: String? = null,
+    val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     val searchQuery: String = "",
     val stateBarDisplay: Boolean = false,
     val events: List<Event> = emptyList(),

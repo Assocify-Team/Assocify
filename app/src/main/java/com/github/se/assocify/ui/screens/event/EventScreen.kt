@@ -18,6 +18,8 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -90,7 +92,12 @@ fun EventScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
       },
-      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) {
+      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp),
+      snackbarHost = {
+        SnackbarHost(
+            hostState = state.snackbarHostState,
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+      }) {
         if (state.loading) {
           CenteredCircularIndicator()
           return@Scaffold

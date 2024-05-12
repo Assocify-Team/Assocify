@@ -7,7 +7,7 @@ import com.github.se.assocify.model.entities.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
+class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : ViewModel() {
   private val _uiState = MutableStateFlow(EventTaskState())
   val uiState: StateFlow<EventTaskState>
 
@@ -35,17 +35,17 @@ class EventTaskViewModel(val db: TaskAPI) : ViewModel() {
    * @param checked whether the task is checked or not
    */
   fun checkTask(task: Task, checked: Boolean) {
-    _uiState.value =
-        _uiState.value.copy(
-            tasks =
-                _uiState.value.tasks.map {
-                  if (it.uid == task.uid) {
-                    db.editTask(it.copy(isCompleted = checked), {}, {})
-                    it.copy(isCompleted = checked)
-                  } else {
-                    it
-                  }
-                })
+    db.editTask(
+        task.copy(isCompleted = checked),
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  tasks =
+                      _uiState.value.tasks.map {
+                        if (it.uid != task.uid) it else it.copy(isCompleted = checked)
+                      })
+        },
+        { showSnackbar("Couldn't update task state") })
     filterTasks()
   }
 
