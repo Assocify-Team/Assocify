@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class BalanceDetailedViewModel(
     private var balanceApi: BalanceAPI,
-    private var receiptApi: ReceiptAPI,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
@@ -78,6 +77,5 @@ class BalanceDetailedViewModel(
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val status: Status = Status.Pending,
-    val year: Int = LocalDate.now().year,
-    val receiptUid: String = "",
+    val year: Int = LocalDate.now().year
 )
