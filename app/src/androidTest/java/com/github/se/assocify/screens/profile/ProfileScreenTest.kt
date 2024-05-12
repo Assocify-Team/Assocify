@@ -1,6 +1,7 @@
 package com.github.se.assocify.screens.profile
 
 import android.net.Uri
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -28,11 +29,15 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.Exception
 
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -203,6 +208,39 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     with(composeTestRule) {
       onNodeWithTag("mainNavBarItem/treasury").performClick()
       assert(tabSelected)
+    }
+  }
+
+  @Test
+  fun changeNameError() {
+    every { mockUserAPI.setDisplayName(any(), "newName", any(), any()) } answers
+        {
+          val onErrorCallback = arg<(Exception) -> Unit>(3)
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editProfile").performClick()
+      onNodeWithTag("editName").performClick()
+      onNodeWithTag("editName").performTextClearance()
+      onNodeWithTag("editName").performTextInput("newName")
+      onNodeWithTag("confirmModifyButton").performClick() // need to set action in test
+      onNodeWithTag("snackbar").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun changeAssociationError() {
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onErrorCallback = secondArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      onNodeWithTag("associationDropdown").assertIsDisplayed().performClick()
+      onNodeWithTag("DropdownItem-${asso2.uid}").performClick()
+      onNodeWithTag("snackbar").assertIsDisplayed()
+      assert(mViewmodel.uiState.value.selectedAssociation.name != asso2.name)
+      assert(CurrentUser.associationUid != asso2.uid)
     }
   }
 }
