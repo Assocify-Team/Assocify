@@ -78,13 +78,15 @@ class BalanceDetailedScreenTest :
               "Sidonie Bouthors",
               Status.Reimbursed))
 
-    val mockBalanceAPI: BalanceAPI = mockk<BalanceAPI>() {
+  val mockBalanceAPI: BalanceAPI =
+      mockk<BalanceAPI>() {
         every { getBalance(any(), any(), any()) } answers
             {
-                val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
-                onSuccessCallback(emptyList())
+              val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
+              onSuccessCallback(balanceItems)
+              balanceItems
             }
-    }
+      }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
   lateinit var balanceDetailedViewModel: BalanceDetailedViewModel

@@ -131,7 +131,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val budgetAPI = mockk<BudgetAPI>(relaxUnitFun = true)
 
-    private val balanceAPI = mockk<BalanceAPI>(relaxUnitFun = true)
+  private val balanceAPI = mockk<BalanceAPI>(relaxUnitFun = true)
 
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
 

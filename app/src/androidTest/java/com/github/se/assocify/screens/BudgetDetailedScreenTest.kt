@@ -39,7 +39,7 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-    @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
+  @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
   val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
   val budgetItems =
@@ -73,8 +73,8 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, "subCategoryUid")
     composeTestRule.setContent {
-      BudgetDetailedScreen("subCategoryUid", mockNavActions, budgetDetailedViewModel,
-          balanceDetailedViewModel)
+      BudgetDetailedScreen(
+          "subCategoryUid", mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 
