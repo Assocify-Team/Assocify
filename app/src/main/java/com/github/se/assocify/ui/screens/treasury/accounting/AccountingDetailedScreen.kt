@@ -200,7 +200,7 @@ fun AccountingDetailedScreen(
             }
           } else if (page == AccountingPage.BUDGET) {
             items(budgetModel.budgetList) {
-              DisplayBudgetItem(it, "displayItem${it.uid}")
+              DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")
               HorizontalDivider(Modifier.fillMaxWidth())
             }
           }
@@ -239,12 +239,17 @@ fun TotalItems(totalAmount: Int) {
  * @param testTag: The test tag of the item
  */
 @Composable
-fun DisplayBudgetItem(budgetItem: BudgetItem, testTag: String) {
+fun DisplayBudgetItem(
+    budgetDetailedViewModel: BudgetDetailedViewModel,
+    budgetItem: BudgetItem,
+    testTag: String
+) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
-      modifier = Modifier.clickable { /*TODO: edit and view details*/}.testTag(testTag))
+      modifier =
+          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
 
 /**
