@@ -16,7 +16,7 @@ fun NavGraphBuilder.eventGraph(
 ) {
   composable(route = Destination.Event.route) {
     val eventScreenViewModel = remember { EventScreenViewModel(eventAPI, taskAPI) }
-    EventScreen(navigationActions, eventScreenViewModel, eventScreenViewModel.taskListViewModel)
+    EventScreen(navigationActions, eventScreenViewModel)
   }
   taskGraph(navigationActions, taskAPI, eventAPI)
 }

@@ -51,8 +51,7 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 @Composable
 fun EventScreen(
     navActions: NavigationActions,
-    eventScreenViewModel: EventScreenViewModel,
-    taskListViewModel: EventTaskViewModel
+    eventScreenViewModel: EventScreenViewModel
 ) {
   val state by eventScreenViewModel.uiState.collectAsState()
 
@@ -106,7 +105,7 @@ fun EventScreen(
         if (state.error != null) {
           ErrorMessage(errorMessage = state.error) {
             eventScreenViewModel.fetchEvents()
-            taskListViewModel.updateTasks()
+            eventScreenViewModel.taskListViewModel.updateTasks()
           }
           return@Scaffold
         }
@@ -124,7 +123,7 @@ fun EventScreen(
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               EventPageIndex.Tasks.ordinal ->
-                  EventTaskScreen(eventScreenViewModel, taskListViewModel, navActions)
+                  EventTaskScreen(eventScreenViewModel, eventScreenViewModel.taskListViewModel, navActions)
               EventPageIndex.Map.ordinal -> EventMapScreen()
               EventPageIndex.Schedule.ordinal -> EventScheduleScreen()
             }
