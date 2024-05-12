@@ -3,6 +3,7 @@ package com.github.se.assocify.screens.profile
 import android.net.Uri
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -237,6 +238,67 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("snackbar").assertIsDisplayed()
       assert(mViewmodel.uiState.value.selectedAssociation.name != asso2.name)
       assert(CurrentUser.associationUid != asso2.uid)
+    }
+  }
+
+  @Test
+  fun profileLoadingError() {
+    every { mockUserAPI.getUser(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile() // reload page in case already loaded by before
+      verify { mockUserAPI.getUser(any(), any(), any()) }
+      waitUntil { mViewmodel.uiState.value.error != null }
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading profile")
+    }
+  }
+
+  @Test
+  fun getCurrentAssocsError() {
+    every { mockUserAPI.getCurrentUserAssociations(any(), any()) } answers
+        {
+          val onErrorCallback = secondArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile() // reload page in case already loaded by before
+      waitUntil { mViewmodel.uiState.value.error != null }
+      onNodeWithTag("errorMessage")
+          .assertIsDisplayed()
+          .assertTextContains("Error loading your associations")
+    }
+  }
+
+  @Test
+  fun getCurrentAssocError() {
+    every { mockAssocAPI.getAssociation(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile() // reload page in case already loaded by before
+      waitUntil { mViewmodel.uiState.value.error != null }
+      onNodeWithTag("errorMessage")
+          .assertIsDisplayed()
+          .assertTextContains("Error loading current association")
+    }
+  }
+
+  @Test
+  fun getRoleError() {
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onErrorCallback = secondArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile() // reload page in case already loaded by before
+      waitUntil { mViewmodel.uiState.value.error != null }
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading role")
     }
   }
 }
