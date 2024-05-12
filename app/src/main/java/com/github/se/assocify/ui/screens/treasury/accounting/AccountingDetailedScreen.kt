@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
@@ -63,9 +62,9 @@ fun AccountingDetailedScreen(
     navigationActions: NavigationActions,
     budgetDetailedViewModel: BudgetDetailedViewModel
 ) {
+
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
-  val subCategory =
-      AccountingSubCategory(subCategoryUid, subCategoryUid, AccountingCategory("Pole"), 1205)
+  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "", 1205)
 
   // TODO: fetch from balance detailed view model
   val receipt =
@@ -82,34 +81,34 @@ fun AccountingDetailedScreen(
           BalanceItem(
               "1",
               "pair of scissors",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategory,
               LocalDate.of(2024, 4, 14),
-              receipt,
               "François Théron",
               Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              subCategory,
               LocalDate.of(2024, 3, 11),
-              receipt,
               "Rayan Boucheny",
               Status.Archived),
           BalanceItem(
               "3",
               "chairs",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               200,
               TVA.TVA_8,
               "order for 200 chairs",
-              subCategory,
               LocalDate.of(2024, 1, 14),
-              receipt,
               "Sidonie Bouthors",
               Status.Reimbursed))
 
@@ -195,7 +194,6 @@ fun AccountingDetailedScreen(
  * A line displaying the total amount of the subcategory
  *
  * @param totalAmount: The total amount of the subcategory
- * @param page: The page to which the total amount belongs
  */
 @Composable
 fun TotalItems(totalAmount: Int) {
@@ -242,9 +240,13 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
+          /* TODO update according to new db changes
           Icon(
+
               balanceItem.receipt!!.status.getIcon(),
               contentDescription = "Create") // TODO: add logo depending on the phase
+
+             */
         }
       },
       supportingContent = { Text(balanceItem.assignee) },

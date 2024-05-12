@@ -7,30 +7,31 @@ import java.time.LocalDate
  *
  * @param uid unique identifier of the item
  * @param nameItem name of the item (for example: sweater)
+ * @param categoryUID unique identifier of the category of the item
+ * @param receiptUID unique identifier of the receipt of the item
  * @param amount amount of the item
  * @param tva TVA of the item
  * @param description description of the item
- * @param category category of the item (for example: Logistics Pole)
  * @param date date of payment of the item
- * @param receipt receipt of the item
  * @param assignee entity to which the item is assigned (payer or receiver)
  * @param status status of the item (for example: paid, not paid)
  */
 data class BalanceItem(
     val uid: String,
     val nameItem: String,
+    val categoryUID: String,
+    val receiptUID: String,
     val amount: Int, // unsigned: can be positive or negative
     val tva: TVA,
     val description: String,
-    val category: AccountingSubCategory,
     val date: LocalDate,
-    val receipt: Receipt?,
     val assignee: String,
-    val status: Status
+    val status: Status,
 )
 
 /**
- * Represents the TVA of a budget or balance item
+ * Represents the TVA of a budget or balance item, these types are also represented in the database
+ * by
  *
  * @param rate the TVA rate
  */
