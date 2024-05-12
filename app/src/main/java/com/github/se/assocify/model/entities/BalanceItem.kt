@@ -41,6 +41,10 @@ enum class TVA(val rate: Float) {
   TVA_2(2.6f), // Reduced rate
   TVA_3(3.8f); // Special housing rate
 
+  override fun toString(): String {
+    return (this.rate).toString() + "%"
+  }
+
   companion object {
     fun floatToTVA(tva: Float): TVA {
       return when (tva) {

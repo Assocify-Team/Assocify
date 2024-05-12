@@ -49,10 +49,20 @@ class BudgetDetailedViewModel(
     updateDatabaseValues()
   }
 
+  /**
+   * Enter in the edit state so the popup appears
+   *
+   * @param budgetItem the item we want to edit
+   */
   fun startEditing(budgetItem: BudgetItem) {
     _uiState.value = _uiState.value.copy(editing = true, editedBudgetItem = budgetItem)
   }
 
+  /**
+   * Exit the edit state while saving the modifications performed
+   *
+   * @param budgetItem the new edited budgetItem
+   */
   fun saveEditing(budgetItem: BudgetItem) {
     budgetApi.updateBudgetItem(CurrentUser.associationUid!!, budgetItem, {}, {})
     _uiState.value =
@@ -62,6 +72,7 @@ class BudgetDetailedViewModel(
             editedBudgetItem = null)
   }
 
+  /** Exit the edit state without keeping the modifications done */
   fun cancelEditing() {
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
