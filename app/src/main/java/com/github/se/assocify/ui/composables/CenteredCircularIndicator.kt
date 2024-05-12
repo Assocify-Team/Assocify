@@ -7,6 +7,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun CenteredCircularIndicator() {
@@ -14,6 +15,6 @@ fun CenteredCircularIndicator() {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
       modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(modifier = Modifier.testTag("circIndicator"))
       }
 }
