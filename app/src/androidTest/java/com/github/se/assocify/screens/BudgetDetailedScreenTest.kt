@@ -6,6 +6,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -74,6 +76,7 @@ class BudgetDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
               onSuccessCallback(budgetItems)
             }
+        every { updateBudgetItem(any(), any(), any(), any()) } answers {}
       }
 
   val mockAccountingSubCategoryApi: AccountingSubCategoryAPI =
@@ -179,6 +182,38 @@ class BudgetDetailedScreenTest :
     with(composeTestRule) {
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
+    }
+  }
+
+  @Test
+  fun testEditDismissWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("scotch")
+      onNodeWithTag("editDismissButton").performClick()
+      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("scotch").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun testEditModifyWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("scotch")
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors ").assertIsNotDisplayed()
+      onNodeWithText("scotch").assertIsDisplayed()
     }
   }
 }
