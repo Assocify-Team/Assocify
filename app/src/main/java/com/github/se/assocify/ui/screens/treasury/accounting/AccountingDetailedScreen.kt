@@ -186,7 +186,6 @@ fun AccountingDetailedScreen(
                   selectedStatus = it
                 }
               }
-
               // TODO: change amount given TVA
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
                 // TODO: budgetDetailedViewModel.onTVAFilter(it)

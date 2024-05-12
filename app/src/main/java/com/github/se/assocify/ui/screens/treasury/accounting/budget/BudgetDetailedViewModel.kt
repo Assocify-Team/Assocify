@@ -73,3 +73,8 @@ data class BudgetItemState(
     val editing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null
 )
+
+enum class TVAFilter(value: String) {
+  TVA_HT("HT"),
+  TVA_TTC("TTC")
+}
