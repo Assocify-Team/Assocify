@@ -85,7 +85,9 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
       snackbarHost = {
         SnackbarHost(
             hostState = state.snackbarHostState,
-            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar")) })
+            snackbar = { snackbarData ->
+              Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
+            })
       }) { innerPadding ->
         if (state.loading) {
           CenteredCircularIndicator()
