@@ -54,7 +54,7 @@ class BudgetDetailedViewModel(
   }
 
   fun saveEditing(budgetItem: BudgetItem) {
-    /* TODO: add to the database */
+    budgetApi.updateBudgetItem(CurrentUser.associationUid!!, budgetItem, {}, {})
     _uiState.value =
         _uiState.value.copy(
             editing = false,
