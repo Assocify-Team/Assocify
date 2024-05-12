@@ -43,8 +43,7 @@ class BudgetDetailedScreenTest :
       listOf(
           AccountingSubCategory("1", "categoryUid", "Logistics", 1205),
           AccountingSubCategory("2", "categoryUid", "Administration", 100),
-          AccountingSubCategory("3", "categoryUid", "Balelec", 399)
-      )
+          AccountingSubCategory("3", "categoryUid", "Balelec", 399))
 
   val budgetItems =
       listOf(
@@ -57,12 +56,16 @@ class BudgetDetailedScreenTest :
               subCategoryList.first(),
               2022),
           BudgetItem(
-              "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters",
-              subCategoryList.first(), 2023),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs",
-              subCategoryList.first(), 2023),
-          BudgetItem("4", "fees", 300, TVA.TVA_8, "banking fees",
-              subCategoryList[1], 2023))
+              "2",
+              "sweaters",
+              1000,
+              TVA.TVA_8,
+              "order for 1000 sweaters",
+              subCategoryList.first(),
+              2023),
+          BudgetItem(
+              "3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategoryList.first(), 2023),
+          BudgetItem("4", "fees", 300, TVA.TVA_8, "banking fees", subCategoryList[1], 2023))
 
   val mockBudgetAPI: BudgetAPI =
       mockk<BudgetAPI>() {
@@ -73,14 +76,14 @@ class BudgetDetailedScreenTest :
             }
       }
 
-    val mockAccountingSubCategoryApi: AccountingSubCategoryAPI =
-        mockk<AccountingSubCategoryAPI>() {
-            every { getSubCategories(any(), any(), any()) } answers
-                    {
-                        val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
-                        onSuccessCallback(subCategoryList)
-                    }
-        }
+  val mockAccountingSubCategoryApi: AccountingSubCategoryAPI =
+      mockk<AccountingSubCategoryAPI>() {
+        every { getSubCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
+              onSuccessCallback(subCategoryList)
+            }
+      }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
 
@@ -88,7 +91,8 @@ class BudgetDetailedScreenTest :
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi,"1")
+    budgetDetailedViewModel =
+        BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "1")
     composeTestRule.setContent {
       BudgetDetailedScreen("1", mockNavActions, budgetDetailedViewModel)
     }
@@ -113,28 +117,27 @@ class BudgetDetailedScreenTest :
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
-        onNodeWithText("fees").assertIsNotDisplayed()
-        onNodeWithText(subCategoryList.first().name).assertIsDisplayed()
+      onNodeWithText("fees").assertIsNotDisplayed()
+      onNodeWithText(subCategoryList.first().name).assertIsDisplayed()
 
-        assert(budgetDetailedViewModel.uiState.value.budgetList == budgetItems.filter { it.year == 2023 &&
-            it.category.uid == "1" })
-        assert(budgetDetailedViewModel.uiState.value.subCategory == subCategoryList.first())
-        assert(budgetDetailedViewModel.uiState.value.yearFilter == 2023)
-
+      assert(
+          budgetDetailedViewModel.uiState.value.budgetList ==
+              budgetItems.filter { it.year == 2023 && it.category.uid == "1" })
+      assert(budgetDetailedViewModel.uiState.value.subCategory == subCategoryList.first())
+      assert(budgetDetailedViewModel.uiState.value.yearFilter == 2023)
     }
   }
 
-    /** Tests if amount is not shown when empty list*/
-    @Test
-    fun testEmptyList() {
-        with(composeTestRule) {
-            onNodeWithTag("yearListTag").performClick()
-            onNodeWithText("2021").performClick()
-            onNodeWithTag("totalItems").assertIsNotDisplayed()
-            onNodeWithText("No items for the ${subCategoryList.first().name} sheet").assertIsDisplayed()
-
-        }
+  /** Tests if amount is not shown when empty list */
+  @Test
+  fun testEmptyList() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2021").performClick()
+      onNodeWithTag("totalItems").assertIsNotDisplayed()
+      onNodeWithText("No items for the ${subCategoryList.first().name} sheet").assertIsDisplayed()
     }
+  }
 
   /** Tests if go back to Treasury */
   @Test

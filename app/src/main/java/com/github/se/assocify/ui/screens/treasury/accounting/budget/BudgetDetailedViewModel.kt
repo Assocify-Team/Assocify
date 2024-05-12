@@ -26,28 +26,32 @@ class BudgetDetailedViewModel(
 
   init {
     updateDatabaseValues()
-      setSubCategory(subCategoryUid)
+    setSubCategory(subCategoryUid)
     uiState = _uiState
   }
-    private fun setSubCategory(subCategoryUid: String) {
+
+  private fun setSubCategory(subCategoryUid: String) {
     accountingSubCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
-            val subCategory = subCategoryList.find { it.uid == subCategoryUid }
-            if (subCategory != null) {
-                _uiState.value = _uiState.value.copy(subCategory = subCategory)
-            }
+          val subCategory = subCategoryList.find { it.uid == subCategoryUid }
+          if (subCategory != null) {
+            _uiState.value = _uiState.value.copy(subCategory = subCategory)
+          }
         },
         {})
-    }
+  }
+
   private fun updateDatabaseValues() {
     budgetApi.getBudget(
         CurrentUser.associationUid!!,
         { budgetList ->
           // Filter the budgetList to only include items with the matching subCategoryUid
           val filteredList =
-              budgetList.filter { budgetItem -> budgetItem.year == _uiState.value.yearFilter
-                      && budgetItem.category.uid == subCategoryUid}
+              budgetList.filter { budgetItem ->
+                budgetItem.year == _uiState.value.yearFilter &&
+                    budgetItem.category.uid == subCategoryUid
+              }
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(budgetList = filteredList)

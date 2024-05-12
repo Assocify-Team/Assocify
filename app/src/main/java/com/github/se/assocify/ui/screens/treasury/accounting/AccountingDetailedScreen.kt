@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
@@ -79,34 +78,34 @@ fun AccountingDetailedScreen(
           BalanceItem(
               "1",
               "pair of scissors",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategory,
               LocalDate.of(2024, 4, 14),
-              receipt,
               "François Théron",
               Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              subCategory,
               LocalDate.of(2024, 3, 11),
-              receipt,
               "Rayan Boucheny",
               Status.Archived),
           BalanceItem(
               "3",
               "chairs",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               200,
               TVA.TVA_8,
               "order for 200 chairs",
-              subCategory,
               LocalDate.of(2024, 1, 14),
-              receipt,
               "Sidonie Bouthors",
               Status.Reimbursed))
 
@@ -154,26 +153,26 @@ fun AccountingDetailedScreen(
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
-            //Display the filter chips
-            item {
-                Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
-                  DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
-                    budgetDetailedViewModel.onYearFilter(it.toInt())
-                  }
-                  if (page == AccountingPage.BALANCE) {
-                    DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
-                      selectedStatus = it
-                    }
-                  }
-
-                  // TODO: change amount given TVA
-                  DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-                    // TODO: budgetDetailedViewModel.onTVAFilter(it)
-                  }
+          // Display the filter chips
+          item {
+            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+              DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
+                budgetDetailedViewModel.onYearFilter(it.toInt())
+              }
+              if (page == AccountingPage.BALANCE) {
+                DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
+                  selectedStatus = it
                 }
-            }
+              }
 
-            //Display the items
+              // TODO: change amount given TVA
+              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+                // TODO: budgetDetailedViewModel.onTVAFilter(it)
+              }
+            }
+          }
+
+          // Display the items
           if (page == AccountingPage.BALANCE) {
             items(filteredBalanceList) {
               DisplayBalanceItem(it, "displayItem${it.uid}")
@@ -186,13 +185,12 @@ fun AccountingDetailedScreen(
             }
           }
 
-            //Display the total amount of the subcategory if list is not empty
-            if(budgetModel.budgetList.isNotEmpty()){
-                item { TotalItems(totalAmount) }
-            } else {
-                item { Text("No items for the ${subCategory.name} sheet") }
-            }
-
+          // Display the total amount of the subcategory if list is not empty
+          if (budgetModel.budgetList.isNotEmpty()) {
+            item { TotalItems(totalAmount) }
+          } else {
+            item { Text("No items for the ${subCategory.name} sheet") }
+          }
         }
       })
 }
@@ -201,7 +199,6 @@ fun AccountingDetailedScreen(
  * A line displaying the total amount of the subcategory
  *
  * @param totalAmount: The total amount of the subcategory
- * @param page: The page to which the total amount belongs
  */
 @Composable
 fun TotalItems(totalAmount: Int) {
@@ -248,9 +245,14 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
+          /* TODO update according to new db changes
           Icon(
+
               balanceItem.receipt!!.status.getIcon(),
               contentDescription = "Create")
+              contentDescription = "Create") // TODO: add logo depending on the phase
+
+             */
         }
       },
       supportingContent = { Text(balanceItem.assignee) },

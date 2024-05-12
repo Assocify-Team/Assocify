@@ -17,7 +17,7 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
   /**
    * Get the subcategories of an association
    *
-   * @param categoryUID the unique identifier of the category
+   * @param associationUID the unique identifier of the category
    * @param onSuccess the callback to be called when the subcategories are retrieved
    * @param onFailure the callback to be called when the subcategories could not be retrieved
    */

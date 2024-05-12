@@ -4,7 +4,7 @@ package com.github.se.assocify.model.entities
  * Represents an item in the budget sheet For example some sweater in the category Logistics Pole
  *
  * @param uid unique identifier of the item
- * @param name name of the item (for example: sweater)
+ * @param nameItem name of the item (for example: sweater)
  * @param amount amount of the item
  * @param tva TVA of the item
  * @param description description of the item

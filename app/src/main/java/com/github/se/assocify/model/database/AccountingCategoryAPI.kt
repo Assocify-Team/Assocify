@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
 
-  val collection_name_category = "accounting_category"
+  private val collectionName = "accounting_category"
 
   /**
    * Get the categories of an association
@@ -26,7 +26,7 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
     tryAsync(onFailure) {
       val categories =
           db.postgrest
-              .from(collection_name_category)
+              .from(collectionName)
               .select { filter { SupabaseAccountingCategory::associationUID eq associationUID } }
               .decodeList<SupabaseAccountingCategory>()
       onSuccess(categories.map { it.toAccountingCategory() })
@@ -49,7 +49,7 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
   ) {
     tryAsync(onFailure) {
       db.postgrest
-          .from(collection_name_category)
+          .from(collectionName)
           .insert(
               SupabaseAccountingCategory(
                   uid = category.uid, associationUID = associationUID, name = category.name))
@@ -72,7 +72,7 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.postgrest.from(collection_name_category).update({
+      db.postgrest.from(collectionName).update({
         SupabaseAccountingCategory::name setTo category.name
       }) {
         filter {
@@ -97,7 +97,7 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.postgrest.from(collection_name_category).delete {
+      db.postgrest.from(collectionName).delete {
         filter { SupabaseAccountingCategory::uid eq category.uid }
       }
       onSuccess()
