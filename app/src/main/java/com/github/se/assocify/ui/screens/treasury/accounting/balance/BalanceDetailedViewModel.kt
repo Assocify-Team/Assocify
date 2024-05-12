@@ -29,19 +29,6 @@ class BalanceDetailedViewModel(
     uiState = _uiState
   }
 
-    private fun updateReceipt(receiptUid: String) {
-        balanceApi.getReceipt(
-            CurrentUser.associationUid!!,
-            { receiptList ->
-                // Filter the receiptList to only include items with the matching subCategoryUid
-                val filteredList =
-                    receiptList.filter { receiptItem ->
-                        receiptItem.uid == receiptUid
-                    }
-
-                // Update the UI state with the filtered list
-                _uiState.value = _uiState.value.copy(receiptList = filteredList) }, {})
-    }
   /** Update the database values */
   private fun updateDatabaseValues() {
     balanceApi.getBalance(
@@ -79,10 +66,6 @@ class BalanceDetailedViewModel(
     updateDatabaseValues()
   }
 
-    fun onReceipt(receiptUid: String) {
-        _uiState.value = _uiState.value.copy(receiptUid = receiptUid)
-        updateDatabaseValues()
-    }
 }
 
 /**

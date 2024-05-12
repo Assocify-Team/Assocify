@@ -200,11 +200,9 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
-          Icon(
+          /*Icon(
               balanceItem.receipt!!.status.getIcon(),
-              contentDescription = "Create") // TODO: add logo depending on the phase
-
-
+              contentDescription = "Create") // TODO: add logo depending on the phase*/
         }
       },
       supportingContent = { Text(balanceItem.assignee) },
