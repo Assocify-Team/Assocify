@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -227,6 +228,40 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
     composeTestRule.setContent {
       EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
-    with(composeTestRule) { onNodeWithTag("errorMessage").assertIsDisplayed() }
+    with(composeTestRule) {
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading events")
+    }
+  }
+
+  @Test
+  fun errorTaskTest() {
+    every { mockTaskAPI.getTasks(any(), any()) } answers
+        {
+          val onFailureError = arg<(Exception) -> Unit>(1)
+          onFailureError(IllegalArgumentException("Test error"))
+        }
+    composeTestRule.setContent {
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
+    }
+    with(composeTestRule) {
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tasks")
+    }
+  }
+
+  @Test
+  fun errorTaskUpdateTest() {
+    every { mockTaskAPI.editTask(any(), any(), any()) } answers
+        {
+          val onFailureError = arg<(Exception) -> Unit>(2)
+          onFailureError(IllegalArgumentException("Test error"))
+        }
+    composeTestRule.setContent {
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
+    }
+    with(composeTestRule) {
+      onNodeWithTag("filterChipTestEvent").performClick()
+      onNodeWithTag("TaskCheckbox").performClick()
+      onNodeWithTag("snackbar").assertIsDisplayed()
+    }
   }
 }

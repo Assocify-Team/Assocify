@@ -91,7 +91,9 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
       snackbarHost = {
         SnackbarHost(
             hostState = state.snackbarHostState,
-            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+            snackbar = { snackbarData ->
+              Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
+            })
       }) {
         if (state.loading) {
           CenteredCircularIndicator()

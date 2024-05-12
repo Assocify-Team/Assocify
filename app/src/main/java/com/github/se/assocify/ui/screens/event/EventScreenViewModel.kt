@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
  * A ViewModel of the global Event Screen, to manage the filter chips and the search bar
  *
  * @param eventAPI the Event database to fetch the events
- * @param taskListViewModel a viewmodel of the screen of the task list
+ * @param taskAPI the Task database to fetch the tasks
  */
 class EventScreenViewModel(
     private var eventAPI: EventAPI,
