@@ -61,7 +61,6 @@ import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.TVAFilter
 import java.time.LocalDate
 
 /**
@@ -132,7 +131,7 @@ fun AccountingDetailedScreen(
 
   val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
-  val tvaList: List<String> = listOf("TTC", "HT")
+  val tvaList: List<String> = listOf("HT", "TTC")
 
   var selectedStatus by remember { mutableStateOf(statusList.first()) }
 
@@ -143,7 +142,7 @@ fun AccountingDetailedScreen(
 
   val totalAmount =
       when (page) {
-        AccountingPage.BUDGET -> if (budgetModel.currentTVAFilter == TVAFilter.TVA_HT) budgetModel.budgetList.sumOf { it.amount } else budgetModel.budgetList.sumOf { it.amount /*TODO: amount if the TVA is applicable*/}
+        AccountingPage.BUDGET -> if (!budgetModel.filterActive) budgetModel.budgetList.sumOf { it.amount } else budgetModel.budgetList.sumOf { it.amount + (it.amount * it.tva.rate/100f).toInt()}
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
       }
 
@@ -189,7 +188,7 @@ fun AccountingDetailedScreen(
               }
               // TODO: change amount given TVA
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-                budgetDetailedViewModel.modifyTVAFilter(TVAFilter.valueOf(it))
+                budgetDetailedViewModel.modifyTVAFilter(it == "TTC")
               }
             }
           }

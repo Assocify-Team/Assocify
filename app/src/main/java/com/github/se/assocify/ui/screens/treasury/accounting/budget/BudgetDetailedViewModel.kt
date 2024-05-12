@@ -3,7 +3,9 @@ package com.github.se.assocify.ui.screens.treasury.accounting.budget
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.model.entities.TVA
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -35,7 +37,7 @@ class BudgetDetailedViewModel(
 
 
           // Update the UI state with the filtered list
-          _uiState.value = _uiState.value.copy(budgetList = filteredList)
+          _uiState.value = _uiState.value.copy(budgetList = budgetList)
         },
         {})
   }
@@ -62,8 +64,8 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
 
-  fun modifyTVAFilter(newFilter: TVAFilter){
-      _uiState.value = _uiState.value.copy(currentTVAFilter = newFilter)
+  fun modifyTVAFilter(tvaActive: Boolean){
+      _uiState.value = _uiState.value.copy(filterActive = tvaActive)
   }
 }
 
@@ -72,10 +74,5 @@ data class BudgetItemState(
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null,
-    val currentTVAFilter: TVAFilter = TVAFilter.TVA_HT
+    val filterActive: Boolean = false
 )
-
-enum class TVAFilter(value: String) {
-  TVA_HT("HT"),
-  TVA_TTC("TTC")
-}
