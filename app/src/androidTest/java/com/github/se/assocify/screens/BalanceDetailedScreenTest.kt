@@ -10,11 +10,9 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
-import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
@@ -43,16 +41,7 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
-  val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
-  val receipt =
-      Receipt(
-          "1",
-          "receipt1",
-          "url",
-          LocalDate.now(),
-          100,
-          Status.Pending,
-          MaybeRemotePhoto.Remote("path"))
+
   val balanceItems =
       listOf(
           BalanceItem(
@@ -63,7 +52,7 @@ class BalanceDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              LocalDate.of(2024, 4, 14),
+              LocalDate.of(2023, 4, 14),
               "François Théron",
               Status.Pending),
           BalanceItem(
@@ -74,7 +63,7 @@ class BalanceDetailedScreenTest :
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              LocalDate.of(2024, 3, 11),
+              LocalDate.of(2023, 3, 11),
               "Rayan Boucheny",
               Status.Archived),
           BalanceItem(
@@ -85,18 +74,18 @@ class BalanceDetailedScreenTest :
               200,
               TVA.TVA_8,
               "order for 200 chairs",
-              LocalDate.of(2024, 1, 14),
+              LocalDate.of(2023, 1, 14),
               "Sidonie Bouthors",
               Status.Reimbursed))
 
-  val mockBalanceAPI: BalanceAPI =
-      mockk<BalanceAPI>() {
+    val mockBalanceAPI: BalanceAPI = mockk<BalanceAPI>() {
         every { getBalance(any(), any(), any()) } answers
             {
-              val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
-              onSuccessCallback(balanceItems)
+                val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
+                onSuccessCallback(emptyList())
             }
-      }
+    }
+
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
   lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
@@ -137,7 +126,7 @@ class BalanceDetailedScreenTest :
     }
 
     assert(
-        balanceItems.filter { it.year == 2023 } ==
+        balanceItems.filter { it.date.year == 2023 } ==
             balanceDetailedViewModel.uiState.value.balanceList)
   }
 

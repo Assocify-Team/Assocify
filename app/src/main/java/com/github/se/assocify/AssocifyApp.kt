@@ -8,6 +8,7 @@ import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
