@@ -53,8 +53,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
-import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
@@ -81,15 +79,6 @@ fun AccountingDetailedScreen(
   val subCategory = budgetModel.subCategory
 
   // TODO: fetch from balance detailed view model
-  val receipt =
-      Receipt(
-          "1",
-          "receipt1",
-          "url",
-          LocalDate.now(),
-          100,
-          Status.Pending,
-          MaybeRemotePhoto.Remote("path"))
   val balanceItems =
       listOf(
           BalanceItem(
@@ -193,23 +182,27 @@ fun AccountingDetailedScreen(
           }
 
           // Display the items
-          if (page == AccountingPage.BALANCE) {
-            items(filteredBalanceList) {
-              DisplayBalanceItem(it, "displayItem${it.uid}")
-              HorizontalDivider(Modifier.fillMaxWidth())
+          when (page) {
+            AccountingPage.BALANCE -> {
+              items(filteredBalanceList) {
+                DisplayBalanceItem(it, "displayItem${it.uid}")
+                HorizontalDivider(Modifier.fillMaxWidth())
+              }
+              item { TotalItems(totalAmount) }
             }
-          } else if (page == AccountingPage.BUDGET) {
-            items(budgetModel.budgetList) {
-              DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")
-              HorizontalDivider(Modifier.fillMaxWidth())
-            }
-          }
+            AccountingPage.BUDGET -> {
+              items(budgetModel.budgetList) {
+                DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")
+                HorizontalDivider(Modifier.fillMaxWidth())
+              }
 
-          // Display the total amount of the subcategory if list is not empty
-          if (budgetModel.budgetList.isNotEmpty()) {
-            item { TotalItems(totalAmount) }
-          } else {
-            item { Text("No items for the ${subCategory.name} sheet") }
+              // display total amount
+              if (budgetModel.budgetList.isNotEmpty()) {
+                item { TotalItems(totalAmount) }
+              } else {
+                item { Text("No items for the ${subCategory.name} sheet") }
+              }
+            }
           }
         }
       })

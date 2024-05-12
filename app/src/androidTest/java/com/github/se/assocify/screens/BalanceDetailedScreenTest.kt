@@ -11,10 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
-import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
@@ -40,16 +37,6 @@ class BalanceDetailedScreenTest :
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
   @RelaxedMockK lateinit var mockAccountingSubCategoryAPI: AccountingSubCategoryAPI
-  val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
-  val receipt =
-      Receipt(
-          "1",
-          "receipt1",
-          "url",
-          LocalDate.now(),
-          100,
-          Status.Pending,
-          MaybeRemotePhoto.Remote("path"))
   val balanceItems =
       listOf(
           BalanceItem(
