@@ -16,7 +16,7 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGraph
 
 fun NavGraphBuilder.treasuryGraph(
-    navigationActions: NavigationActions, 
+    navigationActions: NavigationActions,
     budgetAPI: BudgetAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
@@ -26,13 +26,11 @@ fun NavGraphBuilder.treasuryGraph(
       route = Destination.Treasury.route,
   ) {
     val receiptListViewModel = remember { ReceiptListViewModel(navigationActions) }
-    val budgetViewModel = remember { BudgetViewModel(accountingCategoriesAPI, accountingSubCategoryAPI) }
+    val budgetViewModel = remember {
+      BudgetViewModel(accountingCategoriesAPI, accountingSubCategoryAPI)
+    }
     val treasuryViewModel = remember { TreasuryViewModel(navigationActions, receiptListViewModel) }
-    TreasuryScreen(
-        navigationActions,
-        budgetViewModel,
-        receiptListViewModel,
-        treasuryViewModel)
+    TreasuryScreen(navigationActions, budgetViewModel, receiptListViewModel, treasuryViewModel)
   }
   receiptGraph(navigationActions)
   budgetDetailedGraph(navigationActions, budgetAPI)

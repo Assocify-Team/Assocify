@@ -74,10 +74,11 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
               val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
               onSuccessCallback(listOf(asso1, asso2))
             }
-        every { setDisplayName(any(), "newName", any(), any()) } answers {
-            val onSuccessCallback = thirdArg<() -> Unit>()
-            onSuccessCallback()
-        }
+        every { setDisplayName(any(), "newName", any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
 
         every { getCurrentUserRole(any(), any()) } answers
             {
