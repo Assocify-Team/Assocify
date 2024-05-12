@@ -69,67 +69,14 @@ fun AccountingDetailedScreen(
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
   val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "", 1205)
 
-  // TODO: fetch from balance detailed view model
-  val receipt =
-      Receipt(
-          "1",
-          "receipt1",
-          "url",
-          LocalDate.now(),
-          100,
-          Status.Pending,
-          MaybeRemotePhoto.Remote("path"))
-  val balanceItems =
-      listOf(
-          BalanceItem(
-              "1",
-              "pair of scissors",
-              "",
-              "00000000-0000-0000-0000-000000000000",
-              5,
-              TVA.TVA_8,
-              "scissors for paper cutting",
-              LocalDate.of(2024, 4, 14),
-              "François Théron",
-              Status.Pending),
-          BalanceItem(
-              "2",
-              "sweaters",
-              "",
-              "00000000-0000-0000-0000-000000000000",
-              1000,
-              TVA.TVA_8,
-              "order for 1000 sweaters",
-              LocalDate.of(2024, 3, 11),
-              "Rayan Boucheny",
-              Status.Archived),
-          BalanceItem(
-              "3",
-              "chairs",
-              "",
-              "00000000-0000-0000-0000-000000000000",
-              200,
-              TVA.TVA_8,
-              "order for 200 chairs",
-              LocalDate.of(2024, 1, 14),
-              "Sidonie Bouthors",
-              Status.Reimbursed))
-
   val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
-  var selectedStatus by remember { mutableStateOf(statusList.first()) }
-
-  val filteredBalanceList =
-      if (selectedStatus == statusList.first()) // display everything under the status category
-       balanceItems
-      else balanceItems.filter { it.status.toString() == selectedStatus }
-
   val totalAmount =
       when (page) {
         AccountingPage.BUDGET -> budgetModel.budgetList.sumOf { it.amount }
-        AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
+        AccountingPage.BALANCE -> balanceModel.balanceList.sumOf { it.amount }
       }
 
   Scaffold(
@@ -168,24 +115,26 @@ fun AccountingDetailedScreen(
                   AccountingPage.BUDGET -> balanceDetailedViewModel.onYearFilter(it.toInt())
                 }
               }
+
               // Status filter for balance Items
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                   balanceDetailedViewModel.onStatusFilter(
                       balanceModel.balanceList
                           .first { balanceItem -> balanceItem.status.toString() == it }
-                          .status)
+                          .status
+                  )
                 }
               }
 
-              // TODO: change amount given TVA
+              //Tva filter
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
                 // TODO: budgetDetailedViewModel.onTVAFilter(it)
               }
             }
           }
           if (page == AccountingPage.BALANCE) {
-            items(filteredBalanceList) {
+            items(balanceModel.balanceList) {
               DisplayBalanceItem(it, "displayItem${it.uid}")
               HorizontalDivider(Modifier.fillMaxWidth())
             }
@@ -251,13 +200,11 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
-          /* TODO update according to new db changes
           Icon(
-
               balanceItem.receipt!!.status.getIcon(),
               contentDescription = "Create") // TODO: add logo depending on the phase
 
-             */
+
         }
       },
       supportingContent = { Text(balanceItem.assignee) },
