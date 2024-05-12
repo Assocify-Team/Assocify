@@ -11,7 +11,6 @@ import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDeta
  *
  * @param subCategoryUid the subcategory uid
  * @param navigationActions the navigation actions
- * @param budgetAPI the budget api
  * @param budgetDetailedViewModel the view model for the budget detailed screen
  */
 @Composable

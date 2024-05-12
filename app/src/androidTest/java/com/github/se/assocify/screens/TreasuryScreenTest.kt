@@ -11,14 +11,20 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.entities.AccountingCategory
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
+import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
@@ -28,9 +34,32 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
-
+  @get:Rule val mockkRule = MockKRule(this)
   private val navActions = mockk<NavigationActions>()
   private var tabSelected = false
+  val categoryList = listOf(AccountingCategory("1", "Events"))
+  val subCategoryList =
+      listOf(
+          AccountingSubCategory("2", "1", "OGJ", 2000),
+          AccountingSubCategory("3", "1", "Subsonic", 100))
+
+  val mockAccountingCategoriesAPI: AccountingCategoryAPI =
+      mockk<AccountingCategoryAPI>() {
+        every { getCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
+              onSuccessCallback(categoryList)
+            }
+      }
+
+  val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
+      mockk<AccountingSubCategoryAPI>() {
+        every { getSubCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
+              onSuccessCallback(subCategoryList)
+            }
+      }
 
   @Before
   fun testSetup() {
@@ -40,7 +69,10 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     CurrentUser.associationUid = "testAssociation"
     val receiptListViewModel = ReceiptListViewModel(navActions)
     val viewModel = TreasuryViewModel(navActions, receiptListViewModel)
-    composeTestRule.setContent { TreasuryScreen(navActions, receiptListViewModel, viewModel) }
+    val budgetViewModel = BudgetViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
+    composeTestRule.setContent {
+      TreasuryScreen(navActions, budgetViewModel, receiptListViewModel, viewModel)
+    }
   }
 
   @Test
