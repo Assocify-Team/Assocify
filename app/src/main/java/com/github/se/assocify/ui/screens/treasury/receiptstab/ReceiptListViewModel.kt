@@ -1,7 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab
 
 import android.util.Log
-import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
@@ -17,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class ReceiptListViewModel(
     private val navActions: NavigationActions,
-    private val receiptsDatabase: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
+    private val receiptsDatabase: ReceiptAPI
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())

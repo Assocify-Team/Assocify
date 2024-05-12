@@ -19,6 +19,7 @@ import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -142,6 +143,8 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val budgetAPI = mockk<BudgetAPI>(relaxUnitFun = true)
 
+  private val receiptAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
+
   private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
 
   private val accountingCategoryAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
@@ -163,6 +166,7 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           eventAPI,
           budgetAPI,
           taskAPI,
+          receiptAPI,
           accountingCategoryAPI,
           accountingSubCategoryAPI)
     }
