@@ -38,7 +38,6 @@ import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
-import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 
 /**
  * An event screen that displays the tasks, map, and schedule of an event.
@@ -49,10 +48,7 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EventScreen(
-    navActions: NavigationActions,
-    eventScreenViewModel: EventScreenViewModel
-) {
+fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreenViewModel) {
   val state by eventScreenViewModel.uiState.collectAsState()
 
   Scaffold(
@@ -123,7 +119,8 @@ fun EventScreen(
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               EventPageIndex.Tasks.ordinal ->
-                  EventTaskScreen(eventScreenViewModel, eventScreenViewModel.taskListViewModel, navActions)
+                  EventTaskScreen(
+                      eventScreenViewModel, eventScreenViewModel.taskListViewModel, navActions)
               EventPageIndex.Map.ordinal -> EventMapScreen()
               EventPageIndex.Schedule.ordinal -> EventScheduleScreen()
             }
