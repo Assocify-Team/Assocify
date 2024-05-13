@@ -1,6 +1,7 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
+import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Language
 import com.github.se.assocify.model.entities.Theme
 import com.github.se.assocify.model.entities.UserPreference
@@ -9,6 +10,8 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.mockk
+import io.mockk.verify
 import java.lang.Thread.sleep
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,20 +51,25 @@ class UserPreferenceAPITest {
 
   @Test
   fun testGetUserPreference() {
+    val onSuccess = mockk<(UserPreference) -> Unit>(relaxed = true)
+    val onFailure = mockk<(Exception) -> Unit>(relaxed = true)
 
     error = false
     response =
         """
             {
-                "userUID": "$userUID",
+                "user_uid": "$userUID",
                 "theme": "${userPreference.theme}",
-                "textSize": ${userPreference.textSize},
+                "text_size": ${userPreference.textSize},
                 "language": "${userPreference.language}"
             }
         """
             .trimIndent()
 
-    api.getUserPreference(userUID, { assert(true) }, { assert(false) })
+
+    api.getUserPreference(userUID,onSuccess,onFailure)
+    verify(timeout = 400) {onSuccess(any())}
+    verify(exactly = 0) {onFailure(any())}
   }
 
   @Test
