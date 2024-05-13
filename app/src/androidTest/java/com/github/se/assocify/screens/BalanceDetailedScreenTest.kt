@@ -99,10 +99,10 @@ class BalanceDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
    budgetDetailedViewModel =
         BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryAPI, subCategoryUid)
-    balanceDetailedViewModel = BalanceDetailedViewModel(mockBalanceAPI, subCategoryUid)
+    balanceDetailedViewModel = BalanceDetailedViewModel(mockBalanceAPI, mockAccountingSubCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(
-          subCategoryUid, mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
+          mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 

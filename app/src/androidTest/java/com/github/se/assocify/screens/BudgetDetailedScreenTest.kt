@@ -105,7 +105,7 @@ class BudgetDetailedScreenTest :
         BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "subCategoryUid")
     composeTestRule.setContent {
       BudgetDetailedScreen(
-          "subCategoryUid", mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
+          mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 
@@ -129,7 +129,7 @@ class BudgetDetailedScreenTest :
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
       onNodeWithText("fees").assertIsNotDisplayed()
-      onNodeWithText(subCategoryList.first().name).assertIsDisplayed()
+      onNodeWithText(subCategoryList[0].name).assertIsDisplayed()
 
       assert(
           budgetDetailedViewModel.uiState.value.budgetList ==
@@ -146,7 +146,7 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("yearListTag").performClick()
       onNodeWithText("2021").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
-      onNodeWithText("No items for the ${subCategoryList.first().name} sheet").assertIsDisplayed()
+      onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters").assertIsDisplayed()
     }
   }
 

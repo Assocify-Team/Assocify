@@ -66,6 +66,7 @@ import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetail
  * @param page: The page to display (either "budget" or "balance")
  * @param navigationActions: The navigation actions
  * @param budgetDetailedViewModel: The view model for the budget detailed screen
+ * @param balanceDetailedViewModel: The view model for the balance detailed screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,18 +79,15 @@ fun AccountingDetailedScreen(
 
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
-    val subCategory = budgetModel.subCategory
+    val subCategory = when (page) {
+        AccountingPage.BALANCE -> balanceModel.subCategory
+        AccountingPage.BUDGET -> budgetModel.subCategory
+    }
 
 
     val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
-
-  val totalAmount =
-      when (page) {
-        AccountingPage.BUDGET -> budgetModel.budgetList.sumOf { it.amount }
-        AccountingPage.BALANCE -> balanceModel.balanceList.sumOf { it.amount }
-      }
 
   Scaffold(
       topBar = {
@@ -153,13 +151,21 @@ fun AccountingDetailedScreen(
 
           // Display the items
           when (page) {
+
             AccountingPage.BALANCE -> {
               items(balanceModel.balanceList) {
                 DisplayBalanceItem(it, "displayItem${it.uid}")
                 HorizontalDivider(Modifier.fillMaxWidth())
               }
-              item { TotalItems(totalAmount) }
+
+                // display total amount
+                if (balanceModel.balanceList.isNotEmpty()) {
+                    item { TotalItems(balanceModel.balanceList.sumOf { it.amount }) }
+                } else {
+                    item { Text("No items for the ${subCategory.name} sheet with these filters") }
+                }
             }
+
             AccountingPage.BUDGET -> {
               items(budgetModel.budgetList) {
                 DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")
@@ -168,9 +174,9 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (budgetModel.budgetList.isNotEmpty()) {
-                item { TotalItems(totalAmount) }
+                item { TotalItems(budgetModel.budgetList.sumOf { it.amount }) }
               } else {
-                item { Text("No items for the ${subCategory.name} sheet") }
+                item { Text("No items for the ${subCategory.name} sheet with these filters") }
               }
             }
           }

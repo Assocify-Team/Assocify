@@ -30,6 +30,11 @@ class BudgetDetailedViewModel(
     uiState = _uiState
   }
 
+    /**
+     * Set the subcategory
+     *
+     * @param subCategoryUid the subcategory uid
+     */
   private fun setSubCategory(subCategoryUid: String) {
     accountingSubCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
@@ -42,6 +47,7 @@ class BudgetDetailedViewModel(
         {})
   }
 
+    /** Update the database values */
   private fun updateDatabaseValues() {
     budgetApi.getBudget(
         CurrentUser.associationUid!!,
@@ -59,6 +65,11 @@ class BudgetDetailedViewModel(
         {})
   }
 
+    /**
+     * Handle the year filter
+     *
+     * @param yearFilter the year to filter by
+     */
   fun onYearFilter(yearFilter: Int) {
     _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
     updateDatabaseValues()
@@ -93,6 +104,14 @@ class BudgetDetailedViewModel(
   }
 }
 
+/**
+ * The state for the budget item
+ * @param budgetList the current list of budget items
+ * @param subCategory the current subcategory
+ * @param yearFilter the current year filter
+ * @param editing the current editing state
+ * @param editedBudgetItem the current edited budget item
+ */
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),

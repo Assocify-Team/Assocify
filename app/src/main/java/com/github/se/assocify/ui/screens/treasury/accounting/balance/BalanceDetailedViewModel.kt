@@ -3,7 +3,9 @@ package com.github.se.assocify.ui.screens.treasury.accounting.balance
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class BalanceDetailedViewModel(
     private var balanceApi: BalanceAPI,
+    private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
@@ -24,8 +27,26 @@ class BalanceDetailedViewModel(
 
   init {
     updateDatabaseValues()
+      setSubCategory(subCategoryUid)
     uiState = _uiState
   }
+
+    /**
+     * Set the subcategory
+     *
+     * @param subCategoryUid the subcategory uid
+     */
+    private fun setSubCategory(subCategoryUid: String) {
+        accountingSubCategoryAPI.getSubCategories(
+            CurrentUser.associationUid!!,
+            { subCategoryList ->
+                val subCategory = subCategoryList.find { it.uid == subCategoryUid }
+                if (subCategory != null) {
+                    _uiState.value = _uiState.value.copy(subCategory = subCategory)
+                }
+            },
+            {})
+    }
 
   /** Update the database values */
   private fun updateDatabaseValues() {
@@ -85,6 +106,7 @@ class BalanceDetailedViewModel(
  */
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
+    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val status: Status? = null,
     val year: Int = 2023
 )
