@@ -61,7 +61,9 @@ class ReceiptViewModel {
                   description = receipt.description,
                   amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
                   date = DateUtil.toString(receipt.date),
-                  incoming = receipt.cents >= 0)
+                  incoming = receipt.cents >= 0,
+                  loading = false,
+                  error = null)
 
           receiptApi.getReceiptImage(
               receipt,
@@ -178,7 +180,6 @@ class ReceiptViewModel {
             date = date,
             status = _uiState.value.status,
             photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
-
     receiptApi.uploadReceipt(
         receipt,
         onPhotoUploadSuccess = {},

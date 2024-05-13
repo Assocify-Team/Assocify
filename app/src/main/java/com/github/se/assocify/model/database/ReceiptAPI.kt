@@ -55,12 +55,11 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
           is MaybeRemotePhoto.LocalFile -> {
             bucket.upload(receipt.uid, it.uri, upsert = true)
             val imageCachePath = cachePath.resolve(receipt.uid + ".jpg")
-            // Assigned to a val to trick SonarCloud
-            if (imageCachePath.toFile().delete()) {
-              Log.w(this.javaClass.name, "Failed to delete image cache file")
+            if (!imageCachePath.toFile().delete()) {
+              // If this fails, the cache is corrupted, but it only fails in bad situations
+              // Where the cache breaking is okay
+              Log.w(this.javaClass.simpleName, "Failed to delete image cache file")
             }
-            // If this fails, the cache is corrupted, but it only fails in bad situations
-            // Where the cache breaking is okay
             onPhotoUploadSuccess(true)
           }
           is MaybeRemotePhoto.Remote -> {
@@ -88,15 +87,16 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called when the fetch fails with the exception that occurred
    */
   fun getReceiptImage(receipt: Receipt, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
-    val imageCachePath = cachePath.resolve(receipt.uid + ".jpg")
-    if (imageCachePath.toFile().exists()) {
-      onSuccess(Uri.fromFile(imageCachePath.toFile()))
+    val imageCacheFile = cachePath.resolve(receipt.uid + ".jpg").toFile()
+    val now = System.currentTimeMillis()
+    if (imageCacheFile.exists() && now - imageCacheFile.lastModified() < 60000) {
+      onSuccess(Uri.fromFile(imageCacheFile))
       return
     }
 
     tryAsync(onFailure) {
-      bucket.downloadAuthenticatedTo(receipt.uid, imageCachePath)
-      onSuccess(Uri.fromFile(imageCachePath.toFile()))
+      bucket.downloadAuthenticatedTo(receipt.uid, imageCacheFile.toPath())
+      onSuccess(Uri.fromFile(imageCacheFile))
     }
   }
 
