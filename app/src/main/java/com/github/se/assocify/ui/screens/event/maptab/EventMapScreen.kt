@@ -17,10 +17,8 @@ import com.github.se.assocify.BuildConfig
 import kotlin.random.Random
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
-import org.osmdroid.tileprovider.cachemanager.CacheManager
-import org.osmdroid.tileprovider.tilesource.ITileSource
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
-import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
@@ -50,25 +48,10 @@ fun rememberMapViewWithLifecycle(): MapView {
   // Update OSM configuration, for some reason
   Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
-  // Bulk download of the tiles
-  // This allows caching and better download performance
-  val MAP_DATA_SOURCE: ITileSource =
-      XYTileSource(
-          "Mapnik",
-          0,
-          19,
-          256,
-          ".png",
-          arrayOf(
-              "http://a.tile.openstreetmap.org/",
-              "http://b.tile.openstreetmap.org/",
-              "http://c.tile.openstreetmap.org/"),
-          "© OpenStreetMap contributors")
-
   // Initialise the map view
   val mapView = remember {
     MapView(context).apply {
-      setTileSource(MAP_DATA_SOURCE)
+      setTileSource(MAPNIK)
       // Zoom buttons only appears on touch and then fade out
       zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
       // Enable pinch to zoom
@@ -84,13 +67,6 @@ fun rememberMapViewWithLifecycle(): MapView {
       clipToOutline = true
     }
   }
-
-  // Download the area around the initial position
-  // The initial position will often be EPFL so pre-fetch the tiles
-  val list = ArrayList<GeoPoint>()
-  list.add(INITIAL_POSITION)
-  val cacheManager = CacheManager(mapView)
-  cacheManager.downloadAreaAsync(context, list, 15, 16)
 
   // Make the mapview live as long as the composable
   val lifecycleObserver = rememberLifecycleObserver(mapView)
