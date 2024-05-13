@@ -54,7 +54,9 @@ val dummyTasks =
 
 /** A screen that displays the schedule of a staffer of an event. */
 @Composable
-fun EventScheduleScreen() {
+fun EventScheduleScreen(
+    EventScheduleViewModel: EventScheduleViewModel,
+) {
 
   val hourHeight = 60.dp
 
