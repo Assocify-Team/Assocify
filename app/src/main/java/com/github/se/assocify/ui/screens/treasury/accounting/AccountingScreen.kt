@@ -25,7 +25,6 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -38,16 +37,16 @@ enum class AccountingPage {
  *
  * @param page: The page to display (either "budget" or "balance")
  * @param navigationActions: The navigation actions
- * @param budgetViewModel: The view model for the budget screen
+ * @param accountingViewModel: The view model for the budget screen
  */
 @Composable
 fun AccountingScreen(
     page: AccountingPage,
     navigationActions: NavigationActions,
-    budgetViewModel: BudgetViewModel
+    accountingViewModel: AccountingViewModel
 ) {
-  val budgetModel by budgetViewModel.uiState.collectAsState()
-  val subCategoryList = budgetModel.subCategoryList
+  val model by accountingViewModel.uiState.collectAsState()
+  val subCategoryList = model.subCategoryList
 
   LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
 
@@ -71,11 +70,11 @@ fun AccountingScreen(
 /**
  * The filter bar of the accounting screen
  *
- * @param budgetViewModel: The view model for the budget screen
+ * @param accountingViewModel: The view model for the budget screen
  */
 @Composable
-fun AccountingFilterBar(budgetViewModel: BudgetViewModel) {
-  val model by budgetViewModel.uiState.collectAsState()
+fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
+  val model by accountingViewModel.uiState.collectAsState()
 
   // filter bar lists
   val yearList = listOf("2023", "2022", "2021")
@@ -92,7 +91,7 @@ fun AccountingFilterBar(budgetViewModel: BudgetViewModel) {
     DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") { selectedYear = it }
     DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
       selectedCategory = it
-      budgetViewModel.onSelectedCategory(selectedCategory)
+      accountingViewModel.onSelectedCategory(selectedCategory)
     }
     // TODO: change amount given TVA
     DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { selectedTVA = it }
