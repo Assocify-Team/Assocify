@@ -5,7 +5,6 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -32,16 +31,24 @@ class BalanceDetailedViewModel(
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
-          // Filter the balanceList to only include items with the matching subCategoryUid
+          // Filter the balanceList to only include items with the matching subCategoryUid, year and
+          // status
           val filteredList =
               balanceList.filter { balanceItem ->
                 balanceItem.date.year == _uiState.value.year &&
-                    balanceItem.categoryUID == subCategoryUid &&
-                    balanceItem.status == _uiState.value.status
+                    balanceItem.subcategoryUID == subCategoryUid
+              }
+
+          // if status is not null, filter the list by status
+          val statusFilteredList =
+              if (_uiState.value.status != null) {
+                filteredList.filter { balanceItem -> balanceItem.status == _uiState.value.status }
+              } else {
+                filteredList
               }
 
           // Update the UI state with the filtered list
-          _uiState.value = _uiState.value.copy(balanceList = filteredList)
+          _uiState.value = _uiState.value.copy(balanceList = statusFilteredList)
         },
         {})
   }
@@ -61,7 +68,7 @@ class BalanceDetailedViewModel(
    *
    * @param status the status to filter by
    */
-  fun onStatusFilter(status: Status) {
+  fun onStatusFilter(status: Status?) {
     _uiState.value = _uiState.value.copy(status = status)
     updateDatabaseValues()
   }
@@ -85,7 +92,7 @@ class BalanceDetailedViewModel(
  */
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
-    val status: Status = Status.Pending,
-    val year: Int = LocalDate.now().year,
+    val status: Status? = null,
+    val year: Int = 2023,
     val filterActive: Boolean = false
 )
