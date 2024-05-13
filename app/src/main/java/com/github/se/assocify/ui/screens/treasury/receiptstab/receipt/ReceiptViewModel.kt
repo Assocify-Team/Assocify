@@ -4,7 +4,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -12,7 +11,6 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
-import java.nio.file.Path
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.math.absoluteValue
@@ -34,11 +32,7 @@ class ReceiptViewModel {
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
 
-  constructor(
-      navActions: NavigationActions,
-      cacheDir: Path,
-      receiptApi: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient, cacheDir)
-  ) {
+  constructor(navActions: NavigationActions, receiptApi: ReceiptAPI) {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = UUID.randomUUID().toString()
@@ -46,18 +40,17 @@ class ReceiptViewModel {
     uiState = _uiState
   }
 
-  constructor(
-      receiptUid: String,
-      navActions: NavigationActions,
-      cacheDir: Path,
-      receiptApi: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient, cacheDir)
-  ) {
+  constructor(receiptUid: String, navActions: NavigationActions, receiptApi: ReceiptAPI) {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = receiptUid
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
+    loadReceipt()
+  }
 
+  fun loadReceipt() {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
     this.receiptApi.getReceipt(
         receiptUid,
         onSuccess = { receipt ->
@@ -75,7 +68,9 @@ class ReceiptViewModel {
               { _uiState.value = _uiState.value.copy(receiptImageURI = it) },
               { Log.e("ReceiptViewModel", "Failed to load receipt image", it) })
         },
-        onFailure = { Log.e("ReceiptViewModel", "Failed to load receipt", it) })
+        onFailure = {
+          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
+        })
   }
 
   fun setStatus(status: Status) {
@@ -231,6 +226,8 @@ class ReceiptViewModel {
 }
 
 data class ReceiptState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val isNewReceipt: Boolean,
     val status: Status = Status.Pending,
     val pageTitle: String,

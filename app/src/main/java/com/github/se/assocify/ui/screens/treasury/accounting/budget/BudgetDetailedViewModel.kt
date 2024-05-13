@@ -48,9 +48,39 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
     updateDatabaseValues()
   }
+
+  /**
+   * Enter in the edit state so the popup appears
+   *
+   * @param budgetItem the item we want to edit
+   */
+  fun startEditing(budgetItem: BudgetItem) {
+    _uiState.value = _uiState.value.copy(editing = true, editedBudgetItem = budgetItem)
+  }
+
+  /**
+   * Exit the edit state while saving the modifications performed
+   *
+   * @param budgetItem the new edited budgetItem
+   */
+  fun saveEditing(budgetItem: BudgetItem) {
+    budgetApi.updateBudgetItem(CurrentUser.associationUid!!, budgetItem, {}, {})
+    _uiState.value =
+        _uiState.value.copy(
+            editing = false,
+            budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem,
+            editedBudgetItem = null)
+  }
+
+  /** Exit the edit state without keeping the modifications done */
+  fun cancelEditing() {
+    _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
+  }
 }
 
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
-    val yearFilter: Int = 2023
+    val yearFilter: Int = 2023,
+    val editing: Boolean = false,
+    val editedBudgetItem: BudgetItem? = null
 )

@@ -10,7 +10,6 @@ import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
@@ -39,8 +38,7 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
-  val subCategory =
-      AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
+  val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
   val receipt =
       Receipt(
           "1",
@@ -55,34 +53,34 @@ class BalanceDetailedScreenTest :
           BalanceItem(
               "1",
               "pair of scissors",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategory,
               LocalDate.of(2024, 4, 14),
-              receipt,
               "François Théron",
               Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              subCategory,
               LocalDate.of(2024, 3, 11),
-              receipt,
               "Rayan Boucheny",
               Status.Archived),
           BalanceItem(
               "3",
               "chairs",
+              "",
+              "00000000-0000-0000-0000-000000000000",
               200,
               TVA.TVA_8,
               "order for 200 chairs",
-              subCategory,
               LocalDate.of(2024, 1, 14),
-              receipt,
               "Sidonie Bouthors",
               Status.Reimbursed))
 

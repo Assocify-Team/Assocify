@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -31,7 +32,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.R
 import com.github.se.assocify.model.entities.RoleType
-import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.UserSearchState
 import com.github.se.assocify.ui.composables.UserSearchTextField
@@ -62,7 +61,7 @@ fun CreateAssociationScreen(
   Scaffold(
       modifier = Modifier.testTag("createAssoScreen"),
       topBar = {
-        TopAppBar(
+        CenterAlignedTopAppBar(
             modifier = Modifier.fillMaxWidth().testTag("TopAppBar"),
             navigationIcon = {
               IconButton(
@@ -136,10 +135,7 @@ fun CreateAssociationScreen(
                       Text("Add members")
                     }
                 Button(
-                    onClick = {
-                      viewmodel.saveAsso()
-                      navigationActions.navigateToMainTab(Destination.Home)
-                    },
+                    onClick = { viewmodel.saveAsso() },
                     modifier = Modifier.fillMaxWidth().testTag("create"),
                     enabled = state.savable) {
                       Text("Create")

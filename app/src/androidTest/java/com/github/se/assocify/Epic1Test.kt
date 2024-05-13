@@ -16,9 +16,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -128,7 +131,12 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val budgetAPI = mockk<BudgetAPI>(relaxUnitFun = true)
 
+  private val receiptAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
+
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
+
+  private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
+  private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
 
   @Before
   fun testSetup() {
@@ -138,7 +146,16 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       navActions = NavigationActions(navController, loginSave)
 
       TestAssocifyApp(
-          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI)
+          navController,
+          navActions,
+          userAPI,
+          associationAPI,
+          eventAPI,
+          budgetAPI,
+          taskAPI,
+          receiptAPI,
+          accountingCategoriesAPI,
+          accountingSubCategoryAPI)
     }
   }
 
@@ -204,7 +221,10 @@ fun TestAssocifyApp(
     associationAPI: AssociationAPI,
     eventAPI: EventAPI,
     budgetAPI: BudgetAPI,
-    taskAPI: TaskAPI
+    taskAPI: TaskAPI,
+    receiptAPI: ReceiptAPI,
+    accountingCategoriesAPI: AccountingCategoryAPI,
+    accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
   CurrentUser.userUid = "1"
 
@@ -215,6 +235,9 @@ fun TestAssocifyApp(
         associationAPI = associationAPI,
         eventAPI = eventAPI,
         budgetAPI = budgetAPI,
-        taskAPI)
+        taskAPI = taskAPI,
+        receiptsAPI = receiptAPI,
+        accountingCategoriesAPI = accountingCategoriesAPI,
+        accountingSubCategoryAPI = accountingSubCategoryAPI)
   }
 }

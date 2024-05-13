@@ -67,14 +67,17 @@ class TaskViewModel {
     _uiState = MutableStateFlow(TaskState(isNewTask = false, pageTitle = EDIT_TASK_TITLE))
     uiState = _uiState
 
+    loadTask()
+  }
+
+  fun loadTask() {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
     taskApi.getTask(
         taskUid,
         {
           val date = it.startTime.toLocalDate()
           val time = it.startTime.toLocalTime()
           eventUid = it.eventUid
-
-          loadEvents()
 
           _uiState.value =
               _uiState.value.copy(
@@ -85,16 +88,13 @@ class TaskViewModel {
                   staffNumber = it.peopleNeeded.toString(),
                   date = DateUtil.toString(date),
                   time = TimeUtil.toString(time))
+
+          loadEvents()
         },
-        {
-          CoroutineScope(Dispatchers.Main).launch {
-            _uiState.value.snackbarHostState.showSnackbar(
-                message = "Failed to load task", duration = SnackbarDuration.Short)
-          }
-        })
+        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading task") })
   }
 
-  fun loadEvents() {
+  private fun loadEvents() {
     eventApi.getEvents(
         {
           _uiState.value = _uiState.value.copy(eventList = it)
@@ -103,13 +103,9 @@ class TaskViewModel {
                 _uiState.value.copy(
                     event = _uiState.value.eventList.find { event -> eventUid == event.uid })
           }
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
         },
-        {
-          CoroutineScope(Dispatchers.Main).launch {
-            _uiState.value.snackbarHostState.showSnackbar(
-                message = "Failed to load events", duration = SnackbarDuration.Short)
-          }
-        })
+        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading events") })
   }
 
   fun setEvent(event: Event) {
@@ -245,6 +241,8 @@ class TaskViewModel {
 }
 
 data class TaskState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val isNewTask: Boolean,
     val pageTitle: String,
     val title: String = "",

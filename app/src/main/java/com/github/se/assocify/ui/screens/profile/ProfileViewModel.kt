@@ -2,11 +2,13 @@ package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -42,34 +44,95 @@ class ProfileViewModel(
   private val _uiState = MutableStateFlow(ProfileUIState())
   val uiState: StateFlow<ProfileUIState> = _uiState
 
+  private var loadCounter = 0 // number of things loading
+
   init {
+    loadProfile()
+  }
+
+  /** This function is used to start loading. It increments the load counter. */
+  private fun startLoading() {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+    loadCounter += 4
+  }
+
+  /**
+   * This function is used to end loading. It decrements the load counter.
+   *
+   * @param error the error message, if any
+   */
+  private fun endLoading(error: String? = null) {
+    if (error != null) {
+      if (_uiState.value.error == null) {
+        _uiState.value = _uiState.value.copy(loading = false, error = error)
+      }
+      loadCounter = 0
+    } else if (--loadCounter == 0) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+    }
+  }
+
+  /**
+   * This function is used to load the profile of the user. It gets the user's name, associations
+   * and the current association. It also gets the user's role in the association.
+   */
+  fun loadProfile() {
+    startLoading()
     userAPI.getUser(
         CurrentUser.userUid!!,
         { user ->
           _uiState.value = _uiState.value.copy(myName = user.name, modifyingName = user.name)
+          endLoading()
         },
-        { _uiState.value = _uiState.value.copy(myName = "name not found") })
+        { endLoading("Error loading profile") })
     userAPI.getCurrentUserAssociations(
         { associations ->
           _uiState.value =
               _uiState.value.copy(
-                  myAssociations = associations.map { DropdownOption(it.name, it.uid) })
+                  myAssociations =
+                      associations.map {
+                        DropdownOption(it.name, it.uid)
+                        /* TODO fetch association logo, else by default :*/
+                        {
+                          Icon(
+                              imageVector = Icons.Default.People,
+                              contentDescription = "Association Logo")
+                        }
+                      } + _uiState.value.myAssociations)
+          endLoading()
         },
-        { _uiState.value = _uiState.value.copy(myAssociations = emptyList()) })
-
+        {
+          _uiState.value = _uiState.value.copy(myAssociations = emptyList())
+          endLoading("Error loading your associations")
+        })
     assoAPI.getAssociation(
         CurrentUser.associationUid!!,
         { association ->
           _uiState.value =
               _uiState.value.copy(
-                  selectedAssociation = DropdownOption(association.name, association.uid))
+                  selectedAssociation =
+                      DropdownOption(association.name, association.uid)
+                      /* TODO fetch association logo */
+                      {
+                        Icon(
+                            imageVector = Icons.Default.People,
+                            contentDescription = "Association Logo")
+                      })
+          endLoading()
         },
         {
-          _uiState.value =
-              _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
+          if (_uiState.value.myAssociations.isNotEmpty()) {
+            _uiState.value =
+                _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
+          }
+          endLoading("Error loading current association")
         })
     userAPI.getCurrentUserRole(
-        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
+        { role ->
+          _uiState.value = _uiState.value.copy(currentRole = role)
+          endLoading()
+        },
+        { endLoading("Error loading role") })
   }
 
   /**
@@ -100,15 +163,31 @@ class ProfileViewModel(
   }
 
   /**
-   * This function is used to set the association of the user.
+   * This function is used to set the association of the user. It goes to selectAssociation screen
+   * if the user wants to join an other association.
    *
    * @param association the association
    */
   fun setAssociation(association: DropdownOption) {
+    if (association.uid == "join") {
+      navActions.navigateTo(Destination.SelectAsso)
+      return
+    }
+    val oldAssociationUid = CurrentUser.associationUid
     CurrentUser.associationUid = association.uid
-    _uiState.value = _uiState.value.copy(selectedAssociation = association)
     userAPI.getCurrentUserRole(
-        { role -> _uiState.value = _uiState.value.copy(currentRole = role) }, {})
+        { role ->
+          _uiState.value = _uiState.value.copy(selectedAssociation = association)
+          _uiState.value = _uiState.value.copy(currentRole = role)
+          endLoading()
+        },
+        {
+          CurrentUser.associationUid = oldAssociationUid
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Couldn't switch association", duration = SnackbarDuration.Short)
+          }
+        })
   }
 
   /**
@@ -116,18 +195,16 @@ class ProfileViewModel(
    * database. It shows a snackbar if the name change was successful or not.
    */
   fun confirmModifyName() {
-    _uiState.value = _uiState.value.copy(openEdit = false, myName = _uiState.value.modifyingName)
     CurrentUser.userUid?.let { uid ->
       userAPI.setDisplayName(
           uid,
           _uiState.value.modifyingName,
           {
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Name changed !", duration = SnackbarDuration.Short)
-            }
+            _uiState.value =
+                _uiState.value.copy(openEdit = false, myName = _uiState.value.modifyingName)
           },
           {
+            _uiState.value = _uiState.value.copy(openEdit = false)
             CoroutineScope(Dispatchers.Main).launch {
               _uiState.value.snackbarHostState.showSnackbar(
                   message = "Couldn't change name", duration = SnackbarDuration.Short)
@@ -169,6 +246,10 @@ class ProfileViewModel(
 }
 
 data class ProfileUIState(
+    // wether the screen in loading
+    val loading: Boolean = false,
+    // the error message, if any
+    val error: String? = null,
     // the name of the user
     val myName: String = "",
     // the name of the user as they're editing it
@@ -182,11 +263,20 @@ data class ProfileUIState(
     // the uri of the profile image
     val profileImageURI: Uri? = null,
     // the associations of the user
-    val myAssociations: List<DropdownOption> = emptyList(),
+    val myAssociations: List<DropdownOption> =
+        listOf(
+            DropdownOption(
+                "Add association",
+                "join",
+                {
+                  Icon(
+                      imageVector = Icons.Default.GroupAdd,
+                      contentDescription = "Join an other association")
+                })),
     // true if the association dropdown should be shown, false if should be hidden
     val openAssociationDropdown: Boolean = false,
-    // the selected (current) association - TODO idk what to do with the temporary association
-    val selectedAssociation: DropdownOption = DropdownOption("", "temp"),
+    // the selected (current) association
+    val selectedAssociation: DropdownOption = myAssociations[0],
     // current role of the user in the association
     val currentRole: PermissionRole =
         PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)

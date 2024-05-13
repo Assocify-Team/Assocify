@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedCard
@@ -52,8 +51,10 @@ import coil.compose.AsyncImage
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.composables.DropdownWithSetOptions
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
@@ -84,8 +85,20 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
       snackbarHost = {
         SnackbarHost(
             hostState = state.snackbarHostState,
-            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+            snackbar = { snackbarData ->
+              Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
+            })
       }) { innerPadding ->
+        if (state.loading) {
+          CenteredCircularIndicator()
+          return@Scaffold
+        }
+
+        if (state.error != null) {
+          ErrorMessage(errorMessage = state.error) { viewmodel.loadProfile() }
+          return@Scaffold
+        }
+
         Column(
             modifier =
                 Modifier.padding(innerPadding).verticalScroll(rememberScrollState()).fillMaxWidth(),
@@ -144,14 +157,13 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
               DropdownWithSetOptions(
                   options = state.myAssociations,
                   selectedOption =
-                      DropdownOption(state.selectedAssociation.name, state.selectedAssociation.uid),
+                      DropdownOption(
+                          state.selectedAssociation.name,
+                          state.selectedAssociation.uid,
+                          state.selectedAssociation.leadIcon),
                   opened = state.openAssociationDropdown,
                   onOpenedChange = { viewmodel.controlAssociationDropdown(it) },
                   onSelectOption = { viewmodel.setAssociation(it) },
-                  leadIcon = {
-                    Icon(
-                        imageVector = Icons.Default.People, contentDescription = "Association Logo")
-                  },
                   modifier =
                       Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally))
 

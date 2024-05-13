@@ -1,13 +1,17 @@
 package com.github.se.assocify
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.SupabaseClient
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.localsave.LoginSave
@@ -23,7 +27,11 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
   val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
+  val receiptsAPI =
+      ReceiptAPI(SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath())
   val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
+  val accountingCategoriesAPI = AccountingCategoryAPI(SupabaseClient.supabaseClient)
+  val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
   loginSaver.loadUserInfo()
 
   val firstDest =
@@ -40,6 +48,9 @@ fun AssocifyApp(loginSaver: LoginSave) {
         associationAPI = associationAPI,
         eventAPI = eventAPI,
         budgetAPI = budgetAPI,
-        taskAPI = taskAPI)
+        taskAPI = taskAPI,
+        receiptsAPI = receiptsAPI,
+        accountingCategoriesAPI = accountingCategoriesAPI,
+        accountingSubCategoryAPI = accountingSubCategoryAPI)
   }
 }

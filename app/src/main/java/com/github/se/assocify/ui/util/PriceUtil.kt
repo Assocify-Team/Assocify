@@ -1,5 +1,7 @@
 package com.github.se.assocify.ui.util
 
+import java.util.Locale
+
 /** Utility class for price related operations. */
 object PriceUtil {
 
@@ -15,7 +17,7 @@ object PriceUtil {
    * @return the formatted price
    */
   fun formatPrice(price: Double): String {
-    return "%.2f".format(price)
+    return String.format(Locale.US, "%.2f", price)
   }
 
   /**
@@ -97,6 +99,6 @@ object PriceUtil {
    * @return the string price
    */
   fun fromCents(cents: Int): String {
-    return "%.2f".format(cents.toDouble() / 100)
+    return formatPrice(cents.toDouble() / 100)
   }
 }

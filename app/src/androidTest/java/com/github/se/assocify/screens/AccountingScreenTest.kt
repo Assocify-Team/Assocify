@@ -9,19 +9,22 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
-import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import io.mockk.verify
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,57 +35,96 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @get:Rule val composeTestRule = createComposeRule()
   @get:Rule val mockkRule = MockKRule(this)
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-  val list =
+
+  val categoryList =
       listOf(
-          AccountingSubCategory("1", "Administration Pole", AccountingCategory("Pole"), 2000),
-          AccountingSubCategory("2", "Presidency Pole", AccountingCategory("Pole"), -400),
-          AccountingSubCategory("3", "Balelec", AccountingCategory("Events"), 1000),
-          AccountingSubCategory("4", "Champachelor", AccountingCategory("Events"), 5000),
-          AccountingSubCategory("5", "OGJ", AccountingCategory("Commission"), 6000),
-          AccountingSubCategory("6", "Communication Fees", AccountingCategory("Fees"), 3000))
+          AccountingCategory("1", "Events"),
+          AccountingCategory("2", "Pole"),
+          AccountingCategory("3", "Commissions"),
+          AccountingCategory("4", "Sponsorship"))
+
+  val subCategoryList =
+      listOf(
+          AccountingSubCategory("4", "2", "Administration", 30),
+          AccountingSubCategory("5", "2", "Presidency", 20),
+          AccountingSubCategory("6", "2", "Communication", 10),
+          AccountingSubCategory("7", "1", "Champachelor", 5000),
+          AccountingSubCategory("8", "1", "Balelec", 5000),
+          AccountingSubCategory("9", "3", "Game*", 3000))
+
+  val mockAccountingCategoryAPI: AccountingCategoryAPI =
+      mockk<AccountingCategoryAPI>() {
+        every { getCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
+              onSuccessCallback(categoryList)
+            }
+      }
+
+  val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
+      mockk<AccountingSubCategoryAPI>() {
+        every { getSubCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
+              onSuccessCallback(subCategoryList)
+            }
+      }
+
+  lateinit var accountingViewModel: AccountingViewModel
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
+    accountingViewModel =
+        AccountingViewModel(mockAccountingCategoryAPI, mockAccountingSubCategoryAPI)
     composeTestRule.setContent {
-      AccountingFilterBar()
-      AccountingScreen(AccountingPage.BUDGET, list, mockNavActions)
+      AccountingScreen(AccountingPage.BUDGET, mockNavActions, accountingViewModel)
+      AccountingFilterBar(accountingViewModel = accountingViewModel)
     }
   }
 
   /** Tests if the nodes are displayed */
   @Test
   fun testDisplay() {
-    // Test the accounting screen
     with(composeTestRule) {
       onNodeWithTag("AccountingScreen").assertIsDisplayed()
       onNodeWithTag("filterRow").assertIsDisplayed()
       onNodeWithTag("totalLine").assertIsDisplayed()
       onNodeWithTag("yearFilterChip").assertIsDisplayed()
       onNodeWithTag("categoryFilterChip").assertIsDisplayed()
-      list.forEach { onNodeWithTag("displayLine${it.name}").assertIsDisplayed() }
     }
   }
 
-  /**
-   * Tests if the lines are filtered according to the category
-   *
-   * @Test fun testCategoryFiltering() { with(composeTestRule) { // Initially, select the "Category"
-   *   filter to change its value to "Events" onNodeWithTag("categoryFilterChip").performClick()
-   *   onNodeWithText("Events").performClick()
-   *
-   * // Assert that only the budget lines under "Events" category are shown
-   * onNodeWithText("Balelec").assertIsDisplayed()
-   * onNodeWithText("Champachelor").assertIsDisplayed()
-   *
-   * // Assert that budget lines not under "Events" are not shown onNodeWithText("Logistic
-   * Category").assertDoesNotExist() onNodeWithText("Communication Category").assertDoesNotExist()
-   * onNodeWithText("Game*").assertDoesNotExist()
-   *
-   * // Verify the total is recalculated correctly val expectedTotal = 6000 // Sum of amounts for
-   * "Champachelor" and "Balelec" onNodeWithText("$expectedTotal").assertIsDisplayed() } }
-   */
+  /** Tests if the lines are filtered according to the category */
+  @Test
+  fun testFiltering() {
+    with(composeTestRule) {
+      onNodeWithTag("categoryFilterChip").performClick()
+
+      // Tests if the lines are filtered according to the category
+      onNodeWithText("Events").performClick()
+      subCategoryList
+          .filter { it.categoryUID == "1" }
+          .forEach() { onNodeWithText(it.name).assertIsDisplayed() }
+      assert(!accountingViewModel.uiState.value.globalSelected)
+      assert(
+          accountingViewModel.uiState.value.subCategoryList ==
+              subCategoryList.filter { it.categoryUID == "1" })
+
+      // Tests if the lines are displayed when the global category is selected
+      onNodeWithTag("categoryFilterChip").performClick()
+      onNodeWithText("Global").performClick()
+      subCategoryList.forEach() { onNodeWithText(it.name).assertIsDisplayed() }
+      assert(accountingViewModel.uiState.value.globalSelected)
+      assert(accountingViewModel.uiState.value.subCategoryList == subCategoryList)
+
+      // Tests if a message is shown when no subCategory
+      onNodeWithTag("categoryFilterChip").performClick()
+      onNodeWithText("Sponsorship").performClick()
+      onNodeWithText("No data available with this tag").assertIsDisplayed()
+    }
+  }
 
   /** Tests if filter row is scrollable */
   @Test
@@ -90,15 +132,6 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     with(composeTestRule) {
       onNodeWithTag("filterRow").assertIsDisplayed()
       onNodeWithTag("filterRow").performTouchInput { swipeLeft() }
-    }
-  }
-
-  /** Tests navigate to budget detailed screen */
-  @Test
-  fun testNavigateToDetailedScreen() {
-    with(composeTestRule) {
-      onNodeWithText("Administration Pole").performClick()
-      verify { mockNavActions.navigateTo(Destination.BudgetDetailed("Administration Pole")) }
     }
   }
 }

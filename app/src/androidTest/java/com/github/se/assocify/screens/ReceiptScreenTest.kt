@@ -73,7 +73,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   private val viewModel =
       ReceiptViewModel(
-          navActions = navActions, receiptApi = receiptAPI, cacheDir = File("cache").toPath())
+          navActions = navActions, receiptApi = receiptAPI)
 
   @Before
   fun testSetup() {
@@ -299,8 +299,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       ReceiptViewModel(
           receiptUid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
           navActions = navActions,
-          receiptApi = receiptsAPI,
-          cacheDir = File("cache").toPath())
+          receiptApi = receiptsAPI)
 
   @Before
   fun testSetup() {
@@ -325,6 +324,18 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       onNodeWithTag("saveButton").performScrollTo().performClick()
       assert(capturedReceipt?.title == expectedReceipt.title)
       assert(capturedReceipt?.cents == expectedReceipt.cents)
+    }
+  }
+
+  @Test
+  fun receiptLoading() {
+    every { receiptsAPI.getAllReceipts(any(), any()) } answers
+        {
+          secondArg<(Exception) -> Unit>().invoke(Exception("error"))
+        }
+    with(composeTestRule) {
+      viewModel.loadReceipt()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipt")
     }
   }
 }
