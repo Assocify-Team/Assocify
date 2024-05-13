@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -17,6 +18,7 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGra
 fun NavGraphBuilder.treasuryGraph(
     navigationActions: NavigationActions,
     budgetAPI: BudgetAPI,
+    balanceAPI: BalanceAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
@@ -33,7 +35,7 @@ fun NavGraphBuilder.treasuryGraph(
             navActions = navigationActions, receiptListViewModel = receiptListViewModel))
   }
   receiptGraph(navigationActions)
-  budgetDetailedGraph(navigationActions, budgetAPI)
-  balanceDetailedGraph(navigationActions, budgetAPI)
+  budgetDetailedGraph(navigationActions, budgetAPI, balanceAPI)
+  balanceDetailedGraph(navigationActions, budgetAPI, balanceAPI)
   addAccountingCategory(navigationActions)
 }
