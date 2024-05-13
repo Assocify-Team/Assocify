@@ -90,6 +90,7 @@ class UserPreferenceAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 }
+
 @Serializable
 data class UserPreferenceSupabase(
     @SerialName("user_uid") val userUID: String,
@@ -98,9 +99,5 @@ data class UserPreferenceSupabase(
     @SerialName("language") val language: Language
 ) {
   fun toUserPreference() =
-      UserPreference(
-          userUID = userUID,
-          theme = theme,
-          textSize = textSize,
-          language = language)
+      UserPreference(userUID = userUID, theme = theme, textSize = textSize, language = language)
 }

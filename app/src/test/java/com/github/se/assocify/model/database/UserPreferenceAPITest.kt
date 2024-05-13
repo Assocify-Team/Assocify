@@ -9,13 +9,13 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import java.lang.Thread.sleep
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.lang.Thread.sleep
 
 class UserPreferenceAPITest {
   private var error = false
@@ -36,13 +36,13 @@ class UserPreferenceAPITest {
         UserPreferenceAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
-                httpEngine = MockEngine {
-                    if (!error) {
-                    respond(response)
-                    } else {
-                    respondBadRequest()
-                    }
+              httpEngine = MockEngine {
+                if (!error) {
+                  respond(response)
+                } else {
+                  respondBadRequest()
                 }
+              }
             })
   }
 
@@ -61,14 +61,7 @@ class UserPreferenceAPITest {
         """
             .trimIndent()
 
-
-      api.getUserPreference(
-        userUID,
-        {
-          assert(true)
-        },
-        { assert(false) })
-
+    api.getUserPreference(userUID, { assert(true) }, { assert(false) })
   }
 
   @Test
