@@ -62,9 +62,7 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
                   associationUID = associationUID,
                   name = subCategory.name,
                   amount = subCategory.amount,
-                  year = subCategory.year
-
-              ))
+                  year = subCategory.year))
 
       onSuccess()
     }
@@ -130,6 +128,7 @@ data class SupabaseAccountingSubCategory(
     @SerialName("year") val year: Int
 ) {
   fun toAccountingSubCategory(): AccountingSubCategory {
-    return AccountingSubCategory(uid = uid, name = name, amount = amount, categoryUID = categoryUID, year = year)
+    return AccountingSubCategory(
+        uid = uid, name = name, amount = amount, categoryUID = categoryUID, year = year)
   }
 }

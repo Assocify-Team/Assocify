@@ -81,7 +81,8 @@ class AccountingSubCategoryTest {
             "13379999-0000-0000-0000-000000000000",
             "13379999-0000-0000-0000-000000000000",
             "Test SubCategory",
-            1, 2022),
+            1,
+            2022),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
@@ -96,8 +97,8 @@ class AccountingSubCategoryTest {
     error = false
     response = ""
     api.deleteSubCategory(
-        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory",
-            "", 2, 2022),
+        AccountingSubCategory(
+            "13379999-0000-0000-0000-000000000000", "Test SubCategory", "", 2, 2022),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
@@ -117,7 +118,8 @@ class AccountingSubCategoryTest {
             "cb7b1079-cb62-40b9-9f35-7667fea4748d",
             "13379999-0000-0000-0000-000000000000",
             "Test SubCategory",
-            1, 2022),
+            1,
+            2022),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }

@@ -47,7 +47,8 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   val subCategoryList =
       listOf(
           AccountingSubCategory("2", "1", "OGJ", 2000, 1000),
-          AccountingSubCategory("3", "1", "Subsonic", 100, 50),)
+          AccountingSubCategory("3", "1", "Subsonic", 100, 50),
+      )
 
   val mockAccountingCategoriesAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
