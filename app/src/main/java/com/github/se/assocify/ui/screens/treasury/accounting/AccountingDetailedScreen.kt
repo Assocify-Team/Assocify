@@ -172,7 +172,7 @@ fun AccountingDetailedScreen(
       },
       content = { innerPadding ->
         if (budgetModel.editing && page == AccountingPage.BUDGET) {
-          DisplayEditBudget(budgetDetailedViewModel)
+          DisplayEditBalance()
         }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
@@ -280,9 +280,8 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       modifier = Modifier.clickable {}.testTag(testTag))
 }
 
-
 @Composable
-fun DisplayEditBalance(){
+fun DisplayEditBalance() {
   var nameString by remember { mutableStateOf("") }
   var amount by remember { mutableIntStateOf(0) }
   var tvaString by remember { mutableStateOf("") }
@@ -291,116 +290,24 @@ fun DisplayEditBalance(){
   var date by remember { mutableStateOf(LocalDate.now()) }
   var assignee by remember { mutableStateOf("") }
   var status by remember { mutableStateOf(Status.Pending) }
-  Dialog(onDismissRequest = { /*TODO: wait for viewModel to revert*/ }) {
-    Card(
-      modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
-      shape = RoundedCornerShape(16.dp),
-    ) {
-      Column() {
-        Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
-        OutlinedTextField(
-          modifier = Modifier.padding(8.dp),
-          value = nameString,
-          onValueChange = {nameString = it},
-          label = { Text("Name") },
-          supportingText = {})
-        /*TODO: insert category and receipt value*/
-        OutlinedTextField(
-          modifier = Modifier.padding(8.dp),
-          value = amount.toString(),
-          onValueChange = {amount = it.toInt()},
-          label = { Text("Amount") },
-          keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-          supportingText = {})
-        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-          var tvaExtended by remember { mutableStateOf(false) }
-          FilterChip(
-            modifier = Modifier.fillMaxWidth().height(60.dp),
-            selected = tvaExtended,
-            onClick = { tvaExtended = !tvaExtended },
-            label = { Text(tvaTypeString) },
-            trailingIcon = {
-              Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-            })
-          DropdownMenu(
-            modifier = Modifier,
-            expanded = tvaExtended,
-            onDismissRequest = { tvaExtended = false },
-            properties = PopupProperties(focusable = true)) {
-            TVA.entries.forEach { tva ->
-              DropdownMenuItem(
-                text = { Text(tva.toString()) },
-                onClick = {
-                  tvaTypeString = tva.toString()
-                  tvaString = tva.rate.toString()
-                  tvaExtended = false
-                })
-            }
-          }
-        }
-        OutlinedTextField(
-          modifier = Modifier.padding(8.dp),
-          value = descriptionString,
-          onValueChange = {descriptionString = it},
-          label = { Text("Description") },
-          supportingText = {})
-        /*TODO: insert date picker*/
-        OutlinedTextField(
-          modifier = Modifier.padding(8.dp),
-          value = assignee,
-          onValueChange = {assignee = it},
-          label = { Text("Assignee") },
-          supportingText = {})
-        /*TODO: insert status picker*/
-        Row(
-          modifier = Modifier.fillMaxWidth().padding(15.dp),
-          horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-          Button(
-            onClick = { /*TODO: wait for viewModel to revert*/ },
-            modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
-          ) {
-            Text("Dismiss")
-          }
-          Button(
-            onClick = { /*TODO: wait for viewModel to save*/ },
-            modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
-          ) {
-            Text("Confirm")
-          }
-        }
-    }
-  }
-}
-
-@Composable
-fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
-  val budgetModel by budgetViewModel.uiState.collectAsState()
-  val budget = budgetModel.editedBudgetItem!!
-  var nameString by remember { mutableStateOf(budget.nameItem) }
-  var amountString by remember { mutableStateOf(budget.amount.toString()) }
-  var tvaTypeString by remember { mutableStateOf(budget.tva.toString()) }
-  var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
-  var descriptionString by remember { mutableStateOf(budget.description) }
-  var yearString by remember { mutableStateOf(budget.year.toString()) }
-
-  Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
+  Dialog(onDismissRequest = { /*TODO: wait for viewModel to revert*/}) {
     Card(
         modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
-        Text("Edit Budget Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+        Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
-            modifier = Modifier.padding(8.dp).testTag("editNameBox"),
+            modifier = Modifier.padding(8.dp),
             value = nameString,
             onValueChange = { nameString = it },
             label = { Text("Name") },
             supportingText = {})
+        /*TODO: insert category and receipt value*/
         OutlinedTextField(
             modifier = Modifier.padding(8.dp),
-            value = amountString,
-            onValueChange = { amountString = it },
+            value = amount.toString(),
+            onValueChange = { amount = it.toInt() },
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
@@ -436,38 +343,136 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             onValueChange = { descriptionString = it },
             label = { Text("Description") },
             supportingText = {})
+        /*TODO: insert date picker*/
         OutlinedTextField(
             modifier = Modifier.padding(8.dp),
-            value = yearString,
-            onValueChange = { yearString = it },
-            label = { Text("Year") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+            value = assignee,
+            onValueChange = { assignee = it },
+            label = { Text("Assignee") },
             supportingText = {})
+        /*TODO: insert status picker*/
         Row(
             modifier = Modifier.fillMaxWidth().padding(15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Button(
-              onClick = { budgetViewModel.cancelEditing() },
+              onClick = { /*TODO: wait for viewModel to revert*/},
               modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
           ) {
             Text("Dismiss")
           }
           Button(
-              onClick = {
-                budgetViewModel.saveEditing(
-                    BudgetItem(
-                        budget.uid,
-                        nameItem = nameString,
-                        amount = amountString.toInt(),
-                        tva = TVA.floatToTVA(tvaString.toFloat()),
-                        description = descriptionString,
-                        category = budget.category,
-                        year = yearString.toInt()))
-              },
+              onClick = { /*TODO: wait for viewModel to save*/},
               modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
           ) {
             Text("Confirm")
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Displays the popup to edit a specific budget element
+   *
+   * @param budgetViewModel the viewModel of the budget details
+   */
+  @Composable
+  fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
+    val budgetModel by budgetViewModel.uiState.collectAsState()
+    val budget = budgetModel.editedBudgetItem!!
+    var nameString by remember { mutableStateOf(budget.nameItem) }
+    var amountString by remember { mutableStateOf(budget.amount.toString()) }
+    var tvaTypeString by remember { mutableStateOf(budget.tva.toString()) }
+    var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
+    var descriptionString by remember { mutableStateOf(budget.description) }
+    var yearString by remember { mutableStateOf(budget.year.toString()) }
+
+    Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
+      Card(
+          modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
+          shape = RoundedCornerShape(16.dp),
+      ) {
+        Column() {
+          Text("Edit Budget Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+          OutlinedTextField(
+              modifier = Modifier.padding(8.dp).testTag("editNameBox"),
+              value = nameString,
+              onValueChange = { nameString = it },
+              label = { Text("Name") },
+              supportingText = {})
+          OutlinedTextField(
+              modifier = Modifier.padding(8.dp),
+              value = amountString,
+              onValueChange = { amountString = it },
+              label = { Text("Amount") },
+              keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+              supportingText = {})
+          Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            var tvaExtended by remember { mutableStateOf(false) }
+            FilterChip(
+                modifier = Modifier.fillMaxWidth().height(60.dp),
+                selected = tvaExtended,
+                onClick = { tvaExtended = !tvaExtended },
+                label = { Text(tvaTypeString) },
+                trailingIcon = {
+                  Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+                })
+            DropdownMenu(
+                modifier = Modifier,
+                expanded = tvaExtended,
+                onDismissRequest = { tvaExtended = false },
+                properties = PopupProperties(focusable = true)) {
+                  TVA.entries.forEach { tva ->
+                    DropdownMenuItem(
+                        text = { Text(tva.toString()) },
+                        onClick = {
+                          tvaTypeString = tva.toString()
+                          tvaString = tva.rate.toString()
+                          tvaExtended = false
+                        })
+                  }
+                }
+          }
+          OutlinedTextField(
+              modifier = Modifier.padding(8.dp),
+              value = descriptionString,
+              onValueChange = { descriptionString = it },
+              label = { Text("Description") },
+              supportingText = {})
+          OutlinedTextField(
+              modifier = Modifier.padding(8.dp),
+              value = yearString,
+              onValueChange = { yearString = it },
+              label = { Text("Year") },
+              keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+              supportingText = {})
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(15.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
+          ) {
+            Button(
+                onClick = { budgetViewModel.cancelEditing() },
+                modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
+            ) {
+              Text("Dismiss")
+            }
+            Button(
+                onClick = {
+                  budgetViewModel.saveEditing(
+                      BudgetItem(
+                          budget.uid,
+                          nameItem = nameString,
+                          amount = amountString.toInt(),
+                          tva = TVA.floatToTVA(tvaString.toFloat()),
+                          description = descriptionString,
+                          category = budget.category,
+                          year = yearString.toInt()))
+                },
+                modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
+            ) {
+              Text("Confirm")
+            }
           }
         }
       }

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -16,7 +17,6 @@ import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.EventScreen
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
-import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -91,10 +91,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @Test
   fun display() {
     composeTestRule.setContent {
-      EventScreen(
-          mockNavActions,
-          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
-          EventTaskViewModel(mockTaskAPI))
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
     with(composeTestRule) { onNodeWithTag("eventScreen").assertIsDisplayed() }
   }
@@ -102,10 +99,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @Test
   fun navigate() {
     composeTestRule.setContent {
-      EventScreen(
-          mockNavActions,
-          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
-          EventTaskViewModel(mockTaskAPI))
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
     with(composeTestRule) {
       onNodeWithTag("mainNavBarItem/treasury").performClick()
@@ -116,10 +110,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @Test
   fun testTabSwitching() {
     composeTestRule.setContent {
-      EventScreen(
-          mockNavActions,
-          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
-          EventTaskViewModel(mockTaskAPI))
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
     with(composeTestRule) {
       onNodeWithTag("tasksTab").assertIsDisplayed()
@@ -154,10 +145,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
           onSuccessCallback(events)
         }
     composeTestRule.setContent {
-      EventScreen(
-          mockNavActions,
-          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
-          EventTaskViewModel(mockTaskAPI))
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
 
     with(composeTestRule) {
@@ -192,10 +180,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   */
   fun searchBarSearchesWell() {
     composeTestRule.setContent {
-      EventScreen(
-          mockNavActions,
-          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
-          EventTaskViewModel(mockTaskAPI))
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
     with(composeTestRule) {
       onNodeWithTag("searchBar").assertIsNotDisplayed()
@@ -217,10 +202,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   @Test
   fun testDisplayTask() {
     composeTestRule.setContent {
-      EventScreen(
-          mockNavActions,
-          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
-          EventTaskViewModel(mockTaskAPI))
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
 
     with(composeTestRule) {
@@ -244,11 +226,42 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
           onFailureError(IllegalArgumentException("Test error"))
         }
     composeTestRule.setContent {
-      EventScreen(
-          mockNavActions,
-          EventScreenViewModel(mockEventAPI, EventTaskViewModel(mockTaskAPI)),
-          EventTaskViewModel(mockTaskAPI))
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
     }
-    with(composeTestRule) { onNodeWithTag("errorText").assertIsDisplayed() }
+    with(composeTestRule) {
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading events")
+    }
+  }
+
+  @Test
+  fun errorTaskTest() {
+    every { mockTaskAPI.getTasks(any(), any()) } answers
+        {
+          val onFailureError = arg<(Exception) -> Unit>(1)
+          onFailureError(IllegalArgumentException("Test error"))
+        }
+    composeTestRule.setContent {
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
+    }
+    with(composeTestRule) {
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tasks")
+    }
+  }
+
+  @Test
+  fun errorTaskUpdateTest() {
+    every { mockTaskAPI.editTask(any(), any(), any()) } answers
+        {
+          val onFailureError = arg<(Exception) -> Unit>(2)
+          onFailureError(IllegalArgumentException("Test error"))
+        }
+    composeTestRule.setContent {
+      EventScreen(mockNavActions, EventScreenViewModel(mockEventAPI, mockTaskAPI))
+    }
+    with(composeTestRule) {
+      onNodeWithTag("filterChipTestEvent").performClick()
+      onNodeWithTag("TaskCheckbox").performClick()
+      onNodeWithTag("snackbar").assertIsDisplayed()
+    }
   }
 }

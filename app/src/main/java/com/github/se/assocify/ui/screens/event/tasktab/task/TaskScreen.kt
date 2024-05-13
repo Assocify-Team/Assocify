@@ -43,7 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.BackButton
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.TimePickerWithDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +73,16 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
             hostState = taskState.snackbarHostState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
+        if (taskState.loading) {
+          CenteredCircularIndicator()
+          return@Scaffold
+        }
+
+        if (taskState.error != null) {
+          ErrorMessage(errorMessage = taskState.error) { viewModel.loadTask() }
+          return@Scaffold
+        }
+
         Column(
             modifier =
                 Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
