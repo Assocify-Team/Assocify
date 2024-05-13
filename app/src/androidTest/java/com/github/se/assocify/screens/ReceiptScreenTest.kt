@@ -326,9 +326,9 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
   @Test
   fun receiptLoading() {
-    every { receiptsAPI.getAllReceipts(any(), any()) } answers
+    every { receiptsAPI.getReceipt(any(), any(), any()) } answers
         {
-          secondArg<(Exception) -> Unit>().invoke(Exception("error"))
+          thirdArg<(Exception) -> Unit>().invoke(Exception("error"))
         }
     with(composeTestRule) {
       viewModel.loadReceipt()
