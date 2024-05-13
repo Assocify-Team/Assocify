@@ -32,7 +32,13 @@ fun NavGraphBuilder.mainNavGraph(
     accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
   homeGraph(navActions)
-  treasuryGraph(navActions, budgetAPI, balanceAPI, receiptsAPI, accountingCategoriesAPI, accountingSubCategoryAPI)
+  treasuryGraph(
+      navActions,
+      budgetAPI,
+      balanceAPI,
+      receiptsAPI,
+      accountingCategoriesAPI,
+      accountingSubCategoryAPI)
   eventGraph(navActions, eventAPI, taskAPI)
   chatGraph(navActions)
   profileGraph(navActions, userAPI, associationAPI)

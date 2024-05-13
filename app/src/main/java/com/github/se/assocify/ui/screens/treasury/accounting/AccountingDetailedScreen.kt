@@ -54,15 +54,12 @@ import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
-import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
-import java.time.LocalDate
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -131,8 +128,8 @@ fun AccountingDetailedScreen(
               // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
                 when (page) {
-                  AccountingPage.BALANCE -> budgetDetailedViewModel.onYearFilter(it.toInt())
-                  AccountingPage.BUDGET -> balanceDetailedViewModel.onYearFilter(it.toInt())
+                  AccountingPage.BALANCE -> balanceDetailedViewModel.onYearFilter(it.toInt())
+                  AccountingPage.BUDGET -> budgetDetailedViewModel.onYearFilter(it.toInt())
                 }
               }
 
@@ -140,14 +137,15 @@ fun AccountingDetailedScreen(
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                   balanceDetailedViewModel.onStatusFilter(
-                      balanceModel.balanceList
-                          .first { balanceItem -> balanceItem.status.toString() == it }
-                          .status
-                  )
+                      if (it == "All Status") {
+                        null
+                      } else {
+                        Status.valueOf(it)
+                      })
                 }
               }
 
-              //Tva filter
+              // Tva filter
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
                 // TODO: budgetDetailedViewModel.onTVAFilter(it)
               }
@@ -195,6 +193,7 @@ fun TotalItems(totalAmount: Int) {
 /**
  * Display the budget Item in a list
  *
+ * @param budgetDetailedViewModel: The view model of the budget details
  * @param budgetItem: The budget item to display
  * @param testTag: The test tag of the item
  */
@@ -226,8 +225,8 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
           /*Icon(
-              balanceItem.receipt!!.status.getIcon(),
-              contentDescription = "Create") // TODO: add logo depending on the phase*/
+          balanceItem.receipt!!.status.getIcon(),
+          contentDescription = "Create") // TODO: add logo depending on the phase*/
         }
       },
       supportingContent = { Text(balanceItem.assignee) },
