@@ -65,6 +65,15 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(status = status)
     updateDatabaseValues()
   }
+
+  /**
+   * Set the TVA filter as active or inactive
+   *
+   * @param tvaActive the new status of the TVA filter
+   */
+  fun modifyTVAFilter(tvaActive: Boolean) {
+    _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+  }
 }
 
 /**
@@ -77,5 +86,6 @@ class BalanceDetailedViewModel(
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val status: Status = Status.Pending,
-    val year: Int = LocalDate.now().year
+    val year: Int = LocalDate.now().year,
+    val filterActive: Boolean = false
 )

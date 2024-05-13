@@ -151,7 +151,9 @@ fun AccountingDetailedScreen(
                 budgetModel.budgetList.sumOf {
                   it.amount + (it.amount * it.tva.rate / 100f).toInt()
                 }
-        AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
+        AccountingPage.BALANCE ->
+            if (!balanceModel.filterActive) filteredBalanceList.sumOf { it.amount }
+            else filteredBalanceList.sumOf { it.amount + (it.amount * it.tva.rate / 100f).toInt() }
       }
 
   Scaffold(
@@ -204,6 +206,7 @@ fun AccountingDetailedScreen(
               }
               // TODO: change amount given TVA
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+                balanceDetailedViewModel.modifyTVAFilter(it == "TTC")
                 budgetDetailedViewModel.modifyTVAFilter(it == "TTC")
               }
             }
