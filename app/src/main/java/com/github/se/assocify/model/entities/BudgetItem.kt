@@ -8,7 +8,7 @@ package com.github.se.assocify.model.entities
  * @param amount amount of the item
  * @param tva TVA of the item
  * @param description description of the item
- * @param category category of the item (for example: Logistics Pole)
+ * @param subcategoryUID category of the item (for example: Logistics Pole)
  */
 data class BudgetItem(
     val uid: String,
@@ -16,6 +16,6 @@ data class BudgetItem(
     val amount: Int,
     val tva: TVA,
     val description: String,
-    val category: AccountingSubCategory,
+    val subcategoryUID: String,
     val year: Int
 )

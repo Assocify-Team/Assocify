@@ -40,7 +40,8 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
+  val subCategory =
+      AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205, 0)
   val budgetItems =
       listOf(
           BudgetItem(
@@ -49,11 +50,24 @@ class BudgetDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategory,
+              "00000000-0000-0000-0000-000000000000",
               2022),
           BudgetItem(
-              "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory, 2023),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory, 2023))
+              "2",
+              "sweaters",
+              1000,
+              TVA.TVA_8,
+              "order for 1000 sweaters",
+              "00000000-0000-0000-0000-000000000000",
+              2023),
+          BudgetItem(
+              "3",
+              "chairs",
+              200,
+              TVA.TVA_8,
+              "order for 200 chairs",
+              "00000000-0000-0000-0000-000000000000",
+              2023))
 
   val mockBudgetAPI: BudgetAPI =
       mockk<BudgetAPI>() {

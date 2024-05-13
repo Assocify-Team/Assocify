@@ -13,5 +13,6 @@ data class AccountingSubCategory(
     val uid: String,
     val categoryUID: String,
     val name: String,
-    val amount: Int
+    val amount: Int,
+    val year: Int
 )

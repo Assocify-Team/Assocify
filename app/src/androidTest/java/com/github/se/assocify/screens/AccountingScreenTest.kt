@@ -45,12 +45,13 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   val subCategoryList =
       listOf(
-          AccountingSubCategory("4", "2", "Administration", 30),
-          AccountingSubCategory("5", "2", "Presidency", 20),
-          AccountingSubCategory("6", "2", "Communication", 10),
-          AccountingSubCategory("7", "1", "Champachelor", 5000),
-          AccountingSubCategory("8", "1", "Balelec", 5000),
-          AccountingSubCategory("9", "3", "Game*", 3000))
+          AccountingSubCategory("4", "2", "Administration", 30, 10),
+          AccountingSubCategory("5", "2", "Presidency", 20, 10),
+          AccountingSubCategory("6", "2", "Communication", 10, 10),
+          AccountingSubCategory("7", "1", "Champachelor", 5000, 1000),
+          AccountingSubCategory("8", "1", "Balelec", 5000, 1000),
+          AccountingSubCategory("9", "3", "Game*", 3000, 1000),
+      )
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
