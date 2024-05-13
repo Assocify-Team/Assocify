@@ -31,10 +31,8 @@ class UserPreferenceAPITest {
           userUID = userUID, theme = Theme.DARK, textSize = 20, language = Language.ENGLISH)
 
   @Before
-  @OptIn(ExperimentalCoroutinesApi::class)
   fun setup() {
     APITestUtils.setup()
-    Dispatchers.setMain(UnconfinedTestDispatcher())
     api =
         UserPreferenceAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
