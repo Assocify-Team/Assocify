@@ -18,6 +18,7 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -40,12 +41,13 @@ class BudgetDetailedScreenTest :
   @get:Rule val mockkRule = MockKRule(this)
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
+  @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
   val subCategoryList =
       listOf(
-          AccountingSubCategory("1", "categoryUid", "Logistics", 1205),
-          AccountingSubCategory("2", "categoryUid", "Administration", 100),
-          AccountingSubCategory("3", "categoryUid", "Balelec", 399))
+          AccountingSubCategory("1", "categoryUid", "Logistics", 1205, 2023),
+          AccountingSubCategory("2", "categoryUid", "Administration", 100, 2023),
+          AccountingSubCategory("3", "categoryUid", "Balelec", 399, 2023))
 
   val budgetItems =
       listOf(
@@ -55,7 +57,7 @@ class BudgetDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategoryList.first(),
+              "00000000-0000-0000-0000-000000000000",
               2022),
           BudgetItem(
               "2",
@@ -63,11 +65,16 @@ class BudgetDetailedScreenTest :
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              subCategoryList.first(),
+              "00000000-0000-0000-0000-000000000000",
               2023),
           BudgetItem(
-              "3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategoryList.first(), 2023),
-          BudgetItem("4", "fees", 300, TVA.TVA_8, "banking fees", subCategoryList[1], 2023))
+              "3",
+              "chairs",
+              200,
+              TVA.TVA_8,
+              "order for 200 chairs",
+              "00000000-0000-0000-0000-000000000000",
+              2023))
 
   val mockBudgetAPI: BudgetAPI =
       mockk<BudgetAPI>() {
@@ -95,9 +102,10 @@ class BudgetDetailedScreenTest :
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
-        BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "1")
+        BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "subCategoryUid")
     composeTestRule.setContent {
-      BudgetDetailedScreen("1", mockNavActions, budgetDetailedViewModel)
+      BudgetDetailedScreen(
+          "subCategoryUid", mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 
@@ -125,7 +133,7 @@ class BudgetDetailedScreenTest :
 
       assert(
           budgetDetailedViewModel.uiState.value.budgetList ==
-              budgetItems.filter { it.year == 2023 && it.category.uid == "1" })
+              budgetItems.filter { it.year == 2023 && it.subcategoryUID == "subCategoryUid" })
       assert(budgetDetailedViewModel.uiState.value.subCategory == subCategoryList.first())
       assert(budgetDetailedViewModel.uiState.value.yearFilter == 2023)
     }

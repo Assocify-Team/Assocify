@@ -57,8 +57,8 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
-import java.time.LocalDate
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -72,64 +72,23 @@ import java.time.LocalDate
 fun AccountingDetailedScreen(
     page: AccountingPage,
     navigationActions: NavigationActions,
-    budgetDetailedViewModel: BudgetDetailedViewModel
+    budgetDetailedViewModel: BudgetDetailedViewModel,
+    balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
 
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
-  val subCategory = budgetModel.subCategory
+  val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
+    val subCategory = budgetModel.subCategory
 
-  // TODO: fetch from balance detailed view model
-  val balanceItems =
-      listOf(
-          BalanceItem(
-              "1",
-              "pair of scissors",
-              "",
-              "00000000-0000-0000-0000-000000000000",
-              5,
-              TVA.TVA_8,
-              "scissors for paper cutting",
-              LocalDate.of(2024, 4, 14),
-              "François Théron",
-              Status.Pending),
-          BalanceItem(
-              "2",
-              "sweaters",
-              "",
-              "00000000-0000-0000-0000-000000000000",
-              1000,
-              TVA.TVA_8,
-              "order for 1000 sweaters",
-              LocalDate.of(2024, 3, 11),
-              "Rayan Boucheny",
-              Status.Archived),
-          BalanceItem(
-              "3",
-              "chairs",
-              "",
-              "00000000-0000-0000-0000-000000000000",
-              200,
-              TVA.TVA_8,
-              "order for 200 chairs",
-              LocalDate.of(2024, 1, 14),
-              "Sidonie Bouthors",
-              Status.Reimbursed))
 
-  val yearList = listOf("2023", "2022", "2021")
+    val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
-
-  var selectedStatus by remember { mutableStateOf(statusList.first()) }
-
-  val filteredBalanceList =
-      if (selectedStatus == statusList.first()) // display everything under the status category
-       balanceItems
-      else balanceItems.filter { it.status.toString() == selectedStatus }
 
   val totalAmount =
       when (page) {
         AccountingPage.BUDGET -> budgetModel.budgetList.sumOf { it.amount }
-        AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
+        AccountingPage.BALANCE -> balanceModel.balanceList.sumOf { it.amount }
       }
 
   Scaffold(
@@ -165,16 +124,27 @@ fun AccountingDetailedScreen(
           // Display the filter chips
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+              // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
-                budgetDetailedViewModel.onYearFilter(it.toInt())
-              }
-              if (page == AccountingPage.BALANCE) {
-                DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
-                  selectedStatus = it
+                when (page) {
+                  AccountingPage.BALANCE -> balanceDetailedViewModel.onYearFilter(it.toInt())
+                  AccountingPage.BUDGET -> budgetDetailedViewModel.onYearFilter(it.toInt())
                 }
               }
 
-              // TODO: change amount given TVA
+              // Status filter for balance Items
+              if (page == AccountingPage.BALANCE) {
+                DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
+                  balanceDetailedViewModel.onStatusFilter(
+                      if (it == "All Status") {
+                        null
+                      } else {
+                        Status.valueOf(it)
+                      })
+                }
+              }
+
+              // Tva filter
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
                 // TODO: budgetDetailedViewModel.onTVAFilter(it)
               }
@@ -184,7 +154,7 @@ fun AccountingDetailedScreen(
           // Display the items
           when (page) {
             AccountingPage.BALANCE -> {
-              items(filteredBalanceList) {
+              items(balanceModel.balanceList) {
                 DisplayBalanceItem(it, "displayItem${it.uid}")
                 HorizontalDivider(Modifier.fillMaxWidth())
               }
@@ -233,6 +203,7 @@ fun TotalItems(totalAmount: Int) {
 /**
  * Display the budget Item in a list
  *
+ * @param budgetDetailedViewModel: The view model of the budget details
  * @param budgetItem: The budget item to display
  * @param testTag: The test tag of the item
  */
@@ -263,13 +234,9 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
-          /* TODO: add status icon
-          Icon(
-
-              balanceItem.receipt!!.status.getIcon(),
-              contentDescription = "Create")
-
-             */
+          /*Icon(
+          balanceItem.receipt!!.status.getIcon(),
+          contentDescription = "Create") // TODO: add logo depending on the phase*/
         }
       },
       supportingContent = { Text(balanceItem.assignee) },
@@ -371,7 +338,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
                         amount = amountString.toInt(),
                         tva = TVA.floatToTVA(tvaString.toFloat()),
                         description = descriptionString,
-                        category = budget.category,
+                        subcategoryUID = budget.subcategoryUID,
                         year = yearString.toInt()))
               },
               modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),

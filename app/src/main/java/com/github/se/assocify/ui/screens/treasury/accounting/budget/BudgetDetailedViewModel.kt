@@ -50,7 +50,7 @@ class BudgetDetailedViewModel(
           val filteredList =
               budgetList.filter { budgetItem ->
                 budgetItem.year == _uiState.value.yearFilter &&
-                    budgetItem.category.uid == subCategoryUid
+                    budgetItem.subcategoryUID == subCategoryUid
               }
 
           // Update the UI state with the filtered list
@@ -95,7 +95,7 @@ class BudgetDetailedViewModel(
 
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
-    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0),
+    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null

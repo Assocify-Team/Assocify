@@ -58,7 +58,7 @@ class ReceiptListViewModel(
                       })
           endLoading()
         },
-        onError = {
+        onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching user receipts", it)
           loadingError()
         })
@@ -77,7 +77,7 @@ class ReceiptListViewModel(
                       })
           endLoading()
         },
-        onError = {
+        onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching all receipts", it)
           loadingError()
         })

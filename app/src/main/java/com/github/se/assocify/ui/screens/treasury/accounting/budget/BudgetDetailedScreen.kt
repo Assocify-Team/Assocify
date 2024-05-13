@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 
 /**
  * Detailed budget screen for a subcategory
@@ -16,7 +17,12 @@ import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 fun BudgetDetailedScreen(
     subCategoryUid: String,
     navigationActions: NavigationActions,
-    budgetDetailedViewModel: BudgetDetailedViewModel
+    budgetDetailedViewModel: BudgetDetailedViewModel,
+    balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
-  AccountingDetailedScreen(AccountingPage.BUDGET, navigationActions, budgetDetailedViewModel)
+  AccountingDetailedScreen(
+      AccountingPage.BUDGET,
+      navigationActions,
+      budgetDetailedViewModel,
+      balanceDetailedViewModel)
 }
