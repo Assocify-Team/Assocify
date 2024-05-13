@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,11 +37,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.ErrorMessage
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 /** A screen that displays the schedule of a staffer of an event. */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventScheduleScreen(
     viewModel: EventScheduleViewModel,
@@ -172,7 +175,10 @@ fun DateSwitcher(viewModel: EventScheduleViewModel) {
         IconButton(onClick = { viewModel.previousDate() }) {
           Icon(Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = "Previous date")
         }
-        Text(text = state.dateText)
+        DatePickerWithDialog(
+            value = state.dateText,
+            onDateSelect = { viewModel.changeDate(it) },
+            textFieldFormat = false)
         IconButton(onClick = { viewModel.nextDate() }) {
           Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = "Next date")
         }

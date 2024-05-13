@@ -38,14 +38,10 @@ class EventScheduleViewModel(
                     .filter { it.startTime.toLocalDate() == _uiState.value.currentDate })
   }
 
-  private fun changeDate(date: LocalDate) {
+  fun changeDate(date: LocalDate?) {
+    if (date == null) return
+
     _uiState.value = _uiState.value.copy(currentDate = date)
-    _uiState.value =
-        _uiState.value.copy(
-            currentDayTasks =
-                _uiState.value.tasks.filter {
-                  it.startTime.toLocalDate() == _uiState.value.currentDate
-                })
     val dateText =
         when (date) {
           LocalDate.now() -> "Today"
@@ -54,6 +50,7 @@ class EventScheduleViewModel(
           else -> DateUtil.toString(date)
         }
     _uiState.value = _uiState.value.copy(dateText = dateText)
+    filterTasks()
   }
 
   fun nextDate() {
