@@ -373,7 +373,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
                         amount = amountString.toInt(),
                         tva = TVA.floatToTVA(tvaString.toFloat()),
                         description = descriptionString,
-                        category = budget.category,
+                        subcategoryUID = budget.subcategoryUID,
                         year = yearString.toInt()))
               },
               modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),

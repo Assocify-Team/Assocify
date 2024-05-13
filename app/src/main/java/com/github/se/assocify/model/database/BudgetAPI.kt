@@ -1,6 +1,5 @@
 package com.github.se.assocify.model.database
 
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.SupabaseClient
@@ -10,7 +9,7 @@ import kotlinx.serialization.Serializable
 
 class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
 
-  val collectionName = "budget_item"
+  private val collectionName = "budget_item"
   /**
    * Get the budget of an association
    *
@@ -44,17 +43,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.from(collectionName)
-          .insert(
-              SupabaseBudgetItem(
-                  itemUID = budgetItem.uid,
-                  associationUID = associationUID,
-                  name = budgetItem.nameItem,
-                  description = budgetItem.description,
-                  amount = budgetItem.amount,
-                  year = budgetItem.year,
-                  tva = budgetItem.tva.rate,
-                  category = budgetItem.category.name))
+      db.from(collectionName).insert(SupabaseBudgetItem.fromBudgetItem(budgetItem, associationUID))
       onSuccess()
     }
   }
@@ -79,8 +68,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
         BudgetAPI.SupabaseBudgetItem::amount setTo budgetItem.amount
         BudgetAPI.SupabaseBudgetItem::year setTo budgetItem.year
         BudgetAPI.SupabaseBudgetItem::tva setTo budgetItem.tva.rate
-        // TODO : Implement the category well when it's possible
-        BudgetAPI.SupabaseBudgetItem::category setTo budgetItem.category.name
+        BudgetAPI.SupabaseBudgetItem::subcategoryUID setTo budgetItem.subcategoryUID
       }) {
         filter {
           BudgetAPI.SupabaseBudgetItem::associationUID eq associationUID
@@ -112,12 +100,12 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
   data class SupabaseBudgetItem(
       @SerialName("item_uid") val itemUID: String,
       @SerialName("association_uid") val associationUID: String,
-      val name: String,
-      val description: String,
-      val amount: Int,
-      val year: Int,
-      val tva: Float,
-      val category: String
+      @SerialName("name") val name: String,
+      @SerialName("description") val description: String,
+      @SerialName("amount") val amount: Int,
+      @SerialName("year") val year: Int,
+      @SerialName("tva") val tva: Float,
+      @SerialName("subcategory_uid") val subcategoryUID: String
   ) {
     fun toBudgetItem(): BudgetItem {
       return BudgetItem(
@@ -126,9 +114,21 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
           amount = amount,
           description = description,
           year = year,
-          // TODO: Implement the accounting sub category deserialize and serialize
-          category = AccountingSubCategory("", "", "", 0),
+          subcategoryUID = subcategoryUID,
           tva = TVA.floatToTVA(tva))
+    }
+
+    companion object {
+      fun fromBudgetItem(budgetItem: BudgetItem, associationUID: String) =
+          SupabaseBudgetItem(
+              itemUID = budgetItem.uid,
+              associationUID = associationUID,
+              name = budgetItem.nameItem,
+              description = budgetItem.description,
+              amount = budgetItem.amount,
+              year = budgetItem.year,
+              tva = budgetItem.tva.rate,
+              subcategoryUID = budgetItem.subcategoryUID)
     }
   }
 }
