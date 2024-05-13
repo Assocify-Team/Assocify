@@ -42,10 +42,10 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
-
+val subCategoryUid = "subCategoryUid"
   val subCategoryList =
       listOf(
-          AccountingSubCategory("1", "categoryUid", "Logistics", 1205, 2023),
+          AccountingSubCategory(subCategoryUid, "categoryUid", "Logistics", 1205, 2023),
           AccountingSubCategory("2", "categoryUid", "Administration", 100, 2023),
           AccountingSubCategory("3", "categoryUid", "Balelec", 399, 2023))
 
@@ -57,7 +57,7 @@ class BudgetDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              "00000000-0000-0000-0000-000000000000",
+              subCategoryUid,
               2022),
           BudgetItem(
               "2",
@@ -65,7 +65,7 @@ class BudgetDetailedScreenTest :
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              "00000000-0000-0000-0000-000000000000",
+              subCategoryUid,
               2023),
           BudgetItem(
               "3",
@@ -73,7 +73,7 @@ class BudgetDetailedScreenTest :
               200,
               TVA.TVA_8,
               "order for 200 chairs",
-              "00000000-0000-0000-0000-000000000000",
+              subCategoryUid,
               2023))
 
   val mockBudgetAPI: BudgetAPI =

@@ -13,6 +13,7 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
@@ -42,8 +43,12 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
-  @RelaxedMockK lateinit var mockAccountingSubCategoryAPI: AccountingSubCategoryAPI
-  val subCategoryUid = "subcategoryuid"
+    val subCategoryUid = "subCategoryUid"
+    val subCategoryList =
+        listOf(
+            AccountingSubCategory(subCategoryUid, "categoryUid", "Logistics", 1205, 2023),
+            AccountingSubCategory("2", "categoryUid", "Administration", 100, 2023),
+            AccountingSubCategory("3", "categoryUid", "Balelec", 399, 2023))
   val balanceItems =
       listOf(
           BalanceItem(
@@ -90,6 +95,15 @@ class BalanceDetailedScreenTest :
             }
       }
 
+    val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
+        mockk<AccountingSubCategoryAPI>() {
+            every { getSubCategories(any(), any(), any()) } answers
+                    {
+                        val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
+                        onSuccessCallback(subCategoryList)
+                    }
+        }
+
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
   lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
@@ -120,6 +134,17 @@ class BalanceDetailedScreenTest :
     }
   }
 
+    /**Tests message shown when empty list*/
+    @Test
+    fun testEmptyList() {
+        with(composeTestRule) {
+            onNodeWithTag("yearListTag").performClick()
+            onNodeWithText("2021").performClick()
+            onNodeWithTag("totalItems").assertIsNotDisplayed()
+            onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters").assertIsDisplayed()
+        }
+    }
+
   /** Tests if the items of 2023 are displayed (the default) */
   @Test
   fun testCorrectItemsAreDisplayed() {
@@ -127,6 +152,8 @@ class BalanceDetailedScreenTest :
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
+        //Assert that the name of the subCategory is displayed
+        onNodeWithText("Logistics").assertIsDisplayed()
     }
 
     assert(
