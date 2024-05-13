@@ -26,7 +26,7 @@ class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
 
   @Before
   fun testSetup() {
-    composeTestRule.setContent { EventScheduleScreen() }
+    composeTestRule.setContent { EventScheduleScreen(viewModel) }
   }
 
   @Test
