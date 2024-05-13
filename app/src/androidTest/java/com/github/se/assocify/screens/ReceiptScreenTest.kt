@@ -322,4 +322,16 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       assert(capturedReceipt?.cents == expectedReceipt.cents)
     }
   }
+
+  @Test
+  fun receiptLoading() {
+    every { receiptsAPI.getAllReceipts(any(), any()) } answers
+        {
+          secondArg<(Exception) -> Unit>().invoke(Exception("error"))
+        }
+    with(composeTestRule) {
+      viewModel.loadReceipt()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipt")
+    }
+  }
 }

@@ -53,7 +53,11 @@ class ReceiptViewModel {
     this.receiptUid = receiptUid
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
+    loadReceipt()
+  }
 
+  fun loadReceipt() {
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
     this.receiptApi.getAllReceipts(
         onSuccess = { receipts ->
           receipts.forEach { receipt ->
@@ -68,8 +72,11 @@ class ReceiptViewModel {
                       incoming = receipt.cents >= 0)
             }
           }
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
         },
-        onError = {})
+        onError = {
+          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
+        })
   }
 
   fun setStatus(status: Status) {
@@ -225,6 +232,8 @@ class ReceiptViewModel {
 }
 
 data class ReceiptState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val isNewReceipt: Boolean,
     val status: Status = Status.Pending,
     val pageTitle: String,

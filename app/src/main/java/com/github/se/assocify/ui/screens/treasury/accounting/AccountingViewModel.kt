@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.treasury.accounting.budget
+package com.github.se.assocify.ui.screens.treasury.accounting
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -16,13 +16,13 @@ import kotlinx.coroutines.flow.StateFlow
  * @param accountingCategoryAPI the accounting category api
  * @param accountingSubCategoryAPI the accounting subcategory api
  */
-class BudgetViewModel(
+class AccountingViewModel(
     private var accountingCategoryAPI: AccountingCategoryAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) : ViewModel() {
 
-  private val _uiState: MutableStateFlow<BudgetState> = MutableStateFlow(BudgetState())
-  val uiState: StateFlow<BudgetState>
+  private val _uiState: MutableStateFlow<AccountingState> = MutableStateFlow(AccountingState())
+  val uiState: StateFlow<AccountingState>
 
   /** Initialize the view model */
   init {
@@ -83,7 +83,7 @@ class BudgetViewModel(
  * @param subCategoryList: The list of accounting subcategories
  * @param globalSelected: Whether the global category is selected
  */
-data class BudgetState(
+data class AccountingState(
     val categoryList: List<AccountingCategory> = emptyList(),
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),

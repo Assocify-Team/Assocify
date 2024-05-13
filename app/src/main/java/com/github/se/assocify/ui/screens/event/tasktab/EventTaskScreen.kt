@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.TimeUtil
@@ -36,6 +38,16 @@ fun EventTaskScreen(
 ) {
   val mainState by eventViewModel.uiState.collectAsState()
   val state by eventTaskViewModel.uiState.collectAsState()
+
+  if (state.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (state.error != null) {
+    ErrorMessage(errorMessage = state.error) { eventTaskViewModel.updateTasks() }
+    return
+  }
 
   val visibleTasks =
       state.filteredTasks.filter { t ->
