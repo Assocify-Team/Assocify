@@ -37,7 +37,6 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
-import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
 
 /**
@@ -125,7 +124,8 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
                   EventTaskScreen(
                       eventScreenViewModel, eventScreenViewModel.taskListViewModel, navActions)
               EventPageIndex.Map.ordinal -> EventMapScreen()
-              EventPageIndex.Schedule.ordinal -> EventScheduleScreen(eventScreenViewModel.scheduleViewModel)
+              EventPageIndex.Schedule.ordinal ->
+                  EventScheduleScreen(eventScreenViewModel.scheduleViewModel)
             }
           }
         }

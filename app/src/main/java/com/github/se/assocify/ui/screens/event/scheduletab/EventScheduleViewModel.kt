@@ -8,21 +8,16 @@ import kotlinx.coroutines.flow.StateFlow
 class EventScheduleViewModel(
     private val taskAPI: TaskAPI,
 ) {
-    private val _uiState: MutableStateFlow<ScheduleState> = MutableStateFlow(ScheduleState())
-    val uiState: StateFlow<ScheduleState> = _uiState
+  private val _uiState: MutableStateFlow<ScheduleState> = MutableStateFlow(ScheduleState())
+  val uiState: StateFlow<ScheduleState> = _uiState
 
-    init {
-        fetchTasks()
-    }
+  init {
+    fetchTasks()
+  }
 
-    private fun fetchTasks() {
-        taskAPI.getTasks(
-            { tasks ->
-                _uiState.value.copy(tasks = tasks)
-            },
-            { /* Handle error */ }
-        )
-    }
+  private fun fetchTasks() {
+    taskAPI.getTasks({ tasks -> _uiState.value.copy(tasks = tasks) }, { /* Handle error */})
+  }
 }
 
 data class ScheduleState(
