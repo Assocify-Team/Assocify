@@ -36,7 +36,7 @@ fun NavGraphBuilder.treasuryGraph(
     val treasuryViewModel = remember { TreasuryViewModel(navigationActions, receiptListViewModel) }
     TreasuryScreen(navigationActions, accountingViewModel, receiptListViewModel, treasuryViewModel)
   }
-  receiptGraph(navigationActions)
+  receiptGraph(navigationActions, receiptsAPI)
   budgetDetailedGraph(navigationActions, budgetAPI, balanceAPI)
   balanceDetailedGraph(navigationActions, budgetAPI, balanceAPI)
   addAccountingCategory(navigationActions)
