@@ -40,7 +40,7 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
-  val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205)
+  val subCategory = AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205, 0)
   val budgetItems =
       listOf(
           BudgetItem(
