@@ -5,10 +5,15 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.printToLog
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
@@ -51,6 +56,8 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
     @Before
     fun testSetup() {
         composeTestRule.setContent {
+            CurrentUser.userUid = "1"
+            CurrentUser.associationUid = "a"
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
             navActions = NavigationActions(navController, loginSave)
@@ -77,20 +84,51 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
             val toTreasury = navController.currentBackStackEntry?.destination?.route
             assert(toTreasury == Destination.Treasury.route)
 
-            // (shouldn't have access to budget and balance but not yet implemented)
+            onNodeWithTag("treasuryScreen").assertIsDisplayed()
+            onNodeWithText("Receipt-1-name").assertIsDisplayed().performClick()
+
+            // check that the receipt is correct and change its title
+            onNodeWithTag("titleField").assertIsDisplayed()
+                .performClick().performTextInput("Receipt-1-name-changed")
+            onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed().performClick()
+            onNodeWithText("Receipt-1-name-changed").assertIsDisplayed()
+
+            // (shouldn't have access to budget and balance but not implemented)
 
             // add a receipt
+            onNodeWithTag("createReceipt").assertIsDisplayed().performClick()
+            onNodeWithTag("titleField").performClick().performTextInput("Receipt-2-name")
+            onNodeWithTag("amountField").performClick().performTextInput("10")
+
+            // NEED TO SEE HOW TO TEST DATE PICKER
+            composeTestRule.onRoot().printToLog("ARBITRARY_LOG_TAG")
+            onNodeWithTag("dateField").performClick().performTextInput("2022-01-01")
+
+            onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed().performClick()
 
             // check that receipt is here
+            onNodeWithText("Receipt-2-name").assertIsDisplayed()
 
             // change association
+            onNodeWithTag("mainNavBarItem/profile").performClick()
+            onNodeWithTag("associationDropdown").performClick()
+            onNodeWithTag("DropdownItem-b").performClick()
+            assert(CurrentUser.associationUid == "b")
 
             // go to check receipts are different
+            onNodeWithTag("mainNavBarItem/treasury").assertIsDisplayed().performClick()
+            onNodeWithText("Receipt-1-name-changed").assertDoesNotExist()
+            onNodeWithText("Receipt-2-name").assertDoesNotExist()
 
             // go back to asso1 and check that receipts are here
+            onNodeWithTag("mainNavBarItem/profile").performClick()
+            onNodeWithTag("associationDropdown").performClick()
+            onNodeWithTag("DropdownItem-a").performClick()
+            assert(CurrentUser.associationUid == "a")
 
-            // (maybe check offline ?)
-
+            onNodeWithTag("mainNavBarItem/treasury").performClick()
+            onNodeWithText("Receipt-1-name-changed").assertIsDisplayed()
+            onNodeWithText("Receipt-2-name").assertIsDisplayed()
 
         }
     }
