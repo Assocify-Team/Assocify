@@ -2,16 +2,19 @@ package com.github.se.assocify.ui.screens.event
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
+import com.github.se.assocify.model.entities.MapMarkerData
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
 
 /**
  * A ViewModel of the global Event Screen, to manage the filter chips and the search bar
@@ -31,6 +34,7 @@ class EventScreenViewModel(
 
   init {
     fetchEvents()
+    fetchMarkers()
   }
 
   /** Fetch the events from the database */
@@ -115,6 +119,25 @@ class EventScreenViewModel(
           message = message, duration = SnackbarDuration.Short)
     }
   }
+
+  /** Map viewmodel **/
+
+  fun fetchMarkers() {
+    // Initialize the markers list with the test marker
+    val testMarker = MapMarkerData(
+      name = "EPFL0",
+      eventName = "Test Event",
+      position = GeoPoint(46.518726, 6.566613),
+      description = "Test Description"
+    )
+    addMarker(testMarker)
+  }
+
+  fun addMarker(marker: MapMarkerData) {
+    _uiState.value = _uiState.value.copy(markers = _uiState.value.markers + marker)
+  }
+
+
 }
 
 /**
@@ -136,7 +159,8 @@ data class EventScreenState(
     val stateBarDisplay: Boolean = false,
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
-    val currentTab: EventPageIndex = EventPageIndex.Tasks
+    val currentTab: EventPageIndex = EventPageIndex.Tasks,
+    val markers: List<MapMarkerData> = emptyList()
 )
 
 /** Event tabs */

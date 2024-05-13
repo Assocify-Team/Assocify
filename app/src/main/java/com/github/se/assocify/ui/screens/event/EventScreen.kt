@@ -132,7 +132,8 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
               }
               EventPageIndex.Map.ordinal -> {
                 swapState.value = false
-                EventMapScreen()
+                EventMapScreen(
+                  eventScreenViewModel)
               }
               EventPageIndex.Schedule.ordinal -> {
                 swapState.value = true
