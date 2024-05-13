@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
-import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Language
 import com.github.se.assocify.model.entities.Theme
 import com.github.se.assocify.model.entities.UserPreference
@@ -66,10 +65,9 @@ class UserPreferenceAPITest {
         """
             .trimIndent()
 
-
-    api.getUserPreference(userUID,onSuccess,onFailure)
-    verify(timeout = 400) {onSuccess(any())}
-    verify(exactly = 0) {onFailure(any())}
+    api.getUserPreference(userUID, onSuccess, onFailure)
+    verify(timeout = 400) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
