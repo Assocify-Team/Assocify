@@ -41,24 +41,24 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
-
+  val subCategoryUid = "subcategoryuid"
   val balanceItems =
       listOf(
           BalanceItem(
               "1",
               "pair of scissors",
-              "",
+              subCategoryUid,
               "00000000-0000-0000-0000-000000000000",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              LocalDate.of(2023, 4, 14),
+              LocalDate.of(2022, 4, 14),
               "François Théron",
               Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
-              "",
+              subCategoryUid,
               "00000000-0000-0000-0000-000000000000",
               1000,
               TVA.TVA_8,
@@ -69,7 +69,7 @@ class BalanceDetailedScreenTest :
           BalanceItem(
               "3",
               "chairs",
-              "",
+              subCategoryUid,
               "00000000-0000-0000-0000-000000000000",
               200,
               TVA.TVA_8,
@@ -95,7 +95,6 @@ class BalanceDetailedScreenTest :
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    val subCategoryUid = "subcategoryuid"
     budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, subCategoryUid)
     balanceDetailedViewModel = BalanceDetailedViewModel(mockBalanceAPI, subCategoryUid)
     composeTestRule.setContent {
@@ -128,8 +127,9 @@ class BalanceDetailedScreenTest :
     }
 
     assert(
-        balanceItems.filter { it.date.year == 2023 } ==
+        balanceItems.filter { it.date.year == 2023 && it.subcategoryUID == subCategoryUid } ==
             balanceDetailedViewModel.uiState.value.balanceList)
+    assert(2023 == balanceDetailedViewModel.uiState.value.year)
   }
 
   /** Tests if the total amount correspond to the sum of the items */
@@ -157,15 +157,29 @@ class BalanceDetailedScreenTest :
   @Test
   fun testStatusFiltering() {
     with(composeTestRule) {
-      // Initially, select the "Status" filter to change its value to "Unapproved"
+      // Initially, select the "Status" filter to change its value to Pending and 2022
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
-      // Assert that only the budget lines under "Unapproved" status are shown
+      // Assert that only the item "pair of scissors" is displayed
       onNodeWithText("pair of scissors").assertIsDisplayed()
+      assert(
+          balanceItems.filter { it.date.year == 2022 && it.status == Status.Pending } ==
+              balanceDetailedViewModel.uiState.value.balanceList)
 
-      // Assert that budget lines not under "Unapproved" are not shown
-      onNodeWithText("sweaters").assertDoesNotExist()
+      // Change the status filter to "All Status"
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("All Status").performClick()
+
+      // Assert that all items of 2022 are displayed
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      assert(
+          balanceItems.filter { it.date.year == 2022 } ==
+              balanceDetailedViewModel.uiState.value.balanceList)
+      assert(2022 == balanceDetailedViewModel.uiState.value.year)
+      assert(null == balanceDetailedViewModel.uiState.value.status)
     }
   }
 
