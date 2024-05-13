@@ -4,10 +4,11 @@ import com.github.se.assocify.model.entities.Language
 import com.github.se.assocify.model.entities.Theme
 import com.github.se.assocify.model.entities.UserPreference
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.SerialName
 
-class UserPreferenceAPI(private val db : SupabaseClient ) : SupabaseApi() {
+class UserPreferenceAPI(private val db : SupabaseClient) : SupabaseApi() {
 
     private val collectionName = "user_preference"
 
@@ -60,8 +61,33 @@ class UserPreferenceAPI(private val db : SupabaseClient ) : SupabaseApi() {
                 .insert(userPreferenceSupabase)
             onSuccess()
         }
+    }
 
-
+    /**
+     * Updates a user preference in the database
+     *
+     * @param userUID the user preference to update
+     * @param userPreference the user preference to update
+     * @param onSuccess called on success
+     * @param onFailure called on failure
+     */
+    fun updateUserPreference(
+        userUID: String,
+        userPreference: UserPreference,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit){
+        tryAsync(onFailure) {
+            db.from(collectionName).update({
+                UserPreferenceSupabase::theme setTo userPreference.theme.name
+                UserPreferenceSupabase::textSize setTo userPreference.textSize
+                UserPreferenceSupabase::language setTo userPreference.language.name
+            }) {
+                filter {
+                    UserPreferenceSupabase::userUID eq userUID
+                }
+            }
+            onSuccess()
+        }
     }
 }
 
@@ -72,6 +98,7 @@ data class UserPreferenceSupabase(
     @SerialName("language")val language: String
 ) {
     fun toUserPreference() = UserPreference(
+        userUID = userUID,
         theme = Theme.valueOf(theme),
         textSize = textSize,
         language = Language.valueOf(language)

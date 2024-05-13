@@ -8,6 +8,7 @@ package com.github.se.assocify.model.entities
  * @param language the language of the application
  */
 data class UserPreference(
+    var userUID: String,
     var theme: Theme = Theme.SYSTEM,
     var textSize: Int = 15,
     var language: Language = Language.ENGLISH
