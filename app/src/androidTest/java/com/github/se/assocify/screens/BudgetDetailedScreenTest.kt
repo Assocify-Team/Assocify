@@ -42,7 +42,7 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
-val subCategoryUid = "subCategoryUid"
+  val subCategoryUid = "subCategoryUid"
   val subCategoryList =
       listOf(
           AccountingSubCategory(subCategoryUid, "categoryUid", "Logistics", 1205, 2023),
@@ -60,21 +60,8 @@ val subCategoryUid = "subCategoryUid"
               subCategoryUid,
               2022),
           BudgetItem(
-              "2",
-              "sweaters",
-              1000,
-              TVA.TVA_8,
-              "order for 1000 sweaters",
-              subCategoryUid,
-              2023),
-          BudgetItem(
-              "3",
-              "chairs",
-              200,
-              TVA.TVA_8,
-              "order for 200 chairs",
-              subCategoryUid,
-              2023))
+              "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategoryUid, 2023),
+          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategoryUid, 2023))
 
   val mockBudgetAPI: BudgetAPI =
       mockk<BudgetAPI>() {
@@ -104,8 +91,7 @@ val subCategoryUid = "subCategoryUid"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "subCategoryUid")
     composeTestRule.setContent {
-      BudgetDetailedScreen(
-          mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
+      BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 
@@ -146,7 +132,8 @@ val subCategoryUid = "subCategoryUid"
       onNodeWithTag("yearListTag").performClick()
       onNodeWithText("2021").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
-      onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters").assertIsDisplayed()
+      onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
+          .assertIsDisplayed()
     }
   }
 

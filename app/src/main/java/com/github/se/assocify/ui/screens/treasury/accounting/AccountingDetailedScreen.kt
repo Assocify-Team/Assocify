@@ -79,13 +79,13 @@ fun AccountingDetailedScreen(
 
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
-    val subCategory = when (page) {
+  val subCategory =
+      when (page) {
         AccountingPage.BALANCE -> balanceModel.subCategory
         AccountingPage.BUDGET -> budgetModel.subCategory
-    }
+      }
 
-
-    val yearList = listOf("2023", "2022", "2021")
+  val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
@@ -151,21 +151,19 @@ fun AccountingDetailedScreen(
 
           // Display the items
           when (page) {
-
             AccountingPage.BALANCE -> {
               items(balanceModel.balanceList) {
                 DisplayBalanceItem(it, "displayItem${it.uid}")
                 HorizontalDivider(Modifier.fillMaxWidth())
               }
 
-                // display total amount
-                if (balanceModel.balanceList.isNotEmpty()) {
-                    item { TotalItems(balanceModel.balanceList.sumOf { it.amount }) }
-                } else {
-                    item { Text("No items for the ${subCategory.name} sheet with these filters") }
-                }
+              // display total amount
+              if (balanceModel.balanceList.isNotEmpty()) {
+                item { TotalItems(balanceModel.balanceList.sumOf { it.amount }) }
+              } else {
+                item { Text("No items for the ${subCategory.name} sheet with these filters") }
+              }
             }
-
             AccountingPage.BUDGET -> {
               items(budgetModel.budgetList) {
                 DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")

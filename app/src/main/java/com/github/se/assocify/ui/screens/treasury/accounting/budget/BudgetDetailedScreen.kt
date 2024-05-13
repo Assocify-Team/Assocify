@@ -20,8 +20,5 @@ fun BudgetDetailedScreen(
     balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
   AccountingDetailedScreen(
-      AccountingPage.BUDGET,
-      navigationActions,
-      budgetDetailedViewModel,
-      balanceDetailedViewModel)
+      AccountingPage.BUDGET, navigationActions, budgetDetailedViewModel, balanceDetailedViewModel)
 }

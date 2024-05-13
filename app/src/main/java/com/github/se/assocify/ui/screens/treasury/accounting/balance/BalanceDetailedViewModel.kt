@@ -27,26 +27,26 @@ class BalanceDetailedViewModel(
 
   init {
     updateDatabaseValues()
-      setSubCategory(subCategoryUid)
+    setSubCategory(subCategoryUid)
     uiState = _uiState
   }
 
-    /**
-     * Set the subcategory
-     *
-     * @param subCategoryUid the subcategory uid
-     */
-    private fun setSubCategory(subCategoryUid: String) {
-        accountingSubCategoryAPI.getSubCategories(
-            CurrentUser.associationUid!!,
-            { subCategoryList ->
-                val subCategory = subCategoryList.find { it.uid == subCategoryUid }
-                if (subCategory != null) {
-                    _uiState.value = _uiState.value.copy(subCategory = subCategory)
-                }
-            },
-            {})
-    }
+  /**
+   * Set the subcategory
+   *
+   * @param subCategoryUid the subcategory uid
+   */
+  private fun setSubCategory(subCategoryUid: String) {
+    accountingSubCategoryAPI.getSubCategories(
+        CurrentUser.associationUid!!,
+        { subCategoryList ->
+          val subCategory = subCategoryList.find { it.uid == subCategoryUid }
+          if (subCategory != null) {
+            _uiState.value = _uiState.value.copy(subCategory = subCategory)
+          }
+        },
+        {})
+  }
 
   /** Update the database values */
   private fun updateDatabaseValues() {
