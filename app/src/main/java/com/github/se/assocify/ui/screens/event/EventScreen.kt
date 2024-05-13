@@ -49,7 +49,16 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreenViewModel) {
+
   val state by eventScreenViewModel.uiState.collectAsState()
+
+  val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
+
+  when (pagerState.currentPage) {
+    EventPageIndex.Map.ordinal -> eventScreenViewModel.switchTab(EventPageIndex.Map)
+    EventPageIndex.Tasks.ordinal -> eventScreenViewModel.switchTab(EventPageIndex.Tasks)
+    EventPageIndex.Schedule.ordinal -> eventScreenViewModel.switchTab(EventPageIndex.Schedule)
+  }
 
   Scaffold(
       modifier = Modifier.testTag("eventScreen"),
@@ -60,7 +69,7 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
             query = state.searchQuery,
             onQueryChange = { eventScreenViewModel.setSearchQuery(it) },
             onSearch = { eventScreenViewModel.searchTaskLists() },
-            page = state.currentTab.ordinal)
+            page = pagerState.currentPage)
       },
       bottomBar = {
         MainNavigationBar(
@@ -69,23 +78,18 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
             selectedTab = Destination.Event)
       },
       floatingActionButton = {
-        FloatingActionButton(
-            modifier = Modifier.testTag("floatingButtonEvent"),
-            onClick = {
-              when (state.currentTab) {
-                EventPageIndex.Tasks -> {
-                  navActions.navigateTo(Destination.NewTask) // TODO : event uid
+        when (state.currentTab) {
+          EventPageIndex.Map -> {
+            /*TODO: implement for map screen*/
+          }
+          else -> {
+            FloatingActionButton(
+                modifier = Modifier.testTag("floatingButtonEvent"),
+                onClick = { navActions.navigateTo(Destination.NewTask) }) {
+                  Icon(imageVector = Icons.Default.Add, contentDescription = null)
                 }
-                EventPageIndex.Map -> {
-                  /*TODO: implement for map screen*/
-                }
-                EventPageIndex.Schedule -> {
-                  /*TODO: implement for schedule screen*/
-                }
-              }
-            }) {
-              Icon(imageVector = Icons.Default.Add, contentDescription = null)
-            }
+          }
+        }
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp),
       snackbarHost = {
@@ -109,8 +113,6 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
         }
 
         Column(modifier = Modifier.padding(it).fillMaxHeight()) {
-          val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
-
           EventFilterBar(eventScreenViewModel)
 
           InnerTabRow(

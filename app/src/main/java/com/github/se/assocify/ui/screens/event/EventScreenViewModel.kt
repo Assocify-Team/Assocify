@@ -85,6 +85,7 @@ class EventScreenViewModel(
         }
     _uiState.value = _uiState.value.copy(selectedEvents = selectedEvents)
     taskListViewModel.setEvents(selectedEvents)
+    scheduleViewModel.setEvents(selectedEvents)
   }
 
   /**
