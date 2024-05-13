@@ -13,12 +13,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -35,7 +37,11 @@ import org.junit.runner.RunWith
 class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
   @get:Rule val mockkRule = MockKRule(this)
-  private val navActions = mockk<NavigationActions>()
+  private val navActions =
+      mockk<NavigationActions>() {
+        every { navigateToMainTab(any()) } answers { tabSelected = true }
+        every { navigateTo(any()) } answers {}
+      }
   private var tabSelected = false
   val categoryList = listOf(AccountingCategory("1", "Events"))
   val subCategoryList =
@@ -61,17 +67,30 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             }
       }
 
+  val mockReceiptAPI: ReceiptAPI =
+      mockk<ReceiptAPI>() {
+        every { getAllReceipts(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
+              onSuccessCallback(listOf())
+            }
+        every { getUserReceipts(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
+              onSuccessCallback(listOf())
+            }
+      }
+  var receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions, mockReceiptAPI)
+
   @Before
   fun testSetup() {
-    every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    every { navActions.navigateTo(any()) } answers {}
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    val receiptListViewModel = ReceiptListViewModel(navActions)
     val viewModel = TreasuryViewModel(navActions, receiptListViewModel)
-    val budgetViewModel = BudgetViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
+    val accountingViewModel =
+        AccountingViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
     composeTestRule.setContent {
-      TreasuryScreen(navActions, budgetViewModel, receiptListViewModel, viewModel)
+      TreasuryScreen(navActions, accountingViewModel, receiptListViewModel, viewModel)
     }
   }
 
@@ -135,6 +154,22 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       onNodeWithTag("searchBar").onChild().assertTextContains("")
       onNodeWithTag("searchBackButton").performClick()
       onNodeWithTag("searchBar").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun receiptLoading() {
+    every { mockReceiptAPI.getAllReceipts(any(), any()) } answers
+        {
+          secondArg<(Exception) -> Unit>().invoke(Exception("error"))
+        }
+    every { mockReceiptAPI.getUserReceipts(any(), any()) } answers
+        {
+          secondArg<(Exception) -> Unit>().invoke(Exception("error"))
+        }
+    with(composeTestRule) {
+      receiptListViewModel.updateReceipts()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipts")
     }
   }
 }

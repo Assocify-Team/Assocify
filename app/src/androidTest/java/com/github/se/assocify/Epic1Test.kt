@@ -22,6 +22,7 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
@@ -133,6 +134,8 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val balanceAPI = mockk<BalanceAPI>(relaxUnitFun = true)
 
+  private val receiptAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
+
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
 
   private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
@@ -154,6 +157,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           budgetAPI,
           balanceAPI,
           taskAPI,
+          receiptAPI,
           accountingCategoriesAPI,
           accountingSubCategoryAPI)
     }
@@ -223,6 +227,7 @@ fun TestAssocifyApp(
     budgetAPI: BudgetAPI,
     balanceAPI: BalanceAPI,
     taskAPI: TaskAPI,
+    receiptAPI: ReceiptAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
@@ -237,6 +242,7 @@ fun TestAssocifyApp(
         budgetAPI = budgetAPI,
         balanceAPI = balanceAPI,
         taskAPI = taskAPI,
+        receiptsAPI = receiptAPI,
         accountingCategoriesAPI = accountingCategoriesAPI,
         accountingSubCategoryAPI = accountingSubCategoryAPI)
   }

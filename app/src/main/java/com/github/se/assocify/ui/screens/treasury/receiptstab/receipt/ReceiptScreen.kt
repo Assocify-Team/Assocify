@@ -54,7 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
 import com.github.se.assocify.model.entities.Status
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +85,16 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             hostState = receiptState.snackbarHostState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
+        if (receiptState.loading) {
+          CenteredCircularIndicator()
+          return@Scaffold
+        }
+
+        if (receiptState.error != null) {
+          ErrorMessage(errorMessage = receiptState.error) { viewModel.loadReceipt() }
+          return@Scaffold
+        }
+
         Column(
             modifier =
                 Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),

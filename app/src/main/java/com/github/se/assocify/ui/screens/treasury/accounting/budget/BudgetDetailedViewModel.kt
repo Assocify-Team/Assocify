@@ -3,9 +3,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting.budget
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
-import com.github.se.assocify.model.entities.TVA
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -35,7 +33,6 @@ class BudgetDetailedViewModel(
           val filteredList =
               budgetList.filter { budgetItem -> budgetItem.year == _uiState.value.yearFilter }
 
-
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(budgetList = budgetList)
         },
@@ -47,10 +44,20 @@ class BudgetDetailedViewModel(
     updateDatabaseValues()
   }
 
+  /**
+   * Enter in the edit state so the popup appears
+   *
+   * @param budgetItem the item we want to edit
+   */
   fun startEditing(budgetItem: BudgetItem) {
     _uiState.value = _uiState.value.copy(editing = true, editedBudgetItem = budgetItem)
   }
 
+  /**
+   * Exit the edit state while saving the modifications performed
+   *
+   * @param budgetItem the new edited budgetItem
+   */
   fun saveEditing(budgetItem: BudgetItem) {
     budgetApi.updateBudgetItem(CurrentUser.associationUid!!, budgetItem, {}, {})
     _uiState.value =
@@ -60,12 +67,13 @@ class BudgetDetailedViewModel(
             editedBudgetItem = null)
   }
 
+  /** Exit the edit state without keeping the modifications done */
   fun cancelEditing() {
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
 
-  fun modifyTVAFilter(tvaActive: Boolean){
-      _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+  fun modifyTVAFilter(tvaActive: Boolean) {
+    _uiState.value = _uiState.value.copy(filterActive = tvaActive)
   }
 }
 

@@ -17,7 +17,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -70,16 +70,17 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
             }
       }
 
-  lateinit var budgetViewModel: BudgetViewModel
+  lateinit var accountingViewModel: AccountingViewModel
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    budgetViewModel = BudgetViewModel(mockAccountingCategoryAPI, mockAccountingSubCategoryAPI)
+    accountingViewModel =
+        AccountingViewModel(mockAccountingCategoryAPI, mockAccountingSubCategoryAPI)
     composeTestRule.setContent {
-      AccountingScreen(AccountingPage.BUDGET, mockNavActions, budgetViewModel)
-      AccountingFilterBar(budgetViewModel = budgetViewModel)
+      AccountingScreen(AccountingPage.BUDGET, mockNavActions, accountingViewModel)
+      AccountingFilterBar(accountingViewModel = accountingViewModel)
     }
   }
 
@@ -106,17 +107,17 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       subCategoryList
           .filter { it.categoryUID == "1" }
           .forEach() { onNodeWithText(it.name).assertIsDisplayed() }
-      assert(!budgetViewModel.uiState.value.globalSelected)
+      assert(!accountingViewModel.uiState.value.globalSelected)
       assert(
-          budgetViewModel.uiState.value.subCategoryList ==
+          accountingViewModel.uiState.value.subCategoryList ==
               subCategoryList.filter { it.categoryUID == "1" })
 
       // Tests if the lines are displayed when the global category is selected
       onNodeWithTag("categoryFilterChip").performClick()
       onNodeWithText("Global").performClick()
       subCategoryList.forEach() { onNodeWithText(it.name).assertIsDisplayed() }
-      assert(budgetViewModel.uiState.value.globalSelected)
-      assert(budgetViewModel.uiState.value.subCategoryList == subCategoryList)
+      assert(accountingViewModel.uiState.value.globalSelected)
+      assert(accountingViewModel.uiState.value.subCategoryList == subCategoryList)
 
       // Tests if a message is shown when no subCategory
       onNodeWithTag("categoryFilterChip").performClick()
@@ -133,13 +134,4 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("filterRow").performTouchInput { swipeLeft() }
     }
   }
-
-  /*/** Tests navigate to budget detailed screen */
-  @Test
-  fun testNavigateToDetailedScreen() {
-    with(composeTestRule) {
-      onNodeWithText("Administration").performClick()
-      verify { mockNavActions.navigateTo(Destination.BudgetDetailed("4")) }
-    }
-  }*/
 }

@@ -145,7 +145,12 @@ fun AccountingDetailedScreen(
 
   val totalAmount =
       when (page) {
-        AccountingPage.BUDGET -> if (!budgetModel.filterActive) budgetModel.budgetList.sumOf { it.amount } else budgetModel.budgetList.sumOf { it.amount + (it.amount * it.tva.rate/100f).toInt()}
+        AccountingPage.BUDGET ->
+            if (!budgetModel.filterActive) budgetModel.budgetList.sumOf { it.amount }
+            else
+                budgetModel.budgetList.sumOf {
+                  it.amount + (it.amount * it.tva.rate / 100f).toInt()
+                }
         AccountingPage.BALANCE -> filteredBalanceList.sumOf { it.amount }
       }
 
@@ -289,6 +294,11 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       modifier = Modifier.clickable {}.testTag(testTag))
 }
 
+/**
+ * Displays the popup to edit a specific budget element
+ *
+ * @param budgetViewModel the viewModel of the budget details
+ */
 @Composable
 fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   val budgetModel by budgetViewModel.uiState.collectAsState()
@@ -306,7 +316,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
         shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
-        Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+        Text("Edit Budget Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
             modifier = Modifier.padding(8.dp).testTag("editNameBox"),
             value = nameString,
