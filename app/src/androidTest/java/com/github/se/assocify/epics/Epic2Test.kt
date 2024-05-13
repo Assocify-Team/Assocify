@@ -1,7 +1,11 @@
 package com.github.se.assocify.epics
 
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -11,6 +15,7 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -50,17 +55,27 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
             navController.navigatorProvider.addNavigator(ComposeNavigator())
             navActions = NavigationActions(navController, loginSave)
             TestAssocifyApp(
-                navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI)
+                navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI, Destination.Home)
         }
     }
     @Test
     fun Epic2Test() {
         with(composeTestRule) {
             // start at home
+            onNodeWithTag("homeScreen").assertIsDisplayed()
 
             // go to profile to check what association I'm in and my role
+            onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
+            val toProfile = navController.currentBackStackEntry?.destination?.route
+            assert(toProfile == Destination.Profile.route)
+
+            onNodeWithText("asso1").assertIsDisplayed()
+            onNodeWithText("MEMBER").assertIsDisplayed()
 
             // go to treasury and see current receipts I have previously done (1)
+            onNodeWithTag("mainNavBarItem/treasury").assertIsDisplayed().performClick()
+            val toTreasury = navController.currentBackStackEntry?.destination?.route
+            assert(toTreasury == Destination.Treasury.route)
 
             // (shouldn't have access to budget and balance but not yet implemented)
 

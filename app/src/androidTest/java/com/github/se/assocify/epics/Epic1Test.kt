@@ -138,7 +138,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       navActions = NavigationActions(navController, loginSave)
 
       TestAssocifyApp(
-          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI)
+          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI, Destination.SelectAsso)
     }
   }
 
@@ -204,11 +204,12 @@ fun TestAssocifyApp(
     associationAPI: AssociationAPI,
     eventAPI: EventAPI,
     budgetAPI: BudgetAPI,
-    taskAPI: TaskAPI
+    taskAPI: TaskAPI,
+    startDestination: Destination
 ) {
   CurrentUser.userUid = "1"
 
-  NavHost(navController = navController, startDestination = Destination.SelectAsso.route) {
+  NavHost(navController = navController, startDestination = startDestination.route) {
     mainNavGraph(
         navActions = navActions,
         userAPI = userAPI,
