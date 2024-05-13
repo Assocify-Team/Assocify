@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 
 class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
 
-  val collectionName = "balance_item"
+  private val collectionName = "balance_item"
 
   fun getBalance(
       associationUID: String,
@@ -74,13 +74,13 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
 
 @Serializable
 data class SupabaseBalanceItem(
-    @SerialName("uid") val uid: String,
+    @SerialName("item_uid") val uid: String,
     @SerialName("name") val nameItem: String,
     @SerialName("association_uid") val associationUID: String,
     @SerialName("receipt_uid") val receiptUID: String,
-    @SerialName("category_uid") val categoryUID: String,
+    @SerialName("subcategory_uid") val subcategoryUID: String,
     @SerialName("amount") val amount: Int, // unsigned: can be positive or negative
-    @SerialName("tva") val tva: TVA,
+    @SerialName("tva") val tva: Float,
     @SerialName("description") val description: String,
     @SerialName("date") val date: String,
     @SerialName("assignee") val assignee: String,
@@ -90,10 +90,10 @@ data class SupabaseBalanceItem(
     return BalanceItem(
         uid = uid,
         nameItem = nameItem,
-        categoryUID = categoryUID,
+        subcategoryUID = subcategoryUID,
         receiptUID = receiptUID,
         amount = amount,
-        tva = tva,
+        tva = TVA.floatToTVA(tva),
         description = description,
         date = LocalDate.parse(date),
         assignee = assignee,
@@ -112,13 +112,13 @@ data class SupabaseBalanceItem(
             uid = balanceItem.uid,
             nameItem = balanceItem.nameItem,
             amount = balanceItem.amount,
-            tva = balanceItem.tva,
+            tva = balanceItem.tva.rate,
             description = balanceItem.description,
             date = balanceItem.date.toString(),
             assignee = balanceItem.assignee,
             status = balanceItem.status,
             associationUID = associationUID,
             receiptUID = receiptUID,
-            categoryUID = categoryUID)
+            subcategoryUID = categoryUID)
   }
 }
