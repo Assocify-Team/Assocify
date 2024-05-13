@@ -172,7 +172,9 @@ fun AccountingDetailedScreen(
       },
       content = { innerPadding ->
         if (budgetModel.editing && page == AccountingPage.BUDGET) {
-          DisplayEditBalance()
+          DisplayEditBudget(budgetDetailedViewModel)
+        } else if ( page == AccountingPage.BALANCE){
+
         }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
