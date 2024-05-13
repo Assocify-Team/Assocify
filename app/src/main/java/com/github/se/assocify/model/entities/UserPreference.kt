@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 /**
  * Represents the user preferences
  *
+ * @param userUID the user UID
  * @param theme the theme of the application
  * @param textSize the text size of the application
  * @param language the language of the application
