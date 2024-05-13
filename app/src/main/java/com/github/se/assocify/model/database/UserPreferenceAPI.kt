@@ -42,6 +42,7 @@ class UserPreferenceAPI(private val db: SupabaseClient) : SupabaseApi() {
   /**
    * Adds a user preference to the database
    *
+   * @param userUID the user preference to add
    * @param userPreference the user preference to add
    * @param onSuccess called on success
    * @param onFailure called on failure
