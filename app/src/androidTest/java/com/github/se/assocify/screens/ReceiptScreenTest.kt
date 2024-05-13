@@ -31,7 +31,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import java.io.File
 import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
@@ -71,9 +70,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     every { UUID.randomUUID() } returns UUID.fromString("08a11dc8-975c-4da1-93a6-865c20c7adec")
   }
 
-  private val viewModel =
-      ReceiptViewModel(
-          navActions = navActions, receiptApi = receiptAPI)
+  private val viewModel = ReceiptViewModel(navActions = navActions, receiptApi = receiptAPI)
 
   @Before
   fun testSetup() {
