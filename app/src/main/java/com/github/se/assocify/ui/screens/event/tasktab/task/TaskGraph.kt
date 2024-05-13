@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.event.tasktab.task
 
+import androidx.compose.runtime.remember
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.se.assocify.model.database.EventAPI
@@ -12,22 +13,22 @@ fun NavGraphBuilder.taskGraph(
     taskAPI: TaskAPI,
     eventAPI: EventAPI
 ) {
-  composable(route = Destination.NewTask.route) { backStackEntry ->
-    TaskScreen(
-        navActions = navigationActions,
-        viewModel =
-            TaskViewModel(navActions = navigationActions, taskApi = taskAPI, eventApi = eventAPI))
+  composable(route = Destination.NewTask.route) {
+    val taskViewModel = remember {
+      TaskViewModel(navActions = navigationActions, taskApi = taskAPI, eventApi = eventAPI)
+    }
+    TaskScreen(navigationActions, taskViewModel)
   }
   composable(route = Destination.EditTask("{taskUid}").route) { backStackEntry ->
     backStackEntry.arguments?.getString("taskUid")?.let { taskUid ->
-      TaskScreen(
-          navActions = navigationActions,
-          viewModel =
-              TaskViewModel(
-                  taskUid = taskUid,
-                  navActions = navigationActions,
-                  taskApi = taskAPI,
-                  eventApi = eventAPI))
+      val taskViewModel = remember {
+        TaskViewModel(
+            taskUid = taskUid,
+            navActions = navigationActions,
+            taskApi = taskAPI,
+            eventApi = eventAPI)
+      }
+      TaskScreen(navigationActions, taskViewModel)
     }
   }
 }

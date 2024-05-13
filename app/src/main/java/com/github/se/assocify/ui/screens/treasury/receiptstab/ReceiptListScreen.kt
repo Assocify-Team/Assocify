@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 
@@ -31,6 +33,16 @@ import com.github.se.assocify.ui.util.PriceUtil
 fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
   // Good practice to re-collect it as the page changes
   val viewmodelState by viewModel.uiState.collectAsState()
+
+  if (viewmodelState.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (viewmodelState.error != null) {
+    ErrorMessage(errorMessage = viewmodelState.error) { viewModel.updateReceipts() }
+    return
+  }
 
   LazyColumn(
       modifier = Modifier.testTag("ReceiptList").fillMaxSize(),

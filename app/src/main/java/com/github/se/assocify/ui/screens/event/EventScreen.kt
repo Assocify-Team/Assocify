@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,24 +18,26 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.InnerTabRow
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.event.maptab.EventMapScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
-import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 
 /**
  * An event screen that displays the tasks, map, and schedule of an event.
@@ -47,11 +48,7 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EventScreen(
-    navActions: NavigationActions,
-    eventScreenViewModel: EventScreenViewModel,
-    taskListViewModel: EventTaskViewModel
-) {
+fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreenViewModel) {
   val state by eventScreenViewModel.uiState.collectAsState()
 
   Scaffold(
@@ -90,7 +87,27 @@ fun EventScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
       },
-      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) {
+      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp),
+      snackbarHost = {
+        SnackbarHost(
+            hostState = state.snackbarHostState,
+            snackbar = { snackbarData ->
+              Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
+            })
+      }) {
+        if (state.loading) {
+          CenteredCircularIndicator()
+          return@Scaffold
+        }
+
+        if (state.error != null) {
+          ErrorMessage(errorMessage = state.error) {
+            eventScreenViewModel.fetchEvents()
+            eventScreenViewModel.taskListViewModel.updateTasks()
+          }
+          return@Scaffold
+        }
+
         Column(modifier = Modifier.padding(it).fillMaxHeight()) {
           val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
 
@@ -104,7 +121,8 @@ fun EventScreen(
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               EventPageIndex.Tasks.ordinal ->
-                  EventTaskScreen(eventScreenViewModel, taskListViewModel, navActions)
+                  EventTaskScreen(
+                      eventScreenViewModel, eventScreenViewModel.taskListViewModel, navActions)
               EventPageIndex.Map.ordinal -> EventMapScreen()
               EventPageIndex.Schedule.ordinal -> EventScheduleScreen()
             }
@@ -123,34 +141,24 @@ fun EventFilterBar(eventScreenViewModel: EventScreenViewModel) {
 
   val state by eventScreenViewModel.uiState.collectAsState()
 
-  if (state.error) {
-    Column(
-        modifier = Modifier.fillMaxSize().testTag("errorText"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-          Text(state.errorText)
-        }
-  } else {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      state.events.forEach {
-        item {
-          FilterChip(
-              modifier = Modifier.testTag("filterChipTestEvent"),
-              label = { Text(text = it.name) },
-              leadingIcon = {
-                if (eventScreenViewModel.isEventSelected(it)) {
-                  Icon(
-                      modifier = Modifier.size(FilterChipDefaults.IconSize),
-                      imageVector = Icons.Filled.Check,
-                      contentDescription = "Selected")
-                }
-              },
-              selected = eventScreenViewModel.isEventSelected(it),
-              onClick = {
-                eventScreenViewModel.setEventSelection(
-                    it, !eventScreenViewModel.isEventSelected(it))
-              })
-        }
+  LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    state.events.forEach {
+      item {
+        FilterChip(
+            modifier = Modifier.testTag("filterChipTestEvent"),
+            label = { Text(text = it.name) },
+            leadingIcon = {
+              if (eventScreenViewModel.isEventSelected(it)) {
+                Icon(
+                    modifier = Modifier.size(FilterChipDefaults.IconSize),
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = "Selected")
+              }
+            },
+            selected = eventScreenViewModel.isEventSelected(it),
+            onClick = {
+              eventScreenViewModel.setEventSelection(it, !eventScreenViewModel.isEventSelected(it))
+            })
       }
     }
   }

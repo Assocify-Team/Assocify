@@ -7,6 +7,7 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.EventAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.ui.screens.chat.chatGraph
@@ -26,12 +27,12 @@ fun NavGraphBuilder.mainNavGraph(
     budgetAPI: BudgetAPI,
     balanceAPI: BalanceAPI,
     taskAPI: TaskAPI,
+    receiptsAPI: ReceiptAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
   homeGraph(navActions)
-  treasuryGraph(
-      navActions, budgetAPI, balanceAPI, accountingCategoriesAPI, accountingSubCategoryAPI)
+  treasuryGraph(navActions, budgetAPI, balanceAPI, receiptsAPI, accountingCategoriesAPI, accountingSubCategoryAPI)
   eventGraph(navActions, eventAPI, taskAPI)
   chatGraph(navActions)
   profileGraph(navActions, userAPI, associationAPI)
