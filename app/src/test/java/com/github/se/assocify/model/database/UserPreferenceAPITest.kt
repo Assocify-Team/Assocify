@@ -33,6 +33,7 @@ class UserPreferenceAPITest {
   @Before
   @OptIn(ExperimentalCoroutinesApi::class)
   fun setup() {
+    APITestUtils.setup()
     Dispatchers.setMain(UnconfinedTestDispatcher())
     api =
         UserPreferenceAPI(
