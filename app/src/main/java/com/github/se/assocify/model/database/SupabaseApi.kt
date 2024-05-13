@@ -20,7 +20,7 @@ abstract class SupabaseApi {
         if (tag != null) {
           Log.e("API", "Error in $tag")
         }
-        Log.e("API", e.toString())
+        //Log.e("API", e.toString())
         onFailure(e)
       }
     }

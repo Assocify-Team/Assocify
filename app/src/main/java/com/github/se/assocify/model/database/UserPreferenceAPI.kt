@@ -7,6 +7,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 class UserPreferenceAPI(private val db: SupabaseClient) : SupabaseApi() {
 
@@ -55,9 +56,9 @@ class UserPreferenceAPI(private val db: SupabaseClient) : SupabaseApi() {
       val userPreferenceSupabase =
           UserPreferenceSupabase(
               userUID = userUID,
-              theme = userPreference.theme.name,
+              theme = userPreference.theme,
               textSize = userPreference.textSize,
-              language = userPreference.language.name)
+              language = userPreference.language)
       db.postgrest.from(collectionName).insert(userPreferenceSupabase)
       onSuccess()
     }
@@ -79,9 +80,9 @@ class UserPreferenceAPI(private val db: SupabaseClient) : SupabaseApi() {
   ) {
     tryAsync(onFailure) {
       db.from(collectionName).update({
-        UserPreferenceSupabase::theme setTo userPreference.theme.name
+        UserPreferenceSupabase::theme setTo userPreference.theme
         UserPreferenceSupabase::textSize setTo userPreference.textSize
-        UserPreferenceSupabase::language setTo userPreference.language.name
+        UserPreferenceSupabase::language setTo userPreference.language
       }) {
         filter { UserPreferenceSupabase::userUID eq userUID }
       }
@@ -89,17 +90,17 @@ class UserPreferenceAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 }
-
+@Serializable
 data class UserPreferenceSupabase(
     @SerialName("user_uid") val userUID: String,
-    @SerialName("theme") val theme: String,
+    @SerialName("theme") val theme: Theme,
     @SerialName("text_size") val textSize: Int,
-    @SerialName("language") val language: String
+    @SerialName("language") val language: Language
 ) {
   fun toUserPreference() =
       UserPreference(
           userUID = userUID,
-          theme = Theme.valueOf(theme),
+          theme = theme,
           textSize = textSize,
-          language = Language.valueOf(language))
+          language = language)
 }
