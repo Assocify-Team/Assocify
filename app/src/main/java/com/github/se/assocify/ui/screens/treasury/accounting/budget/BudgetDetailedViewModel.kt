@@ -33,15 +33,10 @@ class BudgetDetailedViewModel(
           val filteredList =
               budgetList.filter { budgetItem -> budgetItem.year == _uiState.value.yearFilter }
 
-          // TODO: handle TVA filter: HT = amount in budgetITem, TTC = amount in budgetItem + amount
-          // * tva
-          // TODO: sprint 7
-
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(budgetList = filteredList)
         },
         {})
-    // Log.d("BudgetList in viewmodel: ", _uiState.value.budgetList.toString())
   }
 
   fun onYearFilter(yearFilter: Int) {

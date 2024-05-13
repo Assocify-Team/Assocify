@@ -13,10 +13,10 @@ import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -39,9 +39,7 @@ class BudgetDetailedScreenTest :
   @get:Rule val mockkRule = MockKRule(this)
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
-  val subCategory =
-      AccountingSubCategory("subCategoryUid", "categoryUid", "Logistics Pole", 1205, 0)
+  @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
   val budgetItems =
       listOf(
           BudgetItem(
@@ -87,7 +85,8 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, "subCategoryUid")
     composeTestRule.setContent {
-      BudgetDetailedScreen("subCategoryUid", mockNavActions, budgetDetailedViewModel)
+      BudgetDetailedScreen(
+          "subCategoryUid", mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 

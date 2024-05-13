@@ -24,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -51,6 +53,8 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
 fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreenViewModel) {
 
   val state by eventScreenViewModel.uiState.collectAsState()
+
+  val swapState = remember { mutableStateOf(true) }
 
   val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
 
@@ -120,14 +124,21 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
               pagerState = pagerState,
               switchTab = { tab -> eventScreenViewModel.switchTab(tab) })
 
-          HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
+          HorizontalPager(state = pagerState, userScrollEnabled = swapState.value) { page ->
             when (page) {
-              EventPageIndex.Tasks.ordinal ->
-                  EventTaskScreen(
-                      eventScreenViewModel, eventScreenViewModel.taskListViewModel, navActions)
-              EventPageIndex.Map.ordinal -> EventMapScreen()
-              EventPageIndex.Schedule.ordinal ->
-                  EventScheduleScreen(eventScreenViewModel.scheduleViewModel)
+              EventPageIndex.Tasks.ordinal -> {
+                swapState.value = true
+                EventTaskScreen(
+                    eventScreenViewModel, eventScreenViewModel.taskListViewModel, navActions)
+              }
+              EventPageIndex.Map.ordinal -> {
+                swapState.value = false
+                EventMapScreen()
+              }
+              EventPageIndex.Schedule.ordinal -> {
+                swapState.value = true
+                EventScheduleScreen(eventScreenViewModel.scheduleViewModel)
+              }
             }
           }
         }

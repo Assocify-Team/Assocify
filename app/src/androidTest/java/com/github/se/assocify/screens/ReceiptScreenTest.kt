@@ -25,7 +25,9 @@ import com.github.se.assocify.ui.util.DateUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
@@ -272,18 +274,17 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           photo = null,
       )
 
-  private var receiptList = listOf(expectedReceipt)
-
   private var capturedReceipt: Receipt? = null
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
   private val receiptsAPI =
       mockk<ReceiptAPI> {
         every { uploadReceipt(any(), any(), any(), any()) } answers { capturedReceipt = firstArg() }
-        every { getAllReceipts(any(), any()) } answers
+        every { getReceipt(any(), any(), any()) } answers
             {
-              firstArg<(List<Receipt>) -> Unit>().invoke(receiptList)
+              secondArg<(Receipt) -> Unit>()(expectedReceipt)
             }
+        every { getReceiptImage(any(), any(), any()) } just Runs
       }
 
   init {
@@ -309,7 +310,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     with(composeTestRule) {
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("receiptScreenTitle").assertIsDisplayed().assertTextContains("Edit Receipt")
-      verify { receiptsAPI.getAllReceipts(any(), any()) }
+      verify { receiptsAPI.getReceipt(any(), any(), any()) }
       onNodeWithTag("titleField").assertTextContains("Edited Receipt")
       onNodeWithTag("amountField").assertTextContains("100.00")
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
@@ -325,9 +326,9 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
   @Test
   fun receiptLoading() {
-    every { receiptsAPI.getAllReceipts(any(), any()) } answers
+    every { receiptsAPI.getReceipt(any(), any(), any()) } answers
         {
-          secondArg<(Exception) -> Unit>().invoke(Exception("error"))
+          thirdArg<(Exception) -> Unit>().invoke(Exception("error"))
         }
     with(composeTestRule) {
       viewModel.loadReceipt()
