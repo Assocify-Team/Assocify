@@ -81,7 +81,7 @@ fun AccountingDetailedScreen(
 ) {
 
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
-  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "", 1205)
+  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "", 1205, 2023)
 
   // TODO: fetch from balance detailed view model
   val receipt =
@@ -373,7 +373,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
                         amount = amountString.toInt(),
                         tva = TVA.floatToTVA(tvaString.toFloat()),
                         description = descriptionString,
-                        category = budget.category,
+                        subcategoryUID = budget.subcategoryUID,
                         year = yearString.toInt()))
               },
               modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),

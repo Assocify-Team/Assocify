@@ -55,7 +55,8 @@ class AccountingSubCategoryTest {
                         "category_uid": "13379999-0000-0000-0000-000000000000",
                         "association_uid": "cb7b1079-cb62-40b9-9f35-7667fea4748d",
                         "name": "Test SubCategory",
-                        "amount": 1
+                        "amount": 1,
+                        "year": 2022
                     }
                 ]
             """
@@ -80,7 +81,8 @@ class AccountingSubCategoryTest {
             "13379999-0000-0000-0000-000000000000",
             "13379999-0000-0000-0000-000000000000",
             "Test SubCategory",
-            1),
+            1,
+            2022),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
@@ -95,7 +97,8 @@ class AccountingSubCategoryTest {
     error = false
     response = ""
     api.deleteSubCategory(
-        AccountingSubCategory("13379999-0000-0000-0000-000000000000", "Test SubCategory", "", 2),
+        AccountingSubCategory(
+            "13379999-0000-0000-0000-000000000000", "Test SubCategory", "", 2, 2022),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
@@ -115,7 +118,8 @@ class AccountingSubCategoryTest {
             "cb7b1079-cb62-40b9-9f35-7667fea4748d",
             "13379999-0000-0000-0000-000000000000",
             "Test SubCategory",
-            1),
+            1,
+            2022),
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
