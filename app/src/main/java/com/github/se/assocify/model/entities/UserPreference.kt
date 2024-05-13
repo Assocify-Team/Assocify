@@ -15,18 +15,16 @@ data class UserPreference(
 )
 
 /**
- * Represents the theme of the application
- * LIGHT: Light theme
- * DARK: Dark theme
- * SYSTEM: synchronizes with the system theme
+ * Represents the theme of the application LIGHT: Light theme DARK: Dark theme SYSTEM: synchronizes
+ * with the system theme
  */
 enum class Theme {
-    LIGHT, DARK, SYSTEM
+  LIGHT,
+  DARK,
+  SYSTEM
 }
 
-/**
- * All the languages supported by the application
- */
+/** All the languages supported by the application */
 enum class Language {
-    ENGLISH
+  ENGLISH
 }
