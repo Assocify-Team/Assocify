@@ -9,7 +9,6 @@ import kotlinx.serialization.Serializable
  * @param textSize the text size of the application
  * @param language the language of the application
  */
-@Serializable
 data class UserPreference(
     var userUID: String,
     var theme: Theme = Theme.SYSTEM,
