@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.PopupProperties
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
@@ -413,6 +414,50 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryDropdownMenu(
+    categoryList: List<AccountingCategory>,
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.testTag("categoryDropdown")
+    ) {
+        OutlinedTextField(
+            value = selectedCategory,
+            onValueChange = {},
+            label = { Text("Category") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            readOnly = true,
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true }
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            categoryList.forEach { category ->
+                DropdownMenuItem(
+                    text = { Text(category.name) },
+                    onClick = {
+                        onCategorySelected(category.name)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -437,7 +482,7 @@ fun DisplayEditSubCategory(
   var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
   var year by remember { mutableStateOf(subCategory.year.toString()) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf(categoryList[0]) }
+    var selectedCategory by remember { mutableStateOf(categoryList[0].name) }
   Dialog(
       onDismissRequest = {
         when (page) {
@@ -471,29 +516,14 @@ fun DisplayEditSubCategory(
                 onValueChange = { year = it },
                 label = { Text("Year") },
                 supportingText = {})
-              ExposedDropdownMenuBox(
-                  expanded = expanded,
-                  onExpandedChange = { expanded = !expanded },
-                  modifier = Modifier.testTag("categoryDropdown")) {
-                  OutlinedTextField(
-                      value = selectedCategory.name,
-                      onValueChange = {},
-                      label = { Text("Tag") },
-                      trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                      },
-                      readOnly = true,
-                      colors = ExposedDropdownMenuDefaults.textFieldColors())
-                  ExposedDropdownMenu(
-                      expanded = expanded, onDismissRequest = { expanded = false }) {
-                      categoryList.forEach { category ->
-                          DropdownMenuItem(
-                              text = { Text(category.name) },
 
-                              onClick = { name = category.name })
-                      }
-                  }
-              }
+              CategoryDropdownMenu(
+                  categoryList = categoryList,
+                  selectedCategory = selectedCategory,
+                  onCategorySelected = { selectedCategory = it }
+              )
+
+          }
 
             Row(
                 modifier = Modifier
@@ -533,4 +563,4 @@ fun DisplayEditSubCategory(
           }
         }
       }
-}
+
