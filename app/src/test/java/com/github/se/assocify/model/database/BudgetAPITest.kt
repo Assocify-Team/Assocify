@@ -1,8 +1,6 @@
 package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
-import com.github.se.assocify.model.entities.AccountingCategory
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.createSupabaseClient
@@ -37,10 +35,9 @@ class BudgetAPITest {
           TVA.TVA_2,
           "lala",
           year = 2022,
-          category =
-              AccountingSubCategory("subCategoryUID", "name", AccountingCategory("categoryUID"), 1))
+          subcategoryUID = "00000000-0000-0000-0000-000000000000")
 
-  lateinit var budgetAPI: BudgetAPI
+  private lateinit var budgetAPI: BudgetAPI
 
   @Before
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -67,18 +64,18 @@ class BudgetAPITest {
     error = false
     response =
         """
-            [
-                {
-                    "item_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
-                    "association_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
-                    "name": "name",
-                    "year": 2022,
-                    "description": "lala",
-                    "amount": 1,
-                    "tva": 2.6,
-                    "category": "subCategoryUID"
-                }
-            ]
+        [
+          {
+            "item_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            "association_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            "name": "name",
+            "amount": 1,
+            "tva": 2.6,
+            "description": "lala",
+            "subcategory_uid": "00000000-0000-0000-0000-000000000000",
+            "year": 2022
+          }
+        ]
         """
             .trimIndent()
 

@@ -1,12 +1,8 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab
 
 import android.util.Log
-import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.ReceiptAPI
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Receipt
-import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,30 +16,38 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class ReceiptListViewModel(
     private val navActions: NavigationActions,
-    private val receiptsDatabase: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
+    private val receiptsDatabase: ReceiptAPI
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState>
 
-  // User entity and it's API
-  private val userAPI = UserAPI(SupabaseClient.supabaseClient)
-  private var user: User? = null
+  private var loadCounter = 0
 
   init {
-    // Define user entity
-    userAPI.getUser(
-        CurrentUser.userUid!!,
-        onSuccess = { user = it },
-        onFailure = { // TODO Error message
-        })
-    updateUserReceipts()
-    updateAllReceipts()
+    updateReceipts()
     uiState = _uiState
   }
 
+  fun updateReceipts() {
+    loadCounter = 2
+    _uiState.value = _uiState.value.copy(loading = true)
+    updateUserReceipts()
+    updateAllReceipts()
+  }
+
+  private fun endLoading() {
+    if (--loadCounter == 0) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+    }
+  }
+
+  private fun loadingError() {
+    _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipts")
+  }
+
   /** Update the user's receipts */
-  fun updateUserReceipts() {
+  private fun updateUserReceipts() {
     receiptsDatabase.getUserReceipts(
         onSuccess = { receipts ->
           _uiState.value =
@@ -52,15 +56,16 @@ class ReceiptListViewModel(
                       receipts.filter {
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
+          endLoading()
         },
-        onError = {
+        onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching user receipts", it)
-          // TODO Error message
+          loadingError()
         })
   }
 
   /** Update all receipts */
-  fun updateAllReceipts() {
+  private fun updateAllReceipts() {
     // TODO : Add a permission check.
     receiptsDatabase.getAllReceipts(
         onSuccess = { receipts ->
@@ -70,10 +75,11 @@ class ReceiptListViewModel(
                       receipts.filter {
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
+          endLoading()
         },
-        onError = {
+        onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching all receipts", it)
-          // TODO Error message
+          loadingError()
         })
   }
 
@@ -84,8 +90,7 @@ class ReceiptListViewModel(
    */
   fun onSearch(searchQuery: String) {
     _uiState.value = _uiState.value.copy(searchQuery = searchQuery)
-    updateUserReceipts()
-    updateAllReceipts()
+    updateReceipts()
   }
 
   fun onReceiptClick(receipt: Receipt) {
@@ -101,6 +106,8 @@ class ReceiptListViewModel(
  * @param searchQuery: Search query in the search bar
  */
 data class ReceiptUIState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val userReceipts: List<Receipt> = listOf(),
     val allReceipts: List<Receipt> = listOf(),
     val searchQuery: String = ""

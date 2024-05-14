@@ -1,6 +1,7 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -9,22 +10,23 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingCategory
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
-import com.github.se.assocify.model.entities.MaybeRemotePhoto
-import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import io.mockk.mockk
+import io.mockk.verify
 import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
@@ -39,61 +41,65 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
-  val subCategory =
-      AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
-  val receipt =
-      Receipt(
-          "1",
-          "receipt1",
-          "url",
-          LocalDate.now(),
-          100,
-          Status.Pending,
-          MaybeRemotePhoto.Remote("path"))
+  val subCategoryUid = "subcategoryuid"
   val balanceItems =
       listOf(
           BalanceItem(
               "1",
               "pair of scissors",
+              subCategoryUid,
+              "00000000-0000-0000-0000-000000000000",
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategory,
-              LocalDate.of(2024, 4, 14),
-              receipt,
+              LocalDate.of(2022, 4, 14),
               "François Théron",
               Status.Pending),
           BalanceItem(
               "2",
               "sweaters",
+              subCategoryUid,
+              "00000000-0000-0000-0000-000000000000",
               1000,
               TVA.TVA_8,
               "order for 1000 sweaters",
-              subCategory,
-              LocalDate.of(2024, 3, 11),
-              receipt,
+              LocalDate.of(2023, 3, 11),
               "Rayan Boucheny",
               Status.Archived),
           BalanceItem(
               "3",
               "chairs",
+              subCategoryUid,
+              "00000000-0000-0000-0000-000000000000",
               200,
               TVA.TVA_8,
               "order for 200 chairs",
-              subCategory,
-              LocalDate.of(2024, 1, 14),
-              receipt,
+              LocalDate.of(2023, 1, 14),
               "Sidonie Bouthors",
               Status.Reimbursed))
+
+  val mockBalanceAPI: BalanceAPI =
+      mockk<BalanceAPI>() {
+        every { getBalance(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
+              onSuccessCallback(balanceItems)
+              balanceItems
+            }
+      }
+
+  lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
+  lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    val subCategoryUid = "subcategoryuid"
-    val budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, subCategoryUid)
+    budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, subCategoryUid)
+    balanceDetailedViewModel = BalanceDetailedViewModel(mockBalanceAPI, subCategoryUid)
     composeTestRule.setContent {
-      BalanceDetailedScreen(subCategoryUid, mockNavActions, budgetDetailedViewModel)
+      BalanceDetailedScreen(
+          subCategoryUid, mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 
@@ -108,8 +114,22 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("yearListTag").assertIsDisplayed()
       onNodeWithTag("statusListTag").assertIsDisplayed()
       onNodeWithTag("tvaListTag").assertIsDisplayed()
-      balanceItems.forEach { onNodeWithTag("displayItem${it.uid}").assertIsDisplayed() }
     }
+  }
+
+  /** Tests if the items of 2023 are displayed (the default) */
+  @Test
+  fun testCorrectItemsAreDisplayed() {
+    with(composeTestRule) {
+      onNodeWithText("sweaters").assertIsDisplayed()
+      onNodeWithText("chairs").assertIsDisplayed()
+      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+    }
+
+    assert(
+        balanceItems.filter { it.date.year == 2023 && it.subcategoryUID == subCategoryUid } ==
+            balanceDetailedViewModel.uiState.value.balanceList)
+    assert(2023 == balanceDetailedViewModel.uiState.value.year)
   }
 
   /** Tests if the total amount correspond to the sum of the items */
@@ -124,19 +144,42 @@ class BalanceDetailedScreenTest :
     }
   }
 
+  /** Tests if go back to Treasury */
+  @Test
+  fun goBackTest() {
+    with(composeTestRule) {
+      onNodeWithTag("backButton").performClick()
+      verify { mockNavActions.back() }
+    }
+  }
+
   /** Tests if the lines are filtered according to the status */
   @Test
   fun testStatusFiltering() {
     with(composeTestRule) {
-      // Initially, select the "Status" filter to change its value to "Unapproved"
+      // Initially, select the "Status" filter to change its value to Pending and 2022
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
-      // Assert that only the budget lines under "Unapproved" status are shown
+      // Assert that only the item "pair of scissors" is displayed
       onNodeWithText("pair of scissors").assertIsDisplayed()
+      assert(
+          balanceItems.filter { it.date.year == 2022 && it.status == Status.Pending } ==
+              balanceDetailedViewModel.uiState.value.balanceList)
 
-      // Assert that budget lines not under "Unapproved" are not shown
-      onNodeWithText("sweaters").assertDoesNotExist()
+      // Change the status filter to "All Status"
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("All Status").performClick()
+
+      // Assert that all items of 2022 are displayed
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      assert(
+          balanceItems.filter { it.date.year == 2022 } ==
+              balanceDetailedViewModel.uiState.value.balanceList)
+      assert(2022 == balanceDetailedViewModel.uiState.value.year)
+      assert(null == balanceDetailedViewModel.uiState.value.status)
     }
   }
 

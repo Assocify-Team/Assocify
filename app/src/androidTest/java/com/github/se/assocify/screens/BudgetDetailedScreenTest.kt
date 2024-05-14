@@ -6,16 +6,17 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.BudgetAPI
-import com.github.se.assocify.model.entities.AccountingCategory
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -38,9 +39,7 @@ class BudgetDetailedScreenTest :
   @get:Rule val mockkRule = MockKRule(this)
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-
-  val subCategory =
-      AccountingSubCategory("subCategoryUid", "Logistics Pole", AccountingCategory("Pole"), 1205)
+  @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
   val budgetItems =
       listOf(
           BudgetItem(
@@ -49,11 +48,24 @@ class BudgetDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              subCategory,
+              "00000000-0000-0000-0000-000000000000",
               2022),
           BudgetItem(
-              "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategory, 2023),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategory, 2023))
+              "2",
+              "sweaters",
+              1000,
+              TVA.TVA_8,
+              "order for 1000 sweaters",
+              "00000000-0000-0000-0000-000000000000",
+              2023),
+          BudgetItem(
+              "3",
+              "chairs",
+              200,
+              TVA.TVA_8,
+              "order for 200 chairs",
+              "00000000-0000-0000-0000-000000000000",
+              2023))
 
   val mockBudgetAPI: BudgetAPI =
       mockk<BudgetAPI>() {
@@ -62,6 +74,7 @@ class BudgetDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
               onSuccessCallback(budgetItems)
             }
+        every { updateBudgetItem(any(), any(), any(), any()) } answers {}
       }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
@@ -72,7 +85,8 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, "subCategoryUid")
     composeTestRule.setContent {
-      BudgetDetailedScreen("subCategoryUid", mockNavActions, budgetDetailedViewModel)
+      BudgetDetailedScreen(
+          "subCategoryUid", mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 
@@ -142,6 +156,38 @@ class BudgetDetailedScreenTest :
     with(composeTestRule) {
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").performTouchInput { swipeLeft() }
+    }
+  }
+
+  @Test
+  fun testEditDismissWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("scotch")
+      onNodeWithTag("editDismissButton").performClick()
+      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("scotch").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun testEditModifyWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("scotch")
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors ").assertIsNotDisplayed()
+      onNodeWithText("scotch").assertIsDisplayed()
     }
   }
 }
