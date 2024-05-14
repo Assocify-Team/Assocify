@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI

@@ -415,17 +415,6 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CategoryDropdownMenu(
-    categoryList: List<AccountingCategory>,
-    selectedCategory: String,
-    onCategorySelected: (String) -> Unit
-) {
-
-}
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -450,7 +439,6 @@ fun DisplayEditSubCategory(
   var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
   var year by remember { mutableStateOf(subCategory.year.toString()) }
     var expanded by remember { mutableStateOf(false) }
-    Log.d("AccountingDetailedScreen", "DisplayEditSubCategory: categoryList: $categoryList")
    var selectedCategory by remember { mutableStateOf(categoryList[0].name) }
   Dialog(
       onDismissRequest = {
@@ -510,6 +498,7 @@ fun DisplayEditSubCategory(
                           DropdownMenuItem(
                               text = { Text(category.name) },
                               onClick = {
+                                  categoryUid = category.uid
                                   selectedCategory = category.name
                                   expanded = false
                               }
@@ -541,6 +530,7 @@ fun DisplayEditSubCategory(
               }
               Button(
                   onClick = {
+                      Log.d("EditSubCategory", "Name: $name, Category: $categoryUid, SelectedCat: ${selectedCategory}, Year: $year")
                     when (page) {
                       AccountingPage.BALANCE ->
                           balanceViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
