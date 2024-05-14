@@ -85,7 +85,6 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       }) {
         filter {
           SupabaseAccountingSubCategory::uid eq subCategory.uid
-          SupabaseAccountingSubCategory::categoryUID eq subCategory.categoryUID
         }
       }
       onSuccess()
