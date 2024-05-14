@@ -192,4 +192,15 @@ class BudgetDetailedScreenTest :
       onNodeWithText("scotch").assertIsDisplayed()
     }
   }
+
+  @Test
+  fun tvaFilterWorks() {
+    with(composeTestRule) {
+      onNodeWithText("2023").performClick()
+      onNodeWithText("HT").performClick()
+      onNodeWithText("1200").assertIsDisplayed()
+      onNodeWithText("TTC").performClick()
+      onNodeWithText((1200 + (1200 * 0.081).toInt()).toString()).assertIsDisplayed()
+    }
+  }
 }
