@@ -88,7 +88,7 @@ fun EventTaskScreen(
               },
               overlineContent = {
                 Text(
-                    DateUtil.toString(it.startTime.toLocalDate()) +
+                    DateUtil.formatDate(it.startTime.toLocalDate()) +
                         " " +
                         TimeUtil.toString(it.startTime.toLocalTime()))
               })

@@ -86,7 +86,7 @@ class TaskViewModel {
                   description = it.description,
                   category = it.category,
                   staffNumber = it.peopleNeeded.toString(),
-                  date = DateUtil.toString(date),
+                  date = DateUtil.formatDate(date),
                   time = TimeUtil.toString(time))
 
           loadEvents()
@@ -141,7 +141,7 @@ class TaskViewModel {
   }
 
   fun setDate(date: LocalDate?) {
-    _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
+    _uiState.value = _uiState.value.copy(date = DateUtil.formatDate(date))
     if (date == null) {
       _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
     } else {
