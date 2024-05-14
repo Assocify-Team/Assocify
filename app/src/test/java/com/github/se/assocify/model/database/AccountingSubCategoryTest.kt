@@ -76,7 +76,6 @@ class AccountingSubCategoryTest {
     response = ""
     api.addSubCategory(
         "cb7b1079-cb62-40b9-9f35-7667fea4748d",
-        "cb7b1079-cb62-40b9-9f35-7667fea4748d",
         AccountingSubCategory(
             "13379999-0000-0000-0000-000000000000",
             "13379999-0000-0000-0000-000000000000",
@@ -113,7 +112,6 @@ class AccountingSubCategoryTest {
     error = false
     response = ""
     api.updateSubCategory(
-        "cb7b1079-cb62-40b9-9f35-7667fea4748d",
         AccountingSubCategory(
             "cb7b1079-cb62-40b9-9f35-7667fea4748d",
             "13379999-0000-0000-0000-000000000000",
