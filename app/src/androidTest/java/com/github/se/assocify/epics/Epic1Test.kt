@@ -138,7 +138,14 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       navActions = NavigationActions(navController, loginSave)
 
       TestAssocifyApp(
-          navController, navActions, userAPI, associationAPI, eventAPI, budgetAPI, taskAPI, Destination.SelectAsso)
+          navController,
+          navActions,
+          userAPI,
+          associationAPI,
+          eventAPI,
+          budgetAPI,
+          taskAPI,
+          Destination.SelectAsso)
     }
   }
 
