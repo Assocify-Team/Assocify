@@ -386,6 +386,14 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   }
 }
 
+/**
+ * Displays the popup to edit a specific subcategory
+ * @param page: The page to display (either "budget" or "balance")
+ * @param budgetViewModel the viewModel of the budget details
+ * @param balanceViewModel the viewModel of the balance details
+ * @param balanceState the state of the balance
+ * @param budgetState the state of the budget
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DisplayEditSubCategory(
