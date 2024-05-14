@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -388,6 +387,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
 
 /**
  * Displays the popup to edit a specific subcategory
+ *
  * @param page: The page to display (either "budget" or "balance")
  * @param budgetViewModel the viewModel of the budget details
  * @param balanceViewModel the viewModel of the balance details
