@@ -17,20 +17,18 @@ import org.osmdroid.util.GeoPoint
 
 class EventMapViewModel(
   private val taskAPI: TaskAPI
-) : ViewModel() {
-
+) {
   private val _uiState: MutableStateFlow<EventMapState> = MutableStateFlow(EventMapState())
   val uiState: StateFlow<EventMapState> = _uiState
 
   init {
     // First, get all tasks
     fetchTasks()
-    Log.w("mdrr: ", _uiState.value.tasks.size.toString())
     // Then, fetch the markers
-    fetchMarkers(_uiState.value.tasks)
+    fetchMarkers()
   }
 
-  private fun fetchTasks() {
+  fun fetchTasks() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
     taskAPI.getTasks(
       { tasks ->
@@ -38,9 +36,13 @@ class EventMapViewModel(
         _uiState.value = _uiState.value.copy(tasks = tasks, loading = false, error = null)
       },
       { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks") })
+    Log.w("mdrrrrr: ", _uiState.value.tasks.size.toString())
   }
 
   private fun filterTasks(tasks: List<Task> = _uiState.value.tasks) {
+    // Filters requires cleaning the markers
+    _uiState.value = _uiState.value.copy(markers = emptyList())
+    // Now filter
     _uiState.value =
       _uiState.value.copy(
         currentEventTasks =
@@ -51,9 +53,11 @@ class EventMapViewModel(
   fun setEvents(events: List<Event>) {
     _uiState.value = _uiState.value.copy(filteredEventsUid = events.map { it.uid })
     filterTasks()
+    fetchMarkers()
   }
 
-  private fun fetchMarkers(tasks: List<Task>) {
+  private fun fetchMarkers() {
+    val tasks = _uiState.value.currentEventTasks
     for (task in tasks) {
       var location = GeoPoint(46.518726,6.566613)
       if (task.location.isNotEmpty())

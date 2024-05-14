@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,31 +17,50 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import com.github.se.assocify.BuildConfig
+import com.github.se.assocify.model.entities.MapMarkerData
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory.WIKIMEDIA
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
+import java.io.File
 import kotlin.random.Random
 
 // Initial position and zoom of the map
 private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
-private const val INITIAL_ZOOM = 15.0
+private const val INITIAL_ZOOM = 17.0
+
 
 /** A screen that displays a map of the event: location with the associated tasks. */
 @Composable
 fun EventMapScreen(viewModel: EventScreenViewModel) {
+  val state by viewModel.mapViewModel.uiState.collectAsState()
+
+  if (state.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (state.error != null) {
+    ErrorMessage(errorMessage = state.error) { viewModel.mapViewModel.fetchTasks() }
+    return
+  }
+
+
   Column(modifier = Modifier
     .fillMaxWidth()
     .testTag("OSMMapScreen")) {
     // EventMapView()
-    EPFLMapView(modifier = Modifier.fillMaxWidth(), { }, viewModel)
+    EPFLMapView(modifier = Modifier.fillMaxWidth(), { }, viewModel, state.markers)
   }
 }
 
@@ -53,6 +74,9 @@ fun rememberMapViewWithLifecycle(viewModel: EventScreenViewModel): MapView {
 
   // Update OSM configuration, for some reason
   Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+  Configuration.getInstance().tileFileSystemCacheMaxBytes = 50L * 1024 * 1024
+  Configuration.getInstance().osmdroidTileCache =
+    File(context.cacheDir, "osmdroid").also { it.mkdir() }
 
   // Initialise the map view
   val mapView = remember {
@@ -82,7 +106,7 @@ fun rememberMapViewWithLifecycle(viewModel: EventScreenViewModel): MapView {
     onDispose { lifecycle.removeObserver(lifecycleObserver) }
   }
 
-  loadMapOverlay(mapView, viewModel.mapViewModel)
+  //loadMapOverlay(mapView, viewModel.mapViewModel)
 
   return mapView
 }
@@ -105,12 +129,31 @@ fun rememberLifecycleObserver(mapView: MapView): LifecycleObserver =
       }
     }
 
+val markersList = mutableListOf<Marker>()
+
 /** A composable that displays a map view. */
 @Composable
 fun EPFLMapView(modifier: Modifier,
                 onLoad: ((map: MapView) -> Unit)? = null,
-                viewModel: EventScreenViewModel) {
+                viewModel: EventScreenViewModel,
+                markers: List<MapMarkerData>) {
   val mapViewState = rememberMapViewWithLifecycle(viewModel)
+
+  // DEBUG
+  markersList.forEach { marker -> mapViewState.overlays.remove(marker) }
+
+  markers.forEach { markerData ->
+    val marker = Marker(mapViewState)
+    marker.title = markerData.name
+    marker.snippet = markerData.description
+    marker.position = markerData.position
+
+    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+    mapViewState.overlays.add(marker)
+
+    markersList.add(marker)
+  }
+
   AndroidView(
       factory = { mapViewState }, modifier = modifier, update = { view -> onLoad?.invoke(view) })
 }
