@@ -195,7 +195,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun tvaFilterWorks() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
       onNodeWithText("2023").performClick()
       onNodeWithText("HT").performClick()
       onNodeWithText("1200").assertIsDisplayed()

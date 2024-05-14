@@ -107,7 +107,6 @@ class BudgetDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
       onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
@@ -197,7 +196,6 @@ class BudgetDetailedScreenTest :
   @Test
   fun tvaFilterWorks() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
       onNodeWithText("2023").performClick()
       onNodeWithText("HT").performClick()
       onNodeWithText("1200").assertIsDisplayed()
