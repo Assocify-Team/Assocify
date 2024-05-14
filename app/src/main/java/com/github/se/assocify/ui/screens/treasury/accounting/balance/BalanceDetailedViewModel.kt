@@ -95,6 +95,33 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(status = status)
     updateDatabaseValues()
   }
+
+    /**
+     * Start editing the Subcategory
+     */
+    fun startSubCategoryEditing(){
+        _uiState.value = _uiState.value.copy(catEditing = true)
+    }
+
+    /**
+     * Save the Subcategory editing
+     * @param name the new name of the Subategory
+     * @param categoryUid the new category uid associated with the subCategory
+     * @param year the new year of the subCategory
+     */
+    fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int){
+        val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
+        accountingSubCategoryAPI.updateSubCategory(categoryUid, subCategory,
+            {},
+            {})
+
+        _uiState.value = _uiState.value.copy(catEditing = false, subCategory = subCategory)
+    }
+
+    /** Cancel the Subcategory editing */
+    fun cancelSubCategoryEditing(){
+        _uiState.value = _uiState.value.copy(catEditing = false)
+    }
 }
 
 /**
@@ -108,5 +135,6 @@ data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val status: Status? = null,
+    val catEditing: Boolean = false,
     val year: Int = 2023
 )

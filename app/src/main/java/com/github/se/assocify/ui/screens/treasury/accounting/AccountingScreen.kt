@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
@@ -47,7 +48,7 @@ fun AccountingScreen(
 ) {
   val model by accountingViewModel.uiState.collectAsState()
   val subCategoryList = model.subCategoryList
-
+    Log.d("AccountingScreen", "subCategoryList: $subCategoryList")
   LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
 
     // display the subcategory if list is not empty

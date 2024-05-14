@@ -51,6 +51,7 @@ class AccountingViewModel(
                     subCategoryList =
                         subCategoryList.filter { it.categoryUID == _uiState.value.selectedCatUid })
           }
+            Log.d("BudgetViewModel", "Subcategories: $subCategoryList")
         },
         { Log.d("BudgetViewModel", "Error getting subcategories") })
   }

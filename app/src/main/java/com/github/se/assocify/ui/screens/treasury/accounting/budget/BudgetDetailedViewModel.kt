@@ -23,7 +23,6 @@ class BudgetDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
   val uiState: StateFlow<BudgetItemState>
-
   init {
     updateDatabaseValues()
     setSubCategory(subCategoryUid)
@@ -102,6 +101,22 @@ class BudgetDetailedViewModel(
   fun cancelEditing() {
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
+
+
+    fun startSubCategoryEditing(){
+        _uiState.value = _uiState.value.copy(catEditing = true)
+    }
+
+    fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int){
+        val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
+        accountingSubCategoryAPI.updateSubCategory(subCategory.categoryUID, subCategory, {}, {})
+
+        _uiState.value = _uiState.value.copy(catEditing = false, subCategory = subCategory)
+    }
+
+    fun cancelSubCategoryEditing(){
+        _uiState.value = _uiState.value.copy(catEditing = false)
+    }
 }
 
 /**
@@ -118,5 +133,6 @@ data class BudgetItemState(
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
+    val catEditing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null
 )
