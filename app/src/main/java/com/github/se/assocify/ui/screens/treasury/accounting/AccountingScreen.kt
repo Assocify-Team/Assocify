@@ -25,7 +25,6 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
-import java.time.LocalDate
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -78,7 +77,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   val model by accountingViewModel.uiState.collectAsState()
 
   // filter bar lists
-  val yearList = (2021..LocalDate.now().year).map { it.toString() }
+  val yearList = listOf("2023", "2022", "2021")
   val tvaList: List<String> = listOf("TTC", "HT")
   val categoryList = listOf("Global") + model.categoryList.map { it.name }
 

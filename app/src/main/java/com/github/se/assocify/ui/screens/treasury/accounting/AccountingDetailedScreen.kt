@@ -60,7 +60,6 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
-import java.time.LocalDate
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -84,7 +83,7 @@ fun AccountingDetailedScreen(
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
   val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "", 1205, 2023)
 
-  val yearList = (2021..LocalDate.now().year).map { it.toString() }
+  val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("HT", "TTC")
 
