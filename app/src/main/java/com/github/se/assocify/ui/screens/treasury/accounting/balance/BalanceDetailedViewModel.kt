@@ -112,7 +112,6 @@ class BalanceDetailedViewModel(
   fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int) {
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
     accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
-
     _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
   }
 
