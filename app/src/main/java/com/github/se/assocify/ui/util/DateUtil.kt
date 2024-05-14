@@ -27,4 +27,8 @@ object DateUtil {
     }
     return java.time.LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
   }
+
+  fun getYearList(): List<String> {
+    return (2021..java.time.LocalDate.now().year).map { it.toString() }
+  }
 }
