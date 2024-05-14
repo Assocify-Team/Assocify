@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -421,42 +422,9 @@ fun CategoryDropdownMenu(
     selectedCategory: String,
     onCategorySelected: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = Modifier.testTag("categoryDropdown")
-    ) {
-        OutlinedTextField(
-            value = selectedCategory,
-            onValueChange = {},
-            label = { Text("Category") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            readOnly = true,
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = true }
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            categoryList.forEach { category ->
-                DropdownMenuItem(
-                    text = { Text(category.name) },
-                    onClick = {
-                        onCategorySelected(category.name)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -482,7 +450,8 @@ fun DisplayEditSubCategory(
   var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
   var year by remember { mutableStateOf(subCategory.year.toString()) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf(categoryList[0].name) }
+    Log.d("AccountingDetailedScreen", "DisplayEditSubCategory: categoryList: $categoryList")
+   var selectedCategory by remember { mutableStateOf(categoryList[0].name) }
   Dialog(
       onDismissRequest = {
         when (page) {
@@ -494,34 +463,60 @@ fun DisplayEditSubCategory(
   ) {
         Card(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(vertical = 16.dp, horizontal = 8.dp)
                 .testTag("editSubCategoryDialog"),
             shape = RoundedCornerShape(16.dp),
         ) {
-          Column(Modifier.verticalScroll(rememberScrollState())) {
+      Column(modifier = Modifier.verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Edit $name", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
             OutlinedTextField(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .testTag("editSubCategoryNameBox"),
+                    .testTag("editSubCategoryNameBox").padding(8.dp),
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Name") },
                 supportingText = {})
             OutlinedTextField(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .testTag("editSubCategoryYearBox"),
+                    .testTag("editSubCategoryYearBox").padding(8.dp),
                 value = year,
                 onValueChange = { year = it },
                 label = { Text("Year") },
                 supportingText = {})
 
-              CategoryDropdownMenu(
-                  categoryList = categoryList,
-                  selectedCategory = selectedCategory,
-                  onCategorySelected = { selectedCategory = it }
-              )
+              ExposedDropdownMenuBox(
+                  expanded = expanded,
+                  onExpandedChange = { expanded = !expanded },
+                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)
+              ) {
+                  OutlinedTextField(
+                      value = selectedCategory,
+                      onValueChange = {},
+                      label = { Text("Tag") },
+                      trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                      },
+                      readOnly = true,
+                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                      modifier = Modifier
+                          .menuAnchor()
+                          .clickable { expanded = !expanded }
+                  )
+                  ExposedDropdownMenu(
+                      expanded = expanded,
+                      onDismissRequest = { expanded = false }
+                  ) {
+                      categoryList.forEach { category ->
+                          DropdownMenuItem(
+                              text = { Text(category.name) },
+                              onClick = {
+                                  selectedCategory = category.name
+                                  expanded = false
+                              }
+                          )
+                      }
+                  }
+              }
 
           }
 
