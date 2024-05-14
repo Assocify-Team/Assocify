@@ -34,7 +34,7 @@ class BudgetDetailedViewModel(
               budgetList.filter { budgetItem -> budgetItem.year == _uiState.value.yearFilter }
 
           // Update the UI state with the filtered list
-          _uiState.value = _uiState.value.copy(budgetList = budgetList)
+          _uiState.value = _uiState.value.copy(budgetList = filteredList)
         },
         {})
   }

@@ -67,7 +67,7 @@ class BudgetDetailedScreenTest :
               "00000000-0000-0000-0000-000000000000",
               2023))
 
-  val mockBudgetAPI: BudgetAPI =
+  private val mockBudgetAPI: BudgetAPI =
       mockk<BudgetAPI>() {
         every { getBudget(any(), any(), any()) } answers
             {
@@ -77,7 +77,7 @@ class BudgetDetailedScreenTest :
         every { updateBudgetItem(any(), any(), any(), any()) } answers {}
       }
 
-  lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
+  private lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
 
   @Before
   fun setup() {
@@ -107,6 +107,7 @@ class BudgetDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
+      onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
@@ -130,6 +131,7 @@ class BudgetDetailedScreenTest :
   fun testFilterByYear() {
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").assertIsDisplayed()
       onNodeWithText("2022").performClick()
 
       onNodeWithText("sweaters").assertDoesNotExist()
