@@ -3,6 +3,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting.balance
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.entities.AccountingSubCategory
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 class BalanceDetailedViewModel(
     private var balanceApi: BalanceAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    private var accountingCategoryAPI: AccountingCategoryAPI,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())

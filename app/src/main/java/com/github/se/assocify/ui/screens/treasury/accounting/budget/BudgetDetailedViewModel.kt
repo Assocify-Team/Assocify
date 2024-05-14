@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingSubCategory
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 class BudgetDetailedViewModel(
     private var budgetApi: BudgetAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    private var accountingCategoryAPI: AccountingCategoryAPI,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
