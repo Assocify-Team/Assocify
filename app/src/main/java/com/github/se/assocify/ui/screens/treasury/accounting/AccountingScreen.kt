@@ -56,7 +56,14 @@ fun AccountingScreen(
         DisplayLine(it, "displayLine${it.name}", page, navigationActions)
         HorizontalDivider(Modifier.fillMaxWidth())
       }
-      item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
+      item {
+        TotalLine(
+            totalAmount =
+                subCategoryList.sumOf {
+                  if (!model.filterActive) it.amount
+                  else it.amount + it.amount /*TODO: have to find the TVA*/
+                })
+      }
     } else {
       item {
         Text(

@@ -72,6 +72,10 @@ class AccountingViewModel(
       updateDatabaseValues()
     }
   }
+
+  fun modifyTVAFilter(tvaActive: Boolean) {
+    _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+  }
 }
 
 /**
@@ -87,4 +91,5 @@ data class AccountingState(
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val globalSelected: Boolean = true,
+    val filterActive: Boolean = false
 )
