@@ -50,7 +50,6 @@ fun AccountingScreen(
   val subCategoryList = model.subCategoryList
 
   LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
-
     // display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
       items(subCategoryList) {
@@ -89,7 +88,10 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 
   // Row of dropdown filters
   Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
-    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") { selectedYear = it }
+    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") {
+      selectedYear = it
+      accountingViewModel.onYearFilter(selectedYear.toInt())
+    }
     DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
       selectedCategory = it
       accountingViewModel.onSelectedCategory(selectedCategory)

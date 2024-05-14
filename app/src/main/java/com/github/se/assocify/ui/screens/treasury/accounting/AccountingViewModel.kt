@@ -43,7 +43,10 @@ class AccountingViewModel(
         { subCategoryList ->
           // If the global category is selected, display all subcategories
           if (_uiState.value.globalSelected) {
-            _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
+            _uiState.value =
+                _uiState.value.copy(
+                    subCategoryList =
+                        subCategoryList.filter { it.year == _uiState.value.yearFilter })
           } else {
             _uiState.value =
                 _uiState.value.copy(
@@ -96,5 +99,5 @@ data class AccountingState(
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val globalSelected: Boolean = true,
-    val yearFilter: Int = 2023
+    val yearFilter: Int = 2024
 )
