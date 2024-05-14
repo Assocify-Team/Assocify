@@ -21,8 +21,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
-import com.github.se.assocify.ui.util.DateUtil
-import com.github.se.assocify.ui.util.TimeUtil
+import com.github.se.assocify.ui.util.DateTimeUtil
 
 /**
  * A screen to display the different tasks that need to be completed for an event.
@@ -86,12 +85,7 @@ fun EventTaskScreen(
                     onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
                 )
               },
-              overlineContent = {
-                Text(
-                    DateUtil.formatDate(it.startTime.toLocalDate()) +
-                        " " +
-                        TimeUtil.toString(it.startTime.toLocalTime()))
-              })
+              overlineContent = { Text(DateTimeUtil.formatDateTime(it.startTime)) })
           HorizontalDivider()
         }
       }

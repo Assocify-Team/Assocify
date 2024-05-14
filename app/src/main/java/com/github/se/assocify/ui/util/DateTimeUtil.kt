@@ -29,4 +29,14 @@ object DateTimeUtil {
   fun toLocalTime(offsetDateTime: OffsetDateTime): LocalTime {
     return offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalTime()
   }
+
+  /** Converts a LocalDateTime to an OffsetDateTime. */
+  fun toOffsetDateTime(localDateTime: LocalDateTime): OffsetDateTime {
+    return localDateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime()
+  }
+
+  /** Converts a LocalDate and a LocalTime to an OffsetDateTime. */
+  fun toOffsetDateTime(localDate: LocalDate, localTime: LocalTime): OffsetDateTime {
+    return localDate.atTime(localTime).atZone(ZoneId.systemDefault()).toOffsetDateTime()
+  }
 }

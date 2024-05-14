@@ -39,6 +39,7 @@ import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.util.DateTimeUtil
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -92,8 +93,9 @@ fun ScheduleContent(hourHeight: Dp, hourNum: Int = 24, tasks: List<Task>) {
       content = {
         tasks.forEach { task ->
           // startOffset determines the y position of the task
-          val startHour = task.startTime.hour
-          val startMinute = task.startTime.minute
+          val startTime = DateTimeUtil.toLocalTime(task.startTime)
+          val startHour = startTime.hour
+          val startMinute = startTime.minute
           val startOffset = hourHeight * (startHour + startMinute / 60f)
 
           // duration determines the height of the task

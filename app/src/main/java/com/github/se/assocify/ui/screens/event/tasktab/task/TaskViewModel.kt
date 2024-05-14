@@ -8,11 +8,11 @@ import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.DateTimeUtil
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.TimeUtil
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.OffsetDateTime
 import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,7 +87,7 @@ class TaskViewModel {
                   category = it.category,
                   staffNumber = it.peopleNeeded.toString(),
                   date = DateUtil.formatDate(date),
-                  time = TimeUtil.toString(time))
+                  time = TimeUtil.formatTime(time))
 
           loadEvents()
         },
@@ -150,7 +150,7 @@ class TaskViewModel {
   }
 
   fun setTime(time: LocalTime?) {
-    _uiState.value = _uiState.value.copy(time = TimeUtil.toString(time))
+    _uiState.value = _uiState.value.copy(time = TimeUtil.formatTime(time))
     if (time == null) {
       _uiState.value = _uiState.value.copy(timeError = "Time cannot be empty")
     } else {
@@ -183,9 +183,8 @@ class TaskViewModel {
 
     val date = DateUtil.toDate(_uiState.value.date) ?: return
     val time = TimeUtil.toTime(_uiState.value.time) ?: return
-    val zone = OffsetDateTime.now().offset
 
-    val startTime = OffsetDateTime.of(date, time, zone)
+    val startTime = DateTimeUtil.toOffsetDateTime(date, time)
 
     val task =
         Task(

@@ -11,7 +11,7 @@ class TimeUtilTest {
   fun testFormatTime() {
     val time = LocalTime.of(16, 40)
     val expected = "16:40"
-    val actual = TimeUtil.toString(time)
+    val actual = TimeUtil.formatTime(time)
     assertEquals(expected, actual)
   }
 
