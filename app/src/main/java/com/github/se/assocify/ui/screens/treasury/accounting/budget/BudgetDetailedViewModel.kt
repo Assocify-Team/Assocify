@@ -103,10 +103,16 @@ class BudgetDetailedViewModel(
   }
 
 
+    /** Start editing the Subcategory */
     fun startSubCategoryEditing(){
         _uiState.value = _uiState.value.copy(catEditing = true)
     }
 
+    /** Start save subCategory editing
+     * @param name the name of the subcategory
+     * @param categoryUid the category uid
+     * @param year the year of the subcategory
+     * */
     fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int){
         val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
         accountingSubCategoryAPI.updateSubCategory(subCategory.categoryUID, subCategory, {}, {})
@@ -114,6 +120,7 @@ class BudgetDetailedViewModel(
         _uiState.value = _uiState.value.copy(catEditing = false, subCategory = subCategory)
     }
 
+    /** Cancel the Subcategory editing */
     fun cancelSubCategoryEditing(){
         _uiState.value = _uiState.value.copy(catEditing = false)
     }
