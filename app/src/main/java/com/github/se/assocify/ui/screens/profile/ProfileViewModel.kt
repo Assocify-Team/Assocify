@@ -98,7 +98,7 @@ class ProfileViewModel(
                               imageVector = Icons.Default.People,
                               contentDescription = "Association Logo")
                         }
-                      } + _uiState.value.myAssociations)
+                      } + _uiState.value.defaultJoinAsso)
           endLoading()
         },
         {
@@ -262,21 +262,19 @@ data class ProfileUIState(
     val showPicOptions: Boolean = false,
     // the uri of the profile image
     val profileImageURI: Uri? = null,
+    // default dropdown option is join an association
+    val defaultJoinAsso: DropdownOption =
+        DropdownOption("Add association", "join") {
+          Icon(
+              imageVector = Icons.Default.GroupAdd,
+              contentDescription = "Join an other association")
+        },
     // the associations of the user
-    val myAssociations: List<DropdownOption> =
-        listOf(
-            DropdownOption(
-                "Add association",
-                "join",
-                {
-                  Icon(
-                      imageVector = Icons.Default.GroupAdd,
-                      contentDescription = "Join an other association")
-                })),
+    val myAssociations: List<DropdownOption> = listOf(defaultJoinAsso),
     // true if the association dropdown should be shown, false if should be hidden
     val openAssociationDropdown: Boolean = false,
     // the selected (current) association
-    val selectedAssociation: DropdownOption = myAssociations[0],
+    val selectedAssociation: DropdownOption = defaultJoinAsso,
     // current role of the user in the association
     val currentRole: PermissionRole =
         PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)

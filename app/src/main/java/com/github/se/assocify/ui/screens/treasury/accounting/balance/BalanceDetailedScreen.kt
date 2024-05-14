@@ -9,19 +9,18 @@ import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetail
 /**
  * Detailed balance screen for a subcategory
  *
- * @param subCategoryUid the subcategory uid
  * @param navigationActions the navigation actions
+ * @param budgetDetailedViewModel the view model for the budget detailed screen
+ * @param balanceDetailedViewModel the view model for the balance detailed screen
  */
 @Composable
 fun BalanceDetailedScreen(
-    subCategoryUid: String,
     navigationActions: NavigationActions,
     budgetDetailedViewModel: BudgetDetailedViewModel,
     balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
   AccountingDetailedScreen(
       page = AccountingPage.BALANCE,
-      subCategoryUid = subCategoryUid,
       navigationActions = navigationActions,
       budgetDetailedViewModel = budgetDetailedViewModel,
       balanceDetailedViewModel = balanceDetailedViewModel)

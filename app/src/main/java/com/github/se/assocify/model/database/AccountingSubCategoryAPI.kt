@@ -40,14 +40,12 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
    * Add a subcategory to a category
    *
    * @param associationUID the unique identifier of the association
-   * @param categoryUID the unique identifier of the category
    * @param subCategory the subcategory to add
    * @param onSuccess the callback to be called when the subcategory is added
    * @param onFailure the callback to be called when the subcategory could not be added
    */
   fun addSubCategory(
       associationUID: String,
-      categoryUID: String,
       subCategory: AccountingSubCategory,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -58,7 +56,7 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
           .insert(
               SupabaseAccountingSubCategory(
                   uid = subCategory.uid,
-                  categoryUID = categoryUID,
+                  categoryUID = subCategory.categoryUID,
                   associationUID = associationUID,
                   name = subCategory.name,
                   amount = subCategory.amount,
@@ -71,13 +69,11 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
   /**
    * Update a subcategory
    *
-   * @param categoryUID the unique identifier of the category
    * @param subCategory the subcategory to update
    * @param onSuccess the callback to be called when the subcategory is updated
    * @param onFailure the callback to be called when the subcategory could not be updated
    */
   fun updateSubCategory(
-      categoryUID: String,
       subCategory: AccountingSubCategory,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -87,10 +83,7 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
         SupabaseAccountingSubCategory::name setTo subCategory.name
         SupabaseAccountingSubCategory::amount setTo subCategory.amount
       }) {
-        filter {
-          SupabaseAccountingSubCategory::uid eq subCategory.uid
-          SupabaseAccountingSubCategory::categoryUID eq categoryUID
-        }
+        filter { SupabaseAccountingSubCategory::uid eq subCategory.uid }
       }
       onSuccess()
     }

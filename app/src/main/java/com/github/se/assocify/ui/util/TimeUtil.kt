@@ -12,7 +12,7 @@ object TimeUtil {
   /**
    * Converts time to a string. If the time is null, it returns a string representing a null time.
    */
-  fun toString(time: java.time.LocalTime?): String {
+  fun formatTime(time: java.time.LocalTime?): String {
     if (time == null) {
       return NULL_TIME_STRING
     }

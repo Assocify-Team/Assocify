@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
-import com.github.se.assocify.model.entities.MapMarkerData
 import com.github.se.assocify.ui.screens.event.maptab.EventMapViewModel
+import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +30,7 @@ class EventScreenViewModel(
 
   val taskListViewModel: EventTaskViewModel = EventTaskViewModel(taskAPI) { showSnackbar(it) }
   val mapViewModel: EventMapViewModel = EventMapViewModel(taskAPI)
+  val scheduleViewModel: EventScheduleViewModel = EventScheduleViewModel(taskAPI)
 
   private val _uiState: MutableStateFlow<EventScreenState> = MutableStateFlow(EventScreenState())
   val uiState: StateFlow<EventScreenState> = _uiState
@@ -90,6 +91,7 @@ class EventScreenViewModel(
     // TODO : will need to merge these two setEvents into one
     taskListViewModel.setEvents(selectedEvents)
     mapViewModel.setEvents(selectedEvents)
+    scheduleViewModel.setEvents(selectedEvents)
   }
 
   /**
