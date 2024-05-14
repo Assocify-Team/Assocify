@@ -96,45 +96,44 @@ class BalanceDetailedViewModel(
     updateDatabaseValues()
   }
 
-    /**
-     * Start editing the Subcategory
-     */
-    fun startSubCategoryEditing(){
-        _uiState.value = _uiState.value.copy(catEditing = true)
-    }
+  /** Start editing the Subcategory */
+  fun startSubCategoryEditing() {
+    _uiState.value = _uiState.value.copy(subCatEditing = true)
+  }
 
-    /**
-     * Save the Subcategory editing
-     * @param name the new name of the Subategory
-     * @param categoryUid the new category uid associated with the subCategory
-     * @param year the new year of the subCategory
-     */
-    fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int){
-        val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-        accountingSubCategoryAPI.updateSubCategory(categoryUid, subCategory,
-            {},
-            {})
+  /**
+   * Save the Subcategory editing
+   *
+   * @param name the new name of the Subategory
+   * @param categoryUid the new category uid associated with the subCategory
+   * @param year the new year of the subCategory
+   */
+  fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int) {
+    val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
+    accountingSubCategoryAPI.updateSubCategory(categoryUid, subCategory, {}, {})
 
-        _uiState.value = _uiState.value.copy(catEditing = false, subCategory = subCategory)
-    }
+    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
+  }
 
-    /** Cancel the Subcategory editing */
-    fun cancelSubCategoryEditing(){
-        _uiState.value = _uiState.value.copy(catEditing = false)
-    }
+  /** Cancel the Subcategory editing */
+  fun cancelSubCategoryEditing() {
+    _uiState.value = _uiState.value.copy(subCatEditing = false)
+  }
 }
 
 /**
  * The state for the balance item
  *
  * @param balanceList the current list of balance items
+ * @param subCategory the current subcategory
  * @param status the current status
+ * @param subCatEditing whether the subcategory is being edited
  * @param year the current year
  */
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val status: Status? = null,
-    val catEditing: Boolean = false,
+    val subCatEditing: Boolean = false,
     val year: Int = 2023
 )

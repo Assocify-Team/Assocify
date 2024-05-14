@@ -23,6 +23,7 @@ class BudgetDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
   val uiState: StateFlow<BudgetItemState>
+
   init {
     updateDatabaseValues()
     setSubCategory(subCategoryUid)
@@ -102,28 +103,29 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
 
+  /** Start editing the Subcategory */
+  fun startSubCategoryEditing() {
+    _uiState.value = _uiState.value.copy(subCatEditing = true)
+  }
 
-    /** Start editing the Subcategory */
-    fun startSubCategoryEditing(){
-        _uiState.value = _uiState.value.copy(catEditing = true)
-    }
+  /**
+   * Start save subCategory editing
+   *
+   * @param name the name of the subcategory
+   * @param categoryUid the category uid
+   * @param year the year of the subcategory
+   */
+  fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int) {
+    val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
+    accountingSubCategoryAPI.updateSubCategory(subCategory.categoryUID, subCategory, {}, {})
 
-    /** Start save subCategory editing
-     * @param name the name of the subcategory
-     * @param categoryUid the category uid
-     * @param year the year of the subcategory
-     * */
-    fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int){
-        val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-        accountingSubCategoryAPI.updateSubCategory(subCategory.categoryUID, subCategory, {}, {})
+    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
+  }
 
-        _uiState.value = _uiState.value.copy(catEditing = false, subCategory = subCategory)
-    }
-
-    /** Cancel the Subcategory editing */
-    fun cancelSubCategoryEditing(){
-        _uiState.value = _uiState.value.copy(catEditing = false)
-    }
+  /** Cancel the Subcategory editing */
+  fun cancelSubCategoryEditing() {
+    _uiState.value = _uiState.value.copy(subCatEditing = false)
+  }
 }
 
 /**
@@ -133,6 +135,7 @@ class BudgetDetailedViewModel(
  * @param subCategory the current subcategory
  * @param yearFilter the current year filter
  * @param editing the current editing state
+ * @param subCatEditing the current category editing state
  * @param editedBudgetItem the current edited budget item
  */
 data class BudgetItemState(
@@ -140,6 +143,6 @@ data class BudgetItemState(
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
-    val catEditing: Boolean = false,
+    val subCatEditing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null
 )

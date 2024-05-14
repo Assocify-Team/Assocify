@@ -48,7 +48,7 @@ fun AccountingScreen(
 ) {
   val model by accountingViewModel.uiState.collectAsState()
   val subCategoryList = model.subCategoryList
-    Log.d("AccountingScreen", "subCategoryList: $subCategoryList")
+  Log.d("AccountingScreen", "subCategoryList: $subCategoryList")
   LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
 
     // display the subcategory if list is not empty

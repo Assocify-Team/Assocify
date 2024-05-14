@@ -84,7 +84,6 @@ fun AccountingDetailedScreen(
   val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
 
-
   val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
@@ -93,12 +92,13 @@ fun AccountingDetailedScreen(
       topBar = {
         CenterAlignedTopAppBar(
             title = {
-                Text(
-                    text = when(page) {
+              Text(
+                  text =
+                      when (page) {
                         AccountingPage.BALANCE -> balanceState.subCategory.name
                         AccountingPage.BUDGET -> budgetState.subCategory.name
-                    }
-                    , style = MaterialTheme.typography.titleLarge)
+                      },
+                  style = MaterialTheme.typography.titleLarge)
             },
             navigationIcon = {
               IconButton(
@@ -107,22 +107,21 @@ fun AccountingDetailedScreen(
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                   }
             },
-              actions = {
-                  IconButton(
-                      onClick = { when(page) {
-                          AccountingPage.BALANCE -> balanceDetailedViewModel.startSubCategoryEditing()
-                          AccountingPage.BUDGET -> budgetDetailedViewModel.startSubCategoryEditing()
-                      }},
-                      modifier = Modifier.testTag("editSubCat")) {
-                      Icon(Icons.Outlined.Edit, contentDescription = "Edit")
+            actions = {
+              IconButton(
+                  onClick = {
+                    when (page) {
+                      AccountingPage.BALANCE -> balanceDetailedViewModel.startSubCategoryEditing()
+                      AccountingPage.BUDGET -> budgetDetailedViewModel.startSubCategoryEditing()
+                    }
+                  },
+                  modifier = Modifier.testTag("editSubCat")) {
+                    Icon(Icons.Outlined.Edit, contentDescription = "Edit")
                   }
-              }
-          )
+            })
       },
       contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("AccountingDetailedScreen"),
+      modifier = Modifier.fillMaxWidth().testTag("AccountingDetailedScreen"),
       floatingActionButton = {
         FloatingActionButton(
             modifier = Modifier.testTag("createNewItem"),
@@ -135,21 +134,17 @@ fun AccountingDetailedScreen(
       content = { innerPadding ->
         if (budgetState.editing && page == AccountingPage.BUDGET) {
           DisplayEditBudget(budgetDetailedViewModel)
-        } else if((budgetState.catEditing && page == AccountingPage.BUDGET)
-            || (balanceState.catEditing && page == AccountingPage.BALANCE)){
-            DisplayEditSubCategory(page, budgetDetailedViewModel, balanceDetailedViewModel, balanceState, budgetState)
+        } else if ((budgetState.subCatEditing && page == AccountingPage.BUDGET) ||
+            (balanceState.subCatEditing && page == AccountingPage.BALANCE)) {
+          DisplayEditSubCategory(
+              page, budgetDetailedViewModel, balanceDetailedViewModel, balanceState, budgetState)
         }
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
           // Display the filter chips
           item {
-            Row(
-                Modifier
-                    .testTag("filterRowDetailed")
-                    .horizontalScroll(rememberScrollState())) {
+            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
                 when (page) {
@@ -189,7 +184,9 @@ fun AccountingDetailedScreen(
               if (balanceState.balanceList.isNotEmpty()) {
                 item { TotalItems(balanceState.balanceList.sumOf { it.amount }) }
               } else {
-                item { Text("No items for the ${balanceState.subCategory.name} sheet with these filters") }
+                item {
+                  Text("No items for the ${balanceState.subCategory.name} sheet with these filters")
+                }
               }
             }
             AccountingPage.BUDGET -> {
@@ -202,7 +199,9 @@ fun AccountingDetailedScreen(
               if (budgetState.budgetList.isNotEmpty()) {
                 item { TotalItems(budgetState.budgetList.sumOf { it.amount }) }
               } else {
-                item { Text("No items for the ${budgetState.subCategory.name} sheet with these filters") }
+                item {
+                  Text("No items for the ${budgetState.subCategory.name} sheet with these filters")
+                }
               }
             }
           }
@@ -218,9 +217,7 @@ fun AccountingDetailedScreen(
 @Composable
 fun TotalItems(totalAmount: Int) {
   ListItem(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("totalItems"),
+      modifier = Modifier.fillMaxWidth().testTag("totalItems"),
       headlineContent = {
         Text(
             text = "Total",
@@ -252,9 +249,7 @@ fun DisplayBudgetItem(
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
       modifier =
-      Modifier
-          .clickable { budgetDetailedViewModel.startEditing(budgetItem) }
-          .testTag(testTag))
+          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
 
 /**
@@ -277,9 +272,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       },
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
-      modifier = Modifier
-          .clickable {}
-          .testTag(testTag))
+      modifier = Modifier.clickable {}.testTag(testTag))
 }
 
 /**
@@ -300,17 +293,13 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
 
   Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
     Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .testTag("editDialogBox"),
+        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
         Text("Edit Budget Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
-            modifier = Modifier
-                .padding(8.dp)
-                .testTag("editNameBox"),
+            modifier = Modifier.padding(8.dp).testTag("editNameBox"),
             value = nameString,
             onValueChange = { nameString = it },
             label = { Text("Name") },
@@ -322,14 +311,10 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
           var tvaExtended by remember { mutableStateOf(false) }
           FilterChip(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .height(60.dp),
+              modifier = Modifier.fillMaxWidth().height(60.dp),
               selected = tvaExtended,
               onClick = { tvaExtended = !tvaExtended },
               label = { Text(tvaTypeString) },
@@ -366,16 +351,12 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
+            modifier = Modifier.fillMaxWidth().padding(15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Button(
               onClick = { budgetViewModel.cancelEditing() },
-              modifier = Modifier
-                  .padding(15.dp)
-                  .testTag("editDismissButton"),
+              modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
           ) {
             Text("Dismiss")
           }
@@ -391,9 +372,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
                         subcategoryUID = budget.subcategoryUID,
                         year = yearString.toInt()))
               },
-              modifier = Modifier
-                  .padding(15.dp)
-                  .testTag("editConfirmButton"),
+              modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
           ) {
             Text("Confirm")
           }
@@ -403,98 +382,79 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   }
 }
 
-
-
-
 @Composable
-fun DisplayEditSubCategory(page: AccountingPage, budgetViewModel: BudgetDetailedViewModel,
-                           balanceViewModel: BalanceDetailedViewModel, balanceState: BalanceItemState,
-                           budgetState: BudgetItemState
+fun DisplayEditSubCategory(
+    page: AccountingPage,
+    budgetViewModel: BudgetDetailedViewModel,
+    balanceViewModel: BalanceDetailedViewModel,
+    balanceState: BalanceItemState,
+    budgetState: BudgetItemState
 ) {
-    val subCategory = when(page) {
+  val subCategory =
+      when (page) {
         AccountingPage.BALANCE -> balanceState.subCategory
         AccountingPage.BUDGET -> budgetState.subCategory
-    }
-    var name by remember { mutableStateOf(subCategory.name) }
-    var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
-    var year by remember { mutableStateOf(subCategory.year.toString()) }
+      }
+  var name by remember { mutableStateOf(subCategory.name) }
+  var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
+  var year by remember { mutableStateOf(subCategory.year.toString()) }
 
-    Dialog(onDismissRequest = {
-        when(page) {
-            AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditing()
-            AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
+  Dialog(
+      onDismissRequest = {
+        when (page) {
+          AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditing()
+          AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
         }
-    }) {
+      }) {
         Card(
-            modifier = Modifier
-                .padding(16.dp)
-                .testTag("editSubCategoryDialog"),
+            modifier = Modifier.padding(16.dp).testTag("editSubCategoryDialog"),
             shape = RoundedCornerShape(16.dp),
         ) {
-        Column(Modifier.verticalScroll(rememberScrollState())) {
+          Column(Modifier.verticalScroll(rememberScrollState())) {
             Text("Edit $name", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
             OutlinedTextField(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .testTag("editSubCategoryNameBox"),
+                modifier = Modifier.padding(8.dp).testTag("editSubCategoryNameBox"),
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Name") },
-                supportingText = {}
-            )
+                supportingText = {})
             OutlinedTextField(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .testTag("editSubCategoryYearBox"),
+                modifier = Modifier.padding(8.dp).testTag("editSubCategoryYearBox"),
                 value = year,
                 onValueChange = { year = it },
                 label = { Text("Year") },
-                supportingText = {}
-            )
+                supportingText = {})
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
+                modifier = Modifier.fillMaxWidth().padding(15.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-            Button(
-                onClick = {
-                    when(page) {
-                        AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditing()
-                        AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
+              Button(
+                  onClick = {
+                    when (page) {
+                      AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditing()
+                      AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
                     }
-                },
-                modifier = Modifier
-                    .padding(15.dp)
-                    .testTag("editSubCategoryDismissButton"),
-            ) {
+                  },
+                  modifier = Modifier.padding(15.dp).testTag("editSubCategoryDismissButton"),
+              ) {
                 Text("Dismiss")
-            }
-            Button(
-                onClick = {
-                    when(page) {
-                        AccountingPage.BALANCE -> balanceViewModel.saveSubCategoryEditing(
-                            name,
-                            categoryUid,
-                            year.toInt()
-                        )
-
-                        AccountingPage.BUDGET -> budgetViewModel.saveSubCategoryEditing(
-                            name,
-                            categoryUid,
-                            year.toInt()
-                        )
+              }
+              Button(
+                  onClick = {
+                    when (page) {
+                      AccountingPage.BALANCE ->
+                          balanceViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
+                      AccountingPage.BUDGET ->
+                          budgetViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
                     }
-                },
-                modifier = Modifier
-                    .padding(15.dp)
-                    .testTag("editSubCategoryConfirmButton"),
-            ) {
+                  },
+                  modifier = Modifier.padding(15.dp).testTag("editSubCategoryConfirmButton"),
+              ) {
                 Text("Confirm")
+              }
             }
-            }
+          }
         }
-        }
-    }
+      }
 }
