@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
  * View model for the balance detailed screen
  *
  * @param balanceApi the balance api
+ * @param accountingSubCategoryAPI the accounting subcategory api
  * @param subCategoryUid the subcategory uid
  */
 class BalanceDetailedViewModel(
