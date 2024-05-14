@@ -26,9 +26,9 @@ import com.github.se.assocify.ui.composables.InnerTabRow
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 
@@ -43,7 +43,7 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    budgetViewModel: BudgetViewModel,
+    accountingViewModel: AccountingViewModel,
     receiptListViewModel: ReceiptListViewModel,
     treasuryViewModel: TreasuryViewModel
 ) {
@@ -94,16 +94,16 @@ fun TreasuryScreen(
 
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(budgetViewModel)
-            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(budgetViewModel)
+            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(accountingViewModel)
+            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(accountingViewModel)
           }
 
           // Pages content
           HorizontalPager(state = pagerState, userScrollEnabled = true) { page ->
             when (page) {
               TreasuryPageIndex.Receipts.ordinal -> ReceiptListScreen(receiptListViewModel)
-              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions, budgetViewModel)
-              TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions)
+              TreasuryPageIndex.Budget.ordinal -> BudgetScreen(navActions, accountingViewModel)
+              TreasuryPageIndex.Balance.ordinal -> BalanceScreen(navActions, accountingViewModel)
             }
           }
         }
