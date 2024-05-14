@@ -20,7 +20,7 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
@@ -46,8 +46,9 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   val categoryList = listOf(AccountingCategory("1", "Events"))
   val subCategoryList =
       listOf(
-          AccountingSubCategory("2", "1", "OGJ", 2000),
-          AccountingSubCategory("3", "1", "Subsonic", 100))
+          AccountingSubCategory("2", "1", "OGJ", 2000, 1000),
+          AccountingSubCategory("3", "1", "Subsonic", 100, 50),
+      )
 
   val mockAccountingCategoriesAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
@@ -87,9 +88,10 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
     val viewModel = TreasuryViewModel(navActions, receiptListViewModel)
-    val budgetViewModel = BudgetViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
+    val accountingViewModel =
+        AccountingViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
     composeTestRule.setContent {
-      TreasuryScreen(navActions, budgetViewModel, receiptListViewModel, viewModel)
+      TreasuryScreen(navActions, accountingViewModel, receiptListViewModel, viewModel)
     }
   }
 

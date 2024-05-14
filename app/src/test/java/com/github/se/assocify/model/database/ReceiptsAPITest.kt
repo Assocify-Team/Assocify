@@ -21,11 +21,9 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
+import java.io.File
 import java.time.LocalDate
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail
 import org.junit.Before
@@ -104,8 +102,7 @@ class ReceiptsAPITest {
   @OptIn(SupabaseInternal::class, ExperimentalCoroutinesApi::class)
   @Before
   fun setUp() {
-    Dispatchers.setMain(UnconfinedTestDispatcher())
-
+    APITestUtils.setup()
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
 
@@ -115,6 +112,7 @@ class ReceiptsAPITest {
 
     CurrentUser.userUid = "2c256037-ad67-4185-991a-1a2b9bb1f9b3"
     CurrentUser.associationUid = "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
+    val cachePath = File("cache").toPath()
     api =
         ReceiptAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -127,7 +125,8 @@ class ReceiptsAPITest {
                   respondBadRequest()
                 }
               }
-            })
+            },
+            cachePath)
   }
 
   @Test
@@ -177,7 +176,7 @@ class ReceiptsAPITest {
   fun getReceipt() {
     val successMock = mockk<(Receipt) -> Unit>(relaxed = true)
 
-    response = remoteJson
+    response = "[$remoteJson]"
 
     api.getReceipt("successful_rid", successMock, { fail("Should not fail, failed with $it") })
 
@@ -188,6 +187,16 @@ class ReceiptsAPITest {
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
 
+    verify(timeout = 1000) { failureMock.invoke(any()) }
+  }
+
+  @Test
+  fun getReceiptImage() {
+    // Can't really test success, sadly.
+
+    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
+    error = true
+    api.getReceiptImage(remoteReceipt, { fail("Should not succeed") }, failureMock)
     verify(timeout = 1000) { failureMock.invoke(any()) }
   }
 

@@ -19,7 +19,7 @@ import java.time.LocalDate
 data class BalanceItem(
     val uid: String,
     val nameItem: String,
-    val categoryUID: String,
+    val subcategoryUID: String,
     val receiptUID: String,
     val amount: Int, // unsigned: can be positive or negative
     val tva: TVA,
