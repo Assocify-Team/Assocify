@@ -34,7 +34,6 @@ class EventScreenViewModel(
 
   init {
     fetchEvents()
-    fetchMarkers()
   }
 
   /** Fetch the events from the database */
@@ -119,25 +118,6 @@ class EventScreenViewModel(
           message = message, duration = SnackbarDuration.Short)
     }
   }
-
-  /** Map viewmodel **/
-
-  fun fetchMarkers() {
-    // Initialize the markers list with the test marker
-    val testMarker = MapMarkerData(
-      name = "EPFL0",
-      eventName = "Test Event",
-      position = GeoPoint(46.518726, 6.566613),
-      description = "Test Description"
-    )
-    addMarker(testMarker)
-  }
-
-  fun addMarker(marker: MapMarkerData) {
-    _uiState.value = _uiState.value.copy(markers = _uiState.value.markers + marker)
-  }
-
-
 }
 
 /**
@@ -160,7 +140,6 @@ data class EventScreenState(
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
     val currentTab: EventPageIndex = EventPageIndex.Tasks,
-    val markers: List<MapMarkerData> = emptyList()
 )
 
 /** Event tabs */
