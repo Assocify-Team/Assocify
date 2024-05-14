@@ -5,6 +5,7 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,9 +49,9 @@ class BudgetDetailedViewModel(
         },
         {})
   }
-
   /** Update the database values */
   private fun updateDatabaseValues() {
+      // Get the budget items from the database
     budgetApi.getBudget(
         CurrentUser.associationUid!!,
         { budgetList ->
@@ -65,6 +66,11 @@ class BudgetDetailedViewModel(
           _uiState.value = _uiState.value.copy(budgetList = filteredList)
         },
         {})
+
+      // Get the categories from the database
+      accountingCategoryAPI.getCategories(CurrentUser.associationUid!!,
+          { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
+          {})
   }
 
   /**
@@ -134,6 +140,7 @@ class BudgetDetailedViewModel(
  *
  * @param budgetList the current list of budget items
  * @param subCategory the current subcategory
+ * @param categoryList the current list of categories
  * @param yearFilter the current year filter
  * @param editing the current editing state
  * @param subCatEditing the current category editing state
@@ -142,6 +149,7 @@ class BudgetDetailedViewModel(
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
+    val categoryList: List<AccountingCategory> = emptyList(),
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
     val subCatEditing: Boolean = false,

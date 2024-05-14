@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
@@ -54,6 +55,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
@@ -411,6 +413,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DisplayEditSubCategory(
@@ -425,19 +428,25 @@ fun DisplayEditSubCategory(
         AccountingPage.BALANCE -> balanceState.subCategory
         AccountingPage.BUDGET -> budgetState.subCategory
       }
-    val categoryList = listOf("Global", "Local", "National", "International")
+
+    val categoryList = when (page) {
+        AccountingPage.BALANCE -> balanceState.categoryList
+        AccountingPage.BUDGET -> budgetState.categoryList
+    }
   var name by remember { mutableStateOf(subCategory.name) }
   var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
   var year by remember { mutableStateOf(subCategory.year.toString()) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf("Global") }
+    var selectedCategory by remember { mutableStateOf(categoryList[0]) }
   Dialog(
       onDismissRequest = {
         when (page) {
           AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditing()
           AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
         }
-      }) {
+      },
+      properties = DialogProperties()
+  ) {
         Card(
             modifier = Modifier
                 .padding(16.dp)
@@ -462,10 +471,30 @@ fun DisplayEditSubCategory(
                 onValueChange = { year = it },
                 label = { Text("Year") },
                 supportingText = {})
+              ExposedDropdownMenuBox(
+                  expanded = expanded,
+                  onExpandedChange = { expanded = !expanded },
+                  modifier = Modifier.testTag("categoryDropdown")) {
+                  OutlinedTextField(
+                      value = selectedCategory.name,
+                      onValueChange = {},
+                      label = { Text("Tag") },
+                      trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                      },
+                      readOnly = true,
+                      colors = ExposedDropdownMenuDefaults.textFieldColors())
+                  ExposedDropdownMenu(
+                      expanded = expanded, onDismissRequest = { expanded = false }) {
+                      categoryList.forEach { category ->
+                          DropdownMenuItem(
+                              text = { Text(category.name) },
 
-            DropdownFilterChip(selectedOption = categoryList.first(), options = categoryList, testTag = "categoryFilterChip") {
-                selectedCategory = it
-            }
+                              onClick = { name = category.name })
+                      }
+                  }
+              }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -483,7 +512,7 @@ fun DisplayEditSubCategory(
                       .padding(15.dp)
                       .testTag("editSubCategoryDismissButton"),
               ) {
-                Text("Dismiss")
+                Text("Cancel")
               }
               Button(
                   onClick = {

@@ -6,6 +6,7 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
@@ -53,6 +54,7 @@ class BalanceDetailedViewModel(
 
   /** Update the database values */
   private fun updateDatabaseValues() {
+      // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
@@ -76,6 +78,11 @@ class BalanceDetailedViewModel(
           _uiState.value = _uiState.value.copy(balanceList = statusFilteredList)
         },
         {})
+
+      // Get the categories from the database
+      accountingCategoryAPI.getCategories(CurrentUser.associationUid!!,
+          { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
+          {})
   }
 
   /**
@@ -135,6 +142,7 @@ class BalanceDetailedViewModel(
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
+    val categoryList: List<AccountingCategory> = emptyList(),
     val status: Status? = null,
     val subCatEditing: Boolean = false,
     val year: Int = 2023
