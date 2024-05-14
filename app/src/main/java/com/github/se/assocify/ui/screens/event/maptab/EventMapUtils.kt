@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.event.maptab
 
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 /**
  * Load the map overlay with the markers of the tasks
@@ -10,7 +11,16 @@ fun loadMapOverlay(
   mapView: MapView,
   viewModel: EventMapViewModel
 ) {
-  val markers = viewModel
+  val markers = viewModel.uiState.value.markers
+  markers.forEach { markerData ->
+    val marker = Marker(mapView)
+    marker.title = markerData.name
+    marker.snippet = markerData.description
+    marker.position = markerData.position
+
+    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+    mapView.overlays.add(marker)
+  }
 }
 
 /**

@@ -41,8 +41,6 @@ fun EventMapScreen(viewModel: EventScreenViewModel) {
     // EventMapView()
     EPFLMapView(modifier = Modifier.fillMaxWidth(), { }, viewModel)
   }
-
-
 }
 
 /**
@@ -84,15 +82,7 @@ fun rememberMapViewWithLifecycle(viewModel: EventScreenViewModel): MapView {
     onDispose { lifecycle.removeObserver(lifecycleObserver) }
   }
 
-  // Test
-  viewModel.uiState.value.markers.forEach { markerData ->
-    val marker = Marker(mapView)
-    marker.position = markerData.position
-    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-    marker.title = markerData.name
-    marker.snippet = markerData.description
-    mapView.overlays.add(marker)
-  }
+  loadMapOverlay(mapView, viewModel.mapViewModel)
 
   return mapView
 }

@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.event.maptab
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,7 @@ class EventMapViewModel(
   init {
     // First, get all tasks
     fetchTasks()
+    Log.w("mdrr: ", _uiState.value.tasks.size.toString())
     // Then, fetch the markers
     fetchMarkers(_uiState.value.tasks)
   }
@@ -43,7 +45,7 @@ class EventMapViewModel(
       _uiState.value.copy(
         currentEventTasks =
         tasks
-          .filter { it.eventUid in _uiState.value.filteredEventsUid }
+          .filter { it.eventUid in _uiState.value.filteredEventsUid })
   }
 
   fun setEvents(events: List<Event>) {
@@ -53,9 +55,12 @@ class EventMapViewModel(
 
   private fun fetchMarkers(tasks: List<Task>) {
     for (task in tasks) {
+      var location = GeoPoint(46.518726,6.566613)
+      if (task.location.isNotEmpty())
+        location = GeoPoint.fromDoubleString(task.location, ',')
       val marker = MapMarkerData(
         name = task.title,
-        position = GeoPoint.fromDoubleString(task.location, ','),
+        position = location,
         description = task.description
       )
       _uiState.value = _uiState.value.copy(markers = _uiState.value.markers + marker)
