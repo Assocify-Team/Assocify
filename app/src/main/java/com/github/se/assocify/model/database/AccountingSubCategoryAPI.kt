@@ -82,6 +82,8 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       db.postgrest.from(collection).update({
         SupabaseAccountingSubCategory::name setTo subCategory.name
         SupabaseAccountingSubCategory::amount setTo subCategory.amount
+        SupabaseAccountingSubCategory::year setTo subCategory.year
+        SupabaseAccountingSubCategory::categoryUID setTo subCategory.categoryUID
       }) {
         filter { SupabaseAccountingSubCategory::uid eq subCategory.uid }
       }
