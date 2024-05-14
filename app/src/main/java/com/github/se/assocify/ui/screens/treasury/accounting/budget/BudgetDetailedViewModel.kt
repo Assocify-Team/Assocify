@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -52,7 +51,7 @@ class BudgetDetailedViewModel(
   }
   /** Update the database values */
   private fun updateDatabaseValues() {
-      // Get the budget items from the database
+    // Get the budget items from the database
     budgetApi.getBudget(
         CurrentUser.associationUid!!,
         { budgetList ->
@@ -68,10 +67,11 @@ class BudgetDetailedViewModel(
         },
         {})
 
-      // Get the categories from the database
-      accountingCategoryAPI.getCategories(CurrentUser.associationUid!!,
-          { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-          {})
+    // Get the categories from the database
+    accountingCategoryAPI.getCategories(
+        CurrentUser.associationUid!!,
+        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
+        {})
   }
 
   /**

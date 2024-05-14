@@ -54,7 +54,7 @@ class BalanceDetailedViewModel(
 
   /** Update the database values */
   private fun updateDatabaseValues() {
-      // Get the balance items from the database
+    // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
@@ -79,10 +79,11 @@ class BalanceDetailedViewModel(
         },
         {})
 
-      // Get the categories from the database
-      accountingCategoryAPI.getCategories(CurrentUser.associationUid!!,
-          { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-          {})
+    // Get the categories from the database
+    accountingCategoryAPI.getCategories(
+        CurrentUser.associationUid!!,
+        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
+        {})
   }
 
   /**

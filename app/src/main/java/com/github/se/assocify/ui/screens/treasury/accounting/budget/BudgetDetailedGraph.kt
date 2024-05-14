@@ -19,7 +19,8 @@ fun NavGraphBuilder.budgetDetailedGraph(
 ) {
   composable(Destination.BudgetDetailed("{subCategoryUid}").route) { backStackEntry ->
     backStackEntry.arguments?.getString("subCategoryUid")?.let {
-      val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, accountingSubCategoryAPI, accountingCategoryAPI, it)
+      val budgetDetailedViewModel =
+          BudgetDetailedViewModel(budgetAPI, accountingSubCategoryAPI, accountingCategoryAPI, it)
       val balanceDetailedViewModel =
           BalanceDetailedViewModel(balanceAPI, accountingSubCategoryAPI, accountingCategoryAPI, it)
       BudgetDetailedScreen(navigationActions, budgetDetailedViewModel, balanceDetailedViewModel)
