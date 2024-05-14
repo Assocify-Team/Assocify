@@ -4,9 +4,9 @@ import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.ui.util.DateUtil
+import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
 
 class EventScheduleViewModel(
     private val taskAPI: TaskAPI,
