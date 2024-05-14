@@ -113,6 +113,7 @@ fun AccountingDetailedScreen(
             actions = {
               IconButton(
                   onClick = {
+                    // Sets the editing state to true
                     when (page) {
                       AccountingPage.BALANCE -> balanceDetailedViewModel.startSubCategoryEditing()
                       AccountingPage.BUDGET -> budgetDetailedViewModel.startSubCategoryEditing()
@@ -135,6 +136,7 @@ fun AccountingDetailedScreen(
             }
       },
       content = { innerPadding ->
+        // Call the various editing popups
         if (budgetState.editing && page == AccountingPage.BUDGET) {
           DisplayEditBudget(budgetDetailedViewModel)
         } else if ((budgetState.subCatEditing && page == AccountingPage.BUDGET) ||
@@ -142,6 +144,7 @@ fun AccountingDetailedScreen(
           DisplayEditSubCategory(
               page, budgetDetailedViewModel, balanceDetailedViewModel, balanceState, budgetState)
         }
+
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
@@ -418,7 +421,9 @@ fun DisplayEditSubCategory(
   var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
   var year by remember { mutableStateOf(subCategory.year.toString()) }
   var expanded by remember { mutableStateOf(false) }
-  var selectedCategory by remember { mutableStateOf(categoryList[0].name) }
+  var selectedCategory by remember {
+    mutableStateOf(categoryList.filter { it.uid == subCategory.categoryUID }[0].name)
+  }
   Dialog(
       onDismissRequest = {
         when (page) {
@@ -490,7 +495,7 @@ fun DisplayEditSubCategory(
                     AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
                   }
                 },
-                modifier = Modifier.padding(15.dp).testTag("editSubCategoryDismissButton"),
+                modifier = Modifier.padding(15.dp).testTag("editSubCategoryCancelButton"),
             ) {
               Text("Cancel")
             }
@@ -503,9 +508,9 @@ fun DisplayEditSubCategory(
                         budgetViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
                   }
                 },
-                modifier = Modifier.padding(15.dp).testTag("editSubCategoryConfirmButton"),
+                modifier = Modifier.padding(15.dp).testTag("editSubCategorySaveButton"),
             ) {
-              Text("Confirm")
+              Text("Save")
             }
           }
         }

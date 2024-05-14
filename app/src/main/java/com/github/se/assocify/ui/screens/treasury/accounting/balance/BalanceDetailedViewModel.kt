@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -93,7 +92,6 @@ class BalanceDetailedViewModel(
    */
   fun onYearFilter(year: Int) {
     _uiState.value = _uiState.value.copy(year = year)
-    Log.d("BalanceDetailedViewModel", "Year filter: $year")
     updateDatabaseValues()
   }
 

@@ -12,8 +12,10 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
@@ -42,12 +44,19 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
+
   val subCategoryUid = "subCategoryUid"
   val subCategoryList =
       listOf(
           AccountingSubCategory(subCategoryUid, "categoryUid", "Logistics", 1205, 2023),
           AccountingSubCategory("2", "categoryUid", "Administration", 100, 2023),
           AccountingSubCategory("3", "categoryUid", "Balelec", 399, 2023))
+  val categoryList =
+      listOf(
+          AccountingCategory("1", "Events"),
+          AccountingCategory("2", "Pole"),
+          AccountingCategory("3", "Commissions"),
+          AccountingCategory("4", "Sponsorship"))
 
   val budgetItems =
       listOf(
@@ -82,6 +91,15 @@ class BudgetDetailedScreenTest :
             }
       }
 
+  val mockAccountingCategoryAPI: AccountingCategoryAPI =
+      mockk<AccountingCategoryAPI>() {
+        every { getCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
+              onSuccessCallback(categoryList)
+            }
+      }
+
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
 
   @Before
@@ -89,7 +107,11 @@ class BudgetDetailedScreenTest :
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
-        BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "subCategoryUid")
+        BudgetDetailedViewModel(
+            mockBudgetAPI,
+            mockAccountingSubCategoryApi,
+            mockAccountingCategoryAPI,
+            "subCategoryUid")
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
