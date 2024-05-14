@@ -3,8 +3,12 @@ package com.github.se.assocify.ui.screens.treasury.accounting.balance
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +21,10 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class BalanceDetailedViewModel(
     private var balanceApi: BalanceAPI,
-    private var subCategoryUid: String
+    private var receiptAPI: ReceiptAPI,
+    private var subCategoryAPI: AccountingSubCategoryAPI,
+    private var subCategoryUid: String,
+    private var assocUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
   val uiState: StateFlow<BalanceItemState>
@@ -29,6 +36,17 @@ class BalanceDetailedViewModel(
 
   /** Update the database values */
   private fun updateDatabaseValues() {
+    // Get the receipt items from the database
+    /*TODO: filter to only the receipts of the current assoc */
+    receiptAPI.getAllReceipts(
+        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
+
+    // Get the subcategories from the database
+    subCategoryAPI.getSubCategories(
+        CurrentUser.associationUid!!,
+        { asc -> _uiState.value = _uiState.value.copy(subCategoryList = asc) },
+        {})
+    // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
@@ -86,5 +104,7 @@ class BalanceDetailedViewModel(
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val status: Status? = null,
-    val year: Int = 2023
+    val year: Int = 2023,
+    val receiptList: List<Receipt> = emptyList(),
+    val subCategoryList: List<AccountingSubCategory> = emptyList()
 )

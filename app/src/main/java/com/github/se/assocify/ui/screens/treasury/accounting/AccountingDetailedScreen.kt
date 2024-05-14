@@ -60,7 +60,6 @@ import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 
 /**
@@ -121,13 +120,10 @@ fun AccountingDetailedScreen(
       content = { innerPadding ->
         if (budgetModel.editing && page == AccountingPage.BUDGET) {
           DisplayEditBudget(budgetDetailedViewModel)
-        } else if ( page == AccountingPage.BALANCE){
+        } else if (page == AccountingPage.BALANCE) {}
 
-        }
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
@@ -214,9 +210,7 @@ fun DisplayBudgetItem(
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
       modifier =
-      Modifier
-          .clickable { budgetDetailedViewModel.startEditing(budgetItem) }
-          .testTag(testTag))
+          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
 
 /**
@@ -239,9 +233,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       },
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
-      modifier = Modifier
-          .clickable {}
-          .testTag(testTag))
+      modifier = Modifier.clickable {}.testTag(testTag))
 }
 
 @Composable
@@ -256,9 +248,7 @@ fun DisplayEditBalance() {
   var status by remember { mutableStateOf(Status.Pending) }
   Dialog(onDismissRequest = { /*TODO: wait for viewModel to revert*/}) {
     Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .testTag("editDialogBox"),
+        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
@@ -277,14 +267,10 @@ fun DisplayEditBalance() {
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
           var tvaExtended by remember { mutableStateOf(false) }
           FilterChip(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .height(60.dp),
+              modifier = Modifier.fillMaxWidth().height(60.dp),
               selected = tvaExtended,
               onClick = { tvaExtended = !tvaExtended },
               label = { Text(tvaTypeString) },
@@ -322,24 +308,18 @@ fun DisplayEditBalance() {
             supportingText = {})
         /*TODO: insert status picker*/
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
+            modifier = Modifier.fillMaxWidth().padding(15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Button(
               onClick = { /*TODO: wait for viewModel to revert*/},
-              modifier = Modifier
-                  .padding(15.dp)
-                  .testTag("editDismissButton"),
+              modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
           ) {
             Text("Dismiss")
           }
           Button(
               onClick = { /*TODO: wait for viewModel to save*/},
-              modifier = Modifier
-                  .padding(15.dp)
-                  .testTag("editConfirmButton"),
+              modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
           ) {
             Text("Confirm")
           }
