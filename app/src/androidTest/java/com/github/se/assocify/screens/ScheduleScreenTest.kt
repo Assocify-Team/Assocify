@@ -4,11 +4,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.TaskAPI
+import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.mockk
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -21,8 +23,13 @@ import org.junit.runner.RunWith
 class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-  val taskAPI: TaskAPI = mockk<TaskAPI>()
-  val viewModel = EventScheduleViewModel(taskAPI)
+  private val tasks: List<Task> = listOf()
+
+  private val taskAPI: TaskAPI =
+      mockk<TaskAPI>() {
+        every { getTasks(any(), any()) } answers { firstArg<(List<Task>) -> Unit>().invoke(tasks) }
+      }
+  private val viewModel = EventScheduleViewModel(taskAPI)
 
   @Before
   fun testSetup() {
