@@ -3,6 +3,8 @@ package com.github.se.assocify.ui.screens.event.scheduletab
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateTimeUtil
 import com.github.se.assocify.ui.util.DateUtil
 import java.time.LocalDate
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 /** A ViewModel for the EventScheduleScreen. */
 class EventScheduleViewModel(
+    private val navActions: NavigationActions,
     private val taskAPI: TaskAPI,
 ) {
   private val _uiState: MutableStateFlow<ScheduleState> = MutableStateFlow(ScheduleState())
@@ -78,6 +81,10 @@ class EventScheduleViewModel(
   /** Changes the current date to the previous day. */
   fun previousDate() {
     changeDate(_uiState.value.currentDate.minusDays(1))
+  }
+
+  fun openTask(uid: String) {
+    navActions.navigateTo(Destination.EditTask(uid))
   }
 
   /**
