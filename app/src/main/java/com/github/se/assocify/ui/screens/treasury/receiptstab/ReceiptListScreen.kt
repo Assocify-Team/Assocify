@@ -61,7 +61,7 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
           // First list of receipts
           viewmodelState.userReceipts.forEach { receipt ->
             item {
-              ReceiptItem(receipt, viewModel)
+              ReceiptItem(receipt, viewModel, true)
               HorizontalDivider()
             }
           }
@@ -89,7 +89,7 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
           // Second list of receipts
           viewmodelState.allReceipts.forEach { receipt ->
             item {
-              ReceiptItem(receipt, viewModel)
+              ReceiptItem(receipt, viewModel, false)
               HorizontalDivider()
             }
           }
@@ -97,11 +97,20 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
       }
 }
 
-/** Receipt item from the list in Receipts page */
+/**
+ * Receipt item from the list in Receipts page
+ *
+ * @param receipt The receipt to display
+ * @param viewModel The view model to handle the click
+ * @param mine True if the receipt is from myReceipts list, false otherwise (allReceipts)
+ */
 @Composable
-private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
+private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel, mine: Boolean) {
   ListItem(
-      modifier = Modifier.clickable { viewModel.onReceiptClick(receipt) }.fillMaxWidth(),
+      modifier =
+          Modifier.clickable { viewModel.onReceiptClick(receipt) }
+              .fillMaxWidth()
+              .testTag("$mine-${receipt.uid}"),
       headlineContent = {
         Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
       },
