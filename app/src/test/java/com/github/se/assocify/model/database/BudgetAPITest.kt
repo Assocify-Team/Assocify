@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -99,7 +100,10 @@ class BudgetAPITest {
     response = ""
     val budgetItemUpdt = budgetItem.copy(uid = UUID.randomUUID().toString())
     budgetAPI.addBudgetItem(
-        "aa3d4ad7-c901-435a-b089-bb835f6ec560", budgetItemUpdt, onSuccess, onFailure)
+        "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+        budgetItemUpdt,
+        onSuccess,
+        { fail("Should not fail, failed with $it") })
     verify(timeout = 1000) { onSuccess() }
     verify(exactly = 0) { onFailure(any()) }
   }
