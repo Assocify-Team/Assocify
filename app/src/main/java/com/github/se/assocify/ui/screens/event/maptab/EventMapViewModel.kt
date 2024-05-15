@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.event.maptab
 
-import android.util.Log
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.MapMarkerData
@@ -9,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.osmdroid.util.GeoPoint
 
+/** A ViewModel of the Event Map tab, to manage the markers and the tasks */
 class EventMapViewModel(private val taskAPI: TaskAPI) {
+  // Viewmodel's state
   private val _uiState: MutableStateFlow<EventMapState> = MutableStateFlow(EventMapState())
   val uiState: StateFlow<EventMapState> = _uiState
 
@@ -20,6 +21,7 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
     fetchMarkers()
   }
 
+  /** Fetch the tasks from the database */
   fun fetchTasks() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
     taskAPI.getTasks(
@@ -28,9 +30,13 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
           _uiState.value = _uiState.value.copy(tasks = tasks, loading = false, error = null)
         },
         { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks") })
-    Log.w("mdrrrrr: ", _uiState.value.tasks.size.toString())
   }
 
+  /**
+   * Filter the tasks depending on the current events
+   *
+   * @param tasks the tasks to filter
+   */
   private fun filterTasks(tasks: List<Task> = _uiState.value.tasks) {
     // Filters requires cleaning the markers
     _uiState.value = _uiState.value.copy(markers = emptyList())

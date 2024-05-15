@@ -53,7 +53,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   OffsetDateTime.now(),
                   OffsetDateTime.now(),
                   "me",
-                  "home")
+                  "46.518726,6.566613")
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
           onSuccessCallback(listOf(e1))
         }
@@ -69,7 +69,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   OffsetDateTime.now(),
                   0,
                   "Committee",
-                  "Here",
+                  "46.518726,6.566615",
                   "eventUID0")
           val t2 =
               Task(
@@ -80,7 +80,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   OffsetDateTime.now(),
                   0,
                   "Committee",
-                  "Here",
+                  "46.518726,6.566610",
                   "eventUID")
           val onSuccessCallback = arg<(List<Task>) -> Unit>(0)
           onSuccessCallback(listOf(t1, t2))

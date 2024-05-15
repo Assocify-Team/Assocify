@@ -33,8 +33,9 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
 
-// Initial position and zoom of the map
+// Initial position of the map (EPFL Agora)
 private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
+// Initial zoom of the map (Zoom made to be focused on the EPFL campus)
 private const val INITIAL_ZOOM = 17.0
 
 /** A screen that displays a map of the event: location with the associated tasks. */
@@ -46,14 +47,12 @@ fun EventMapScreen(viewModel: EventMapViewModel) {
     CenteredCircularIndicator()
     return
   }
-
   if (state.error != null) {
     ErrorMessage(errorMessage = state.error) { viewModel.fetchTasks() }
     return
   }
 
   Column(modifier = Modifier.fillMaxWidth().testTag("OSMMapScreen")) {
-    // EventMapView()
     EPFLMapView(modifier = Modifier.fillMaxWidth(), {}, state.markers)
   }
 }
@@ -125,7 +124,14 @@ fun rememberLifecycleObserver(mapView: MapView): LifecycleObserver =
 
 val markersList = mutableListOf<Marker>()
 
-/** A composable that displays a map view. */
+/**
+ * A map view that displays the EPFL campus
+ *
+ * @param modifier the modifier to apply to the map view
+ * @param onLoad the callback to call when the map is loaded (not used for the moment but could be
+ *   useful for trickiers UX features)
+ * @param markers the parsed markers list to display on the map
+ */
 @Composable
 fun EPFLMapView(
     modifier: Modifier,
@@ -134,9 +140,11 @@ fun EPFLMapView(
 ) {
   val mapViewState = rememberMapViewWithLifecycle()
 
-  // DEBUG
+  // A list to keep track of the markers in order to remove them
+  // A clean wouldn't work as the EPFL buildings is part of the overlay
   markersList.forEach { marker -> mapViewState.overlays.remove(marker) }
 
+  // For each markers, so for each task, add a marker on the map
   markers.forEach { markerData ->
     val marker = Marker(mapViewState)
     marker.title = markerData.name
@@ -149,6 +157,7 @@ fun EPFLMapView(
     markersList.add(marker)
   }
 
+  // OSM maps are displayed as an Android view component
   AndroidView(
       factory = { mapViewState }, modifier = modifier, update = { view -> onLoad?.invoke(view) })
 }
