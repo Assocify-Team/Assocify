@@ -82,39 +82,39 @@ class BudgetDetailedScreenTest :
         every { updateBudgetItem(any(), any(), any(), any()) } answers {}
       }
 
-    val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
-        mockk<AccountingSubCategoryAPI>() {
-            every { getSubCategories(any(), any(), any()) } answers
-                    {
-                        val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
-                        onSuccessCallback(subCategoryList)
-                    }
-            every { updateSubCategory(any(), any(), any()) } answers {}
-        }
+  val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
+      mockk<AccountingSubCategoryAPI>() {
+        every { getSubCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
+              onSuccessCallback(subCategoryList)
+            }
+        every { updateSubCategory(any(), any(), any()) } answers {}
+      }
 
-    val mockAccountingCategoryAPI: AccountingCategoryAPI =
-        mockk<AccountingCategoryAPI>() {
-            every { updateCategory(any(), any(), any(), any()) } answers {}
-            every { getCategories(any(), any(), any()) } answers
-                    {
-                        val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
-                        onSuccessCallback(categoryList)
-                    }
-        }
+  val mockAccountingCategoryAPI: AccountingCategoryAPI =
+      mockk<AccountingCategoryAPI>() {
+        every { updateCategory(any(), any(), any(), any()) } answers {}
+        every { getCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
+              onSuccessCallback(categoryList)
+            }
+      }
 
-    lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
-    lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
+  lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
+  lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-      budgetDetailedViewModel =
-          BudgetDetailedViewModel(
-              mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
-      balanceDetailedViewModel =
-          BalanceDetailedViewModel(
-              mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+    budgetDetailedViewModel =
+        BudgetDetailedViewModel(
+            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+    balanceDetailedViewModel =
+        BalanceDetailedViewModel(
+            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -205,7 +205,7 @@ class BudgetDetailedScreenTest :
     }
   }
 
-    /**Tests if the budget Item pop up is displayed and can cancel*/
+  /** Tests if the budget Item pop up is displayed and can cancel */
   @Test
   fun testEditDismissWorks() {
     with(composeTestRule) {
@@ -222,7 +222,7 @@ class BudgetDetailedScreenTest :
     }
   }
 
-    /** Tests if the budget item edit pop up is displayed and working correctly */
+  /** Tests if the budget item edit pop up is displayed and working correctly */
   @Test
   fun testEditModifyWorks() {
     with(composeTestRule) {
@@ -239,54 +239,54 @@ class BudgetDetailedScreenTest :
     }
   }
 
-    /** Tests if the subCategory edit pop up is displayed and working correctly */
-    @Test
-    fun testSubCatEditPopUp() {
-        with(composeTestRule) {
-            onNodeWithTag("editSubCat").performClick()
-            assert(budgetDetailedViewModel.uiState.value.subCatEditing)
-            onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
-            onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
-            onNodeWithTag("editSubCategoryNameBox").performTextClearance()
-            onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
-            onNodeWithTag("editSubCategoryYearBox").assertIsDisplayed()
-            onNodeWithTag("editSubCategoryYearBox").performTextClearance()
-            onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
-            onNodeWithTag("categoryDropdown").assertIsDisplayed()
-            // onNodeWithTag("categoryDropdown").performClick()
-            // onNodeWithText("Events").performClick()
-            onNodeWithTag("editSubCategorySaveButton").performClick()
-            onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
-            assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
-            onNodeWithText("newName").assertIsDisplayed()
-            assert(budgetDetailedViewModel.uiState.value.subCategory.name == "newName")
-            assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2024)
-            // assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
-        }
+  /** Tests if the subCategory edit pop up is displayed and working correctly */
+  @Test
+  fun testSubCatEditPopUp() {
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      assert(budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategoryYearBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryYearBox").performTextClearance()
+      onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
+      onNodeWithTag("categoryDropdown").assertIsDisplayed()
+      // onNodeWithTag("categoryDropdown").performClick()
+      // onNodeWithText("Events").performClick()
+      onNodeWithTag("editSubCategorySaveButton").performClick()
+      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
+      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithText("newName").assertIsDisplayed()
+      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "newName")
+      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2024)
+      // assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
     }
+  }
 
-    /** Tests if the subCategory edit pop up is canceled correctly */
-    @Test
-    fun testSubCatEditCancel() {
-        with(composeTestRule) {
-            onNodeWithTag("editSubCat").performClick()
-            assert(budgetDetailedViewModel.uiState.value.subCatEditing)
-            onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
-            onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
-            onNodeWithTag("editSubCategoryNameBox").performTextClearance()
-            onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
-            onNodeWithTag("editSubCategoryYearBox").assertIsDisplayed()
-            onNodeWithTag("editSubCategoryYearBox").performTextClearance()
-            onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
-            onNodeWithTag("categoryDropdown").performClick()
-            onNodeWithText("Sponsorship").performClick()
-            onNodeWithTag("editSubCategoryCancelButton").performClick()
-            onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
-            assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
-            onNodeWithText("newName").assertIsNotDisplayed()
-            assert(budgetDetailedViewModel.uiState.value.subCategory.name == "Logistics")
-            assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2023)
-            assert(budgetDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
-        }
+  /** Tests if the subCategory edit pop up is canceled correctly */
+  @Test
+  fun testSubCatEditCancel() {
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      assert(budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategoryYearBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryYearBox").performTextClearance()
+      onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
+      onNodeWithTag("categoryDropdown").performClick()
+      onNodeWithText("Sponsorship").performClick()
+      onNodeWithTag("editSubCategoryCancelButton").performClick()
+      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
+      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithText("newName").assertIsNotDisplayed()
+      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "Logistics")
+      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2023)
+      assert(budgetDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
     }
+  }
 }
