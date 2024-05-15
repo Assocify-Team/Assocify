@@ -25,7 +25,6 @@ class BudgetDetailedViewModel(
     private var balanceApi: BalanceAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
-    private var navigationActions: NavigationActions,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
