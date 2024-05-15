@@ -23,8 +23,7 @@ class BalanceDetailedViewModel(
     private var balanceApi: BalanceAPI,
     private var receiptAPI: ReceiptAPI,
     private var subCategoryAPI: AccountingSubCategoryAPI,
-    private var subCategoryUid: String,
-    private var assocUid: String
+    private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
   val uiState: StateFlow<BalanceItemState>
@@ -37,15 +36,6 @@ class BalanceDetailedViewModel(
   /** Update the database values */
   private fun updateDatabaseValues() {
     // Get the receipt items from the database
-    /*TODO: filter to only the receipts of the current assoc */
-    receiptAPI.getAllReceipts(
-        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
-
-    // Get the subcategories from the database
-    subCategoryAPI.getSubCategories(
-        CurrentUser.associationUid!!,
-        { asc -> _uiState.value = _uiState.value.copy(subCategoryList = asc) },
-        {})
     // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,

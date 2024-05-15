@@ -37,7 +37,7 @@ fun NavGraphBuilder.treasuryGraph(
     TreasuryScreen(navigationActions, accountingViewModel, receiptListViewModel, treasuryViewModel)
   }
   receiptGraph(navigationActions, receiptsAPI)
-  budgetDetailedGraph(navigationActions, budgetAPI, balanceAPI)
-  balanceDetailedGraph(navigationActions, budgetAPI, balanceAPI)
+  budgetDetailedGraph(navigationActions, budgetAPI, balanceAPI, receiptsAPI, accountingSubCategoryAPI)
+  balanceDetailedGraph(navigationActions, budgetAPI, balanceAPI, receiptsAPI, accountingSubCategoryAPI)
   addAccountingCategory(navigationActions)
 }

@@ -251,33 +251,35 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   var tvaString by remember { mutableStateOf("") }
   var tvaTypeString by remember { mutableStateOf("") }
   var descriptionString by remember { mutableStateOf("") }
-  var date by remember { mutableStateOf(LocalDate.now()) }
+  val date by remember { mutableStateOf(LocalDate.now()) }
   var assignee by remember { mutableStateOf("") }
-  var status by remember { mutableStateOf(Status.Pending) }
+  val status by remember { mutableStateOf(Status.Pending) }
   Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
     Card(
-        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
-        shape = RoundedCornerShape(16.dp),
+      modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
+      shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
         Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = nameString,
-            onValueChange = { nameString = it },
-            label = { Text("Name") },
-            supportingText = {})
-        /*TODO: insert category and receipt value*/
-        OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = amount.toString(),
-            onValueChange = { amount = it.toInt() },
-            label = { Text("Amount") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-            supportingText = {})
+          modifier = Modifier.padding(8.dp),
+          value = nameString,
+          onValueChange = { nameString = it },
+          label = { Text("Name") },
+          supportingText = {})
         Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
           var tvaExtended by remember { mutableStateOf(false) }
           FilterChip(
+            modifier = Modifier.fillMaxWidth().height(60.dp),
+            selected = tvaExtended,
+            onClick = { tvaExtended = !tvaExtended },
+            label = { Text(tvaTypeString) },
+            trailingIcon = {
+              Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+            })
+          Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            var tvaExtended by remember { mutableStateOf(false) }
+            FilterChip(
               modifier = Modifier.fillMaxWidth().height(60.dp),
               selected = tvaExtended,
               onClick = { tvaExtended = !tvaExtended },
@@ -285,64 +287,86 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               trailingIcon = {
                 Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
               })
-          DropdownMenu(
-              modifier = Modifier,
-              expanded = tvaExtended,
-              onDismissRequest = { tvaExtended = false },
-              properties = PopupProperties(focusable = true)) {
+            OutlinedTextField(
+              modifier = Modifier.padding(8.dp),
+              value = amount.toString(),
+              onValueChange = { amount = it.toInt() },
+              label = { Text("Amount") },
+              keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+              supportingText = {})
+            Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+              var tvaExtended by remember { mutableStateOf(false) }
+              FilterChip(
+                modifier = Modifier.fillMaxWidth().height(60.dp),
+                selected = tvaExtended,
+                onClick = { tvaExtended = !tvaExtended },
+                label = { Text(tvaTypeString) },
+                trailingIcon = {
+                  Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+                })
+              DropdownMenu(
+                modifier = Modifier,
+                expanded = tvaExtended,
+                onDismissRequest = { tvaExtended = false },
+                properties = PopupProperties(focusable = true)
+              ) {
                 TVA.entries.forEach { tva ->
                   DropdownMenuItem(
-                      text = { Text(tva.toString()) },
-                      onClick = {
-                        tvaTypeString = tva.toString()
-                        tvaString = tva.rate.toString()
-                        tvaExtended = false
-                      })
+                    text = { Text(tva.toString()) },
+                    onClick = {
+                      tvaTypeString = tva.toString()
+                      tvaString = tva.rate.toString()
+                      tvaExtended = false
+                    })
                 }
               }
-        }
-        OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = descriptionString,
-            onValueChange = { descriptionString = it },
-            label = { Text("Description") },
-            supportingText = {})
-        /*TODO: insert date picker*/
-        OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = assignee,
-            onValueChange = { assignee = it },
-            label = { Text("Assignee") },
-            supportingText = {})
-        /*TODO: insert status picker*/
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(15.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-          Button(
-              onClick = { balanceDetailedViewModel.cancelEditing() },
-              modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
-          ) {
-            Text("Dismiss")
-          }
-          Button(
-              onClick = {
-                balanceDetailedViewModel.saveEditing(
+            }
+            OutlinedTextField(
+              modifier = Modifier.padding(8.dp),
+              value = descriptionString,
+              onValueChange = { descriptionString = it },
+              label = { Text("Description") },
+              supportingText = {})
+            /*TODO: insert date picker*/
+            OutlinedTextField(
+              modifier = Modifier.padding(8.dp),
+              value = assignee,
+              onValueChange = { assignee = it },
+              label = { Text("Assignee") },
+              supportingText = {})
+            /*TODO: insert status picker*/
+            Row(
+              modifier = Modifier.fillMaxWidth().padding(15.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+              Button(
+                onClick = { balanceDetailedViewModel.cancelEditing() },
+                modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
+              ) {
+                Text("Dismiss")
+              }
+              Button(
+                onClick = {
+                  balanceDetailedViewModel.saveEditing(
                     BalanceItem(
-                        balance.uid,
-                        nameString,
-                        "",
-                        "",
-                        amount,
-                        TVA.floatToTVA(tvaString.toFloat()),
-                        descriptionString,
-                        date,
-                        assignee,
-                        status))
-              },
-              modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
-          ) {
-            Text("Confirm")
+                      balance.uid,
+                      nameString,
+                      "",
+                      "",
+                      amount,
+                      TVA.floatToTVA(tvaString.toFloat()),
+                      descriptionString,
+                      date,
+                      assignee,
+                      status
+                    )
+                  )
+                },
+                modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
+              ) {
+                Text("Confirm")
+              }
+            }
           }
         }
       }
