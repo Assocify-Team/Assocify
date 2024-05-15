@@ -180,7 +180,13 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
                           .aspectRatio(1f)
                           .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                      if (receiptState.receiptImageURI != null) {
+                      if (receiptState.imageLoading) {
+                        CenteredCircularIndicator()
+                      } else if (receiptState.imageError != null) {
+                        ErrorMessage(errorMessage = receiptState.imageError) {
+                          viewModel.loadImage()
+                        }
+                      } else if (receiptState.receiptImageURI != null) {
                         AsyncImage(
                             model = receiptState.receiptImageURI,
                             modifier = Modifier.align(Alignment.Center),
@@ -192,6 +198,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
                             imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
                             contentDescription = "receipt icon")
                       }
+
                       FilledIconButton(
                           modifier =
                               Modifier.testTag("editImageButton")
