@@ -25,6 +25,7 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.util.DateUtil
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -49,7 +50,6 @@ fun AccountingScreen(
   val subCategoryList = model.subCategoryList
 
   LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
-
     // display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
       items(subCategoryList) {
@@ -84,7 +84,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   val model by accountingViewModel.uiState.collectAsState()
 
   // filter bar lists
-  val yearList = listOf("2023", "2022", "2021")
+  val yearList = DateUtil.getYearList()
   val tvaList: List<String> = listOf("TTC", "HT")
   val categoryList = listOf("Global") + model.categoryList.map { it.name }
 
@@ -95,7 +95,10 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 
   // Row of dropdown filters
   Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
-    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") { selectedYear = it }
+    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") {
+      selectedYear = it
+      accountingViewModel.onYearFilter(selectedYear.toInt())
+    }
     DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
       selectedCategory = it
       accountingViewModel.onSelectedCategory(selectedCategory)

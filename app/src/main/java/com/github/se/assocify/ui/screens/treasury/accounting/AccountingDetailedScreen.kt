@@ -59,6 +59,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
+import com.github.se.assocify.ui.util.DateUtil
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -85,7 +86,7 @@ fun AccountingDetailedScreen(
         AccountingPage.BUDGET -> budgetModel.subCategory
       }
 
-  val yearList = listOf("2023", "2022", "2021")
+  val yearList = DateUtil.getYearList()
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("HT", "TTC")
 

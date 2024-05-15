@@ -1,7 +1,9 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,6 +15,37 @@ import kotlinx.serialization.Serializable
  */
 class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
   private val collection = "accounting_subcategory"
+
+  private var subCategoryCache: List<AccountingSubCategory>? = null
+  private var subCategoryCacheAssociationUID: String? = null
+
+  init {
+    CurrentUser.associationUid?.let { updateSubCategoryCache(it, {}, {}) }
+  }
+
+  /**
+   * Get the subcategories of an association, but force an update of the cache
+   *
+   * @param associationUID the unique identifier of the association
+   * @param onSuccess the callback to be called when the subcategories are retrieved
+   * @param onFailure the callback to be called when the subcategories could not be retrieved
+   */
+  fun updateSubCategoryCache(
+      associationUID: String,
+      onSuccess: (List<AccountingSubCategory>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      val subCategories =
+          db.from(collection)
+              .select { filter { SupabaseAccountingSubCategory::associationUID eq associationUID } }
+              .decodeList<SupabaseAccountingSubCategory>()
+              .map { it.toAccountingSubCategory() }
+      subCategoryCache = subCategories
+      subCategoryCacheAssociationUID = associationUID
+      onSuccess(subCategories)
+    }
+  }
 
   /**
    * Get the subcategories of an association
@@ -26,13 +59,10 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<AccountingSubCategory>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
-      val subCategories =
-          db.postgrest
-              .from(collection)
-              .select { filter { SupabaseAccountingSubCategory::associationUID eq associationUID } }
-              .decodeList<SupabaseAccountingSubCategory>()
-      onSuccess(subCategories.map { it.toAccountingSubCategory() })
+    if (subCategoryCacheAssociationUID == associationUID && subCategoryCache != null) {
+      onSuccess(subCategoryCache!!)
+    } else {
+      updateSubCategoryCache(associationUID, onSuccess, onFailure)
     }
   }
 
@@ -62,6 +92,9 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
                   amount = subCategory.amount,
                   year = subCategory.year))
 
+      if (subCategoryCacheAssociationUID == associationUID) {
+        subCategoryCache = subCategoryCache?.plus(subCategory)
+      }
       onSuccess()
     }
   }
@@ -87,6 +120,15 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       }) {
         filter { SupabaseAccountingSubCategory::uid eq subCategory.uid }
       }
+
+      subCategoryCache =
+          subCategoryCache?.map {
+            if (it.uid == subCategory.uid) {
+              subCategory
+            } else {
+              it
+            }
+          }
       onSuccess()
     }
   }
@@ -107,6 +149,8 @@ class AccountingSubCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       db.postgrest.from(collection).delete {
         filter { SupabaseAccountingSubCategory::uid eq subCategory.uid }
       }
+
+      subCategoryCache = subCategoryCache?.filter { it.uid != subCategory.uid }
       onSuccess()
     }
   }

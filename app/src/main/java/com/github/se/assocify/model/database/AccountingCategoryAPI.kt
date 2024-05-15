@@ -1,14 +1,46 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.from
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
 
   private val collectionName = "accounting_category"
+
+  private var categoryCache: List<AccountingCategory>? = null
+  private var categoryCacheAssociationUID: String? = null
+
+  init {
+    CurrentUser.associationUid?.let { updateCategoryCache(it, {}, {}) }
+  }
+
+  /**
+   * Get the categories of an association, but force an update of the cache
+   *
+   * @param associationUID the unique identifier of the association
+   * @param onSuccess the callback to be called when the categories are retrieved
+   * @param onFailure the callback to be called when the categories could not be retrieved
+   */
+  fun updateCategoryCache(
+      associationUID: String,
+      onSuccess: (List<AccountingCategory>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      val categories =
+          db.from(collectionName)
+              .select { filter { SupabaseAccountingCategory::associationUID eq associationUID } }
+              .decodeList<SupabaseAccountingCategory>()
+              .map { it.toAccountingCategory() }
+      categoryCache = categories
+      categoryCacheAssociationUID = associationUID
+      onSuccess(categories)
+    }
+  }
 
   /**
    * Get the categories of an association
@@ -23,13 +55,10 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<AccountingCategory>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
-      val categories =
-          db.postgrest
-              .from(collectionName)
-              .select { filter { SupabaseAccountingCategory::associationUID eq associationUID } }
-              .decodeList<SupabaseAccountingCategory>()
-      onSuccess(categories.map { it.toAccountingCategory() })
+    if (categoryCacheAssociationUID == associationUID && categoryCache != null) {
+      categoryCache?.let { onSuccess(it) }
+    } else {
+      updateCategoryCache(associationUID, onSuccess, onFailure)
     }
   }
 
@@ -48,11 +77,14 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.postgrest
-          .from(collectionName)
+      db.from(collectionName)
           .insert(
               SupabaseAccountingCategory(
                   uid = category.uid, associationUID = associationUID, name = category.name))
+
+      if (categoryCacheAssociationUID == associationUID) {
+        categoryCache = categoryCache?.plus(category)
+      }
       onSuccess()
     }
   }
@@ -72,14 +104,24 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.postgrest.from(collectionName).update({
-        SupabaseAccountingCategory::name setTo category.name
-      }) {
+      db.from(collectionName).update({ SupabaseAccountingCategory::name setTo category.name }) {
         filter {
           SupabaseAccountingCategory::uid eq category.uid
           SupabaseAccountingCategory::associationUID eq associationUID
         }
       }
+
+      if (categoryCacheAssociationUID == associationUID) {
+        categoryCache =
+            categoryCache?.map {
+              if (it.uid == category.uid) {
+                category
+              } else {
+                it
+              }
+            }
+      }
+
       onSuccess()
     }
   }
@@ -97,9 +139,10 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.postgrest.from(collectionName).delete {
-        filter { SupabaseAccountingCategory::uid eq category.uid }
-      }
+      db.from(collectionName).delete { filter { SupabaseAccountingCategory::uid eq category.uid } }
+
+      categoryCache = categoryCache?.filter { it.uid != category.uid }
+
       onSuccess()
     }
   }
