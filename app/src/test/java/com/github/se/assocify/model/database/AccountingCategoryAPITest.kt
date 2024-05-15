@@ -65,13 +65,15 @@ class AccountingCategoryAPITest {
 
     api.getCategories(CurrentUser.associationUid.toString(), onSuccess, onFailure)
     verify(timeout = 400) { onSuccess(any()) }
-    clearMocks(onSuccess)
+    verify(exactly = 0) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
 
     error = true
 
     // Test cache
     api.getCategories(CurrentUser.associationUid.toString(), onSuccess, onFailure)
     verify(timeout = 400) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -89,6 +91,7 @@ class AccountingCategoryAPITest {
         onFailure)
 
     verify(timeout = 400) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -106,6 +109,7 @@ class AccountingCategoryAPITest {
         onFailure)
 
     verify(timeout = 400) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -122,5 +126,6 @@ class AccountingCategoryAPITest {
         onFailure)
 
     verify(timeout = 400) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
   }
 }

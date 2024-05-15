@@ -95,6 +95,7 @@ class AccountingSubCategoryTest {
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -111,6 +112,7 @@ class AccountingSubCategoryTest {
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -131,5 +133,6 @@ class AccountingSubCategoryTest {
         onSuccess,
         onFailure)
     verify(timeout = 400) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
   }
 }
