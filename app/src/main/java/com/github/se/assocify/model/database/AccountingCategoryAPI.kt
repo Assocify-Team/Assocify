@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.AccountingCategory
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
@@ -12,6 +13,10 @@ class AccountingCategoryAPI(val db: SupabaseClient) : SupabaseApi() {
 
   private var categoryCache: List<AccountingCategory>? = null
   private var categoryCacheAssociationUID: String? = null
+
+  init {
+    CurrentUser.associationUid?.let { updateCategoryCache(it, {}, {}) }
+  }
 
   /**
    * Get the categories of an association, but force an update of the cache
