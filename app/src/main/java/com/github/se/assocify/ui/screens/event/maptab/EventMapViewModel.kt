@@ -23,11 +23,13 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
 
   /** Fetch the tasks from the database */
   fun fetchTasks() {
+    // Set the loading state
     _uiState.value = _uiState.value.copy(loading = true, error = null)
+    // Fetch the tasks from the database
     taskAPI.getTasks(
         { tasks ->
           filterTasks(tasks)
-          _uiState.value = _uiState.value.copy(tasks = tasks, loading = false, error = null)
+          _uiState.value = _uiState.value.copy(taskList = tasks, loading = false, error = null)
         },
         { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks") })
   }
@@ -37,7 +39,7 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
    *
    * @param tasks the tasks to filter
    */
-  private fun filterTasks(tasks: List<Task> = _uiState.value.tasks) {
+  private fun filterTasks(tasks: List<Task> = _uiState.value.taskList) {
     // Filters requires cleaning the markers
     _uiState.value = _uiState.value.copy(markers = emptyList())
     // Now filter
@@ -67,7 +69,7 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
 data class EventMapState(
     val loading: Boolean = false,
     val error: String? = null,
-    val tasks: List<Task> = emptyList(),
+    val taskList: List<Task> = emptyList(),
     val currentEventTasks: List<Task> = emptyList(),
     val filteredEventsUid: List<String> = emptyList(),
     val markers: List<MapMarkerData> = emptyList()
