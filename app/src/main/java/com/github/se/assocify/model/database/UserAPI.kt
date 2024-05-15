@@ -106,8 +106,9 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
     tryAsync(onFailure) {
       db.from("users").update({ User::name setTo newName }) { filter { User::uid eq userId } }
 
-      if (userCache[userId] != null) {
-        userCache[userId] = userCache[userId]!!.copy(name = newName)
+      val cachedValue = userCache[userId]
+      if (cachedValue != null) {
+        userCache[userId] = cachedValue.copy(name = newName)
       }
       onSuccess()
     }
