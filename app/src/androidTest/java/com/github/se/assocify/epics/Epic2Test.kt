@@ -23,13 +23,22 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.MaybeRemotePhoto
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.RoleType
+import com.github.se.assocify.model.entities.Status
+import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.every
 import io.mockk.mockk
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,14 +57,75 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   private lateinit var navController: TestNavHostController
   private lateinit var navActions: NavigationActions
 
-  private val associationAPI = mockk<AssociationAPI> {}
-  private val userAPI = mockk<UserAPI> {}
-  private val eventAPI = mockk<EventAPI> {}
+  private val associations =
+      listOf(
+          Association("a", "asso1", "desc1", LocalDate.EPOCH),
+          Association("b", "asso2", "desc2", LocalDate.EPOCH),
+      )
 
+  private val user = User("1", "user1")
+
+  private val prevReceipts =
+      listOf(
+          Receipt(
+              "r1",
+              "Receipt-1-name",
+              "descR1",
+              LocalDate.EPOCH,
+              100,
+              Status.Pending,
+              MaybeRemotePhoto.Remote("r1")))
+
+  private val associationAPI =
+      mockk<AssociationAPI> {
+        every { getAssociations(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
+              onSuccessCallback.invoke(associations)
+            }
+
+        every { getAssociation(any(), any(), any()) } answers
+            {
+              val assoID = firstArg<String>()
+              val onSuccessCallback = secondArg<(Association) -> Unit>()
+              onSuccessCallback.invoke(associations.find { it.uid == assoID }!!)
+            }
+      }
+
+  private val userAPI =
+      mockk<UserAPI> {
+        every { getUser(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(User) -> Unit>()
+              onSuccessCallback.invoke(user)
+            }
+
+        every { getCurrentUserAssociations(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Association>) -> Unit>()
+              onSuccessCallback.invoke(associations)
+            }
+
+        every { getCurrentUserRole(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+              when (CurrentUser.associationUid) {
+                "a" -> {
+                  onSuccessCallback.invoke(PermissionRole("m", "a", RoleType.MEMBER))
+                }
+                "b" -> {
+                  onSuccessCallback.invoke(PermissionRole("m", "b", RoleType.MEMBER))
+                }
+              }
+            }
+      }
+
+  private val receiptAPI = mockk<ReceiptAPI> {}
+
+  private val eventAPI = mockk<EventAPI>(relaxUnitFun = true)
   private val taskAPI = mockk<TaskAPI>(relaxUnitFun = true)
   private val budgetAPI = mockk<BudgetAPI>(relaxUnitFun = true)
   private val balanceAPI = mockk<BalanceAPI>(relaxUnitFun = true)
-  private val receiptAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
   private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
   private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
   private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
