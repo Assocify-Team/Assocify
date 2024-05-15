@@ -264,7 +264,9 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balance = balanceModel.editedBalanceItem!!
   var nameString by remember { mutableStateOf("") }
   var subCategoryUid by remember { mutableStateOf("") }
+  var subCategoryName by remember { mutableStateOf("") }
   var receiptUid by remember { mutableStateOf("") }
+  var receiptName by remember { mutableStateOf("") }
   var amount by remember { mutableIntStateOf(0) }
   var tvaString by remember { mutableStateOf("") }
   var tvaTypeString by remember { mutableStateOf("") }
@@ -294,34 +296,35 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
         }
         // The subcategory selector
         item {
-          Box(
+          var subcategoryExpanded by remember { mutableStateOf(false) }
+          ExposedDropdownMenuBox(
+            expanded = subcategoryExpanded,
+            onExpandedChange = { subcategoryExpanded = !subcategoryExpanded },
             modifier = Modifier
-              .fillMaxWidth()
+              .testTag("categoryDropdown")
               .padding(8.dp)
           ) {
-            var subExtended by remember { mutableStateOf(false) }
-            FilterChip(
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-              selected = subExtended,
-              onClick = { subExtended = !subExtended },
-              label = { Text(subCategoryUid) },
+            OutlinedTextField(
+              value = subCategoryUid,
+              onValueChange = {},
+              label = { Text("SubCategory") },
               trailingIcon = {
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-              })
-            DropdownMenu(
-              modifier = Modifier,
-              expanded = subExtended,
-              onDismissRequest = { subExtended = false },
-              properties = PopupProperties(focusable = true)
-            ) {
-              balanceModel.subCategoryList.forEach { subBalance ->
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = subcategoryExpanded)
+              },
+              readOnly = true,
+              colors = ExposedDropdownMenuDefaults.textFieldColors(),
+              modifier = Modifier
+                .menuAnchor()
+                .clickable { subcategoryExpanded = !subcategoryExpanded })
+            ExposedDropdownMenu(
+              expanded = subcategoryExpanded, onDismissRequest = { subcategoryExpanded = false }) {
+              balanceModel.subCategoryList.forEach { subCat ->
                 DropdownMenuItem(
-                  text = { Text(subBalance.name) },
+                  text = { Text(subCat.name) },
                   onClick = {
-                    subCategoryUid = subBalance.uid
-                    subExtended = false
+                    subCategoryUid = subCat.uid
+                    subCategoryName = subCat.name
+                    subcategoryExpanded = false
                   })
               }
             }
@@ -329,39 +332,41 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
         }
         // The receipt selector
         item {
-          Box(
+          var receiptExpanded by remember { mutableStateOf(false) }
+          ExposedDropdownMenuBox(
+            expanded = receiptExpanded,
+            onExpandedChange = { receiptExpanded = !receiptExpanded },
             modifier = Modifier
-              .fillMaxWidth()
+              .testTag("categoryDropdown")
               .padding(8.dp)
           ) {
-            var receiptExtended by remember { mutableStateOf(false) }
-            FilterChip(
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-              selected = receiptExtended,
-              onClick = { receiptExtended = !receiptExtended },
-              label = { Text(receiptUid) },
+            OutlinedTextField(
+              value = receiptUid,
+              onValueChange = {},
+              label = { Text("Receipt") },
               trailingIcon = {
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-              })
-            DropdownMenu(
-              modifier = Modifier,
-              expanded = receiptExtended,
-              onDismissRequest = { receiptExtended = false },
-              properties = PopupProperties(focusable = true)
-            ) {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = receiptExpanded)
+              },
+              readOnly = true,
+              colors = ExposedDropdownMenuDefaults.textFieldColors(),
+              modifier = Modifier
+                .menuAnchor()
+                .clickable { receiptExpanded = !receiptExpanded })
+            ExposedDropdownMenu(
+              expanded = receiptExpanded, onDismissRequest = { receiptExpanded = false }) {
               balanceModel.receiptList.forEach { receipt ->
                 DropdownMenuItem(
                   text = { Text(receipt.title) },
                   onClick = {
                     receiptUid = receipt.uid
-                    receiptExtended = false
+                    receiptName = receipt.title
+                    receiptExpanded = false
                   })
               }
             }
           }
         }
+
         // The amount field
         item {
           OutlinedTextField(
@@ -375,35 +380,34 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
 
         //The TVA box
         item {
-          Box(
+          var tvaExpanded by remember { mutableStateOf(false) }
+          ExposedDropdownMenuBox(
+            expanded = tvaExpanded,
+            onExpandedChange = { tvaExpanded = !tvaExpanded },
             modifier = Modifier
-              .fillMaxWidth()
+              .testTag("categoryDropdown")
               .padding(8.dp)
           ) {
-            var tvaExtended by remember { mutableStateOf(false) }
-            FilterChip(
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-              selected = tvaExtended,
-              onClick = { tvaExtended = !tvaExtended },
-              label = { Text(tvaTypeString) },
+            OutlinedTextField(
+              value = tvaString,
+              onValueChange = {},
+              label = { Text("Tva") },
               trailingIcon = {
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-              })
-            DropdownMenu(
-              modifier = Modifier,
-              expanded = tvaExtended,
-              onDismissRequest = { tvaExtended = false },
-              properties = PopupProperties(focusable = true)
-            ) {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = tvaExpanded)
+              },
+              readOnly = true,
+              colors = ExposedDropdownMenuDefaults.textFieldColors(),
+              modifier = Modifier
+                .menuAnchor()
+                .clickable { tvaExpanded = !tvaExpanded })
+            ExposedDropdownMenu(
+              expanded = tvaExpanded, onDismissRequest = { tvaExpanded = false }) {
               TVA.entries.forEach { tva ->
                 DropdownMenuItem(
                   text = { Text(tva.toString()) },
                   onClick = {
-                    tvaTypeString = tva.toString()
                     tvaString = tva.rate.toString()
-                    tvaExtended = false
+                    tvaExpanded = false
                   })
               }
             }
