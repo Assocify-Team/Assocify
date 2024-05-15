@@ -121,7 +121,7 @@ fun AccountingDetailedScreen(
       content = { innerPadding ->
         if (budgetModel.editing && page == AccountingPage.BUDGET) {
           DisplayEditBudget(budgetDetailedViewModel)
-        } else if (page == AccountingPage.BALANCE) {
+        } else if (balanceModel.editing && page == AccountingPage.BALANCE) {
           DisplayEditBalance(balanceDetailedViewModel)
         }
 
@@ -152,7 +152,6 @@ fun AccountingDetailedScreen(
 
               // Tva filter
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-                // TODO: budgetDetailedViewModel.onTVAFilter(it)
               }
             }
           }

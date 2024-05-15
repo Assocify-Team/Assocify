@@ -75,7 +75,9 @@ class BalanceDetailedViewModel(
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(balanceList = statusFilteredList)
         },
-        {})
+        {
+          Log.e("BalanceDetailedViewModel", "Error getting balance list")
+        })
   }
 
   /**
