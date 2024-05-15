@@ -9,6 +9,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
 import io.ktor.http.Headers
+import io.mockk.clearMocks
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import io.mockk.verify
@@ -62,6 +63,13 @@ class AccountingCategoryAPITest {
         """
             .trimIndent()
 
+    api.getCategories(CurrentUser.associationUid.toString(), onSuccess, onFailure)
+    verify(timeout = 400) { onSuccess(any()) }
+    clearMocks(onSuccess)
+
+    error = true
+
+    // Test cache
     api.getCategories(CurrentUser.associationUid.toString(), onSuccess, onFailure)
     verify(timeout = 400) { onSuccess(any()) }
   }

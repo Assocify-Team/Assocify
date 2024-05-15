@@ -8,6 +8,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
 import io.ktor.http.Headers
+import io.mockk.clearMocks
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import io.mockk.verify
@@ -64,6 +65,15 @@ class AccountingSubCategoryTest {
     api.getSubCategories("cb7b1079-cb62-40b9-9f35-7667fea4748d", onSuccess, onFailure)
 
     verify(timeout = 400) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
+
+    // Test cache
+    error = true
+
+    api.getSubCategories("cb7b1079-cb62-40b9-9f35-7667fea4748d", onSuccess, onFailure)
+    verify(timeout = 400) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
