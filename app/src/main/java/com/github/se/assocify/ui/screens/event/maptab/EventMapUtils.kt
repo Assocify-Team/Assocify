@@ -4,13 +4,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
-/**
- * Load the map overlay with the markers of the tasks
- */
-fun loadMapOverlay(
-  mapView: MapView,
-  viewModel: EventMapViewModel
-) {
+/** Load the map overlay with the markers of the tasks */
+fun loadMapOverlay(mapView: MapView, viewModel: EventMapViewModel) {
   val markers = viewModel.uiState.value.markers
   markers.forEach { markerData ->
     val marker = Marker(mapView)
@@ -24,9 +19,9 @@ fun loadMapOverlay(
 }
 
 /**
- * Convert the GeoPoint version of the latitude & longitude
- * to a String format used in the database storage.
- * The inverted version is GeoPoint.fromDoubleString
+ * Convert the GeoPoint version of the latitude & longitude to a String format used in the database
+ * storage. The inverted version is GeoPoint.fromDoubleString
+ *
  * @param location the GeoPoint version of the latitude & longitude
  */
 fun geoPointToString(location: GeoPoint): String {

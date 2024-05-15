@@ -20,30 +20,27 @@ import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.MapMarkerData
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.ErrorMessage
-import com.github.se.assocify.ui.screens.event.EventScreenViewModel
+import java.io.File
+import kotlin.random.Random
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory.WIKIMEDIA
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
-import java.io.File
-import kotlin.random.Random
 
 // Initial position and zoom of the map
 private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
 private const val INITIAL_ZOOM = 17.0
 
-
 /** A screen that displays a map of the event: location with the associated tasks. */
 @Composable
-fun EventMapScreen(viewModel: EventScreenViewModel) {
-  val state by viewModel.mapViewModel.uiState.collectAsState()
+fun EventMapScreen(viewModel: EventMapViewModel) {
+  val state by viewModel.uiState.collectAsState()
 
   if (state.loading) {
     CenteredCircularIndicator()
@@ -51,16 +48,13 @@ fun EventMapScreen(viewModel: EventScreenViewModel) {
   }
 
   if (state.error != null) {
-    ErrorMessage(errorMessage = state.error) { viewModel.mapViewModel.fetchTasks() }
+    ErrorMessage(errorMessage = state.error) { viewModel.fetchTasks() }
     return
   }
 
-
-  Column(modifier = Modifier
-    .fillMaxWidth()
-    .testTag("OSMMapScreen")) {
+  Column(modifier = Modifier.fillMaxWidth().testTag("OSMMapScreen")) {
     // EventMapView()
-    EPFLMapView(modifier = Modifier.fillMaxWidth(), { }, viewModel, state.markers)
+    EPFLMapView(modifier = Modifier.fillMaxWidth(), {}, state.markers)
   }
 }
 
@@ -69,14 +63,14 @@ fun EventMapScreen(viewModel: EventScreenViewModel) {
  */
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun rememberMapViewWithLifecycle(viewModel: EventScreenViewModel): MapView {
+fun rememberMapViewWithLifecycle(): MapView {
   val context = LocalContext.current
 
   // Update OSM configuration, for some reason
   Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
   Configuration.getInstance().tileFileSystemCacheMaxBytes = 50L * 1024 * 1024
   Configuration.getInstance().osmdroidTileCache =
-    File(context.cacheDir, "osmdroid").also { it.mkdir() }
+      File(context.cacheDir, "osmdroid").also { it.mkdir() }
 
   // Initialise the map view
   val mapView = remember {
@@ -106,7 +100,7 @@ fun rememberMapViewWithLifecycle(viewModel: EventScreenViewModel): MapView {
     onDispose { lifecycle.removeObserver(lifecycleObserver) }
   }
 
-  //loadMapOverlay(mapView, viewModel.mapViewModel)
+  // loadMapOverlay(mapView, viewModel.mapViewModel)
 
   return mapView
 }
@@ -133,11 +127,12 @@ val markersList = mutableListOf<Marker>()
 
 /** A composable that displays a map view. */
 @Composable
-fun EPFLMapView(modifier: Modifier,
-                onLoad: ((map: MapView) -> Unit)? = null,
-                viewModel: EventScreenViewModel,
-                markers: List<MapMarkerData>) {
-  val mapViewState = rememberMapViewWithLifecycle(viewModel)
+fun EPFLMapView(
+    modifier: Modifier,
+    onLoad: ((map: MapView) -> Unit)? = null,
+    markers: List<MapMarkerData>
+) {
+  val mapViewState = rememberMapViewWithLifecycle()
 
   // DEBUG
   markersList.forEach { marker -> mapViewState.overlays.remove(marker) }
