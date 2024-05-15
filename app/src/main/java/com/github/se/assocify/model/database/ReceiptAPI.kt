@@ -39,6 +39,10 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   /// The user's UID
   private var userUid: String? = CurrentUser.userUid
 
+  init {
+    updateCaches({ _, _ -> }, { _, _ -> })
+  }
+
   // TODO: caches should use mutable lists to be more efficient
   private fun updateReceiptInList(receipt: Receipt, receipts: List<Receipt>): List<Receipt> {
     val index = receipts.indexOfFirst { r -> r.uid == receipt.uid }
