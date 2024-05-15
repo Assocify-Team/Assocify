@@ -1,6 +1,5 @@
 package com.github.se.assocify.model.database
 
-import android.util.Log
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
@@ -273,7 +272,6 @@ class UserAPITest {
 
   @Test
   fun testGetCurrentUserRole() {
-    Log.i("TEST", "Start of test")
     val onSuccess: (PermissionRole) -> Unit = mockk(relaxed = true)
 
     response =
