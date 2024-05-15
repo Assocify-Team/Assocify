@@ -46,6 +46,7 @@ val dummyTasks =
             "Category 1",
             false,
             OffsetDateTime.of(2024, 3, 3, 9, 30, 0, 0, ZoneOffset.UTC),
+            60,
             2,
             "Catering",
             "Rolex",
