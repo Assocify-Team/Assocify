@@ -7,16 +7,14 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.clearMocks
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.OffsetDateTime
 import java.util.UUID
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
@@ -37,8 +35,8 @@ class EventAPITest {
   @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
-
-    Dispatchers.setMain(UnconfinedTestDispatcher())
+    APITestUtils.setup()
+    error = true
     eventAPI =
         EventAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -51,17 +49,25 @@ class EventAPITest {
                 }
               }
             })
+    error = false
   }
 
   @Test
   fun testGetEvent() {
     val onSuccess: (Event) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    error = true
+    eventAPI.updateEventCache({ fail("should not succeed") }, onFailure)
+    eventAPI.getEvent("$uuid1", { fail("should not succeed") }, onFailure)
+    verify(timeout = 100, exactly = 2) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
+
     error = false
 
     response =
         """
-            {
+            [{
                 "uid": "$uuid1",
                 "name": "Test Event",
                 "description": "Test Description",
@@ -69,17 +75,13 @@ class EventAPITest {
                 "end_date": "$responseTime",
                 "guests_or_artists": "Test Guest",
                 "location": "Test Location"
-            }
+            }]
         """
             .trimIndent()
 
     eventAPI.getEvent("$uuid1", onSuccess, onFailure)
     verify(timeout = 200) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
-
-    error = true
-    eventAPI.getEvent("$uuid1", onSuccess, onFailure)
-    verify(timeout = 100) { onFailure(any()) }
   }
 
   @Test

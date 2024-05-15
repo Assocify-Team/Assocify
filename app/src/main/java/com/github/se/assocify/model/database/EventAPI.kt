@@ -13,6 +13,16 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
 
   private var eventCache: List<Event>? = null
 
+  init {
+    updateEventCache({}, {})
+  }
+
+  /**
+   * Updates the event cache with the events from the database
+   *
+   * @param onSuccess called on success with the list of events
+   * @param onFailure called on failure
+   */
   fun updateEventCache(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       val events =
