@@ -11,11 +11,15 @@ object DateUtil {
   /**
    * Converts a date to a string. If the date is null, it returns a string representing a null date.
    */
-  fun toString(date: java.time.LocalDate?): String {
+  fun formatDate(date: java.time.LocalDate?): String {
     if (date == null) {
       return NULL_DATE_STRING
     }
     return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+  }
+
+  fun formatVerboseDate(date: java.time.LocalDate): String {
+    return date.format(DateTimeFormatter.ofPattern("EEE dd MMMM, yyyy"))
   }
 
   /**

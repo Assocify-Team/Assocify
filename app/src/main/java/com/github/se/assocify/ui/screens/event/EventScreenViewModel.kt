@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
+import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,7 @@ class EventScreenViewModel(
 ) : ViewModel() {
 
   val taskListViewModel: EventTaskViewModel = EventTaskViewModel(taskAPI) { showSnackbar(it) }
+  val scheduleViewModel: EventScheduleViewModel = EventScheduleViewModel(taskAPI)
 
   private val _uiState: MutableStateFlow<EventScreenState> = MutableStateFlow(EventScreenState())
   val uiState: StateFlow<EventScreenState> = _uiState
@@ -83,6 +85,7 @@ class EventScreenViewModel(
         }
     _uiState.value = _uiState.value.copy(selectedEvents = selectedEvents)
     taskListViewModel.setEvents(selectedEvents)
+    scheduleViewModel.setEvents(selectedEvents)
   }
 
   /**
