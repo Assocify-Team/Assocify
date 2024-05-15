@@ -43,7 +43,9 @@ class BudgetAPITest {
   @Before
   @OptIn(ExperimentalCoroutinesApi::class)
   fun setup() {
+    APITestUtils.setup()
     Dispatchers.setMain(UnconfinedTestDispatcher())
+    error = true
     budgetAPI =
         BudgetAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -56,6 +58,7 @@ class BudgetAPITest {
                 }
               }
             })
+    error = false
   }
 
   @Test
