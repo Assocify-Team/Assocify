@@ -27,12 +27,12 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.LocalTime
-import java.time.OffsetDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalTime
+import java.time.OffsetDateTime
 
 @RunWith(AndroidJUnit4::class)
 class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -265,6 +265,7 @@ class EditTaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           "Test Description",
           false,
           OffsetDateTime.now(),
+          60,
           5,
           "category",
           "location",
