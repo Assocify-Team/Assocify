@@ -21,14 +21,14 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import java.io.File
-import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
+import java.time.LocalDate
 
 @MockKExtension.ConfirmVerification
 class ReceiptsAPITest {
@@ -214,7 +214,7 @@ class ReceiptsAPITest {
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     error = true
-    api.getReceiptImage(remoteReceipt, { fail("Should not succeed") }, failureMock)
+    api.getReceiptImage(remoteReceipt.uid, { fail("Should not succeed") }, failureMock)
     verify(timeout = 1000) { failureMock.invoke(any()) }
   }
 
