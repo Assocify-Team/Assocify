@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
@@ -128,9 +127,7 @@ fun AccountingDetailedScreen(
             })
       },
       contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("AccountingDetailedScreen"),
+      modifier = Modifier.fillMaxWidth().testTag("AccountingDetailedScreen"),
       floatingActionButton = {
         FloatingActionButton(
             modifier = Modifier.testTag("createNewItem"),
@@ -147,20 +144,20 @@ fun AccountingDetailedScreen(
         } else if ((budgetState.subCatEditing && page == AccountingPage.BUDGET) ||
             (balanceState.subCatEditing && page == AccountingPage.BALANCE)) {
           DisplayEditSubCategory(
-              page, budgetDetailedViewModel, balanceDetailedViewModel, navigationActions, balanceState, budgetState)
+              page,
+              budgetDetailedViewModel,
+              balanceDetailedViewModel,
+              navigationActions,
+              balanceState,
+              budgetState)
         }
 
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding),
+            modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
           // Display the filter chips
           item {
-            Row(
-                Modifier
-                    .testTag("filterRowDetailed")
-                    .horizontalScroll(rememberScrollState())) {
+            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
                 when (page) {
@@ -233,9 +230,7 @@ fun AccountingDetailedScreen(
 @Composable
 fun TotalItems(totalAmount: Int) {
   ListItem(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("totalItems"),
+      modifier = Modifier.fillMaxWidth().testTag("totalItems"),
       headlineContent = {
         Text(
             text = "Total",
@@ -267,9 +262,7 @@ fun DisplayBudgetItem(
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
       modifier =
-      Modifier
-          .clickable { budgetDetailedViewModel.startEditing(budgetItem) }
-          .testTag(testTag))
+          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
 
 /**
@@ -292,9 +285,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       },
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
-      modifier = Modifier
-          .clickable {}
-          .testTag(testTag))
+      modifier = Modifier.clickable {}.testTag(testTag))
 }
 
 /**
@@ -315,17 +306,13 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
 
   Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
     Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .testTag("editDialogBox"),
+        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
         Text("Edit Budget Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
-            modifier = Modifier
-                .padding(8.dp)
-                .testTag("editNameBox"),
+            modifier = Modifier.padding(8.dp).testTag("editNameBox"),
             value = nameString,
             onValueChange = { nameString = it },
             label = { Text("Name") },
@@ -337,14 +324,10 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
           var tvaExtended by remember { mutableStateOf(false) }
           FilterChip(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .height(60.dp),
+              modifier = Modifier.fillMaxWidth().height(60.dp),
               selected = tvaExtended,
               onClick = { tvaExtended = !tvaExtended },
               label = { Text(tvaTypeString) },
@@ -381,16 +364,12 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
+            modifier = Modifier.fillMaxWidth().padding(15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Button(
               onClick = { budgetViewModel.cancelEditing() },
-              modifier = Modifier
-                  .padding(15.dp)
-                  .testTag("editDismissButton"),
+              modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
           ) {
             Text("Dismiss")
           }
@@ -406,9 +385,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
                         subcategoryUID = budget.subcategoryUID,
                         year = yearString.toInt()))
               },
-              modifier = Modifier
-                  .padding(15.dp)
-                  .testTag("editConfirmButton"),
+              modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
           ) {
             Text("Confirm")
           }
@@ -465,44 +442,43 @@ fun DisplayEditSubCategory(
       properties = DialogProperties()) {
         Card(
             modifier =
-            Modifier
-                .padding(vertical = 16.dp, horizontal = 8.dp)
-                .testTag("editSubCategoryDialog"),
+                Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
+                    .testTag("editSubCategoryDialog"),
             shape = RoundedCornerShape(16.dp),
         ) {
           Column(
-              modifier = Modifier
-                  .verticalScroll(rememberScrollState())
-                  .padding(8.dp),
+              modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
               horizontalAlignment = Alignment.CenterHorizontally) {
+                // Title
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
-                    Icon(Icons.Default.Close, contentDescription = "Close dialog", modifier =
-                            Modifier.clickable {
+                  Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
+                  Icon(
+                      Icons.Default.Close,
+                      contentDescription = "Close dialog",
+                      modifier =
+                          Modifier.clickable {
                                 when (page) {
-                                    AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditing()
-                                    AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
+                                  AccountingPage.BALANCE ->
+                                      balanceViewModel.cancelSubCategoryEditing()
+                                  AccountingPage.BUDGET ->
+                                      budgetViewModel.cancelSubCategoryEditing()
                                 }
-                            })
+                              }
+                              .testTag("editSubCategoryCancelButton"))
                 }
 
+                // Edit fields
                 OutlinedTextField(
-                    modifier = Modifier
-                        .testTag("editSubCategoryNameBox")
-                        .padding(8.dp),
+                    modifier = Modifier.testTag("editSubCategoryNameBox").padding(8.dp),
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
                     supportingText = {})
                 OutlinedTextField(
-                    modifier = Modifier
-                        .testTag("editSubCategoryYearBox")
-                        .padding(8.dp),
+                    modifier = Modifier.testTag("editSubCategoryYearBox").padding(8.dp),
                     value = year,
                     onValueChange = { year = it },
                     label = { Text("Year") },
@@ -511,9 +487,7 @@ fun DisplayEditSubCategory(
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
-                    modifier = Modifier
-                        .testTag("categoryDropdown")
-                        .padding(8.dp)) {
+                    modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                       OutlinedTextField(
                           value = selectedCategory,
                           onValueChange = {},
@@ -523,9 +497,7 @@ fun DisplayEditSubCategory(
                           },
                           readOnly = true,
                           colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                          modifier = Modifier
-                              .menuAnchor()
-                              .clickable { expanded = !expanded })
+                          modifier = Modifier.menuAnchor().clickable { expanded = !expanded })
                       ExposedDropdownMenu(
                           expanded = expanded, onDismissRequest = { expanded = false }) {
                             categoryList.forEach { category ->
@@ -541,41 +513,38 @@ fun DisplayEditSubCategory(
                     }
               }
 
+          // Buttons
           Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(8.dp),
-              horizontalArrangement = Arrangement.Absolute.Right
-          ) {
-            // Delete button
-            TextButton(
-                onClick = {
-                  when (page) {
-                    AccountingPage.BALANCE -> balanceViewModel.deleteSubCategory()
-                    AccountingPage.BUDGET -> budgetViewModel.deleteSubCategory()
-                  }
-                    navigationActions.back()
-                },
-                modifier = Modifier.testTag("editSubCategoryDeleteButton")
-            ) {
-                  Text("Delete", color = MaterialTheme.colorScheme.error)
-                }
+              modifier = Modifier.fillMaxWidth().padding(8.dp),
+              horizontalArrangement = Arrangement.Absolute.Right) {
+                // Delete button
+                TextButton(
+                    onClick = {
+                      when (page) {
+                        AccountingPage.BALANCE -> balanceViewModel.deleteSubCategory()
+                        AccountingPage.BUDGET -> budgetViewModel.deleteSubCategory()
+                      }
+                      navigationActions.back()
+                    },
+                    modifier = Modifier.testTag("editSubCategoryDeleteButton")) {
+                      Text("Delete", color = MaterialTheme.colorScheme.error)
+                    }
 
-            // Save button
-            TextButton(
-                onClick = {
-                  when (page) {
-                    AccountingPage.BALANCE ->
-                        balanceViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
-                    AccountingPage.BUDGET ->
-                        budgetViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
-                  }
-                },
-                modifier = Modifier.testTag("editSubCategorySaveButton"),
-            ) {
-              Text("Save")
-            }
-          }
+                // Save button
+                TextButton(
+                    onClick = {
+                      when (page) {
+                        AccountingPage.BALANCE ->
+                            balanceViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
+                        AccountingPage.BUDGET ->
+                            budgetViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
+                      }
+                    },
+                    modifier = Modifier.testTag("editSubCategorySaveButton"),
+                ) {
+                  Text("Save")
+                }
+              }
         }
       }
 }

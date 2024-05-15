@@ -1,34 +1,27 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
-import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
-import com.github.se.assocify.model.entities.TVA
-import com.github.se.assocify.navigation.Destination
-import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.time.LocalDate
-import java.util.UUID
 
 /**
  * View model for the balance detailed screen
  *
  * @param balanceApi the balance api
  * @param accountingSubCategoryAPI the accounting subcategory api
+ * @param accountingCategoryAPI the accounting category api
  * @param subCategoryUid the subcategory uid
  */
 class BalanceDetailedViewModel(
     private var balanceApi: BalanceAPI,
-    private var budgetAPI: BudgetAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
     private var subCategoryUid: String
@@ -37,6 +30,7 @@ class BalanceDetailedViewModel(
   val uiState: StateFlow<BalanceItemState>
 
   init {
+
     updateDatabaseValues()
     setSubCategory(subCategoryUid)
     uiState = _uiState
@@ -136,34 +130,13 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 
-    /**Delete the subcategory and all items related to it*/
-    fun deleteSubCategory() {
-        //delete all balanceItems related to the subcategory
-        _uiState.value.balanceList.forEach { balanceItem ->
-            balanceApi.deleteBalance(balanceItem.uid, {}, {})
-        }
-
-        _uiState.value = _uiState.value.copy(
-            balanceList = emptyList())
-
-        //delete all budgetItems related to the subcategory
-        budgetAPI.getBudget(
-            CurrentUser.associationUid!!,
-            { budgetList ->
-                budgetList.filter { it.subcategoryUID == _uiState.value.subCategory.uid }
-                    .forEach { budgetItem ->
-                        budgetAPI.deleteBudgetItem(budgetItem.uid, {}, {})
-                    }
-            },
-            {})
-        
-        //delete subcategory
-        accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
-        _uiState.value = _uiState.value.copy(
-            subCategory = AccountingSubCategory("", "", "", 0, 2023))
-
-        _uiState.value = _uiState.value.copy(subCatEditing = false)
-    }
+  /** Delete the subcategory and all items related to it */
+  fun deleteSubCategory() {
+    // delete subcategory
+    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
+    _uiState.value = _uiState.value.copy(balanceList = emptyList())
+    _uiState.value = _uiState.value.copy(subCatEditing = false)
+  }
 }
 
 /**

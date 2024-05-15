@@ -111,10 +111,18 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI, mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockBudgetAPI,
+            mockBalanceAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI, mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockBalanceAPI,
+            mockBudgetAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
