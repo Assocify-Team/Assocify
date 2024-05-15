@@ -117,8 +117,7 @@ fun ScheduleContent(
                   Modifier.height((duration * hourHeight.value).dp)
                       .padding(horizontal = 4.dp, vertical = 2.dp)
                       .offset(y = startOffset)
-                      .clickable { viewModel.openTask(task.uid) }
-          ) {
+                      .clickable { viewModel.openTask(task.uid) }) {
                 ScheduleTask(task, lines)
               }
         }
