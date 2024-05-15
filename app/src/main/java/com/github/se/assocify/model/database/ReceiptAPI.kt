@@ -101,7 +101,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
 
       // Update the cache
-      if (CurrentUser.userUid == userUid) {
+      if (CurrentUser.userUid != userUid) {
         // Invalidate cache if the user changed
         userReceipts = null
         receipts = null
