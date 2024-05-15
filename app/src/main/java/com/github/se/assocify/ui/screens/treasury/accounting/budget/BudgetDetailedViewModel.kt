@@ -9,6 +9,7 @@ import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -24,6 +25,7 @@ class BudgetDetailedViewModel(
     private var balanceApi: BalanceAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
+    private var navigationActions: NavigationActions,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BudgetItemState> = MutableStateFlow(BudgetItemState())
@@ -135,7 +137,7 @@ class BudgetDetailedViewModel(
   /** Cancel the Subcategory editing */
   fun cancelSubCategoryEditing() {
     _uiState.value = _uiState.value.copy(subCatEditing = false)
-  } 
+  }
 
     /**Delete the subcategory and all items related to it*/
     fun deleteSubCategory() {

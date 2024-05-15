@@ -143,7 +143,7 @@ fun AccountingDetailedScreen(
         } else if ((budgetState.subCatEditing && page == AccountingPage.BUDGET) ||
             (balanceState.subCatEditing && page == AccountingPage.BALANCE)) {
           DisplayEditSubCategory(
-              page, budgetDetailedViewModel, balanceDetailedViewModel, balanceState, budgetState)
+              page, budgetDetailedViewModel, balanceDetailedViewModel, navigationActions, balanceState, budgetState)
         }
 
         LazyColumn(
@@ -404,6 +404,7 @@ fun DisplayEditSubCategory(
     page: AccountingPage,
     budgetViewModel: BudgetDetailedViewModel,
     balanceViewModel: BalanceDetailedViewModel,
+    navigationActions: NavigationActions,
     balanceState: BalanceItemState,
     budgetState: BudgetItemState
 ) {
@@ -496,6 +497,7 @@ fun DisplayEditSubCategory(
                     AccountingPage.BALANCE -> balanceViewModel.deleteSubCategory()
                     AccountingPage.BUDGET -> budgetViewModel.deleteSubCategory()
                   }
+                    navigationActions.back()
                 },
                 modifier = Modifier.testTag("editSubCategoryDeleteButton"),
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)) {

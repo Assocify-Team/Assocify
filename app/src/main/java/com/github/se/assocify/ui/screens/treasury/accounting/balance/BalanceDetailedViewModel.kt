@@ -11,8 +11,13 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
+import com.github.se.assocify.model.entities.TVA
+import com.github.se.assocify.navigation.Destination
+import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import java.util.UUID
 
 /**
  * View model for the balance detailed screen
@@ -26,6 +31,7 @@ class BalanceDetailedViewModel(
     private var budgetAPI: BudgetAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
+    private var navigationActions: NavigationActions,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
@@ -121,7 +127,6 @@ class BalanceDetailedViewModel(
    * @param year the new year of the subCategory
    */
   fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int) {
-      Log.d("BalanceDetailedViewModel", "saveSubCategoryEditing: $name, $categoryUid, $year")
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
     accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
     _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
@@ -134,12 +139,13 @@ class BalanceDetailedViewModel(
 
     /**Delete the subcategory and all items related to it*/
     fun deleteSubCategory() {
-        accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
-
         //delete all balanceItems related to the subcategory
         _uiState.value.balanceList.forEach { balanceItem ->
             balanceApi.deleteBalance(balanceItem.uid, {}, {})
         }
+
+        _uiState.value = _uiState.value.copy(
+            balanceList = emptyList())
 
         //delete all budgetItems related to the subcategory
         budgetAPI.getBudget(
@@ -151,7 +157,13 @@ class BalanceDetailedViewModel(
                     }
             },
             {})
+        
+        //delete subcategory
+        accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
+        _uiState.value = _uiState.value.copy(
+            subCategory = AccountingSubCategory("", "", "", 0, 2023))
 
+        _uiState.value = _uiState.value.copy(subCatEditing = false)
     }
 }
 
