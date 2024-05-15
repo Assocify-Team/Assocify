@@ -24,6 +24,7 @@ import com.github.se.assocify.navigation.mainNavGraph
 fun AssocifyApp(loginSaver: LoginSave) {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController, loginSaver)
+
   loginSaver.loadUserInfo()
 
   val userAPI = UserAPI(SupabaseClient.supabaseClient)
