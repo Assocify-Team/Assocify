@@ -39,6 +39,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   /// The user's UID
   private var userUid: String? = CurrentUser.userUid
 
+  // TODO: caches should use mutable lists to be more efficient
   private fun updateReceiptInList(receipt: Receipt, receipts: List<Receipt>): List<Receipt> {
     val index = receipts.indexOfFirst { r -> r.uid == receipt.uid }
     return if (index != -1) {
@@ -46,6 +47,10 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
     } else {
       receipts + receipt
     }
+  }
+
+  private fun deleteReceiptInList(id: String, receipts: List<Receipt>): List<Receipt> {
+    return receipts.filter { r -> r.uid != id }
   }
 
   /**
@@ -233,6 +238,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("receipt").delete { filter { SupabaseReceipt::uid eq id } }
+      // Update the cache
+      userReceipts = userReceipts?.let { deleteReceiptInList(id, it) }
+      receipts = receipts?.let { deleteReceiptInList(id, it) }
       onSuccess()
     }
   }
