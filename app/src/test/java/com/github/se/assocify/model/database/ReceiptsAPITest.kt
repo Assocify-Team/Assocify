@@ -165,6 +165,13 @@ class ReceiptsAPITest {
     verify(timeout = 1000) { successMock(receivedList) }
 
     error = true
+    // Test the cache; this shouldn't ping remote
+    api.getUserReceipts(successMock, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { successMock(receivedList) }
+
+    // Change the UID to invalidate the cache
+    CurrentUser.userUid = "DEADBEEF-1000-0000-0000-000000000000"
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getUserReceipts({ fail("Should not succeed") }, failureMock)
@@ -178,14 +185,21 @@ class ReceiptsAPITest {
 
     response = "[$remoteJson]"
 
-    api.getReceipt("successful_rid", successMock, { fail("Should not fail, failed with $it") })
+    api.getReceipt(remoteReceipt.uid, successMock, { fail("Should not fail, failed with $it") })
 
     verify(timeout = 1000) { successMock(remoteReceipt) }
 
     error = true
 
+    // Test the cache; this shouldn't ping remote
+    api.getReceipt(remoteReceipt.uid, successMock, { fail("Should not fail, failed with $it") })
+    verify(timeout = 1000) { successMock(remoteReceipt) }
+
+    // Change the UID to invalidate the cache
+    CurrentUser.userUid = "DEADBEEF-1000-0000-0000-000000000000"
+
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
-    api.getReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
+    api.getReceipt(remoteReceipt.uid, { fail("Should not succeed") }, failureMock)
 
     verify(timeout = 1000) { failureMock.invoke(any()) }
   }
@@ -211,6 +225,12 @@ class ReceiptsAPITest {
     verify(timeout = 1000) { successMock(receivedList) }
 
     error = true
+    // Test the cache; this shouldn't ping remote
+    api.getAllReceipts(successMock, { fail("Should not fail, failed with $it") })
+    verify(timeout = 1000) { successMock(receivedList) }
+
+    // Change the UID to invalidate the cache
+    CurrentUser.userUid = "DEADBEEF-1000-0000-0000-000000000000"
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.getAllReceipts({ fail("Should not succeed") }, failureMock)
@@ -229,10 +249,33 @@ class ReceiptsAPITest {
     verify(timeout = 1000) { successMock() }
 
     error = true
+    // Change the UID to invalidate the cache
+    CurrentUser.userUid = "DEADBEEF-1000-0000-0000-000000000000"
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     api.deleteReceipt("failing_rid", { fail("Should not succeed") }, failureMock)
 
     verify(timeout = 1000) { failureMock(any()) }
+  }
+
+  @Test
+  fun testUpdateCaches() {
+    val successMock = mockk<(Boolean, List<Receipt>) -> Unit>(relaxed = true)
+    val failureMock = mockk<(Boolean, Exception) -> Unit>(relaxed = true)
+    response = receivedListJson
+
+    api.updateCaches(successMock, { _, _ -> fail() })
+    verify(timeout = 1000) {
+      successMock(true, receivedList)
+      successMock(false, receivedList)
+    }
+
+    val successMockGet = mockk<(Receipt) -> Unit>(relaxed = true)
+    api.getReceipt(remoteReceipt.uid, successMockGet, { fail() })
+    verify(timeout = 1000) { successMockGet(remoteReceipt) }
+
+    error = true
+    api.updateCaches(successMock, failureMock)
+    verify(timeout = 1000) { failureMock.invoke(any(), any()) }
   }
 }

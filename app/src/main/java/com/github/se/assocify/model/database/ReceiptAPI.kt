@@ -193,7 +193,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called whenever an error has occurred with the exception that occurred
    */
   fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
-    if (receipts != null) {
+    if (receipts != null && userUid == CurrentUser.userUid) {
       onSuccess(receipts!!)
       return
     }
