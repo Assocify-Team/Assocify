@@ -111,6 +111,7 @@ class BudgetDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
       onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()

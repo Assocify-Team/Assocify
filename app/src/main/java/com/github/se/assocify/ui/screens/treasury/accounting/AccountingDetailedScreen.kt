@@ -177,7 +177,7 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (balanceModel.balanceList.isNotEmpty()) {
-                item { TotalItems(balanceModel.balanceList.sumOf { it.amount }) }
+                item { TotalItems(totalAmount) }
               } else {
                 item { Text("No items for the ${subCategory.name} sheet with these filters") }
               }
@@ -190,7 +190,7 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (budgetModel.budgetList.isNotEmpty()) {
-                item { TotalItems(budgetModel.budgetList.sumOf { it.amount }) }
+                item { TotalItems(totalAmount) }
               } else {
                 item { Text("No items for the ${subCategory.name} sheet with these filters") }
               }
