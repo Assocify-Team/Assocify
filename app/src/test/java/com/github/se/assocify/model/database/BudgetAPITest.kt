@@ -8,6 +8,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.clearMocks
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
@@ -82,6 +83,7 @@ class BudgetAPITest {
     verify(timeout = 300) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
 
+    clearMocks(onSuccess, onFailure)
     // Test cache
     error = true
     budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess, onFailure)
