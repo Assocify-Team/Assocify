@@ -31,8 +31,8 @@ class BalanceDetailedViewModel(
 
   init {
 
-    updateDatabaseValues()
-    setSubCategory(subCategoryUid)
+    updateDatabaseValuesInBalance()
+    setSubCategoryInBalance(subCategoryUid)
     uiState = _uiState
   }
 
@@ -41,7 +41,7 @@ class BalanceDetailedViewModel(
    *
    * @param subCategoryUid the subcategory uid
    */
-  private fun setSubCategory(subCategoryUid: String) {
+  private fun setSubCategoryInBalance(subCategoryUid: String) {
     accountingSubCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
@@ -54,29 +54,31 @@ class BalanceDetailedViewModel(
   }
 
   /** Update the database values */
-  private fun updateDatabaseValues() {
+  private fun updateDatabaseValuesInBalance() {
     // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
           // Filter the balanceList to only include items with the matching subCategoryUid, year and
           // status
-          val filteredList =
+          val filteredBalanceList =
               balanceList.filter { balanceItem ->
                 balanceItem.date.year == _uiState.value.year &&
                     balanceItem.subcategoryUID == subCategoryUid
               }
 
           // if status is not null, filter the list by status
-          val statusFilteredList =
+          val statusFilteredBalanceList =
               if (_uiState.value.status != null) {
-                filteredList.filter { balanceItem -> balanceItem.status == _uiState.value.status }
+                filteredBalanceList.filter { balanceItem ->
+                  balanceItem.status == _uiState.value.status
+                }
               } else {
-                filteredList
+                filteredBalanceList
               }
 
           // Update the UI state with the filtered list
-          _uiState.value = _uiState.value.copy(balanceList = statusFilteredList)
+          _uiState.value = _uiState.value.copy(balanceList = statusFilteredBalanceList)
         },
         {})
 
@@ -94,7 +96,7 @@ class BalanceDetailedViewModel(
    */
   fun onYearFilter(year: Int) {
     _uiState.value = _uiState.value.copy(year = year)
-    updateDatabaseValues()
+    updateDatabaseValuesInBalance()
   }
 
   /**
@@ -104,11 +106,11 @@ class BalanceDetailedViewModel(
    */
   fun onStatusFilter(status: Status?) {
     _uiState.value = _uiState.value.copy(status = status)
-    updateDatabaseValues()
+    updateDatabaseValuesInBalance()
   }
 
   /** Start editing the Subcategory */
-  fun startSubCategoryEditing() {
+  fun startSubCategoryBalanceEditing() {
     _uiState.value = _uiState.value.copy(subCatEditing = true)
   }
 
@@ -119,19 +121,19 @@ class BalanceDetailedViewModel(
    * @param categoryUid the new category uid associated with the subCategory
    * @param year the new year of the subCategory
    */
-  fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int) {
+  fun saveSubCategoryBalanceEditing(name: String, categoryUid: String, year: Int) {
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
     accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
     _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
   }
 
   /** Cancel the Subcategory editing */
-  fun cancelSubCategoryEditing() {
+  fun cancelSubCategoryBalanceEditing() {
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 
   /** Delete the subcategory and all items related to it */
-  fun deleteSubCategory() {
+  fun deleteSubCategoryInBalance() {
     // delete subcategory
     accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
     _uiState.value = _uiState.value.copy(balanceList = emptyList())

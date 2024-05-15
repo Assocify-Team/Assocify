@@ -29,8 +29,8 @@ class BudgetDetailedViewModel(
   val uiState: StateFlow<BudgetItemState>
 
   init {
-    updateDatabaseValues()
-    setSubCategory(subCategoryUid)
+    updateDatabaseBudgetValues()
+    setSubCategoryInBudget(subCategoryUid)
     uiState = _uiState
   }
 
@@ -39,19 +39,19 @@ class BudgetDetailedViewModel(
    *
    * @param subCategoryUid the subcategory uid
    */
-  private fun setSubCategory(subCategoryUid: String) {
+  private fun setSubCategoryInBudget(subCategoryUid: String) {
     accountingSubCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
-          val subCategory = subCategoryList.find { it.uid == subCategoryUid }
-          if (subCategory != null) {
-            _uiState.value = _uiState.value.copy(subCategory = subCategory)
+          val subCategoryInBudget = subCategoryList.find { it.uid == subCategoryUid }
+          if (subCategoryInBudget != null) {
+            _uiState.value = _uiState.value.copy(subCategory = subCategoryInBudget)
           }
         },
         {})
   }
   /** Update the database values */
-  private fun updateDatabaseValues() {
+  private fun updateDatabaseBudgetValues() {
     // Get the budget items from the database
     budgetApi.getBudget(
         CurrentUser.associationUid!!,
@@ -82,7 +82,7 @@ class BudgetDetailedViewModel(
    */
   fun onYearFilter(yearFilter: Int) {
     _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
-    updateDatabaseValues()
+    updateDatabaseBudgetValues()
   }
 
   /**
@@ -114,7 +114,7 @@ class BudgetDetailedViewModel(
   }
 
   /** Start editing the Subcategory */
-  fun startSubCategoryEditing() {
+  fun startSubCategoryEditingInBudget() {
     _uiState.value = _uiState.value.copy(subCatEditing = true)
   }
 
@@ -125,19 +125,19 @@ class BudgetDetailedViewModel(
    * @param categoryUid the category uid
    * @param year the year of the subcategory
    */
-  fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int) {
-    val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-    accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
-    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
+  fun saveSubCategoryEditingInBudget(name: String, categoryUid: String, year: Int) {
+    val subCategoryBudget = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
+    accountingSubCategoryAPI.updateSubCategory(subCategoryBudget, {}, {})
+    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategoryBudget)
   }
 
   /** Cancel the Subcategory editing */
-  fun cancelSubCategoryEditing() {
+  fun cancelSubCategoryEditingInBudget() {
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 
   /** Delete the subcategory and all items related to it */
-  fun deleteSubCategory() {
+  fun deleteSubCategoryInBudget() {
     _uiState.value = _uiState.value.copy(budgetList = emptyList())
     accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
     _uiState.value = _uiState.value.copy(subCatEditing = false)
