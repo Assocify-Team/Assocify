@@ -99,12 +99,14 @@ class EventScheduleViewModel(
 
   /** Filters the tasks to only include tasks that start or end on the current day. */
   private fun dayTasks(tasks: List<Task>): List<Task> {
+    // Filter tasks that start on the current day
     val startAtDay =
         tasks.filter {
           // Check if the task starts on the current day
           DateTimeUtil.toLocalDate(it.startTime) == _uiState.value.currentDate
         }
 
+    // Filter tasks that end on the current day
     val endAtDay =
         tasks
             .filter {
@@ -127,8 +129,24 @@ class EventScheduleViewModel(
                   duration = currentDayDuration)
             }
 
+    // Filter tasks that are ongoing on the current day
+    val ongoingTasks =
+        tasks
+            .filter {
+              // Check if the task starts before the current day and ends after the current day
+              DateTimeUtil.toLocalDate(it.startTime) < _uiState.value.currentDate &&
+                  DateTimeUtil.toLocalDate(it.startTime.plusMinutes(it.duration.toLong())) >
+                      _uiState.value.currentDate
+            }
+            .map {
+              val startTime =
+                  DateTimeUtil.toOffsetDateTime(LocalTime.MIN.atDate(_uiState.value.currentDate))
+              val duration = (LocalTime.MAX.toSecondOfDay() - LocalTime.MIN.toSecondOfDay()) / 60
+              it.copy(startTime = startTime, duration = duration)
+            }
+
     val dayTasks =
-        (startAtDay + endAtDay).map {
+        (startAtDay + endAtDay + ongoingTasks).map {
           // Clamp task time to end of day if it spans more than one day
           val endTime = it.startTime.plusMinutes(it.duration.toLong())
           if (DateTimeUtil.toLocalDate(endTime) != _uiState.value.currentDate) {
