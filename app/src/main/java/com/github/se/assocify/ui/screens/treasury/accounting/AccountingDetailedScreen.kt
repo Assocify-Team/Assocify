@@ -108,7 +108,9 @@ fun AccountingDetailedScreen(
             })
       },
       contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
-      modifier = Modifier.fillMaxWidth().testTag("AccountingDetailedScreen"),
+      modifier = Modifier
+        .fillMaxWidth()
+        .testTag("AccountingDetailedScreen"),
       floatingActionButton = {
         FloatingActionButton(
             modifier = Modifier.testTag("createNewItem"),
@@ -126,10 +128,15 @@ fun AccountingDetailedScreen(
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().padding(innerPadding),
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(innerPadding),
         ) {
           item {
-            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+            Row(
+              Modifier
+                .testTag("filterRowDetailed")
+                .horizontalScroll(rememberScrollState())) {
               // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
                 when (page) {
@@ -181,7 +188,9 @@ fun AccountingDetailedScreen(
 @Composable
 fun TotalItems(totalAmount: Int) {
   ListItem(
-      modifier = Modifier.fillMaxWidth().testTag("totalItems"),
+      modifier = Modifier
+        .fillMaxWidth()
+        .testTag("totalItems"),
       headlineContent = {
         Text(
             text = "Total",
@@ -213,7 +222,9 @@ fun DisplayBudgetItem(
       trailingContent = { Text("${budgetItem.amount}") },
       supportingContent = { Text(budgetItem.description) },
       modifier =
-          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
+      Modifier
+        .clickable { budgetDetailedViewModel.startEditing(budgetItem) }
+        .testTag(testTag))
 }
 
 /**
@@ -238,8 +249,9 @@ fun DisplayBalanceItem(
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
       modifier =
-          Modifier.clickable { balanceDetailedViewModel.startEditing(balanceItem) }
-              .testTag(testTag))
+      Modifier
+        .clickable { balanceDetailedViewModel.startEditing(balanceItem) }
+        .testTag(testTag))
 }
 
 @Composable
@@ -247,6 +259,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
   val balance = balanceModel.editedBalanceItem!!
   var nameString by remember { mutableStateOf("") }
+  var subCategoryUid by remember { mutableStateOf("") }
   var amount by remember { mutableIntStateOf(0) }
   var tvaString by remember { mutableStateOf("") }
   var tvaTypeString by remember { mutableStateOf("") }
@@ -256,37 +269,53 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val status by remember { mutableStateOf(Status.Pending) }
   Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
     Card(
-      modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
+      modifier = Modifier
+        .padding(16.dp)
+        .testTag("editDialogBox"),
       shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
         Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+        // The name box
         OutlinedTextField(
           modifier = Modifier.padding(8.dp),
           value = nameString,
           onValueChange = { nameString = it },
           label = { Text("Name") },
           supportingText = {})
-        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-          var tvaExtended by remember { mutableStateOf(false) }
+
+        // The subcategory selector
+        Box(modifier = Modifier
+          .fillMaxWidth()
+          .padding(8.dp)) {
+          var subExtended by remember { mutableStateOf(false) }
           FilterChip(
-            modifier = Modifier.fillMaxWidth().height(60.dp),
-            selected = tvaExtended,
-            onClick = { tvaExtended = !tvaExtended },
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(60.dp),
+            selected = subExtended,
+            onClick = { subExtended = !subExtended },
             label = { Text(tvaTypeString) },
             trailingIcon = {
               Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
             })
-          Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-            var tvaExtended by remember { mutableStateOf(false) }
-            FilterChip(
-              modifier = Modifier.fillMaxWidth().height(60.dp),
-              selected = tvaExtended,
-              onClick = { tvaExtended = !tvaExtended },
-              label = { Text(tvaTypeString) },
-              trailingIcon = {
-                Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
-              })
+          DropdownMenu(
+            modifier = Modifier,
+            expanded = subExtended,
+            onDismissRequest = { subExtended = false },
+            properties = PopupProperties(focusable = true)
+          ) {
+            balanceModel.subCategoryList.forEach { subBalance ->
+              DropdownMenuItem(
+                text = { Text(subBalance.name) },
+                onClick = {
+                  subCategoryUid = subBalance.uid
+                  subExtended = false
+                })
+            }
+          }
+        }
+
             OutlinedTextField(
               modifier = Modifier.padding(8.dp),
               value = amount.toString(),
@@ -294,10 +323,14 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               label = { Text("Amount") },
               keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
               supportingText = {})
-            Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Box(modifier = Modifier
+              .fillMaxWidth()
+              .padding(8.dp)) {
               var tvaExtended by remember { mutableStateOf(false) }
               FilterChip(
-                modifier = Modifier.fillMaxWidth().height(60.dp),
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .height(60.dp),
                 selected = tvaExtended,
                 onClick = { tvaExtended = !tvaExtended },
                 label = { Text(tvaTypeString) },
@@ -336,12 +369,16 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               supportingText = {})
             /*TODO: insert status picker*/
             Row(
-              modifier = Modifier.fillMaxWidth().padding(15.dp),
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
               horizontalArrangement = Arrangement.SpaceBetween,
             ) {
               Button(
                 onClick = { balanceDetailedViewModel.cancelEditing() },
-                modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
+                modifier = Modifier
+                  .padding(15.dp)
+                  .testTag("editDismissButton"),
               ) {
                 Text("Dismiss")
               }
@@ -362,7 +399,9 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     )
                   )
                 },
-                modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
+                modifier = Modifier
+                  .padding(15.dp)
+                  .testTag("editConfirmButton"),
               ) {
                 Text("Confirm")
               }
@@ -371,8 +410,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
         }
       }
     }
-  }
-}
+
 
 /**
  * Displays the popup to edit a specific budget element
@@ -392,13 +430,17 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
 
   Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
     Card(
-        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
+        modifier = Modifier
+          .padding(16.dp)
+          .testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
         Text("Edit Budget Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
-            modifier = Modifier.padding(8.dp).testTag("editNameBox"),
+            modifier = Modifier
+              .padding(8.dp)
+              .testTag("editNameBox"),
             value = nameString,
             onValueChange = { nameString = it },
             label = { Text("Name") },
@@ -410,10 +452,14 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
-        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        Box(modifier = Modifier
+          .fillMaxWidth()
+          .padding(8.dp)) {
           var tvaExtended by remember { mutableStateOf(false) }
           FilterChip(
-              modifier = Modifier.fillMaxWidth().height(60.dp),
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
               selected = tvaExtended,
               onClick = { tvaExtended = !tvaExtended },
               label = { Text(tvaTypeString) },
@@ -450,12 +496,16 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
         Row(
-            modifier = Modifier.fillMaxWidth().padding(15.dp),
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Button(
               onClick = { budgetViewModel.cancelEditing() },
-              modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
+              modifier = Modifier
+                .padding(15.dp)
+                .testTag("editDismissButton"),
           ) {
             Text("Dismiss")
           }
@@ -471,7 +521,9 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
                         subcategoryUID = budget.subcategoryUID,
                         year = yearString.toInt()))
               },
-              modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
+              modifier = Modifier
+                .padding(15.dp)
+                .testTag("editConfirmButton"),
           ) {
             Text("Confirm")
           }
