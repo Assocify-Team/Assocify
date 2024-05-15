@@ -11,12 +11,12 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.OffsetDateTime
-import java.util.UUID
 import junit.framework.TestCase.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @MockKExtension.ConfirmVerification
 class TaskAPITest {
@@ -142,6 +142,7 @@ class TaskAPITest {
             "description",
             false,
             OffsetDateTime.now(),
+            60,
             0,
             "Committee",
             "Here",
@@ -174,6 +175,7 @@ class TaskAPITest {
             "newDescription",
             true,
             OffsetDateTime.now(),
+            60,
             2,
             "newCategory",
             "newLocation",
@@ -192,6 +194,7 @@ class TaskAPITest {
             true,
             OffsetDateTime.now(),
             2,
+            60,
             "newCategory",
             "newLocation",
             "newEventUid"),
