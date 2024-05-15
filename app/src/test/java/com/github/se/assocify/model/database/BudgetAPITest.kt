@@ -11,7 +11,6 @@ import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.lang.Thread.sleep
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -82,6 +81,12 @@ class BudgetAPITest {
     budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess, onFailure)
     verify(timeout = 300) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
+
+    // Test cache
+    error = true
+    budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess, onFailure)
+    verify(timeout = 300) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -93,7 +98,6 @@ class BudgetAPITest {
     val budgetItemUpdt = budgetItem.copy(uid = UUID.randomUUID().toString())
     budgetAPI.addBudgetItem(
         "aa3d4ad7-c901-435a-b089-bb835f6ec560", budgetItemUpdt, onSuccess, onFailure)
-    sleep(1000)
     verify(timeout = 1000) { onSuccess() }
     verify(exactly = 0) { onFailure(any()) }
   }
@@ -121,5 +125,32 @@ class BudgetAPITest {
     response = ""
     budgetAPI.deleteBudgetItem("uiiddddd", onSuccess, onFailure)
     verify(timeout = 1000) { onSuccess() }
+  }
+
+  @Test
+  fun testUpdateBudgetCache() {
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    val onSuccess: (List<BudgetItem>) -> Unit = mockk(relaxed = true)
+
+    error = false
+    response =
+        """
+        [
+          {
+            "item_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            "association_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            "name": "name",
+            "amount": 1,
+            "tva": 2.6,
+            "description": "lala",
+            "subcategory_uid": "00000000-0000-0000-0000-000000000000",
+            "year": 2022
+          }
+        ]
+        """
+            .trimIndent()
+
+    budgetAPI.updateBudgetCache("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess, onFailure)
+    verify(timeout = 1000) { onSuccess(any()) }
   }
 }

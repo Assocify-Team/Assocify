@@ -10,6 +10,34 @@ import kotlinx.serialization.Serializable
 class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
 
   private val collectionName = "budget_item"
+
+  private var budgetCache: List<BudgetItem>? = null
+  private var budgetCacheAssociationUID: String? = null
+
+  /**
+   * Get the budget of an association, but force an update of the cache
+   *
+   * @param associationUID the unique identifier of the association
+   * @param onSuccess the callback to be called when the budget items are retrieved
+   * @param onFailure the callback to be called when the budget items could not be retrieved
+   */
+  fun updateBudgetCache(
+      associationUID: String,
+      onSuccess: (List<BudgetItem>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      val response =
+          db.from(collectionName)
+              .select { filter { SupabaseBudgetItem::associationUID eq associationUID } }
+              .decodeList<SupabaseBudgetItem>()
+              .map { it.toBudgetItem() }
+      budgetCache = response
+      budgetCacheAssociationUID = associationUID
+      onSuccess(response)
+    }
+  }
+
   /**
    * Get the budget of an association
    *
@@ -22,13 +50,12 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<BudgetItem>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
-      val response =
-          db.from(collectionName)
-              .select { filter { SupabaseBudgetItem::associationUID eq associationUID } }
-              .decodeList<SupabaseBudgetItem>()
-      onSuccess(response.map { it.toBudgetItem() })
+    if (budgetCacheAssociationUID == associationUID && budgetCache != null) {
+      onSuccess(budgetCache!!)
+      return
     }
+
+    updateBudgetCache(associationUID, onSuccess, onFailure)
   }
 
   /**
@@ -44,6 +71,12 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
   ) {
     tryAsync(onFailure) {
       db.from(collectionName).insert(SupabaseBudgetItem.fromBudgetItem(budgetItem, associationUID))
+
+      // Update cache
+      if (budgetCacheAssociationUID == associationUID) {
+        budgetCache = budgetCache.orEmpty() + budgetItem
+      }
+
       onSuccess()
     }
   }
@@ -75,6 +108,12 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
           SupabaseBudgetItem::itemUID eq budgetItem.uid
         }
       }
+
+      // Update cache
+      if (budgetCacheAssociationUID == associationUID) {
+        budgetCache = budgetCache.orEmpty().map { if (it.uid == budgetItem.uid) budgetItem else it }
+      }
+
       onSuccess()
     }
   }
@@ -92,6 +131,10 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
   ) {
     tryAsync(onFailure) {
       db.from(collectionName).delete { filter { SupabaseBudgetItem::itemUID eq budgetItemUID } }
+
+      // Update cache
+      budgetCache = budgetCache.orEmpty().filter { it.uid != budgetItemUID }
+
       onSuccess()
     }
   }
