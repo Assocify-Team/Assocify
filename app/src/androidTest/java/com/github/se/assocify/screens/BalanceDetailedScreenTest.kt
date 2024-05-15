@@ -105,7 +105,7 @@ class BalanceDetailedScreenTest :
               balanceItems
             }
       }
-  // val testingSubCategory = AccountingSubCategory(subCategoryUid, "1", "newName", 1205, 2024)
+
   val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
       mockk<AccountingSubCategoryAPI>() {
         every { getSubCategories(any(), any(), any()) } answers
