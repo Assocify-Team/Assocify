@@ -63,7 +63,6 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
    *
    * @param onSuccess called on success with the list of users
    * @param onFailure called on failure
-   * @return a list of all users
    */
   fun getAllUsers(onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
     if (userCache.isNotEmpty()) {
@@ -216,7 +215,7 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   private var currentUserAssociationCache: Map<String, Pair<Association, PermissionRole>>? = null
-  private var currentUserAssociationId: String? = null
+  private var currentUserId: String? = null
 
   fun updateCurrentUserAssociationCache(
       onSuccess: (Map<String, Pair<Association, PermissionRole>>) -> Unit,
@@ -230,7 +229,7 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
               .associate { it.associationId to (it.getAssociation() to it.getRole()) }
 
       currentUserAssociationCache = associations
-      currentUserAssociationId = CurrentUser.userUid
+      currentUserId = CurrentUser.userUid
 
       onSuccess(associations)
     }
@@ -246,7 +245,7 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<Association>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    if (currentUserAssociationCache != null && currentUserAssociationId == CurrentUser.userUid) {
+    if (currentUserAssociationCache != null && currentUserId == CurrentUser.userUid) {
       onSuccess(currentUserAssociationCache!!.values.map { it.first })
     } else {
       updateCurrentUserAssociationCache({ onSuccess(it.values.map { it.first }) }, onFailure)
@@ -260,7 +259,7 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getCurrentUserRole(onSuccess: (PermissionRole) -> Unit, onFailure: (Exception) -> Unit) {
-    if (currentUserAssociationCache != null && currentUserAssociationId == CurrentUser.userUid) {
+    if (currentUserAssociationCache != null && currentUserId == CurrentUser.userUid) {
       val associationUid = CurrentUser.associationUid!!
       currentUserAssociationCache!![associationUid]?.let { onSuccess(it.second) }
           ?: onFailure(Exception("Association not found"))
