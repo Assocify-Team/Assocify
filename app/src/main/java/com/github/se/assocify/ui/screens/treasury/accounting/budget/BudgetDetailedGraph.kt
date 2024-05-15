@@ -22,8 +22,7 @@ fun NavGraphBuilder.budgetDetailedGraph(
       BudgetDetailedScreen(
           navigationActions,
           BudgetDetailedViewModel(budgetAPI, subCategoryAPI, it),
-          BalanceDetailedViewModel(balanceAPI, receiptAPI, subCategoryAPI, it)
-      )
+          BalanceDetailedViewModel(balanceAPI, receiptAPI, subCategoryAPI, it))
     }
   }
 }

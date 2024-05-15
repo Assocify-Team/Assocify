@@ -75,9 +75,7 @@ class BalanceDetailedViewModel(
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(balanceList = statusFilteredList)
         },
-        {
-          Log.e("BalanceDetailedViewModel", "Error getting balance list")
-        })
+        { Log.e("BalanceDetailedViewModel", "Error getting balance list") })
   }
 
   /**
@@ -133,10 +131,15 @@ class BalanceDetailedViewModel(
     balanceApi.deleteBalance(
         balanceItemUid,
         {
-          _uiState.value = _uiState.value.copy(balanceList = _uiState.value.balanceList.filter { it.uid != balanceItemUid })
+          _uiState.value =
+              _uiState.value.copy(
+                  balanceList = _uiState.value.balanceList.filter { it.uid != balanceItemUid },
+                  editedBalanceItem = null,
+                  editing = false)
         },
         {
           Log.e("BalanceDetailedViewModel", "Error deleting balance item")
+          _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false)
         })
   }
 }

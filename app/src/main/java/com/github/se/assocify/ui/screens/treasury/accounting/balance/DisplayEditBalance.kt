@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,7 +19,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,14 +59,12 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   var mutableStatus by remember { mutableStateOf(Status.Pending) }
   Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
     Card(
-      modifier = Modifier
-        .padding(16.dp)
-        .testTag("editDialogBox"),
-      shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
+        shape = RoundedCornerShape(16.dp),
     ) {
       LazyColumn {
         item {
-          Row{
+          Row {
             IconButton(onClick = { balanceDetailedViewModel.cancelEditing() }) {
               Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
             }
@@ -78,231 +74,202 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
         // The name box
         item {
           OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = nameString,
-            onValueChange = { nameString = it },
-            label = { Text("Name") },
-            supportingText = {})
+              modifier = Modifier.padding(8.dp),
+              value = nameString,
+              onValueChange = { nameString = it },
+              label = { Text("Name") },
+              supportingText = {})
         }
         // The subcategory selector
         item {
           var subcategoryExpanded by remember { mutableStateOf(false) }
           ExposedDropdownMenuBox(
-            expanded = subcategoryExpanded,
-            onExpandedChange = { subcategoryExpanded = !subcategoryExpanded },
-            modifier = Modifier
-              .testTag("categoryDropdown")
-              .padding(8.dp)
-          ) {
-            OutlinedTextField(
-              value = subCategoryUid,
-              onValueChange = {},
-              label = { Text("SubCategory") },
-              trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = subcategoryExpanded)
-              },
-              readOnly = true,
-              colors = ExposedDropdownMenuDefaults.textFieldColors(),
-              modifier = Modifier
-                .menuAnchor()
-                .clickable { subcategoryExpanded = !subcategoryExpanded })
-            ExposedDropdownMenu(
-              expanded = subcategoryExpanded, onDismissRequest = { subcategoryExpanded = false }) {
-              balanceModel.subCategoryList.forEach { subCat ->
-                DropdownMenuItem(
-                  text = { Text(subCat.name) },
-                  onClick = {
-                    subCategoryUid = subCat.uid
-                    subCategoryName = subCat.name
-                    subcategoryExpanded = false
-                  })
+              expanded = subcategoryExpanded,
+              onExpandedChange = { subcategoryExpanded = !subcategoryExpanded },
+              modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                OutlinedTextField(
+                    value = subCategoryUid,
+                    onValueChange = {},
+                    label = { Text("SubCategory") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = subcategoryExpanded)
+                    },
+                    readOnly = true,
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier =
+                        Modifier.menuAnchor().clickable {
+                          subcategoryExpanded = !subcategoryExpanded
+                        })
+                ExposedDropdownMenu(
+                    expanded = subcategoryExpanded,
+                    onDismissRequest = { subcategoryExpanded = false }) {
+                      balanceModel.subCategoryList.forEach { subCat ->
+                        DropdownMenuItem(
+                            text = { Text(subCat.name) },
+                            onClick = {
+                              subCategoryUid = subCat.uid
+                              subCategoryName = subCat.name
+                              subcategoryExpanded = false
+                            })
+                      }
+                    }
               }
-            }
-          }
         }
         // The receipt selector
         item {
           var receiptExpanded by remember { mutableStateOf(false) }
           ExposedDropdownMenuBox(
-            expanded = receiptExpanded,
-            onExpandedChange = { receiptExpanded = !receiptExpanded },
-            modifier = Modifier
-              .testTag("categoryDropdown")
-              .padding(8.dp)
-          ) {
-            OutlinedTextField(
-              value = receiptUid,
-              onValueChange = {},
-              label = { Text("Receipt") },
-              trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = receiptExpanded)
-              },
-              readOnly = true,
-              colors = ExposedDropdownMenuDefaults.textFieldColors(),
-              modifier = Modifier
-                .menuAnchor()
-                .clickable { receiptExpanded = !receiptExpanded })
-            ExposedDropdownMenu(
-              expanded = receiptExpanded, onDismissRequest = { receiptExpanded = false }) {
-              balanceModel.receiptList.forEach { receipt ->
-                DropdownMenuItem(
-                  text = { Text(receipt.title) },
-                  onClick = {
-                    receiptUid = receipt.uid
-                    receiptName = receipt.title
-                    receiptExpanded = false
-                  })
+              expanded = receiptExpanded,
+              onExpandedChange = { receiptExpanded = !receiptExpanded },
+              modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                OutlinedTextField(
+                    value = receiptUid,
+                    onValueChange = {},
+                    label = { Text("Receipt") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = receiptExpanded)
+                    },
+                    readOnly = true,
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier =
+                        Modifier.menuAnchor().clickable { receiptExpanded = !receiptExpanded })
+                ExposedDropdownMenu(
+                    expanded = receiptExpanded, onDismissRequest = { receiptExpanded = false }) {
+                      balanceModel.receiptList.forEach { receipt ->
+                        DropdownMenuItem(
+                            text = { Text(receipt.title) },
+                            onClick = {
+                              receiptUid = receipt.uid
+                              receiptName = receipt.title
+                              receiptExpanded = false
+                            })
+                      }
+                    }
               }
-            }
-          }
         }
 
         // The amount field
         item {
           OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = amount.toString(),
-            onValueChange = { amount = it.toInt() },
-            label = { Text("Amount") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-            supportingText = {})
+              modifier = Modifier.padding(8.dp),
+              value = amount.toString(),
+              onValueChange = { amount = it.toInt() },
+              label = { Text("Amount") },
+              keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+              supportingText = {})
         }
 
-        //The TVA box
+        // The TVA box
         item {
           var tvaExpanded by remember { mutableStateOf(false) }
           ExposedDropdownMenuBox(
-            expanded = tvaExpanded,
-            onExpandedChange = { tvaExpanded = !tvaExpanded },
-            modifier = Modifier
-              .testTag("categoryDropdown")
-              .padding(8.dp)
-          ) {
-            OutlinedTextField(
-              value = tvaString,
-              onValueChange = {},
-              label = { Text("Tva") },
-              trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = tvaExpanded)
-              },
-              readOnly = true,
-              colors = ExposedDropdownMenuDefaults.textFieldColors(),
-              modifier = Modifier
-                .menuAnchor()
-                .clickable { tvaExpanded = !tvaExpanded })
-            ExposedDropdownMenu(
-              expanded = tvaExpanded, onDismissRequest = { tvaExpanded = false }) {
-              TVA.entries.forEach { tva ->
-                DropdownMenuItem(
-                  text = { Text(tva.toString()) },
-                  onClick = {
-                    tvaString = tva.rate.toString()
-                    tvaExpanded = false
-                  })
+              expanded = tvaExpanded,
+              onExpandedChange = { tvaExpanded = !tvaExpanded },
+              modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                OutlinedTextField(
+                    value = tvaString,
+                    onValueChange = {},
+                    label = { Text("Tva") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = tvaExpanded)
+                    },
+                    readOnly = true,
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor().clickable { tvaExpanded = !tvaExpanded })
+                ExposedDropdownMenu(
+                    expanded = tvaExpanded, onDismissRequest = { tvaExpanded = false }) {
+                      TVA.entries.forEach { tva ->
+                        DropdownMenuItem(
+                            text = { Text(tva.toString()) },
+                            onClick = {
+                              tvaString = tva.rate.toString()
+                              tvaExpanded = false
+                            })
+                      }
+                    }
               }
-            }
-          }
         }
 
-        //The description field
+        // The description field
         item {
           OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = descriptionString,
-            onValueChange = { descriptionString = it },
-            label = { Text("Description") },
-            supportingText = {})
+              modifier = Modifier.padding(8.dp),
+              value = descriptionString,
+              onValueChange = { descriptionString = it },
+              label = { Text("Description") },
+              supportingText = {})
         }
-        //The date screen
-        item {
-          DatePickerWithDialog(value = "Date", onDateSelect = { newDate ->
-            date = newDate
-          })
-        }
+        // The date screen
+        item { DatePickerWithDialog(value = "Date", onDateSelect = { newDate -> date = newDate }) }
 
-
-        //The assignee field
+        // The assignee field
         item {
           OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
-            value = assignee,
-            onValueChange = { assignee = it },
-            label = { Text("Assignee") },
-            supportingText = {})
+              modifier = Modifier.padding(8.dp),
+              value = assignee,
+              onValueChange = { assignee = it },
+              label = { Text("Assignee") },
+              supportingText = {})
         }
-        //The status picker
+        // The status picker
         item {
           var statusExpanded by remember { mutableStateOf(false) }
           ExposedDropdownMenuBox(
-            expanded = statusExpanded,
-            onExpandedChange = { statusExpanded = !statusExpanded },
-            modifier = Modifier
-              .testTag("categoryDropdown")
-              .padding(8.dp)
-          ) {
-            OutlinedTextField(
-              value = mutableStatus.name,
-              onValueChange = {},
-              label = { Text("Tag") },
-              trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusExpanded)
-              },
-              readOnly = true,
-              colors = ExposedDropdownMenuDefaults.textFieldColors(),
-              modifier = Modifier
-                .menuAnchor()
-                .clickable { statusExpanded = !statusExpanded })
-            ExposedDropdownMenu(
-              expanded = statusExpanded, onDismissRequest = { statusExpanded = false }) {
-              Status.entries.forEach { status ->
-                DropdownMenuItem(
-                  text = { Text(status.name) },
-                  onClick = {
-                    mutableStatus = status
-                    statusExpanded = false
-                  })
+              expanded = statusExpanded,
+              onExpandedChange = { statusExpanded = !statusExpanded },
+              modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                OutlinedTextField(
+                    value = mutableStatus.name,
+                    onValueChange = {},
+                    label = { Text("Tag") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusExpanded)
+                    },
+                    readOnly = true,
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor().clickable { statusExpanded = !statusExpanded })
+                ExposedDropdownMenu(
+                    expanded = statusExpanded, onDismissRequest = { statusExpanded = false }) {
+                      Status.entries.forEach { status ->
+                        DropdownMenuItem(
+                            text = { Text(status.name) },
+                            onClick = {
+                              mutableStatus = status
+                              statusExpanded = false
+                            })
+                      }
+                    }
               }
-            }
-          }
         }
 
-
-        //The buttons
+        // The buttons
         item {
           Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(15.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+              modifier = Modifier.fillMaxWidth().padding(15.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
           ) {
             Button(
-              onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
-              modifier = Modifier
-                .padding(15.dp)
-                .testTag("editDeleteButton"),
+                onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
+                modifier = Modifier.padding(15.dp).testTag("editDeleteButton"),
             ) {
               Text("Delete")
             }
             Button(
-              onClick = {
-                balanceDetailedViewModel.saveEditing(
-                  BalanceItem(
-                    balance.uid,
-                    nameString,
-                    "",
-                    "",
-                    amount,
-                    TVA.floatToTVA(tvaString.toFloat()),
-                    descriptionString,
-                    date,
-                    assignee,
-                    mutableStatus
-                  )
-                )
-              },
-              modifier = Modifier
-                .padding(15.dp)
-                .testTag("editConfirmButton"),
+                onClick = {
+                  balanceDetailedViewModel.saveEditing(
+                      BalanceItem(
+                          balance.uid,
+                          nameString,
+                          "",
+                          "",
+                          amount,
+                          TVA.floatToTVA(tvaString.toFloat()),
+                          descriptionString,
+                          date,
+                          assignee,
+                          mutableStatus))
+                },
+                modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
             ) {
               Text("Confirm")
             }
@@ -312,4 +279,3 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
     }
   }
 }
-

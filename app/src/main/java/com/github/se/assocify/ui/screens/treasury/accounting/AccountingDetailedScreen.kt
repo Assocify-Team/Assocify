@@ -25,8 +25,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -41,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,18 +51,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEditBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
-import java.time.LocalDate
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -152,8 +146,7 @@ fun AccountingDetailedScreen(
               }
 
               // Tva filter
-              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-              }
+              DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {}
             }
           }
 
@@ -258,11 +251,9 @@ fun DisplayBalanceItem(
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
       modifier =
-      Modifier
-        .clickable { balanceDetailedViewModel.startEditing(balanceItem) }
-        .testTag(testTag))
+          Modifier.clickable { balanceDetailedViewModel.startEditing(balanceItem) }
+              .testTag(testTag))
 }
-
 
 /**
  * Displays the popup to edit a specific budget element
