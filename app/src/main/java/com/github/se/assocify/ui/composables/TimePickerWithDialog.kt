@@ -57,7 +57,10 @@ import java.time.LocalTime
  * @param modifier The modifier to be applied to the composable.
  * @param label The label to be displayed above the text field.
  * @param isError Whether the DatePicker is in an error state.
- * @param supportingText Additional supporting text to be displayed below the DatePicker.
+ * @param errorText Additional supporting text to be displayed below the DatePicker.
+ * @param dialogTitle The title of the dialog.
+ * @param switchModes Whether to show the toggle button to switch between dial and text input or not
+ *   : If not, the dialog will only show the text input.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
