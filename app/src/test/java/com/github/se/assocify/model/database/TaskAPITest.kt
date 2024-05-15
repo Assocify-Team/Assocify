@@ -132,6 +132,14 @@ class TaskAPITest {
 
     verify(timeout = 1000) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
+
+    error = true
+    // Test cache
+    taskAPI.getTasks(onSuccess, onFailure)
+
+    verify(timeout = 1000) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -168,6 +176,25 @@ class TaskAPITest {
 
   @Test
   fun testEditTask() {
+    response =
+        """
+          [{
+          "uid": "$uuid1",
+          "title": "testName",
+          "description": "description",
+          "is_completed": false,
+          "start_time": "$responseTime" ,
+          "people_needed": 0,
+          "category": "Committee",
+          "location": "Here",
+          "event_id": "eventUid"
+        }]
+      """
+            .trimIndent()
+    val successMockCache: (List<Task>) -> Unit = mockk(relaxed = true)
+    taskAPI.updateTaskCache(successMockCache, { fail("should not fail") })
+    verify(timeout = 1000) { successMockCache(any()) }
+
     val onSuccess: () -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
     error = false
