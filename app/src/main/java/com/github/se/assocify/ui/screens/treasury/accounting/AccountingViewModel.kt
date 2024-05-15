@@ -6,9 +6,10 @@ import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
-import java.time.Year
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+
 
 /**
  * The view model for the budget screen
@@ -100,5 +101,5 @@ data class AccountingState(
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val globalSelected: Boolean = true,
-    val yearFilter: Int = Year.now().value
+    val yearFilter: Int = LocalDate.now().year
 )
