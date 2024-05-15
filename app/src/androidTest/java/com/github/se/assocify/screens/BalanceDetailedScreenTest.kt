@@ -114,6 +114,7 @@ class BalanceDetailedScreenTest :
               onSuccessCallback(subCategoryList)
             }
         every { updateSubCategory(any(), any(), any()) } answers {}
+        every { deleteSubCategory(any(), any(), any()) } answers {}
       }
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -135,18 +136,10 @@ class BalanceDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI,
-            mockBalanceAPI,
-            mockAccountingSubCategoryAPI,
-            mockAccountingCategoryAPI,
-            subCategoryUid)
+            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI,
-            mockBudgetAPI,
-            mockAccountingSubCategoryAPI,
-            mockAccountingCategoryAPI,
-            subCategoryUid)
+            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -303,6 +296,19 @@ class BalanceDetailedScreenTest :
       assert(balanceDetailedViewModel.uiState.value.subCategory.name == "Logistics")
       assert(balanceDetailedViewModel.uiState.value.subCategory.year == 2023)
       assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
+    }
+  }
+
+  @Test
+  fun testDeleteSubCategory() {
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      assert(balanceDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryDeleteButton").performClick()
+      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
+      assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
+      assert(balanceDetailedViewModel.uiState.value.balanceList.isEmpty())
     }
   }
 }

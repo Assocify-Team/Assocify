@@ -90,6 +90,7 @@ class BudgetDetailedScreenTest :
               onSuccessCallback(subCategoryList)
             }
         every { updateSubCategory(any(), any(), any()) } answers {}
+        every { deleteSubCategory(any(), any(), any()) } answers {}
       }
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -111,18 +112,10 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI,
-            mockBalanceAPI,
-            mockAccountingSubCategoryAPI,
-            mockAccountingCategoryAPI,
-            subCategoryUid)
+            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI,
-            mockBudgetAPI,
-            mockAccountingSubCategoryAPI,
-            mockAccountingCategoryAPI,
-            subCategoryUid)
+            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -269,7 +262,6 @@ class BudgetDetailedScreenTest :
       onNodeWithText("newName").assertIsDisplayed()
       assert(budgetDetailedViewModel.uiState.value.subCategory.name == "newName")
       assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2024)
-      assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
     }
   }
 
@@ -295,6 +287,19 @@ class BudgetDetailedScreenTest :
       assert(budgetDetailedViewModel.uiState.value.subCategory.name == "Logistics")
       assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2023)
       assert(budgetDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
+    }
+  }
+
+  @Test
+  fun testDeleteSubCategory() {
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      assert(budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryDeleteButton").performClick()
+      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
+      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
+      assert(budgetDetailedViewModel.uiState.value.budgetList.isEmpty())
     }
   }
 }
