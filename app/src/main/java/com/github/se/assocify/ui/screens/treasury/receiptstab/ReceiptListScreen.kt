@@ -106,7 +106,9 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
         Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
       },
       overlineContent = {
-        Text(modifier = Modifier.testTag("receiptDateText"), text = DateUtil.toString(receipt.date))
+        Text(
+            modifier = Modifier.testTag("receiptDateText"),
+            text = DateUtil.formatDate(receipt.date))
       },
       supportingContent = {
         Text(

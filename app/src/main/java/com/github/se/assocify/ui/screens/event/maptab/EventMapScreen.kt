@@ -13,10 +13,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
+import com.github.se.assocify.BuildConfig
+import kotlin.random.Random
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
@@ -44,12 +46,12 @@ fun rememberMapViewWithLifecycle(): MapView {
   val context = LocalContext.current
 
   // Update OSM configuration, for some reason
-  Configuration.getInstance().userAgentValue = context.packageName
+  Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
   // Initialise the map view
   val mapView = remember {
     MapView(context).apply {
-      setTileSource(DEFAULT_TILE_SOURCE)
+      setTileSource(MAPNIK)
       // Zoom buttons only appears on touch and then fade out
       zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
       // Enable pinch to zoom
@@ -111,8 +113,10 @@ fun EPFLMapView(modifier: Modifier, onLoad: ((map: MapView) -> Unit)? = null) {
 class CampusTileSource(private val floorId: Int) :
     OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
   override fun getTileURLString(pMapTileIndex: Long): String {
+    // Select at random the map server to use
+    val epflCampusServerCount = 3
     // EPFL plan API has 3 servers, tilesX correspond to the server number
-    return "https://plan-epfl-tiles3.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${
+    return "https://plan-epfl-tiles${Random.nextInt(epflCampusServerCount)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${
       MapTileIndex.getZoom(
         pMapTileIndex
       )

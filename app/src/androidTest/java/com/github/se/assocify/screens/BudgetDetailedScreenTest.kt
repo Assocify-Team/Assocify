@@ -12,7 +12,9 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
@@ -40,6 +42,13 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
+  val subCategoryUid = "subCategoryUid"
+  val subCategoryList =
+      listOf(
+          AccountingSubCategory(subCategoryUid, "categoryUid", "Logistics", 1205, 2023),
+          AccountingSubCategory("2", "categoryUid", "Administration", 100, 2023),
+          AccountingSubCategory("3", "categoryUid", "Balelec", 399, 2023))
+
   val budgetItems =
       listOf(
           BudgetItem(
@@ -48,26 +57,13 @@ class BudgetDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              "00000000-0000-0000-0000-000000000000",
+              subCategoryUid,
               2022),
           BudgetItem(
-              "2",
-              "sweaters",
-              1000,
-              TVA.TVA_8,
-              "order for 1000 sweaters",
-              "00000000-0000-0000-0000-000000000000",
-              2023),
-          BudgetItem(
-              "3",
-              "chairs",
-              200,
-              TVA.TVA_8,
-              "order for 200 chairs",
-              "00000000-0000-0000-0000-000000000000",
-              2023))
+              "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategoryUid, 2023),
+          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategoryUid, 2023))
 
-  private val mockBudgetAPI: BudgetAPI =
+  val mockBudgetAPI: BudgetAPI =
       mockk<BudgetAPI>() {
         every { getBudget(any(), any(), any()) } answers
             {
@@ -77,23 +73,31 @@ class BudgetDetailedScreenTest :
         every { updateBudgetItem(any(), any(), any(), any()) } answers {}
       }
 
-  private lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
+  val mockAccountingSubCategoryApi: AccountingSubCategoryAPI =
+      mockk<AccountingSubCategoryAPI>() {
+        every { getSubCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
+              onSuccessCallback(subCategoryList)
+            }
+      }
+
+  lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
-    budgetDetailedViewModel = BudgetDetailedViewModel(mockBudgetAPI, "subCategoryUid")
+    budgetDetailedViewModel =
+        BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "subCategoryUid")
     composeTestRule.setContent {
-      BudgetDetailedScreen(
-          "subCategoryUid", mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
+      BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
 
   /** Tests if the nodes are displayed */
   @Test
   fun testDisplay() {
-    // Test the accounting screen
     with(composeTestRule) {
       onNodeWithTag("AccountingDetailedScreen").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
@@ -111,10 +115,27 @@ class BudgetDetailedScreenTest :
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
-    }
+      onNodeWithText("fees").assertIsNotDisplayed()
+      onNodeWithText(subCategoryList[0].name).assertIsDisplayed()
 
-    assert(
-        budgetItems.filter { it.year == 2023 } == budgetDetailedViewModel.uiState.value.budgetList)
+      assert(
+          budgetDetailedViewModel.uiState.value.budgetList ==
+              budgetItems.filter { it.year == 2023 && it.subcategoryUID == "subCategoryUid" })
+      assert(budgetDetailedViewModel.uiState.value.subCategory == subCategoryList.first())
+      assert(budgetDetailedViewModel.uiState.value.yearFilter == 2023)
+    }
+  }
+
+  /** Tests if amount is not shown when empty list */
+  @Test
+  fun testEmptyList() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2021").performClick()
+      onNodeWithTag("totalItems").assertIsNotDisplayed()
+      onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
+          .assertIsDisplayed()
+    }
   }
 
   /** Tests if go back to Treasury */

@@ -1,9 +1,9 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import com.github.se.assocify.model.SupabaseClient
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -32,10 +32,7 @@ class ReceiptViewModel {
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
 
-  constructor(
-      navActions: NavigationActions,
-      receiptApi: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
-  ) {
+  constructor(navActions: NavigationActions, receiptApi: ReceiptAPI) {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = UUID.randomUUID().toString()
@@ -43,11 +40,7 @@ class ReceiptViewModel {
     uiState = _uiState
   }
 
-  constructor(
-      receiptUid: String,
-      navActions: NavigationActions,
-      receiptApi: ReceiptAPI = ReceiptAPI(SupabaseClient.supabaseClient)
-  ) {
+  constructor(receiptUid: String, navActions: NavigationActions, receiptApi: ReceiptAPI) {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = receiptUid
@@ -58,23 +51,26 @@ class ReceiptViewModel {
 
   fun loadReceipt() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
-    this.receiptApi.getAllReceipts(
-        onSuccess = { receipts ->
-          receipts.forEach { receipt ->
-            if (receipt.uid == receiptUid) {
-              _uiState.value =
-                  _uiState.value.copy(
-                      status = receipt.status,
-                      title = receipt.title,
-                      description = receipt.description,
-                      amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
-                      date = DateUtil.toString(receipt.date),
-                      incoming = receipt.cents >= 0)
-            }
-          }
-          _uiState.value = _uiState.value.copy(loading = false, error = null)
+    this.receiptApi.getReceipt(
+        receiptUid,
+        onSuccess = { receipt ->
+          _uiState.value =
+              _uiState.value.copy(
+                  status = receipt.status,
+                  title = receipt.title,
+                  description = receipt.description,
+                  amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
+                  date = DateUtil.formatDate(receipt.date),
+                  incoming = receipt.cents >= 0,
+                  loading = false,
+                  error = null)
+
+          receiptApi.getReceiptImage(
+              receipt,
+              { _uiState.value = _uiState.value.copy(receiptImageURI = it) },
+              { Log.e("ReceiptViewModel", "Failed to load receipt image", it) })
         },
-        onError = {
+        onFailure = {
           _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
         })
   }
@@ -121,7 +117,7 @@ class ReceiptViewModel {
   }
 
   fun setDate(date: LocalDate?) {
-    _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
+    _uiState.value = _uiState.value.copy(date = DateUtil.formatDate(date))
     if (date == null) {
       _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
     } else {
@@ -184,7 +180,6 @@ class ReceiptViewModel {
             date = date,
             status = _uiState.value.status,
             photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
-
     receiptApi.uploadReceipt(
         receipt,
         onPhotoUploadSuccess = {},

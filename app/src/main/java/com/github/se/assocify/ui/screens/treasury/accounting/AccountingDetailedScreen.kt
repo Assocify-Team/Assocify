@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
@@ -65,15 +64,14 @@ import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetail
  * The detailed screen of a subcategory in the accounting screen
  *
  * @param page: The page to display (either "budget" or "balance")
- * @param subCategoryUid: The unique identifier of the subcategory
  * @param navigationActions: The navigation actions
  * @param budgetDetailedViewModel: The view model for the budget detailed screen
+ * @param balanceDetailedViewModel: The view model for the balance detailed screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountingDetailedScreen(
     page: AccountingPage,
-    subCategoryUid: String,
     navigationActions: NavigationActions,
     budgetDetailedViewModel: BudgetDetailedViewModel,
     balanceDetailedViewModel: BalanceDetailedViewModel
@@ -81,7 +79,11 @@ fun AccountingDetailedScreen(
 
   val budgetModel by budgetDetailedViewModel.uiState.collectAsState()
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
-  val subCategory = AccountingSubCategory(subCategoryUid, subCategoryUid, "", 1205, 2023)
+  val subCategory =
+      when (page) {
+        AccountingPage.BALANCE -> balanceModel.subCategory
+        AccountingPage.BUDGET -> budgetModel.subCategory
+      }
 
   val yearList = listOf("2023", "2022", "2021")
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
@@ -133,6 +135,7 @@ fun AccountingDetailedScreen(
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
         ) {
+          // Display the filter chips
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               // Year filter
@@ -162,19 +165,36 @@ fun AccountingDetailedScreen(
               }
             }
           }
-          if (page == AccountingPage.BALANCE) {
-            items(balanceModel.balanceList) {
-              DisplayBalanceItem(it, "displayItem${it.uid}")
-              HorizontalDivider(Modifier.fillMaxWidth())
+
+          // Display the items
+          when (page) {
+            AccountingPage.BALANCE -> {
+              items(balanceModel.balanceList) {
+                DisplayBalanceItem(it, "displayItem${it.uid}")
+                HorizontalDivider(Modifier.fillMaxWidth())
+              }
+
+              // display total amount
+              if (balanceModel.balanceList.isNotEmpty()) {
+                item { TotalItems(balanceModel.balanceList.sumOf { it.amount }) }
+              } else {
+                item { Text("No items for the ${subCategory.name} sheet with these filters") }
+              }
             }
-          } else if (page == AccountingPage.BUDGET) {
-            items(budgetModel.budgetList) {
-              DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")
-              HorizontalDivider(Modifier.fillMaxWidth())
+            AccountingPage.BUDGET -> {
+              items(budgetModel.budgetList) {
+                DisplayBudgetItem(budgetDetailedViewModel, it, "displayItem${it.uid}")
+                HorizontalDivider(Modifier.fillMaxWidth())
+              }
+
+              // display total amount
+              if (budgetModel.budgetList.isNotEmpty()) {
+                item { TotalItems(budgetModel.budgetList.sumOf { it.amount }) }
+              } else {
+                item { Text("No items for the ${subCategory.name} sheet with these filters") }
+              }
             }
           }
-
-          item { TotalItems(totalAmount) }
         }
       })
 }
@@ -204,6 +224,7 @@ fun TotalItems(totalAmount: Int) {
 /**
  * Display the budget Item in a list
  *
+ * @param budgetDetailedViewModel: The view model of the budget details
  * @param budgetItem: The budget item to display
  * @param testTag: The test tag of the item
  */
