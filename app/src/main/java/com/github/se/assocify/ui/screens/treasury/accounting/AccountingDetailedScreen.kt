@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
@@ -439,7 +440,7 @@ fun DisplayEditSubCategory(
             shape = RoundedCornerShape(16.dp),
         ) {
           Column(
-              modifier = Modifier.verticalScroll(rememberScrollState()),
+              modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Edit $name", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
                 OutlinedTextField(
@@ -485,9 +486,23 @@ fun DisplayEditSubCategory(
               }
 
           Row(
-              modifier = Modifier.fillMaxWidth().padding(15.dp),
+              modifier = Modifier.fillMaxWidth().padding(8.dp),
               horizontalArrangement = Arrangement.SpaceBetween,
           ) {
+            // Delete button
+            Button(
+                onClick = {
+                  when (page) {
+                    AccountingPage.BALANCE -> balanceViewModel.deleteSubCategory()
+                    AccountingPage.BUDGET -> budgetViewModel.deleteSubCategory()
+                  }
+                },
+                modifier = Modifier.testTag("editSubCategoryDeleteButton"),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)) {
+                  Text("Delete")
+                }
+
+            // Cancel button
             Button(
                 onClick = {
                   when (page) {
@@ -495,10 +510,12 @@ fun DisplayEditSubCategory(
                     AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditing()
                   }
                 },
-                modifier = Modifier.padding(15.dp).testTag("editSubCategoryCancelButton"),
+                modifier = Modifier.testTag("editSubCategoryCancelButton"),
             ) {
               Text("Cancel")
             }
+
+            // Save button
             Button(
                 onClick = {
                   when (page) {
@@ -508,7 +525,7 @@ fun DisplayEditSubCategory(
                         budgetViewModel.saveSubCategoryEditing(name, categoryUid, year.toInt())
                   }
                 },
-                modifier = Modifier.padding(15.dp).testTag("editSubCategorySaveButton"),
+                modifier = Modifier.testTag("editSubCategorySaveButton"),
             ) {
               Text("Save")
             }

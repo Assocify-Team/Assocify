@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class BudgetDetailedViewModel(
     private var budgetApi: BudgetAPI,
+    private var balanceApi: BalanceAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
     private var subCategoryUid: String
@@ -133,7 +135,30 @@ class BudgetDetailedViewModel(
   /** Cancel the Subcategory editing */
   fun cancelSubCategoryEditing() {
     _uiState.value = _uiState.value.copy(subCatEditing = false)
-  }
+  } 
+
+    /**Delete the subcategory and all items related to it*/
+    fun deleteSubCategory() {
+        accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
+
+        //delete all budgetItems related to the subcategory
+        _uiState.value.budgetList.forEach { budgetItem ->
+            budgetApi.deleteBudgetItem(budgetItem.uid, {}, {})
+        }
+
+        //delete all balanceItems related to the subcategory
+        balanceApi.getBalance(
+            CurrentUser.associationUid!!,
+            { balanceList ->
+                balanceList.filter { it.subcategoryUID == _uiState.value.subCategory.uid }
+                    .forEach { balanceItem ->
+                        balanceApi.deleteBalance(balanceItem.uid, {}, {})
+                    }
+            },
+            {})
+
+    }
+
 }
 
 /**
