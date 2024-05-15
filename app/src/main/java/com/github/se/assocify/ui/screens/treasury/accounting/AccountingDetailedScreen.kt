@@ -60,6 +60,7 @@ import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
@@ -268,7 +269,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   var tvaString by remember { mutableStateOf("") }
   var tvaTypeString by remember { mutableStateOf("") }
   var descriptionString by remember { mutableStateOf("") }
-  val date by remember { mutableStateOf(LocalDate.now()) }
+  var date by remember { mutableStateOf(LocalDate.now()) }
   var assignee by remember { mutableStateOf("") }
   var mutableStatus by remember { mutableStateOf(Status.Pending) }
   Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
@@ -418,7 +419,12 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             label = { Text("Description") },
             supportingText = {})
         }
-        /*TODO: insert date picker*/
+        //The date screen
+        item {
+          DatePickerWithDialog(value = "Date", onDateSelect = { newDate ->
+            date = newDate
+          })
+        }
 
 
         //The assignee field
@@ -436,7 +442,9 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
           ExposedDropdownMenuBox(
             expanded = statusExpanded,
             onExpandedChange = { statusExpanded = !statusExpanded },
-            modifier = Modifier.testTag("categoryDropdown").padding(8.dp)
+            modifier = Modifier
+              .testTag("categoryDropdown")
+              .padding(8.dp)
           ) {
             OutlinedTextField(
               value = mutableStatus.name,
@@ -447,7 +455,9 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               },
               readOnly = true,
               colors = ExposedDropdownMenuDefaults.textFieldColors(),
-              modifier = Modifier.menuAnchor().clickable { statusExpanded = !statusExpanded })
+              modifier = Modifier
+                .menuAnchor()
+                .clickable { statusExpanded = !statusExpanded })
             ExposedDropdownMenu(
               expanded = statusExpanded, onDismissRequest = { statusExpanded = false }) {
               Status.entries.forEach { status ->
