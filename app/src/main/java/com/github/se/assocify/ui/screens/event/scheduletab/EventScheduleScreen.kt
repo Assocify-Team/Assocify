@@ -17,11 +17,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -33,28 +36,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.Task
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.DatePickerWithDialog
+import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.util.DateTimeUtil
 import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-val dummyTasks =
-    listOf(
-        Task(
-            "uid",
-            "Cooking",
-            "Category 1",
-            false,
-            OffsetDateTime.of(2024, 3, 3, 9, 30, 0, 0, ZoneOffset.UTC),
-            2,
-            "Catering",
-            "Rolex",
-            "uid2"),
-    )
-
 /** A screen that displays the schedule of a staffer of an event. */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventScheduleScreen() {
+fun EventScheduleScreen(
+    viewModel: EventScheduleViewModel,
+) {
+  val state by viewModel.uiState.collectAsState()
 
   val hourHeight = 60.dp
 
@@ -63,13 +58,21 @@ fun EventScheduleScreen() {
   val initialScroll = with(LocalDensity.current) { hourHeight.toPx() }.toInt() * scrollStartHour
   val scrollState = rememberScrollState(initialScroll)
 
+  if (state.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (state.error != null) {
+    ErrorMessage(errorMessage = state.error) { viewModel.fetchTasks() }
+    return
+  }
+
   Column {
-    DateSwitcher()
+    DateSwitcher(viewModel)
     Row(modifier = Modifier.verticalScroll(scrollState)) {
       ScheduleSidebar(hourHeight = hourHeight)
-      ScheduleContent(
-          hourHeight = hourHeight,
-          tasks = dummyTasks) // The tasks should be prefiltered for the current selected day
+      ScheduleContent(hourHeight = hourHeight, tasks = state.currentDayTasks)
     }
   }
 }
@@ -90,8 +93,9 @@ fun ScheduleContent(hourHeight: Dp, hourNum: Int = 24, tasks: List<Task>) {
       content = {
         tasks.forEach { task ->
           // startOffset determines the y position of the task
-          val startHour = task.startTime.hour
-          val startMinute = task.startTime.minute
+          val startTime = DateTimeUtil.toLocalTime(task.startTime)
+          val startHour = startTime.hour
+          val startMinute = startTime.minute
           val startOffset = hourHeight * (startHour + startMinute / 60f)
 
           // duration determines the height of the task
@@ -164,16 +168,20 @@ fun ScheduleTask(task: Task) {
 
 /** The current date, with buttons to switch to the previous and next date. */
 @Composable
-fun DateSwitcher() {
+fun DateSwitcher(viewModel: EventScheduleViewModel) {
+  val state by viewModel.uiState.collectAsState()
   Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { /*TODO*/}) {
+        IconButton(onClick = { viewModel.previousDate() }) {
           Icon(Icons.AutoMirrored.Filled.ArrowLeft, contentDescription = "Previous date")
         }
-        Text(text = "Today")
-        IconButton(onClick = { /*TODO*/}) {
+        DatePickerWithDialog(
+            value = state.dateText,
+            onDateSelect = { viewModel.changeDate(it) },
+            textFieldFormat = false)
+        IconButton(onClick = { viewModel.nextDate() }) {
           Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = "Next date")
         }
       }

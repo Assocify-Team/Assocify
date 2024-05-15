@@ -30,13 +30,29 @@ class BalanceDetailedViewModel(
 
   init {
     updateDatabaseValues()
+    setSubCategory(subCategoryUid)
     uiState = _uiState
+  }
+
+  /**
+   * Set the subcategory
+   *
+   * @param subCategoryUid the subcategory uid
+   */
+  private fun setSubCategory(subCategoryUid: String) {
+    subCategoryAPI.getSubCategories(
+        CurrentUser.associationUid!!,
+        { subCategoryList ->
+          val subCategory = subCategoryList.find { it.uid == subCategoryUid }
+          if (subCategory != null) {
+            _uiState.value = _uiState.value.copy(subCategory = subCategory)
+          }
+        },
+        {})
   }
 
   /** Update the database values */
   private fun updateDatabaseValues() {
-    // Get the receipt items from the database
-    // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
@@ -121,6 +137,7 @@ class BalanceDetailedViewModel(
  */
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
+    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val status: Status? = null,
     val year: Int = 2023,
     val receiptList: List<Receipt> = emptyList(),

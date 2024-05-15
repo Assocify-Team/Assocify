@@ -51,6 +51,8 @@ enum class DateRestriction {
  * @param isSelectableDate The restriction on selectable dates.
  * @param isError Whether the DatePicker is in an error state.
  * @param supportingText Additional supporting text to be displayed below the DatePicker.
+ * @param textFieldFormat Whether a TextField should be used to display the date. If false, the date
+ *   will be displayed as plain text.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +63,8 @@ fun DatePickerWithDialog(
     label: @Composable (() -> Unit)? = null,
     isSelectableDate: DateRestriction = DateRestriction.ANY,
     isError: Boolean = false,
-    supportingText: @Composable (() -> Unit)? = null
+    supportingText: @Composable (() -> Unit)? = null,
+    textFieldFormat: Boolean = true
 ) {
   var showDialog by remember { mutableStateOf(false) }
   val datePickerState =
@@ -97,17 +100,23 @@ fun DatePickerWithDialog(
         Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
       }
 
-  Box {
-    OutlinedTextField(
-        modifier = modifier,
-        value = value,
-        onValueChange = {},
-        readOnly = true,
-        label = label,
-        placeholder = { Text(DateUtil.NULL_DATE_STRING) },
-        isError = isError,
-        supportingText = supportingText)
-    Box(modifier = Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
+  if (textFieldFormat) {
+    Box {
+      OutlinedTextField(
+          modifier = modifier,
+          value = value,
+          onValueChange = {},
+          readOnly = true,
+          label = label,
+          placeholder = { Text(DateUtil.NULL_DATE_STRING) },
+          isError = isError,
+          supportingText = supportingText)
+      Box(
+          modifier =
+              Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
+    }
+  } else {
+    Text(text = value, modifier = modifier.clickable(onClick = { showDialog = true }))
   }
 
   if (showDialog) {
