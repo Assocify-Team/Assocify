@@ -26,6 +26,7 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
     // Set the loading state
     _uiState.value = _uiState.value.copy(loading = true, error = null)
     // Fetch the tasks from the database
+
     taskAPI.getTasks(
         { tasks ->
           filterTasks(tasks)
