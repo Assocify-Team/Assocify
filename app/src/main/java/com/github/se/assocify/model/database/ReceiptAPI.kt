@@ -31,6 +31,32 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
               .trimIndent()
               .filter { it != '\n' })
 
+  /// The list of receipts owned by the user
+  private var userReceipts: List<Receipt>? = null
+  // The list of *all* receipts (if the user doesn't have permission to see all receipts, this
+  // will be the same as userReceipts)
+  private var receipts: List<Receipt>? = null
+  /// The user's UID
+  private var userUid: String? = CurrentUser.userUid
+
+  init {
+    updateCaches({ _, _ -> }, { _, _ -> })
+  }
+
+  // TODO: caches should use mutable lists to be more efficient
+  private fun updateReceiptInList(receipt: Receipt, receipts: List<Receipt>): List<Receipt> {
+    val index = receipts.indexOfFirst { r -> r.uid == receipt.uid }
+    return if (index != -1) {
+      receipts.toMutableList().apply { set(index, receipt) }
+    } else {
+      receipts + receipt
+    }
+  }
+
+  private fun deleteReceiptInList(id: String, receipts: List<Receipt>): List<Receipt> {
+    return receipts.filter { r -> r.uid != id }
+  }
+
   /**
    * Uploads a receipt to the database, as well as the image (if needed). Can create or update a
    * receipt.
@@ -73,6 +99,19 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       val sreceipt = SupabaseReceipt.fromReceipt(receipt)
       db.from("receipt").upsert(sreceipt)
       db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
+
+      // Update the cache
+      if (CurrentUser.userUid != userUid) {
+        // Invalidate cache if the user changed
+        userReceipts = null
+        receipts = null
+      }
+
+      if (userUid == sreceipt.userId) {
+        userReceipts = userReceipts?.let { updateReceiptInList(receipt, it) }
+      }
+      receipts = receipts?.let { updateReceiptInList(receipt, it) }
+
       onReceiptUploadSuccess()
     }
   }
@@ -100,6 +139,48 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
     }
   }
 
+  private fun updateUserCache(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      userReceipts =
+          db.from("receipt")
+              .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
+              .decodeList<SupabaseReceipt>()
+              .map { it.toReceipt() }
+      userUid = CurrentUser.userUid
+
+      onSuccess(userReceipts!!)
+    }
+  }
+
+  private fun updateCache(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      receipts =
+          db.from("receipt").select(columns).decodeList<SupabaseReceipt>().map { it.toReceipt() }
+
+      onSuccess(receipts!!)
+    }
+  }
+
+  /**
+   * Updates the caches of receipts. This is useful when the user wants to refresh the list of
+   * receipts.
+   *
+   * @param onSuccess called when the update is successful with the list of receipts. The boolean
+   *   parameter indicates whether the user's receipts were updated (`true`), or the global receipts
+   *   (`false`). Thus, this lambda will be called up to 2 times.
+   * @param onFailure called when the update fails with the exception that occurred. The boolean
+   *   parameter indicates whether the user's receipts were updated (`true`), or the global receipts
+   *   (`false`). Thus, this lambda will be called up to 2 times.
+   */
+  fun updateCaches(
+      onSuccess: (Boolean, List<Receipt>) -> Unit,
+      onFailure: (Boolean, Exception) -> Unit
+  ) {
+    updateUserCache({ onSuccess(true, it) }, { onFailure(true, it) })
+
+    updateCache({ onSuccess(false, it) }, { onFailure(false, it) })
+  }
+
   /**
    * Gets all receipts created by the current user.
    *
@@ -107,13 +188,12 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called when the fetch fails with the exception that occurred
    */
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      onSuccess(
-          db.from("receipt")
-              .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
-              .decodeList<SupabaseReceipt>()
-              .map { it.toReceipt() })
+    if (userReceipts != null && userUid == CurrentUser.userUid) {
+      onSuccess(userReceipts!!)
+      return
     }
+
+    updateUserCache(onSuccess, onFailure)
   }
 
   /**
@@ -124,14 +204,17 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called when the fetch fails with the exception that occurred
    */
   fun getReceipt(id: String, onSuccess: (Receipt) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      val receipt =
-          db.from("receipt")
-              .select(columns) { filter { SupabaseReceipt::uid eq id } }
-              .decodeSingle<SupabaseReceipt>()
-              .toReceipt()
-      onSuccess(receipt)
+    val getReceiptFromCache = { receipts: List<Receipt>? ->
+      receipts!!.find { it.uid == id }?.let { onSuccess(it) }
+          ?: onFailure(Exception("Receipt not found"))
     }
+
+    if (userReceipts != null && userUid == CurrentUser.userUid) {
+      getReceiptFromCache(userReceipts)
+      return
+    }
+
+    updateUserCache(getReceiptFromCache, onFailure)
   }
 
   /**
@@ -141,10 +224,12 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called whenever an error has occurred with the exception that occurred
    */
   fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      val select = db.from("receipt").select(columns)
-      onSuccess(select.decodeList<SupabaseReceipt>().map { it.toReceipt() })
+    if (receipts != null && userUid == CurrentUser.userUid) {
+      onSuccess(receipts!!)
+      return
     }
+
+    updateCache(onSuccess, onFailure)
   }
 
   /**
@@ -157,6 +242,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   fun deleteReceipt(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("receipt").delete { filter { SupabaseReceipt::uid eq id } }
+      // Update the cache
+      userReceipts = userReceipts?.let { deleteReceiptInList(id, it) }
+      receipts = receipts?.let { deleteReceiptInList(id, it) }
       onSuccess()
     }
   }
