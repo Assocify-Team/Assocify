@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param budgetApi the budget api
  * @param accountingSubCategoryAPI the accounting subcategory api
+ * @param accountingCategoryAPI the accounting category api
  * @param subCategoryUid the subcategory uid
  */
 class BudgetDetailedViewModel(
