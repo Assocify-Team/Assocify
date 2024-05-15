@@ -121,20 +121,30 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * network, and stored in disk cache. TODO: limit the size of the cache NOTE: If the *same* image
    * is requested twice at the same time, the second request will return immediately, *incorrectly*!
    *
-   * @param receipt the receipt to fetch the image of
+   * @param receiptUid the uid of the receipt to fetch the image of
    * @param onSuccess called when the image is fetched successfully with the URI of the image
    * @param onFailure called when the fetch fails with the exception that occurred
    */
-  fun getReceiptImage(receipt: Receipt, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
-    val imageCacheFile = cachePath.resolve(receipt.uid + ".jpg").toFile()
+  fun getReceiptImage(
+      receiptUid: String,
+      onSuccess: (Uri) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    val imageCacheFile = cachePath.resolve("$receiptUid.jpg").toFile()
     val now = System.currentTimeMillis()
     if (imageCacheFile.exists() && now - imageCacheFile.lastModified() < 60000) {
       onSuccess(Uri.fromFile(imageCacheFile))
       return
     }
 
-    tryAsync(onFailure) {
-      bucket.downloadAuthenticatedTo(receipt.uid, imageCacheFile.toPath())
+    val tmpImageCacheFile = cachePath.resolve("$receiptUid.jpg.tmp").toFile()
+
+    tryAsync({
+      tmpImageCacheFile.delete()
+      onFailure(it)
+    }) {
+      bucket.downloadAuthenticatedTo(receiptUid, tmpImageCacheFile.toPath())
+      tmpImageCacheFile.renameTo(imageCacheFile)
       onSuccess(Uri.fromFile(imageCacheFile))
     }
   }
@@ -209,8 +219,8 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
           ?: onFailure(Exception("Receipt not found"))
     }
 
-    if (userReceipts != null && userUid == CurrentUser.userUid) {
-      getReceiptFromCache(userReceipts)
+    if (receipts != null && userUid == CurrentUser.userUid) {
+      getReceiptFromCache(receipts)
       return
     }
 
