@@ -112,9 +112,7 @@ class EventScreenViewModel(
       EventPageIndex.Map -> {
         mapViewModel
       }
-      EventPageIndex.Schedule -> {
-        /*TODO: implement for schedule screen*/
-      }
+      EventPageIndex.Schedule -> {}
     }
   }
 

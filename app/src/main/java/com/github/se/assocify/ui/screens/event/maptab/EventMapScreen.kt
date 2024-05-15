@@ -99,8 +99,6 @@ fun rememberMapViewWithLifecycle(): MapView {
     onDispose { lifecycle.removeObserver(lifecycleObserver) }
   }
 
-  // loadMapOverlay(mapView, viewModel.mapViewModel)
-
   return mapView
 }
 
