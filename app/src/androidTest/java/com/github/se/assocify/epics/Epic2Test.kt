@@ -1,15 +1,17 @@
 package com.github.se.assocify.epics
 
+import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.printToLog
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -76,6 +78,21 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               Status.Pending,
               MaybeRemotePhoto.Remote("r1")))
 
+  private var myReceipts = prevReceipts.toMutableList()
+
+  private var allReceipts =
+      myReceipts +
+          Receipt(
+              "r2",
+              "Receipt-2-name",
+              "descR2",
+              LocalDate.EPOCH,
+              10,
+              Status.Pending,
+              MaybeRemotePhoto.Remote("r2"))
+
+  private var testUri = Uri.parse("content://test")
+
   private val associationAPI =
       mockk<AssociationAPI> {
         every { getAssociations(any(), any()) } answers
@@ -120,7 +137,40 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
             }
       }
 
-  private val receiptAPI = mockk<ReceiptAPI> {}
+  private val receiptAPI =
+      mockk<ReceiptAPI> {
+        every { getAllReceipts(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
+              onSuccessCallback.invoke(allReceipts)
+            }
+
+        every { getUserReceipts(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
+              onSuccessCallback.invoke(myReceipts)
+            }
+
+        every { getReceipt(any(), any(), any()) } answers
+            {
+              val receipt = myReceipts.find { it.uid == firstArg() }!!
+              val onSuccessCallback = secondArg<(Receipt) -> Unit>()
+              onSuccessCallback.invoke(receipt)
+            }
+
+        every { getReceiptImage(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(Uri) -> Unit>()
+              onSuccessCallback.invoke(Uri.parse(firstArg<Receipt>().uid))
+            }
+
+        every { uploadReceipt(any(), any(), any(), any()) } answers
+            {
+              val receipt = firstArg<Receipt>()
+              myReceipts.add(receipt)
+              navActions.back()
+            }
+      }
 
   private val eventAPI = mockk<EventAPI>(relaxUnitFun = true)
   private val taskAPI = mockk<TaskAPI>(relaxUnitFun = true)
@@ -132,6 +182,11 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   @Before
   fun testSetup() {
+     /*everyComposable { PhotoSelectionSheet(any(), any(), any(), any()) } answers {
+        val setImageUri = secondArg<(Uri?) -> Unit>()
+        setImageUri(testUri)
+     }*/
+
     composeTestRule.setContent {
       CurrentUser.userUid = "1"
       CurrentUser.associationUid = "a"
@@ -174,14 +229,15 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       assert(toTreasury == Destination.Treasury.route)
 
       onNodeWithTag("treasuryScreen").assertIsDisplayed()
-      onNodeWithText("Receipt-1-name").assertIsDisplayed().performClick()
+      onAllNodesWithText("Receipt-1-name").apply {
+        fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
+      }
+      onNodeWithTag("true-r1").performClick()
 
       // check that the receipt is correct and change its title
-      onNodeWithTag("titleField")
-          .assertIsDisplayed()
-          .performClick()
-          .performTextInput("Receipt-1-name-changed")
+      onNodeWithTag("titleField").assertIsDisplayed().performClick().performTextInput("-changed")
       onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed().performClick()
+      onNodeWithTag("ReceiptList").assertIsDisplayed()
       onNodeWithText("Receipt-1-name-changed").assertIsDisplayed()
 
       // (shouldn't have access to budget and balance but not implemented)
@@ -191,13 +247,19 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("titleField").performClick().performTextInput("Receipt-2-name")
       onNodeWithTag("amountField").performClick().performTextInput("10")
 
-      // NEED TO SEE HOW TO TEST DATE PICKER
-      composeTestRule.onRoot().printToLog("ARBITRARY_LOG_TAG")
-      onNodeWithTag("dateField").performClick().performTextInput("2022-01-01")
+      onNodeWithTag("dateField").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012024")
+      onNodeWithTag("datePickerDialogOk").performClick()
+      onNodeWithTag("dateField").assertTextContains("01/01/2024")
+
+        onNodeWithTag("editImageButton").performClick()
+
 
       onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed().performClick()
 
       // check that receipt is here
+      onNodeWithTag("ReceiptList").assertIsDisplayed()
       onNodeWithText("Receipt-2-name").assertIsDisplayed()
 
       // change association
