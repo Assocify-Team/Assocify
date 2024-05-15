@@ -82,6 +82,13 @@ class EventAPITest {
     eventAPI.getEvent("$uuid1", onSuccess, onFailure)
     verify(timeout = 200) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
+
+    error = true
+    // Test cache
+    eventAPI.getEvent("$uuid1", onSuccess, onFailure)
+    verify(timeout = 100) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -114,6 +121,14 @@ class EventAPITest {
             ]
         """
             .trimIndent()
+
+    eventAPI.getEvents(onSuccess, onFailure)
+    verify(timeout = 100) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
+
+    error = true
+    // Test cache
 
     eventAPI.getEvents(onSuccess, onFailure)
     verify(timeout = 100) { onSuccess(any()) }
@@ -171,6 +186,23 @@ class EventAPITest {
     val onSuccess: () -> Unit = mockk(relaxed = true)
     error = false
     val currentTime = OffsetDateTime.parse("2007-12-03T10:15:30+01:00")
+
+    response =
+        """
+          [{
+            "uid": "$uuid1",
+            "name": "Test Event",
+            "description": "Test Description A",
+            "start_date": "2008-12-03T10:15:30+01:00",
+            "end_date": "2008-12-03T10:15:30+01:00",
+            "guests_or_artists": "Test Guest",
+            "location": "Test Location"
+        }]
+      """
+            .trimIndent()
+    val successMockCache = mockk<(List<Event>) -> Unit>(relaxed = true)
+    eventAPI.updateEventCache(successMockCache, { fail("Should not fail") })
+    verify(timeout = 1000) { successMockCache(any()) }
 
     eventAPI.updateEvent(
         Event(
