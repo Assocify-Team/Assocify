@@ -199,6 +199,7 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
       onNodeWithTag("staffNumberField").assertTextContains("Staff number cannot be empty")
       onNodeWithTag("dateField").assertTextContains("Date cannot be empty")
       onNodeWithTag("timeField").assertTextContains("Time cannot be empty")
+      onNodeWithTag("durationField").assertTextContains("Duration cannot be empty")
 
       onNodeWithTag("titleField").performClick().performTextInput("Test Title")
 
@@ -211,11 +212,13 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
 
       viewModel.setTime(LocalTime.now())
+      viewModel.setDuration(LocalTime.of(1, 0))
 
       assert(viewModel.uiState.value.titleError == null)
       assert(viewModel.uiState.value.staffNumberError == null)
       assert(viewModel.uiState.value.dateError == null)
       assert(viewModel.uiState.value.timeError == null)
+      assert(viewModel.uiState.value.durationError == null)
 
       onNodeWithTag("saveButton").performScrollTo().performClick()
       onNodeWithText("Event is required", true).assertIsDisplayed()
@@ -265,6 +268,7 @@ class EditTaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           "Test Description",
           false,
           OffsetDateTime.now(),
+          60,
           5,
           "category",
           "location",

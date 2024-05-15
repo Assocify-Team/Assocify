@@ -1,6 +1,7 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -25,6 +26,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
+import java.lang.Thread.sleep
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,12 +47,12 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   val subCategoryList =
       listOf(
-          AccountingSubCategory("4", "2", "Administration", 30, 10),
-          AccountingSubCategory("5", "2", "Presidency", 20, 10),
-          AccountingSubCategory("6", "2", "Communication", 10, 10),
-          AccountingSubCategory("7", "1", "Champachelor", 5000, 1000),
-          AccountingSubCategory("8", "1", "Balelec", 5000, 1000),
-          AccountingSubCategory("9", "3", "Game*", 3000, 1000),
+          AccountingSubCategory("4", "2", "Administration", 30, 2023),
+          AccountingSubCategory("5", "2", "Presidency", 20, 2023),
+          AccountingSubCategory("6", "2", "Communication", 10, 2023),
+          AccountingSubCategory("7", "1", "Champachelor", 5000, 2022),
+          AccountingSubCategory("8", "1", "Balelec", 5000, 2022),
+          AccountingSubCategory("9", "3", "Game*", 3000, 2022),
       )
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -91,7 +93,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     with(composeTestRule) {
       onNodeWithTag("AccountingScreen").assertIsDisplayed()
       onNodeWithTag("filterRow").assertIsDisplayed()
-      onNodeWithTag("totalLine").assertIsDisplayed()
+      onNodeWithTag("totalLine").assertIsNotDisplayed()
       onNodeWithTag("yearFilterChip").assertIsDisplayed()
       onNodeWithTag("categoryFilterChip").assertIsDisplayed()
     }
@@ -101,12 +103,16 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @Test
   fun testFiltering() {
     with(composeTestRule) {
+      onNodeWithTag("yearFilterChip").performClick()
+      sleep(2000)
+      onNodeWithText("2022").performClick()
       onNodeWithTag("categoryFilterChip").performClick()
 
       // Tests if the lines are filtered according to the category
       onNodeWithText("Events").performClick()
       subCategoryList
           .filter { it.categoryUID == "1" }
+          .filter { it.year == 2022 }
           .forEach() { onNodeWithText(it.name).assertIsDisplayed() }
       assert(!accountingViewModel.uiState.value.globalSelected)
       assert(
@@ -116,9 +122,13 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       // Tests if the lines are displayed when the global category is selected
       onNodeWithTag("categoryFilterChip").performClick()
       onNodeWithText("Global").performClick()
-      subCategoryList.forEach() { onNodeWithText(it.name).assertIsDisplayed() }
+      subCategoryList
+          .filter { it.year == 2022 }
+          .forEach() { onNodeWithText(it.name).assertIsDisplayed() }
       assert(accountingViewModel.uiState.value.globalSelected)
-      assert(accountingViewModel.uiState.value.subCategoryList == subCategoryList)
+      assert(
+          accountingViewModel.uiState.value.subCategoryList ==
+              subCategoryList.filter { it.year == 2022 })
 
       // Tests if a message is shown when no subCategory
       onNodeWithTag("categoryFilterChip").performClick()
