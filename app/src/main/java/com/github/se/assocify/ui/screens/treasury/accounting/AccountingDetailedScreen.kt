@@ -61,6 +61,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
+import java.time.LocalDate
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -120,7 +121,9 @@ fun AccountingDetailedScreen(
       content = { innerPadding ->
         if (budgetModel.editing && page == AccountingPage.BUDGET) {
           DisplayEditBudget(budgetDetailedViewModel)
-        } else if (page == AccountingPage.BALANCE) {}
+        } else if (page == AccountingPage.BALANCE) {
+          DisplayEditBalance(balanceDetailedViewModel)
+        }
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
@@ -155,7 +158,7 @@ fun AccountingDetailedScreen(
           }
           if (page == AccountingPage.BALANCE) {
             items(balanceModel.balanceList) {
-              DisplayBalanceItem(it, "displayItem${it.uid}")
+              DisplayBalanceItem(balanceDetailedViewModel, it, "displayItem${it.uid}")
               HorizontalDivider(Modifier.fillMaxWidth())
             }
           } else if (page == AccountingPage.BUDGET) {
@@ -220,33 +223,38 @@ fun DisplayBudgetItem(
  * @param testTag: The test tag of the item
  */
 @Composable
-fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
+fun DisplayBalanceItem(
+    balanceDetailedViewModel: BalanceDetailedViewModel,
+    balanceItem: BalanceItem,
+    testTag: String
+) {
   ListItem(
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
-          /*Icon(
-          balanceItem.receipt!!.status.getIcon(),
-          contentDescription = "Create") // TODO: add logo depending on the phase*/
         }
       },
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
-      modifier = Modifier.clickable {}.testTag(testTag))
+      modifier =
+          Modifier.clickable { balanceDetailedViewModel.startEditing(balanceItem) }
+              .testTag(testTag))
 }
 
 @Composable
-fun DisplayEditBalance() {
+fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
+  val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
+  val balance = balanceModel.editedBalanceItem!!
   var nameString by remember { mutableStateOf("") }
   var amount by remember { mutableIntStateOf(0) }
   var tvaString by remember { mutableStateOf("") }
   var tvaTypeString by remember { mutableStateOf("") }
   var descriptionString by remember { mutableStateOf("") }
-  var date by remember { mutableStateOf("") }
+  var date by remember { mutableStateOf(LocalDate.now()) }
   var assignee by remember { mutableStateOf("") }
   var status by remember { mutableStateOf(Status.Pending) }
-  Dialog(onDismissRequest = { /*TODO: wait for viewModel to revert*/}) {
+  Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
     Card(
         modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
@@ -312,13 +320,26 @@ fun DisplayEditBalance() {
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
           Button(
-              onClick = { /*TODO: wait for viewModel to revert*/},
+              onClick = { balanceDetailedViewModel.cancelEditing() },
               modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
           ) {
             Text("Dismiss")
           }
           Button(
-              onClick = { /*TODO: wait for viewModel to save*/},
+              onClick = {
+                balanceDetailedViewModel.saveEditing(
+                    BalanceItem(
+                        balance.uid,
+                        nameString,
+                        "",
+                        "",
+                        amount,
+                        TVA.floatToTVA(tvaString.toFloat()),
+                        descriptionString,
+                        date,
+                        assignee,
+                        status))
+              },
               modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
           ) {
             Text("Confirm")

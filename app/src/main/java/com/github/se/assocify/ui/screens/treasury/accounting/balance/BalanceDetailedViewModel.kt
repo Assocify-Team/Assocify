@@ -92,6 +92,34 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(status = status)
     updateDatabaseValues()
   }
+
+  /**
+   * Enter in the edit state so the popup appears
+   *
+   * @param balanceItem the item we want to edit
+   */
+  fun startEditing(balanceItem: BalanceItem) {
+    _uiState.value = _uiState.value.copy(editing = true, editedBalanceItem = balanceItem)
+  }
+
+  /**
+   * Exit the edit state while saving the modifications performed
+   *
+   * @param balanceItem the new edited budgetItem
+   */
+  fun saveEditing(balanceItem: BalanceItem) {
+    _uiState.value =
+        _uiState.value.copy(
+            editing = false,
+            balanceList =
+                _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
+            editedBalanceItem = null)
+  }
+
+  /** Exit the edit state without keeping the modifications done */
+  fun cancelEditing() {
+    _uiState.value = _uiState.value.copy(editing = false, editedBalanceItem = null)
+  }
 }
 
 /**
@@ -106,5 +134,7 @@ data class BalanceItemState(
     val status: Status? = null,
     val year: Int = 2023,
     val receiptList: List<Receipt> = emptyList(),
-    val subCategoryList: List<AccountingSubCategory> = emptyList()
+    val subCategoryList: List<AccountingSubCategory> = emptyList(),
+    val editing: Boolean = false,
+    val editedBalanceItem: BalanceItem? = null
 )
