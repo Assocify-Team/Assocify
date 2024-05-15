@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.SupabaseClient
@@ -13,6 +14,10 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
 
   private var budgetCache: List<BudgetItem>? = null
   private var budgetCacheAssociationUID: String? = null
+
+  init {
+    CurrentUser.associationUid?.let { updateBudgetCache(it, {}, {}) }
+  }
 
   /**
    * Get the budget of an association, but force an update of the cache

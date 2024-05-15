@@ -24,6 +24,8 @@ import com.github.se.assocify.navigation.mainNavGraph
 fun AssocifyApp(loginSaver: LoginSave) {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController, loginSaver)
+  loginSaver.loadUserInfo()
+
   val userAPI = UserAPI(SupabaseClient.supabaseClient)
   val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
@@ -34,7 +36,6 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val accountingCategoriesAPI = AccountingCategoryAPI(SupabaseClient.supabaseClient)
   val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
   val balanceAPI = BalanceAPI(SupabaseClient.supabaseClient)
-  loginSaver.loadUserInfo()
 
   val firstDest =
       if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
