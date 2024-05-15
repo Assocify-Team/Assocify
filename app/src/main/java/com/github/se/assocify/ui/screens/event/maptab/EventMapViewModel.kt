@@ -49,12 +49,22 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
             currentEventTasks = tasks.filter { it.eventUid in _uiState.value.filteredEventsUid })
   }
 
+  /**
+   * Set the events to filter the tasks
+   *
+   * @param events the events to filter the tasks
+   */
   fun setEvents(events: List<Event>) {
     _uiState.value = _uiState.value.copy(filteredEventsUid = events.map { it.uid })
     filterTasks()
     fetchMarkers()
   }
 
+  /**
+   * Fetch the markers from the tasks
+   *
+   * @param tasks the tasks to fetch the markers from
+   */
   private fun fetchMarkers() {
     val tasks = _uiState.value.currentEventTasks
     for (task in tasks) {
@@ -68,10 +78,16 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
 }
 
 data class EventMapState(
+    // Whether the view is loading
     val loading: Boolean = false,
+    // The error message
     val error: String? = null,
+    // The list of tasks
     val taskList: List<Task> = emptyList(),
+    // The list of tasks filtered by the current events
     val currentEventTasks: List<Task> = emptyList(),
+    // The list of events to filter the tasks
     val filteredEventsUid: List<String> = emptyList(),
+    // The list of markers to display on the map
     val markers: List<MapMarkerData> = emptyList()
 )
