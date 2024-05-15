@@ -4,13 +4,23 @@ import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import java.time.OffsetDateTime
-import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
+class EventAPI(db: SupabaseClient) : SupabaseApi() {
   private val postgrest = db.postgrest
   private val collectionName = "event"
+
+  private var eventCache: List<Event>? = null
+
+  fun updateEventCache(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      val events =
+          postgrest.from(collectionName).select().decodeList<SupabaseEvent>().map { it.toEvent() }
+      eventCache = events
+      onSuccess(events)
+    }
+  }
 
   /**
    * Creates an event in the database
@@ -20,24 +30,20 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun addEvent(event: Event, onSuccess: (String) -> Unit = {}, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-
-        postgrest
-            .from(collectionName)
-            .insert(
-                SupabaseEvent(
-                    uid = event.uid,
-                    name = event.name,
-                    description = event.description,
-                    startDate = event.startDate.toString(),
-                    endDate = event.endDate.toString(),
-                    guestsOrArtists = event.guestsOrArtists,
-                    location = event.location))
-        onSuccess(event.uid)
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure) {
+      postgrest
+          .from(collectionName)
+          .insert(
+              SupabaseEvent(
+                  uid = event.uid,
+                  name = event.name,
+                  description = event.description,
+                  startDate = event.startDate.toString(),
+                  endDate = event.endDate.toString(),
+                  guestsOrArtists = event.guestsOrArtists,
+                  location = event.location))
+      eventCache = eventCache?.plus(event)
+      onSuccess(event.uid)
     }
   }
 
@@ -48,14 +54,12 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val events = postgrest.from(collectionName).select().decodeList<SupabaseEvent>()
-        onSuccess(events.map { it.toEvent() })
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    if (eventCache != null) {
+      onSuccess(eventCache!!)
+      return
     }
+
+    updateEventCache(onSuccess, onFailure)
   }
 
   /**
@@ -66,21 +70,16 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getEvent(id: String, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        val event =
-            postgrest
-                .from(collectionName)
-                .select {
-                  filter { Event::uid eq id }
-                  limit(1)
-                  single()
-                }
-                .decodeAs<SupabaseEvent>()
-        onSuccess(event.toEvent())
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    if (eventCache != null) {
+      val event = eventCache!!.find { it.uid == id }
+      event?.let { onSuccess(it) } ?: onFailure(Exception("Event with id $id not found"))
+    } else {
+      updateEventCache(
+          onSuccess = {
+            val event = it.find { it.uid == id }
+            event?.let { onSuccess(it) } ?: onFailure(Exception("Event with id $id not found"))
+          },
+          onFailure = onFailure)
     }
   }
 
@@ -128,22 +127,34 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: () -> Unit = {},
       onFailure: (Exception) -> Unit
   ) {
-    scope.launch {
-      try {
-        postgrest.from(collectionName).update({
-          SupabaseEvent::name setTo name
-          SupabaseEvent::description setTo description
-          SupabaseEvent::startDate setTo startDate.toString()
-          SupabaseEvent::endDate setTo endDate.toString()
-          SupabaseEvent::guestsOrArtists setTo guestsOrArtists
-          SupabaseEvent::location setTo location
-        }) {
-          filter { Event::uid eq uid }
-        }
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
+    tryAsync(onFailure) {
+      postgrest.from(collectionName).update({
+        SupabaseEvent::name setTo name
+        SupabaseEvent::description setTo description
+        SupabaseEvent::startDate setTo startDate.toString()
+        SupabaseEvent::endDate setTo endDate.toString()
+        SupabaseEvent::guestsOrArtists setTo guestsOrArtists
+        SupabaseEvent::location setTo location
+      }) {
+        filter { Event::uid eq uid }
       }
+
+      eventCache =
+          eventCache?.map {
+            if (it.uid == uid) {
+              Event(
+                  uid = uid,
+                  name = name,
+                  description = description,
+                  startDate = startDate,
+                  endDate = endDate,
+                  guestsOrArtists = guestsOrArtists,
+                  location = location)
+            } else {
+              it
+            }
+          }
+      onSuccess()
     }
   }
 
@@ -155,13 +166,12 @@ class EventAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun deleteEvent(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
-    scope.launch {
-      try {
-        postgrest.from(collectionName).delete { filter { Event::uid eq id } }
-        onSuccess()
-      } catch (e: Exception) {
-        onFailure(e)
-      }
+    tryAsync(onFailure) {
+      postgrest.from(collectionName).delete { filter { Event::uid eq id } }
+
+      eventCache = eventCache?.filter { it.uid != id }
+
+      onSuccess()
     }
   }
 
