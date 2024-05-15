@@ -128,6 +128,17 @@ class BalanceDetailedViewModel(
   fun cancelEditing() {
     _uiState.value = _uiState.value.copy(editing = false, editedBalanceItem = null)
   }
+
+  fun deleteBalanceItem(balanceItemUid: String) {
+    balanceApi.deleteBalance(
+        balanceItemUid,
+        {
+          _uiState.value = _uiState.value.copy(balanceList = _uiState.value.balanceList.filter { it.uid != balanceItemUid })
+        },
+        {
+          Log.e("BalanceDetailedViewModel", "Error deleting balance item")
+        })
+  }
 }
 
 /**
