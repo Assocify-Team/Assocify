@@ -8,12 +8,12 @@ import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.DateTimeUtil
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.DurationUtil
 import com.github.se.assocify.ui.util.TimeUtil
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.OffsetDateTime
 import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,8 +87,8 @@ class TaskViewModel {
                   description = it.description,
                   category = it.category,
                   staffNumber = it.peopleNeeded.toString(),
-                  date = DateUtil.toString(date),
-                  time = TimeUtil.toString(time),
+                  date = DateUtil.formatDate(date),
+                  time = TimeUtil.formatTime(time),
                   duration = DurationUtil.toString(it.duration))
 
           loadEvents()
@@ -143,7 +143,7 @@ class TaskViewModel {
   }
 
   fun setDate(date: LocalDate?) {
-    _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
+    _uiState.value = _uiState.value.copy(date = DateUtil.formatDate(date))
     if (date == null) {
       _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
     } else {
@@ -152,7 +152,7 @@ class TaskViewModel {
   }
 
   fun setTime(time: LocalTime?) {
-    _uiState.value = _uiState.value.copy(time = TimeUtil.toString(time))
+    _uiState.value = _uiState.value.copy(time = TimeUtil.formatTime(time))
     if (time == null) {
       _uiState.value = _uiState.value.copy(timeError = "Time cannot be empty")
     } else {
@@ -198,9 +198,8 @@ class TaskViewModel {
     val time = TimeUtil.toTime(_uiState.value.time) ?: return
     val duration = DurationUtil.toDuration(_uiState.value.duration) ?: return
 
-    val zone = OffsetDateTime.now().offset
 
-    val startTime = OffsetDateTime.of(date, time, zone)
+    val startTime = DateTimeUtil.toOffsetDateTime(date, time)
 
     val task =
         Task(

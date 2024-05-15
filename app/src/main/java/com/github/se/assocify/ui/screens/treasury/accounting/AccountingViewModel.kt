@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -51,7 +52,7 @@ class AccountingViewModel(
                         subCategoryList.filter { it.categoryUID == _uiState.value.selectedCatUid })
           }
         },
-        {})
+        { Log.d("BudgetViewModel", "Error getting subcategories") })
   }
 
   /**
