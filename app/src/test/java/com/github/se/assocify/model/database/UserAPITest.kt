@@ -171,7 +171,7 @@ class UserAPITest {
       [{
         "user_id": "$uuid1",
         "role_id": "$uuid1",
-        "association_id": "$uuid1",
+        "association_id": "${APITestUtils.ASSOCIATION.uid}",
         "type": "presidency",
         "association_name": "Test",
         "association_description": "Test",
@@ -185,10 +185,10 @@ class UserAPITest {
 
     error = true
 
+    clearMocks(onSuccess)
     // Test cache
     userAPI.getCurrentUserAssociations(onSuccess, { fail("Should not fail, failed with $it") })
 
-    clearMocks(onSuccess)
     verify(timeout = 1000) { onSuccess(any()) }
 
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
