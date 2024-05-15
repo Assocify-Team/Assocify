@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -120,6 +121,7 @@ class BalanceDetailedViewModel(
    * @param year the new year of the subCategory
    */
   fun saveSubCategoryEditing(name: String, categoryUid: String, year: Int) {
+      Log.d("BalanceDetailedViewModel", "saveSubCategoryEditing: $name, $categoryUid, $year")
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
     accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
     _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)

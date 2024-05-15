@@ -253,15 +253,15 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editSubCategoryYearBox").performTextClearance()
       onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
       onNodeWithTag("categoryDropdown").assertIsDisplayed()
-      // onNodeWithTag("categoryDropdown").performClick()
-      // onNodeWithText("Events").performClick()
+      onNodeWithTag("categoryDropdown").performClick()
+      onNodeWithText("Events").performClick()
       onNodeWithTag("editSubCategorySaveButton").performClick()
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsDisplayed()
       assert(budgetDetailedViewModel.uiState.value.subCategory.name == "newName")
       assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2024)
-      // assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
+      assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
     }
   }
 

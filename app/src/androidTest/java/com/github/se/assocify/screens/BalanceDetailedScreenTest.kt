@@ -135,10 +135,10 @@ class BalanceDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockBudgetAPI, mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockBalanceAPI, mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -261,15 +261,15 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryYearBox").performTextClearance()
       onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
       onNodeWithTag("categoryDropdown").assertIsDisplayed()
-      // onNodeWithTag("categoryDropdown").performClick()
-      // onNodeWithText("Events").performClick()
+      onNodeWithTag("categoryDropdown").performClick()
+      onNodeWithText("Events").performClick()
       onNodeWithTag("editSubCategorySaveButton").performClick()
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsDisplayed()
       assert(balanceDetailedViewModel.uiState.value.subCategory.name == "newName")
       assert(balanceDetailedViewModel.uiState.value.subCategory.year == 2024)
-      // assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
+      assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
     }
   }
 
