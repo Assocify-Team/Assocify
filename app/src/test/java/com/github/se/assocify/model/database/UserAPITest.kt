@@ -1,6 +1,8 @@
 package com.github.se.assocify.model.database
 
+import android.util.Log
 import com.github.se.assocify.BuildConfig
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
@@ -10,10 +12,12 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.clearMocks
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.lang.Thread.sleep
 import java.util.UUID
 import org.junit.Assert.fail
 import org.junit.Before
@@ -39,6 +43,7 @@ class UserAPITest {
   @Before
   fun setup() {
     APITestUtils.setup()
+    error = true
     userAPI =
         UserAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -51,42 +56,58 @@ class UserAPITest {
                 }
               }
             })
+    error = false
+    sleep(300) // Sleep to let the init pass by
   }
 
   @Test
   fun testGetUser() {
-    val onSuccess: (User) -> Unit = mockk(relaxed = true)
-
-    error = false
-    response = testUserJson1
-    userAPI.getUser("testId", onSuccess, { fail("Should not fail, failed with $it") })
-
-    verify(timeout = 1000) { onSuccess(testUser1) }
-
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
     error = true
+
     userAPI.getUser("testId", { fail("Should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
+
+    val onSuccess: (User) -> Unit = mockk(relaxed = true)
+
+    error = false
+    response = "[$testUserJson1, $testUserJson2]"
+    userAPI.getUser(testUser1.uid, onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(testUser1) }
+
+    error = true
+
+    clearMocks(onSuccess)
+    userAPI.getUser(testUser1.uid, onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(testUser1) }
   }
 
   @Test
   fun testGetAllUsers() {
-    val onSuccess: (List<User>) -> Unit = mockk(relaxed = true)
+    error = true
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
+    userAPI.getAllUsers({ fail("Should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+
+    val onSuccess: (List<User>) -> Unit = mockk(relaxed = true)
     error = false
     response = "[$testUserJson1, $testUserJson2]"
     userAPI.getAllUsers(onSuccess, { fail("Should not fail, failed with $it") })
 
     verify(timeout = 1000) { onSuccess(listOf(testUser1, testUser2)) }
 
-    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
-
     error = true
-    userAPI.getAllUsers({ fail("Should not succeed") }, onFailure)
 
-    verify(timeout = 1000) { onFailure(any()) }
+    clearMocks(onSuccess)
+    userAPI.getAllUsers(onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) { onSuccess(listOf(testUser1, testUser2)) }
   }
 
   @Test
@@ -163,9 +184,19 @@ class UserAPITest {
 
     verify(timeout = 1000) { onSuccess(any()) }
 
+    error = true
+
+    // Test cache
+    userAPI.getCurrentUserAssociations(onSuccess, { fail("Should not fail, failed with $it") })
+
+    clearMocks(onSuccess)
+    verify(timeout = 1000) { onSuccess(any()) }
+
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    error = true
+    // Change user to invalidate cache
+    CurrentUser.userUid = "DEADBEEF-1000-0000-0000-000000000000"
+
     userAPI.getCurrentUserAssociations({ fail("Should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
@@ -242,15 +273,15 @@ class UserAPITest {
 
   @Test
   fun testGetCurrentUserRole() {
+    Log.i("TEST", "Start of test")
     val onSuccess: (PermissionRole) -> Unit = mockk(relaxed = true)
 
-    error = false
     response =
         """
       [{
         "user_id": "$uuid1",
         "role_id": "$uuid1",
-        "association_id": "$uuid1",
+        "association_id": "${APITestUtils.ASSOCIATION.uid}",
         "type": "presidency",
         "association_name": "Test",
         "association_description": "Test",
@@ -258,15 +289,27 @@ class UserAPITest {
       }]
     """
             .trimIndent()
+    error = false
     userAPI.getCurrentUserRole(onSuccess, { fail("Should not fail, failed with $it") })
 
     verify(timeout = 1000) {
-      onSuccess(PermissionRole(uuid1.toString(), uuid1.toString(), RoleType.PRESIDENCY))
+      onSuccess(PermissionRole(uuid1.toString(), APITestUtils.ASSOCIATION.uid, RoleType.PRESIDENCY))
+    }
+
+    error = true
+
+    clearMocks(onSuccess)
+    userAPI.getCurrentUserRole(onSuccess, { fail("Should not fail, failed with $it") })
+
+    verify(timeout = 1000) {
+      onSuccess(PermissionRole(uuid1.toString(), APITestUtils.ASSOCIATION.uid, RoleType.PRESIDENCY))
     }
 
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
 
-    error = true
+    // Change user to invalidate cache
+    CurrentUser.userUid = "DEADBEEF-1000-0000-0000-000000000000"
+
     userAPI.getCurrentUserRole({ fail("Should not succeed") }, onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
