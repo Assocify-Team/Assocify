@@ -11,7 +11,7 @@ object DurationUtil {
    * Converts duration to a string. If the time is null, it returns a string representing a null
    * time.
    */
-  fun toString(time: LocalTime?): String {
+  fun formatTime(time: LocalTime?): String {
     if (time == null) {
       return NULL_DURATION_STRING
     }
@@ -22,7 +22,7 @@ object DurationUtil {
    * Converts duration to a string. If the time is null, it returns a string representing a null
    * time.
    */
-  fun toString(time: Int): String {
+  fun formatTime(time: Int): String {
     val localTime = LocalTime.of(time / 60, time % 60)
     return localTime.format(DateTimeFormatter.ofPattern("HH:mm"))
   }

@@ -76,8 +76,9 @@ class TaskViewModel {
     taskApi.getTask(
         taskUid,
         {
-          val date = it.startTime.toLocalDate()
-          val time = it.startTime.toLocalTime()
+          val dateTime = DateTimeUtil.toLocalDateTime(it.startTime)
+          val date = dateTime.toLocalDate()
+          val time = dateTime.toLocalTime()
           eventUid = it.eventUid
 
           _uiState.value =
@@ -89,7 +90,7 @@ class TaskViewModel {
                   staffNumber = it.peopleNeeded.toString(),
                   date = DateUtil.formatDate(date),
                   time = TimeUtil.formatTime(time),
-                  duration = DurationUtil.toString(it.duration))
+                  duration = DurationUtil.formatTime(it.duration))
 
           loadEvents()
         },
@@ -161,7 +162,7 @@ class TaskViewModel {
   }
 
   fun setDuration(duration: LocalTime?) {
-    _uiState.value = _uiState.value.copy(duration = DurationUtil.toString(duration))
+    _uiState.value = _uiState.value.copy(duration = DurationUtil.formatTime(duration))
     if (duration == null) {
       _uiState.value = _uiState.value.copy(durationError = "Duration cannot be empty")
     } else {
@@ -196,8 +197,7 @@ class TaskViewModel {
 
     val date = DateUtil.toDate(_uiState.value.date) ?: return
     val time = TimeUtil.toTime(_uiState.value.time) ?: return
-    val duration = DurationUtil.toDuration(_uiState.value.duration) ?: return
-
+    val duration = DurationUtil.toDuration(_uiState.value.duration)
 
     val startTime = DateTimeUtil.toOffsetDateTime(date, time)
 
