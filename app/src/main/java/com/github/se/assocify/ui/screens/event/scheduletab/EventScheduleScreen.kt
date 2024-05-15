@@ -116,8 +116,10 @@ fun ScheduleContent(
               modifier =
                   Modifier.height((duration * hourHeight.value).dp)
                       .padding(horizontal = 4.dp, vertical = 2.dp)
-                      .offset(y = startOffset)) {
-                ScheduleTask(task, lines, viewModel)
+                      .offset(y = startOffset)
+                      .clickable { viewModel.openTask(task.uid) }
+          ) {
+                ScheduleTask(task, lines)
               }
         }
       },
@@ -160,7 +162,7 @@ fun ScheduleContent(
  * @param task The task to display
  */
 @Composable
-fun ScheduleTask(task: Task, lines: Int, viewModel: EventScheduleViewModel) {
+fun ScheduleTask(task: Task, lines: Int) {
   Column(
       modifier =
           Modifier.fillMaxSize()
@@ -168,8 +170,7 @@ fun ScheduleTask(task: Task, lines: Int, viewModel: EventScheduleViewModel) {
               .background(
                   color = MaterialTheme.colorScheme.primaryContainer,
                   shape = RoundedCornerShape(4.dp))
-              .padding(horizontal = 8.dp, vertical = 4.dp)
-              .clickable { viewModel.openTask(task.uid) }) {
+              .padding(horizontal = 8.dp, vertical = 4.dp)) {
         Text(
             task.title,
             maxLines = 1,
