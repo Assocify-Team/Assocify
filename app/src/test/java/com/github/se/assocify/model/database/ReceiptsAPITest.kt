@@ -195,6 +195,10 @@ class ReceiptsAPITest {
     api.getReceipt(remoteReceipt.uid, successMock, { fail("Should not fail, failed with $it") })
     verify(timeout = 1000) { successMock(remoteReceipt) }
 
+    val failureMock1 = mockk<(Exception) -> Unit>(relaxed = true)
+    api.getReceipt(localReceipt.uid, { fail("Should not succeed") }, failureMock1)
+    verify(timeout = 1000) { failureMock1.invoke(any()) }
+
     // Change the UID to invalidate the cache
     CurrentUser.userUid = "DEADBEEF-1000-0000-0000-000000000000"
 
