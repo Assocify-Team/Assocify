@@ -60,7 +60,7 @@ class ReceiptViewModel {
                   title = receipt.title,
                   description = receipt.description,
                   amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
-                  date = DateUtil.toString(receipt.date),
+                  date = DateUtil.formatDate(receipt.date),
                   incoming = receipt.cents >= 0,
                   loading = false,
                   error = null)
@@ -117,7 +117,7 @@ class ReceiptViewModel {
   }
 
   fun setDate(date: LocalDate?) {
-    _uiState.value = _uiState.value.copy(date = DateUtil.toString(date))
+    _uiState.value = _uiState.value.copy(date = DateUtil.formatDate(date))
     if (date == null) {
       _uiState.value = _uiState.value.copy(dateError = "Date cannot be empty")
     } else {

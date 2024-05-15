@@ -64,7 +64,11 @@ class SelectAssociationViewModel(
               {})
         },
         {}) // TODO: handle joining assoc (non immediate approval)
-    navActions.onLogin(true)
+    if (navActions.backFromSelectAsso()) {
+      navActions.back()
+    } else {
+      navActions.onLogin(true)
+    }
   }
 }
 
