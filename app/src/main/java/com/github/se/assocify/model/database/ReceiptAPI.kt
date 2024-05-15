@@ -39,6 +39,15 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   /// The user's UID
   private var userUid: String? = CurrentUser.userUid
 
+  private fun updateReceiptInList(receipt: Receipt, receipts: List<Receipt>): List<Receipt> {
+    val index = receipts.indexOfFirst { r -> r.uid == receipt.uid }
+    return if (index != -1) {
+      receipts.toMutableList().apply { set(index, receipt) }
+    } else {
+      receipts + receipt
+    }
+  }
+
   /**
    * Uploads a receipt to the database, as well as the image (if needed). Can create or update a
    * receipt.
@@ -81,6 +90,19 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       val sreceipt = SupabaseReceipt.fromReceipt(receipt)
       db.from("receipt").upsert(sreceipt)
       db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
+
+      // Update the cache
+      if (CurrentUser.userUid == userUid) {
+        // Invalidate cache if the user changed
+        userReceipts = null
+        receipts = null
+      }
+
+      if (userUid == sreceipt.userId) {
+        userReceipts = userReceipts?.let { updateReceiptInList(receipt, it) }
+      }
+      receipts = receipts?.let { updateReceiptInList(receipt, it) }
+
       onReceiptUploadSuccess()
     }
   }
