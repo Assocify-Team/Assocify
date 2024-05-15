@@ -260,13 +260,14 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balance = balanceModel.editedBalanceItem!!
   var nameString by remember { mutableStateOf("") }
   var subCategoryUid by remember { mutableStateOf("") }
+  var receiptUid by remember { mutableStateOf("") }
   var amount by remember { mutableIntStateOf(0) }
   var tvaString by remember { mutableStateOf("") }
   var tvaTypeString by remember { mutableStateOf("") }
   var descriptionString by remember { mutableStateOf("") }
   val date by remember { mutableStateOf(LocalDate.now()) }
   var assignee by remember { mutableStateOf("") }
-  val status by remember { mutableStateOf(Status.Pending) }
+  var mutableStatus by remember { mutableStateOf(Status.Pending) }
   Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
     Card(
       modifier = Modifier
@@ -295,7 +296,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               .height(60.dp),
             selected = subExtended,
             onClick = { subExtended = !subExtended },
-            label = { Text(tvaTypeString) },
+            label = { Text(subCategoryUid) },
             trailingIcon = {
               Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
             })
@@ -315,7 +316,39 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             }
           }
         }
+        // The receipt selector
+        Box(modifier = Modifier
+          .fillMaxWidth()
+          .padding(8.dp)) {
+          var receiptExtended by remember { mutableStateOf(false) }
+          FilterChip(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(60.dp),
+            selected = receiptExtended,
+            onClick = { receiptExtended = !receiptExtended },
+            label = { Text(receiptUid) },
+            trailingIcon = {
+              Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+            })
+          DropdownMenu(
+            modifier = Modifier,
+            expanded = receiptExtended,
+            onDismissRequest = { receiptExtended = false },
+            properties = PopupProperties(focusable = true)
+          ) {
+            balanceModel.receiptList.forEach { receipt ->
+              DropdownMenuItem(
+                text = { Text(receipt.title) },
+                onClick = {
+                  receiptUid = receipt.uid
+                  receiptExtended = false
+                })
+            }
+          }
+        }
 
+        // The amount field
             OutlinedTextField(
               modifier = Modifier.padding(8.dp),
               value = amount.toString(),
@@ -323,6 +356,8 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               label = { Text("Amount") },
               keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
               supportingText = {})
+
+        //The TVA box
             Box(modifier = Modifier
               .fillMaxWidth()
               .padding(8.dp)) {
@@ -354,6 +389,8 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                 }
               }
             }
+
+        //The description field
             OutlinedTextField(
               modifier = Modifier.padding(8.dp),
               value = descriptionString,
@@ -361,13 +398,51 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               label = { Text("Description") },
               supportingText = {})
             /*TODO: insert date picker*/
+
+
+        //The assignee field
             OutlinedTextField(
               modifier = Modifier.padding(8.dp),
               value = assignee,
               onValueChange = { assignee = it },
               label = { Text("Assignee") },
               supportingText = {})
-            /*TODO: insert status picker*/
+
+        //The status picker
+        Box(modifier = Modifier
+          .fillMaxWidth()
+          .padding(8.dp)) {
+          var statusExtended by remember { mutableStateOf(false) }
+          FilterChip(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(60.dp),
+            selected = statusExtended,
+            onClick = { statusExtended = !statusExtended },
+            label = { Text(mutableStatus.name) },
+            trailingIcon = {
+              Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+            })
+          DropdownMenu(
+            modifier = Modifier,
+            expanded = statusExtended,
+            onDismissRequest = { statusExtended = false },
+            properties = PopupProperties(focusable = true)
+          ) {
+            Status.entries.forEach { status ->
+              DropdownMenuItem(
+                text = { Text(status.name) },
+                onClick = {
+                  mutableStatus = status
+                  statusExtended = false
+                })
+            }
+          }
+        }
+
+
+
+        //The buttons
             Row(
               modifier = Modifier
                 .fillMaxWidth()
@@ -395,7 +470,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                       descriptionString,
                       date,
                       assignee,
-                      status
+                      mutableStatus
                     )
                   )
                 },
