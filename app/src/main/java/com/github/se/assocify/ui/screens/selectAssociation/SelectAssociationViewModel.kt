@@ -59,6 +59,7 @@ class SelectAssociationViewModel(
                 val role = roles.find { it.type == RoleType.MEMBER }
                 if (role != null) {
                   associationAPI.acceptUser(CurrentUser.userUid!!, role, {}, {})
+                  userAPI.updateCurrentUserAssociationCache({}, {})
                 }
               },
               {})
