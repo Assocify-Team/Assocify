@@ -146,6 +146,19 @@ class BudgetDetailedViewModel(
     accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
+
+  fun startCreating(){
+    _uiState.value = _uiState.value.copy(creating = true)
+  }
+
+  fun cancelCreating(){
+    _uiState.value = _uiState.value.copy(creating = false)
+  }
+
+  fun saveCreating(budgetItem: BudgetItem){
+    budgetApi.addBudgetItem(CurrentUser.associationUid!!, budgetItem, {_uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)}, {})
+    _uiState.value = _uiState.value.copy(creating = false)
+  }
 }
 
 /**
@@ -165,6 +178,7 @@ data class BudgetItemState(
     val categoryList: List<AccountingCategory> = emptyList(),
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
+    val creating: Boolean = false,
     val subCatEditing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null,
     val filterActive: Boolean = false

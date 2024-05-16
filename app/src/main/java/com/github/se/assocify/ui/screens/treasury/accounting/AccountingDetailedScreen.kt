@@ -177,7 +177,7 @@ fun AccountingDetailedScreen(
               navigationActions,
               balanceState,
               budgetState)
-        }
+        } else if(budgetState.creating && page == AccountingPage.BUDGET)
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
