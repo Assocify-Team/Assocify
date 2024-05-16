@@ -116,6 +116,7 @@ class BudgetDetailedViewModel(
  * @param yearFilter the current year filter
  * @param editing the current editing state
  * @param editedBudgetItem the current edited budget item
+ * @param filterActive if the tva filter is active or not
  */
 data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),

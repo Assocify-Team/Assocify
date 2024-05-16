@@ -207,6 +207,7 @@ fun AccountingDetailedScreen(
  */
 @Composable
 fun TotalItems(totalAmount: Int) {
+  val totalAmountDouble = totalAmount.toDouble() / 100.0
   ListItem(
       modifier = Modifier.fillMaxWidth().testTag("totalItems"),
       headlineContent = {
@@ -216,7 +217,7 @@ fun TotalItems(totalAmount: Int) {
       },
       trailingContent = {
         Text(
-            text = "$totalAmount",
+            text = "$totalAmountDouble €",
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
@@ -237,7 +238,7 @@ fun DisplayBudgetItem(
 ) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
-      trailingContent = { Text("${budgetItem.amount}") },
+      trailingContent = { Text("${budgetItem.amount.toDouble()/100.0} €") },
       supportingContent = { Text(budgetItem.description) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))

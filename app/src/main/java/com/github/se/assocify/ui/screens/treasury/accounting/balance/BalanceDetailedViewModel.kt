@@ -108,8 +108,10 @@ class BalanceDetailedViewModel(
  * The state for the balance item
  *
  * @param balanceList the current list of balance items
+ * @param subCategory the current subcategory of the item
  * @param status the current status
  * @param year the current year
+ * @param filterActive if the tva filter is active or not
  */
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),

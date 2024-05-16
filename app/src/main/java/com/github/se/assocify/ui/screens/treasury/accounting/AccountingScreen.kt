@@ -115,6 +115,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
  */
 @Composable
 fun TotalLine(totalAmount: Int) {
+  val totalAmountDouble = totalAmount.toDouble() / 100.0
   ListItem(
       modifier = Modifier.fillMaxWidth().testTag("totalLine"),
       headlineContent = {
@@ -124,14 +125,14 @@ fun TotalLine(totalAmount: Int) {
       },
       trailingContent = {
         Text(
-            text = "$totalAmount",
+            text = "$totalAmountDouble €",
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
 }
 
 /**
- * A line displaying a budget category and its amount
+ * \ A line displaying a budget category and its amount
  *
  * @param category: The budget category
  * @param testTag: The test tag of the line
@@ -147,7 +148,7 @@ fun DisplayLine(
 ) {
   ListItem(
       headlineContent = { Text(category.name) },
-      trailingContent = { Text("${category.amount}") },
+      trailingContent = { Text("${category.amount.toDouble()/100.0} €") },
       modifier =
           Modifier.clickable {
                 if (page == AccountingPage.BUDGET) {
