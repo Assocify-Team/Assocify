@@ -57,7 +57,6 @@ class AccountingViewModel(
                               it.year == _uiState.value.yearFilter
                         })
           }
-          Log.d("BudgetViewModel", "Subcategories: $subCategoryList")
         },
         { Log.d("BudgetViewModel", "Error getting subcategories") })
   }
