@@ -88,7 +88,7 @@ class EventScreenViewModel(
           _uiState.value.selectedEvents - event
         }
     _uiState.value = _uiState.value.copy(selectedEvents = selectedEvents)
-    // TODO : will need to merge these two setEvents into one
+
     taskListViewModel.setEvents(selectedEvents)
     mapViewModel.setEvents(selectedEvents)
     scheduleViewModel.setEvents(selectedEvents)
@@ -105,14 +105,10 @@ class EventScreenViewModel(
 
   /** Filter the elements from the current tab depending on the current search query */
   fun searchTaskLists() {
-    when (_uiState.value.currentTab) {
-      EventPageIndex.Tasks -> {
-        taskListViewModel.search(_uiState.value.searchQuery)
-      }
-      EventPageIndex.Map -> {
-        mapViewModel
-      }
-      EventPageIndex.Schedule -> {}
+    if (_uiState.value.currentTab == EventPageIndex.Tasks) {
+      taskListViewModel.search(_uiState.value.searchQuery)
+    } else if (_uiState.value.currentTab == EventPageIndex.Map) {
+      mapViewModel
     }
   }
 

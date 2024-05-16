@@ -68,8 +68,13 @@ fun rememberMapViewWithLifecycle(): MapView {
   // Update OSM configuration, for some reason
   Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
   Configuration.getInstance().tileFileSystemCacheMaxBytes = 50L * 1024 * 1024
-  Configuration.getInstance().osmdroidTileCache =
-      File(context.cacheDir, "osmdroid").also { it.mkdir() }
+
+  // Cache initialization. Will need to add something for error case handling
+  val cacheDir = File(context.cacheDir, "osmdroid")
+  val dirCreationSuccessful = cacheDir.mkdir()
+  if (dirCreationSuccessful) {
+    Configuration.getInstance().osmdroidTileCache = cacheDir
+  }
 
   // Initialise the map view
   val mapView = remember {
