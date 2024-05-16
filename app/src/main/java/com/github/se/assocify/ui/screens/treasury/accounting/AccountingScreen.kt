@@ -26,7 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.util.DateUtil
 
 /** Represents the page to display in the accounting screen */
@@ -50,6 +52,16 @@ fun AccountingScreen(
 ) {
   val model by accountingViewModel.uiState.collectAsState()
   val subCategoryList = model.subCategoryList
+
+  if (model.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (model.error != null) {
+    ErrorMessage(errorMessage = model.error) { accountingViewModel.loadAccounting() }
+    return
+  }
 
   LazyColumn(
       modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),

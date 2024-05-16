@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -26,17 +25,38 @@ class AccountingViewModel(
 
   /** Initialize the view model */
   init {
-    updateDatabaseValues()
+    loadAccounting()
     uiState = _uiState
   }
 
-  /** Function to update the database values */
-  private fun updateDatabaseValues() {
+  private var loadCounter = 0
+
+  fun startLoad(count: Int) {
+    loadCounter = count
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+  }
+
+  fun endLoad(error: String? = null) {
+    loadCounter--
+    if (error != null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = error)
+    } else if (loadCounter == 0) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+    }
+  }
+
+  /** Function to load categories and subcategories */
+  fun loadAccounting() {
+    startLoad(2)
+
     // Sets the category list in the state from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-        {})
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(categoryList = categoryList)
+          endLoad()
+        },
+        { endLoad("Error loading tags") })
 
     // Sets the subcategory list in the state from the database if a category is selected
     accountingSubCategoryAPI.getSubCategories(
@@ -57,8 +77,9 @@ class AccountingViewModel(
                               it.year == _uiState.value.yearFilter
                         })
           }
+          endLoad()
         },
-        { Log.d("BudgetViewModel", "Error getting subcategories") })
+        { endLoad("Error loading categories") })
   }
 
   /**
@@ -70,20 +91,20 @@ class AccountingViewModel(
     // if the category is global, display all subcategories
     if (categoryName == "Global") {
       _uiState.value = _uiState.value.copy(globalSelected = true)
-      updateDatabaseValues()
+      loadAccounting()
     } else {
       _uiState.value = _uiState.value.copy(globalSelected = false)
       _uiState.value =
           _uiState.value.copy(
               selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid)
-      updateDatabaseValues()
+      loadAccounting()
     }
   }
 
   /** Function to update the year filter */
   fun onYearFilter(yearFilter: Int) {
     _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
-    updateDatabaseValues()
+    loadAccounting()
   }
 }
 
@@ -96,6 +117,8 @@ class AccountingViewModel(
  * @param globalSelected: Whether the global category is selected
  */
 data class AccountingState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
