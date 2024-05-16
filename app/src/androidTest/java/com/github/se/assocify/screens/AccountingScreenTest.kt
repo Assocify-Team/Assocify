@@ -45,6 +45,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @get:Rule val mockkRule = MockKRule(this)
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
 
+  // mocked list
   val categoryList =
       listOf(
           AccountingCategory("1", "Events"),
@@ -61,6 +62,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           AccountingSubCategory("8", "1", "Balelec", 5000, 2022),
           AccountingSubCategory("9", "3", "Game*", 3000, 2022),
       )
+
   val balanceItems =
       listOf(
           BalanceItem(
@@ -104,6 +106,8 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", "2", 2023),
           BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", "3", 2023))
 
+
+    //mocked APIs
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
         every { getCategories(any(), any(), any()) } answers
