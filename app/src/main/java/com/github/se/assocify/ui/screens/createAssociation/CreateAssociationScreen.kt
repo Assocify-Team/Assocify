@@ -82,7 +82,7 @@ fun CreateAssociationScreen(
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.fillMaxWidth()) {
                 OutlinedIconButton(
-                    modifier = Modifier.padding(top = 8.dp).testTag("logo"),
+                    modifier = Modifier.testTag("logo"),
                     onClick = {
                       /* TODO : can add association logo // note : nowhere to put it yet because picture not handled in DB */
                     }) {
@@ -93,6 +93,8 @@ fun CreateAssociationScreen(
                 OutlinedTextField(
                     value = state.name,
                     onValueChange = { viewmodel.setName(it) },
+                    isError = state.nameError != null,
+                    supportingText = { Text(state.nameError ?: "") },
                     label = { Text("Association Name") },
                     modifier = Modifier.fillMaxWidth().testTag("name"))
               }
