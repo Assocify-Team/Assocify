@@ -272,7 +272,9 @@ fun DisplayBudgetItem(
 ) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
-      trailingContent = { Text("${budgetItem.amount}") },
+      trailingContent = {
+        Text("${budgetItem.amount}", style = MaterialTheme.typography.bodyMedium)
+      },
       supportingContent = { Text(budgetItem.description) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
@@ -290,7 +292,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text("${balanceItem.amount}")
+          Text("${balanceItem.amount}", style = MaterialTheme.typography.bodyMedium)
           /*Icon(
           balanceItem.receipt!!.status.getIcon(),
           contentDescription = "Create") // TODO: add logo depending on the phase*/

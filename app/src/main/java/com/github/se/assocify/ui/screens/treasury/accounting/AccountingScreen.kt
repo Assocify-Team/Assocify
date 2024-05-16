@@ -147,7 +147,7 @@ fun DisplayLine(
 ) {
   ListItem(
       headlineContent = { Text(category.name) },
-      trailingContent = { Text("${category.amount}") },
+      trailingContent = { Text("${category.amount}", style = MaterialTheme.typography.bodyMedium) },
       modifier =
           Modifier.clickable {
                 if (page == AccountingPage.BUDGET) {
