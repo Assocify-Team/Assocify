@@ -66,7 +66,7 @@ fun AccountingScreen(
     } else {
       item {
         Text(
-            text = "No data available with this tag",
+            text = "No data available with these tags",
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
         )
       }
