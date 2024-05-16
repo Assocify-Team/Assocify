@@ -18,8 +18,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.MapMarkerData
-import com.github.se.assocify.ui.composables.CenteredCircularIndicator
-import com.github.se.assocify.ui.composables.ErrorMessage
 import java.io.File
 import kotlin.random.Random
 import org.osmdroid.config.Configuration
@@ -42,15 +40,6 @@ private const val INITIAL_ZOOM = 17.0
 @Composable
 fun EventMapScreen(viewModel: EventMapViewModel) {
   val state by viewModel.uiState.collectAsState()
-
-  if (state.loading) {
-    CenteredCircularIndicator()
-    return
-  }
-  if (state.error != null) {
-    ErrorMessage(errorMessage = state.error) { viewModel.fetchTasks() }
-    return
-  }
 
   Column(modifier = Modifier.fillMaxWidth().testTag("OSMMapScreen")) {
     EPFLMapView(modifier = Modifier.fillMaxWidth(), {}, state.markers)
