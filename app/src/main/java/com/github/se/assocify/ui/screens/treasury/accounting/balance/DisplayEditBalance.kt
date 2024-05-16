@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
@@ -19,6 +20,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,16 +30,24 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.github.se.assocify.model.SupabaseClient
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
+import com.github.se.assocify.ui.util.DateUtil
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,30 +55,34 @@ import java.time.LocalDate
 fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
   val balance = balanceModel.editedBalanceItem!!
-  var nameString by remember { mutableStateOf("") }
-  var subCategoryUid by remember { mutableStateOf("") }
+  var nameString by remember { mutableStateOf(balance.nameItem) }
+  var subCategoryUid by remember { mutableStateOf(balance.subcategoryUID) }
   var subCategoryName by remember { mutableStateOf("") }
-  var receiptUid by remember { mutableStateOf("") }
+  var receiptUid by remember { mutableStateOf(balance.receiptUID) }
   var receiptName by remember { mutableStateOf("") }
-  var amount by remember { mutableIntStateOf(0) }
-  var tvaString by remember { mutableStateOf("") }
-  var tvaTypeString by remember { mutableStateOf("") }
-  var descriptionString by remember { mutableStateOf("") }
-  var date by remember { mutableStateOf(LocalDate.now()) }
-  var assignee by remember { mutableStateOf("") }
-  var mutableStatus by remember { mutableStateOf(Status.Pending) }
+  var amountString by remember { mutableStateOf(balance.amount.toString()) }
+  var tvaString by remember { mutableStateOf(balance.tva.toString()) }
+  var tvaTypeString by remember { mutableStateOf(balance.tva.name) }
+  var descriptionString by remember { mutableStateOf(balance.description) }
+  var date by remember { mutableStateOf(balance.date) }
+  var assignee by remember { mutableStateOf((balance.assignee)) }
+  var mutableStatus by remember { mutableStateOf(balance.status) }
   Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
     Card(
-        modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
+        modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
-      LazyColumn {
+      LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
         item {
-          Row {
-            IconButton(onClick = { balanceDetailedViewModel.cancelEditing() }) {
-              Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-            }
-            Text("Edit Balance Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+          Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text("Edit Balance Detail", style = MaterialTheme.typography.titleLarge)
+            Icon(
+              Icons.Default.Close,
+              contentDescription = "Close dialog",
+              modifier =
+              Modifier.clickable {
+                balanceDetailedViewModel.cancelEditing()
+              }.testTag("editSubCategoryCancelButton"))
           }
         }
         // The name box
@@ -152,8 +166,8 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
         item {
           OutlinedTextField(
               modifier = Modifier.padding(8.dp),
-              value = amount.toString(),
-              onValueChange = { amount = it.toInt() },
+              value = amountString,
+              onValueChange = { amountString = it },
               label = { Text("Amount") },
               keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
               supportingText = {})
@@ -200,7 +214,11 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
               supportingText = {})
         }
         // The date screen
-        item { DatePickerWithDialog(value = "Date", onDateSelect = { newDate -> date = newDate }) }
+        item { DatePickerWithDialog(value = DateUtil.formatDate(date), onDateSelect = { newDate ->
+          if (newDate != null) {
+            date = newDate
+          }
+        }, modifier = Modifier.padding(8.dp), ) }
 
         // The assignee field
         item {
@@ -245,12 +263,12 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
         // The buttons
         item {
           Row(
-              modifier = Modifier.fillMaxWidth().padding(15.dp),
+              modifier = Modifier.fillMaxWidth().padding(8.dp),
               horizontalArrangement = Arrangement.SpaceBetween,
           ) {
             Button(
                 onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
-                modifier = Modifier.padding(15.dp).testTag("editDeleteButton"),
+                modifier = Modifier.testTag("editDeleteButton"),
             ) {
               Text("Delete")
             }
@@ -262,14 +280,14 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                           nameString,
                           "",
                           "",
-                          amount,
+                          amountString.toInt(),
                           TVA.floatToTVA(tvaString.toFloat()),
                           descriptionString,
                           date,
                           assignee,
                           mutableStatus))
                 },
-                modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
+                modifier = Modifier.testTag("editConfirmButton"),
             ) {
               Text("Confirm")
             }
