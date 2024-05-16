@@ -59,7 +59,7 @@ fun AccountingScreen(
     // display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
       items(subCategoryList) {
-        DisplayLine(it, "displayLine${it.name}", page, navigationActions)
+        DisplayLine(it, "displayLine${it.name}", page, navigationActions, model)
         HorizontalDivider(Modifier.fillMaxWidth())
       }
       item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
@@ -143,19 +143,27 @@ fun DisplayLine(
     category: AccountingSubCategory,
     testTag: String,
     page: AccountingPage,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    accountingState: AccountingState
 ) {
+    val budgetItemList = accountingState.budgetItemsList
+    val balanceItemList = accountingState.balanceItemList
+    val amountBudget = budgetItemList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
+    val amountBalance = balanceItemList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
   ListItem(
       headlineContent = { Text(category.name) },
-      trailingContent = { Text("${category.amount}", style = MaterialTheme.typography.bodyMedium) },
+      trailingContent = {
+          when(page){
+              AccountingPage.BUDGET -> Text("$amountBudget", style = MaterialTheme.typography.bodyMedium)
+              AccountingPage.BALANCE -> Text("$amountBalance", style = MaterialTheme.typography.bodyMedium)
+          }
+        },
       modifier =
           Modifier.clickable {
-                if (page == AccountingPage.BUDGET) {
-                  navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
-                } else {
-                  navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
-                }
+              when(page){
+                    AccountingPage.BUDGET -> navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
+                    AccountingPage.BALANCE -> navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
               }
-              .testTag(testTag),
+          }.testTag(testTag)
   )
 }
