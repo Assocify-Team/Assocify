@@ -63,6 +63,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
                   description = task.description,
                   isCompleted = task.isCompleted,
                   startTime = task.startTime.toString(),
+                  duration = task.duration,
                   peopleNeeded = task.peopleNeeded,
                   category = task.category,
                   location = task.location,
@@ -79,6 +80,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param description the new description of the task
    * @param isCompleted the new completion status of the task
    * @param startTime the new start time of the task
+   * @param duration the new duration of the task
    * @param peopleNeeded the new number of people needed for the task
    * @param category the new category of the task
    * @param location the new location of the task
@@ -91,6 +93,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       description: String,
       isCompleted: Boolean,
       startTime: OffsetDateTime,
+      duration: Int,
       peopleNeeded: Int,
       category: String,
       location: String,
@@ -103,6 +106,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
         SupabaseTask::description setTo description
         SupabaseTask::isCompleted setTo isCompleted
         SupabaseTask::startTime setTo startTime.toString()
+        SupabaseTask::duration setTo duration
         SupabaseTask::peopleNeeded setTo peopleNeeded
         SupabaseTask::category setTo category
         SupabaseTask::location setTo location
@@ -127,6 +131,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
         task.description,
         task.isCompleted,
         task.startTime,
+        task.duration,
         task.peopleNeeded,
         task.category,
         task.location,
@@ -176,6 +181,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       @SerialName("description") val description: String,
       @SerialName("is_completed") val isCompleted: Boolean,
       @SerialName("start_time") val startTime: String,
+      @SerialName("duration") val duration: Int,
       @SerialName("people_needed") val peopleNeeded: Int,
       @SerialName("category") val category: String,
       @SerialName("location") val location: String,
@@ -188,6 +194,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
           description = description,
           isCompleted = isCompleted,
           startTime = OffsetDateTime.parse(startTime),
+          duration = duration,
           peopleNeeded = peopleNeeded,
           category = category,
           location = location,

@@ -44,12 +44,18 @@ class AccountingViewModel(
         { subCategoryList ->
           // If the global category is selected, display all subcategories
           if (_uiState.value.globalSelected) {
-            _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
+            _uiState.value =
+                _uiState.value.copy(
+                    subCategoryList =
+                        subCategoryList.filter { it.year == _uiState.value.yearFilter })
           } else {
             _uiState.value =
                 _uiState.value.copy(
                     subCategoryList =
-                        subCategoryList.filter { it.categoryUID == _uiState.value.selectedCatUid })
+                        subCategoryList.filter {
+                          it.categoryUID == _uiState.value.selectedCatUid &&
+                              it.year == _uiState.value.yearFilter
+                        })
           }
           Log.d("BudgetViewModel", "Subcategories: $subCategoryList")
         },
@@ -74,6 +80,12 @@ class AccountingViewModel(
       updateDatabaseValues()
     }
   }
+
+  /** Function to update the year filter */
+  fun onYearFilter(yearFilter: Int) {
+    _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
+    updateDatabaseValues()
+  }
 }
 
 /**
@@ -89,4 +101,5 @@ data class AccountingState(
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val globalSelected: Boolean = true,
+    val yearFilter: Int = 2024
 )

@@ -68,6 +68,7 @@ import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDeta
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceItemState
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetItemState
+import com.github.se.assocify.ui.util.DateUtil
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -89,7 +90,7 @@ fun AccountingDetailedScreen(
   val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
 
-  val yearList = listOf("2023", "2022", "2021")
+  val yearList = DateUtil.getYearList()
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("TTC", "HT")
 
