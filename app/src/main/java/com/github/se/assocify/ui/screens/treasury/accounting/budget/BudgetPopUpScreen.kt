@@ -34,8 +34,17 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
+import java.time.Year
+import java.util.UUID
+
+
 @Composable
 fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
+  BudgetPopUpScreen(budgetViewModel)
+}
+
+@Composable
+fun DisplayCreateBudget(budgetViewModel: BudgetDetailedViewModel){
   BudgetPopUpScreen(budgetViewModel)
 }
 
@@ -47,7 +56,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
 @Composable
 fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
   val budgetModel by budgetViewModel.uiState.collectAsState()
-  val budget = budgetModel.editedBudgetItem!!
+  val budget = if (budgetModel.editedBudgetItem == null) BudgetItem(uid = UUID.randomUUID().toString(),nameItem = "", amount = 0, tva = TVA.TVA_0, description = "", subcategoryUID = "", year =Year.now().value.toInt()) else budgetModel.editedBudgetItem!!
   var nameString by remember { mutableStateOf(budget.nameItem) }
   var amountString by remember { mutableStateOf(budget.amount.toString()) }
   var tvaTypeString by remember { mutableStateOf(budget.tva.toString()) }
