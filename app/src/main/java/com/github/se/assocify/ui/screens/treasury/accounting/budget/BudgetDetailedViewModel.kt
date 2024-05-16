@@ -147,16 +147,22 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 
-  fun startCreating(){
+  fun startCreating() {
     _uiState.value = _uiState.value.copy(creating = true)
   }
 
-  fun cancelCreating(){
+  fun cancelCreating() {
     _uiState.value = _uiState.value.copy(creating = false)
   }
 
-  fun saveCreating(budgetItem: BudgetItem){
-    budgetApi.addBudgetItem(CurrentUser.associationUid!!, budgetItem, {_uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)}, {})
+  fun saveCreating(budgetItem: BudgetItem) {
+    budgetApi.addBudgetItem(
+        CurrentUser.associationUid!!,
+        budgetItem,
+        {
+          _uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
+        },
+        {})
     _uiState.value = _uiState.value.copy(creating = false)
   }
 }

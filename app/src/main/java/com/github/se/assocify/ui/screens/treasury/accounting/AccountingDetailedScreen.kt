@@ -3,34 +3,27 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -52,16 +45,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.PopupProperties
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
-import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
@@ -155,16 +144,14 @@ fun AccountingDetailedScreen(
             })
       },
       contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
-      modifier = Modifier
-        .fillMaxWidth()
-        .testTag("AccountingDetailedScreen"),
+      modifier = Modifier.fillMaxWidth().testTag("AccountingDetailedScreen"),
       floatingActionButton = {
         FloatingActionButton(
             modifier = Modifier.testTag("createNewItem"),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
             onClick = {
-              when(page){
+              when (page) {
                 AccountingPage.BUDGET -> budgetDetailedViewModel.startCreating()
                 AccountingPage.BALANCE -> /*TODO: implement the balance popup*/ TODO()
               }
@@ -185,23 +172,18 @@ fun AccountingDetailedScreen(
               navigationActions,
               balanceState,
               budgetState)
-        } else if(budgetState.creating && page == AccountingPage.BUDGET){
+        } else if (budgetState.creating && page == AccountingPage.BUDGET) {
           DisplayCreateBudget(budgetViewModel = budgetDetailedViewModel)
         }
 
         LazyColumn(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(innerPadding),
+            modifier = Modifier.fillMaxWidth().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
           // Display the filter chips
           item {
-            Row(
-              Modifier
-                .testTag("filterRowDetailed")
-                .horizontalScroll(rememberScrollState())) {
+            Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               // Year filter
               DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
                 when (page) {
@@ -277,9 +259,7 @@ fun AccountingDetailedScreen(
 @Composable
 fun TotalItems(totalAmount: Int) {
   ListItem(
-      modifier = Modifier
-        .fillMaxWidth()
-        .testTag("totalItems"),
+      modifier = Modifier.fillMaxWidth().testTag("totalItems"),
       headlineContent = {
         Text(
             text = "Total",
@@ -311,9 +291,7 @@ fun DisplayBudgetItem(
       trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount)) },
       supportingContent = { Text(budgetItem.description) },
       modifier =
-      Modifier
-        .clickable { budgetDetailedViewModel.startEditing(budgetItem) }
-        .testTag(testTag))
+          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
 
 /**
@@ -339,9 +317,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       },
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
-      modifier = Modifier
-        .clickable {}
-        .testTag(testTag))
+      modifier = Modifier.clickable {}.testTag(testTag))
 }
 
 /**
@@ -391,21 +367,16 @@ fun DisplayEditSubCategory(
       properties = DialogProperties()) {
         Card(
             modifier =
-            Modifier
-              .padding(vertical = 16.dp, horizontal = 8.dp)
-              .testTag("editSubCategoryDialog"),
+                Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
+                    .testTag("editSubCategoryDialog"),
             shape = RoundedCornerShape(16.dp),
         ) {
           Column(
-              modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(8.dp),
+              modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 // Title
                 Row(
-                    modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                   Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
@@ -413,32 +384,26 @@ fun DisplayEditSubCategory(
                       Icons.Default.Close,
                       contentDescription = "Close dialog",
                       modifier =
-                      Modifier
-                        .clickable {
-                          when (page) {
-                            AccountingPage.BALANCE ->
-                              balanceViewModel.cancelSubCategoryEditingInBalance()
-
-                            AccountingPage.BUDGET ->
-                              budgetViewModel.cancelSubCategoryEditingInBudget()
-                          }
-                        }
-                        .testTag("editSubCategoryCancelButton"))
+                          Modifier.clickable {
+                                when (page) {
+                                  AccountingPage.BALANCE ->
+                                      balanceViewModel.cancelSubCategoryEditingInBalance()
+                                  AccountingPage.BUDGET ->
+                                      budgetViewModel.cancelSubCategoryEditingInBudget()
+                                }
+                              }
+                              .testTag("editSubCategoryCancelButton"))
                 }
 
                 // Edit fields
                 OutlinedTextField(
-                    modifier = Modifier
-                      .testTag("editSubCategoryNameBox")
-                      .padding(8.dp),
+                    modifier = Modifier.testTag("editSubCategoryNameBox").padding(8.dp),
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
                     supportingText = {})
                 OutlinedTextField(
-                    modifier = Modifier
-                      .testTag("editSubCategoryYearBox")
-                      .padding(8.dp),
+                    modifier = Modifier.testTag("editSubCategoryYearBox").padding(8.dp),
                     value = year,
                     onValueChange = { year = it },
                     label = { Text("Year") },
@@ -447,9 +412,7 @@ fun DisplayEditSubCategory(
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
-                    modifier = Modifier
-                      .testTag("categoryDropdown")
-                      .padding(8.dp)) {
+                    modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                       OutlinedTextField(
                           value = selectedCategory,
                           onValueChange = {},
@@ -459,9 +422,7 @@ fun DisplayEditSubCategory(
                           },
                           readOnly = true,
                           colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                          modifier = Modifier
-                            .menuAnchor()
-                            .clickable { expanded = !expanded })
+                          modifier = Modifier.menuAnchor().clickable { expanded = !expanded })
                       ExposedDropdownMenu(
                           expanded = expanded, onDismissRequest = { expanded = false }) {
                             categoryList.forEach { category ->
@@ -479,9 +440,7 @@ fun DisplayEditSubCategory(
 
           // Buttons
           Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+              modifier = Modifier.fillMaxWidth().padding(8.dp),
               horizontalArrangement = Arrangement.Absolute.Right) {
                 // Delete button
                 TextButton(
