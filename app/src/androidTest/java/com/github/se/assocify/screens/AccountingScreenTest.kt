@@ -12,8 +12,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.model.entities.Status
+import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
@@ -31,6 +37,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -54,6 +61,55 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           AccountingSubCategory("8", "1", "Balelec", 5000, 2022),
           AccountingSubCategory("9", "3", "Game*", 3000, 2022),
       )
+    val balanceItems =
+        listOf(
+            BalanceItem(
+                "1",
+                "pair of scissors",
+                "1",
+                "00000000-0000-0000-0000-000000000000",
+                5,
+                TVA.TVA_8,
+                "scissors for paper cutting",
+                LocalDate.of(2022, 4, 14),
+                "François Théron",
+                Status.Pending),
+            BalanceItem(
+                "2",
+                "sweaters",
+                "2",
+                "00000000-0000-0000-0000-000000000000",
+                1000,
+                TVA.TVA_8,
+                "order for 1000 sweaters",
+                LocalDate.of(2023, 3, 11),
+                "Rayan Boucheny",
+                Status.Archived),
+            BalanceItem(
+                "3",
+                "chairs",
+                "3",
+                "00000000-0000-0000-0000-000000000000",
+                200,
+                TVA.TVA_8,
+                "order for 200 chairs",
+                LocalDate.of(2023, 1, 14),
+                "Sidonie Bouthors",
+                Status.Reimbursed))
+
+    val budgetItems =
+        listOf(
+            BudgetItem(
+                "1",
+                "pair of scissors",
+                5,
+                TVA.TVA_8,
+                "scissors for paper cutting",
+                "1",
+                2022),
+            BudgetItem(
+                "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", "2", 2023),
+            BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", "3", 2023))
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
@@ -73,6 +129,24 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
             }
       }
 
+    val mockBudgetAPI: BudgetAPI =
+        mockk<BudgetAPI>() {
+            every { getBudget(any(), any(), any()) } answers
+                    {
+                        val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
+                        onSuccessCallback(budgetItems)
+                    }
+        }
+
+    val mockBalanceAPI: BalanceAPI =
+        mockk<BalanceAPI>() {
+            every { getBalance(any(), any(), any()) } answers
+                    {
+                        val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
+                        onSuccessCallback(balanceItems)
+                        balanceItems
+                    }
+        }
   lateinit var accountingViewModel: AccountingViewModel
 
   @Before
@@ -80,7 +154,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     accountingViewModel =
-        AccountingViewModel(mockAccountingCategoryAPI, mockAccountingSubCategoryAPI)
+        AccountingViewModel(mockAccountingCategoryAPI, mockAccountingSubCategoryAPI, mockBalanceAPI, mockBudgetAPI)
     composeTestRule.setContent {
       AccountingScreen(AccountingPage.BUDGET, mockNavActions, accountingViewModel)
       AccountingFilterBar(accountingViewModel = accountingViewModel)
