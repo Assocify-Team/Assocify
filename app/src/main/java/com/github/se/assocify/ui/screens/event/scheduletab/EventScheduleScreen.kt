@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.screens.event.scheduletab
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,7 +73,7 @@ fun EventScheduleScreen(
     DateSwitcher(viewModel)
     Row(modifier = Modifier.verticalScroll(scrollState)) {
       ScheduleSidebar(hourHeight = hourHeight)
-      ScheduleContent(hourHeight = hourHeight, tasks = state.currentDayTasks)
+      ScheduleContent(hourHeight = hourHeight, tasks = state.currentDayTasks, viewModel = viewModel)
     }
   }
 }
@@ -87,26 +88,37 @@ fun EventScheduleScreen(
  * @param tasks The tasks to display in the schedule.
  */
 @Composable
-fun ScheduleContent(hourHeight: Dp, hourNum: Int = 24, tasks: List<Task>) {
+fun ScheduleContent(
+    hourHeight: Dp,
+    hourNum: Int = 24,
+    tasks: List<OverlapTask>,
+    viewModel: EventScheduleViewModel
+) {
   val divColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
   Layout(
       content = {
-        tasks.forEach { task ->
+        tasks.forEach { overlapTask ->
+          val task = overlapTask.task
+
           // startOffset determines the y position of the task
           val startTime = DateTimeUtil.toLocalTime(task.startTime)
           val startHour = startTime.hour
           val startMinute = startTime.minute
           val startOffset = hourHeight * (startHour + startMinute / 60f)
 
-          // duration determines the height of the task
-          val duration = hourHeight /* TODO: task duration. For now they will all be 1h */
+          // duration determines the duration of the task (in hours), with a minimum of 30 minutes
+          val duration = Math.max((task.duration.toDouble() / 60), 0.5)
+
+          // the number of lines to display in the task (2 if the duration is >= 1h)
+          val lines = if (duration > 1) 2 else 1
 
           Box(
               modifier =
-                  Modifier.height(duration)
+                  Modifier.height((duration * hourHeight.value).dp)
                       .padding(horizontal = 4.dp, vertical = 2.dp)
-                      .offset(y = startOffset)) {
-                ScheduleTask(task)
+                      .offset(y = startOffset)
+                      .clickable { viewModel.openTask(task.uid) }) {
+                ScheduleTask(task, lines)
               }
         }
       },
@@ -125,13 +137,19 @@ fun ScheduleContent(hourHeight: Dp, hourNum: Int = 24, tasks: List<Task>) {
                 }
               }) { measurables, constraints ->
         val placeables =
-            measurables.map {
-              val height = it.minIntrinsicHeight(0) // The height of the task is already determined
-              it.measure(constraints.copy(minHeight = height, maxHeight = height))
+            measurables.zip(tasks).map { (measurable, task) ->
+              val width = constraints.maxWidth / task.overlaps
+              val height =
+                  measurable.minIntrinsicHeight(0) // The height of the task is already determined
+              measurable.measure(
+                  constraints.copy(
+                      minHeight = height, maxHeight = height, minWidth = width, maxWidth = width))
             }
         layout(constraints.maxWidth, constraints.maxHeight) {
-          placeables.forEach { placeable ->
-            placeable.place(0, 0) // All tasks are placed at (0, 0) because they are already offset
+          placeables.zip(tasks).forEach { (placeable, overlapTask) ->
+            val xOffset = constraints.maxWidth / overlapTask.overlaps * overlapTask.order
+            placeable.place(
+                xOffset, 0) // All tasks are placed at (0, 0) because they are already offset
           }
         }
       }
@@ -143,7 +161,7 @@ fun ScheduleContent(hourHeight: Dp, hourNum: Int = 24, tasks: List<Task>) {
  * @param task The task to display
  */
 @Composable
-fun ScheduleTask(task: Task) {
+fun ScheduleTask(task: Task, lines: Int) {
   Column(
       modifier =
           Modifier.fillMaxSize()
@@ -157,12 +175,14 @@ fun ScheduleTask(task: Task) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.bodyMedium)
-        Text(
-            task.category,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodySmall)
-        // TODO: Add more task details ?
+        if (lines > 1) {
+          Text(
+              task.category,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+              style = MaterialTheme.typography.bodySmall)
+          // TODO: Add more task details ?
+        }
       }
 }
 
