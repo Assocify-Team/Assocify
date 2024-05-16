@@ -84,7 +84,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   val model by accountingViewModel.uiState.collectAsState()
 
   // filter bar lists
-  val yearList = DateUtil.getYearList()
+    val yearList = DateUtil.getYearList().reversed()
   val tvaList: List<String> = listOf("TTC", "HT")
   val categoryList = listOf("Global") + model.categoryList.map { it.name }
 
