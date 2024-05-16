@@ -66,7 +66,7 @@ class BudgetAPITest {
         """
         [
           {
-            "item_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            "uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
             "association_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
             "name": "name",
             "amount": 1,

@@ -22,7 +22,7 @@ fun NavGraphBuilder.treasuryGraph(
     budgetAPI: BudgetAPI,
     balanceAPI: BalanceAPI,
     receiptsAPI: ReceiptAPI,
-    accountingCategoriesAPI: AccountingCategoryAPI,
+    accountingCategoryAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
 
@@ -31,13 +31,15 @@ fun NavGraphBuilder.treasuryGraph(
   ) {
     val receiptListViewModel = remember { ReceiptListViewModel(navigationActions, receiptsAPI) }
     val accountingViewModel = remember {
-      AccountingViewModel(accountingCategoriesAPI, accountingSubCategoryAPI)
+      AccountingViewModel(accountingCategoryAPI, accountingSubCategoryAPI)
     }
     val treasuryViewModel = remember { TreasuryViewModel(navigationActions, receiptListViewModel) }
     TreasuryScreen(navigationActions, accountingViewModel, receiptListViewModel, treasuryViewModel)
   }
   receiptGraph(navigationActions, receiptsAPI)
-  budgetDetailedGraph(navigationActions, budgetAPI, balanceAPI, accountingSubCategoryAPI)
-  balanceDetailedGraph(navigationActions, budgetAPI, balanceAPI, accountingSubCategoryAPI)
+  budgetDetailedGraph(
+      navigationActions, budgetAPI, balanceAPI, accountingSubCategoryAPI, accountingCategoryAPI)
+  balanceDetailedGraph(
+      navigationActions, budgetAPI, balanceAPI, accountingSubCategoryAPI, accountingCategoryAPI)
   addAccountingCategory(navigationActions)
 }

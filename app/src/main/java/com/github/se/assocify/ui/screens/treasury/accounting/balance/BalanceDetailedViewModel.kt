@@ -1,10 +1,11 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
@@ -15,19 +16,22 @@ import kotlinx.coroutines.flow.StateFlow
  * View model for the balance detailed screen
  *
  * @param balanceApi the balance api
+ * @param accountingSubCategoryAPI the accounting subcategory api
+ * @param accountingCategoryAPI the accounting category api
  * @param subCategoryUid the subcategory uid
  */
 class BalanceDetailedViewModel(
     private var balanceApi: BalanceAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    private var accountingCategoryAPI: AccountingCategoryAPI,
     private var subCategoryUid: String
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
   val uiState: StateFlow<BalanceItemState>
 
   init {
-    updateDatabaseValues()
-    setSubCategory(subCategoryUid)
+    updateDatabaseValuesInBalance()
+    setSubCategoryInBalance(subCategoryUid)
     uiState = _uiState
   }
 
@@ -36,7 +40,7 @@ class BalanceDetailedViewModel(
    *
    * @param subCategoryUid the subcategory uid
    */
-  private fun setSubCategory(subCategoryUid: String) {
+  private fun setSubCategoryInBalance(subCategoryUid: String) {
     accountingSubCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
@@ -49,29 +53,38 @@ class BalanceDetailedViewModel(
   }
 
   /** Update the database values */
-  private fun updateDatabaseValues() {
+  private fun updateDatabaseValuesInBalance() {
+    // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
           // Filter the balanceList to only include items with the matching subCategoryUid, year and
           // status
-          val filteredList =
+          val filteredBalanceList =
               balanceList.filter { balanceItem ->
                 balanceItem.date.year == _uiState.value.year &&
                     balanceItem.subcategoryUID == subCategoryUid
               }
 
           // if status is not null, filter the list by status
-          val statusFilteredList =
+          val statusFilteredBalanceList =
               if (_uiState.value.status != null) {
-                filteredList.filter { balanceItem -> balanceItem.status == _uiState.value.status }
+                filteredBalanceList.filter { balanceItem ->
+                  balanceItem.status == _uiState.value.status
+                }
               } else {
-                filteredList
+                filteredBalanceList
               }
 
           // Update the UI state with the filtered list
-          _uiState.value = _uiState.value.copy(balanceList = statusFilteredList)
+          _uiState.value = _uiState.value.copy(balanceList = statusFilteredBalanceList)
         },
+        {})
+
+    // Get the categories from the database
+    accountingCategoryAPI.getCategories(
+        CurrentUser.associationUid!!,
+        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
         {})
   }
 
@@ -82,8 +95,7 @@ class BalanceDetailedViewModel(
    */
   fun onYearFilter(year: Int) {
     _uiState.value = _uiState.value.copy(year = year)
-    Log.d("BalanceDetailedViewModel", "Year filter: $year")
-    updateDatabaseValues()
+    updateDatabaseValuesInBalance()
   }
 
   /**
@@ -93,7 +105,37 @@ class BalanceDetailedViewModel(
    */
   fun onStatusFilter(status: Status?) {
     _uiState.value = _uiState.value.copy(status = status)
-    updateDatabaseValues()
+    updateDatabaseValuesInBalance()
+  }
+
+  /** Start editing the Subcategory */
+  fun startSubCategoryEditingInBalance() {
+    _uiState.value = _uiState.value.copy(subCatEditing = true)
+  }
+
+  /**
+   * Save the Subcategory editing
+   *
+   * @param name the new name of the subCategory
+   * @param categoryUid the new category uid associated with the subCategory
+   * @param year the new year of the subCategory
+   */
+  fun saveSubCategoryEditingInBalance(name: String, categoryUid: String, year: Int) {
+    val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
+    accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
+    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
+  }
+
+  /** Cancel the Subcategory editing */
+  fun cancelSubCategoryEditingInBalance() {
+    _uiState.value = _uiState.value.copy(subCatEditing = false)
+  }
+
+  /** Delete the subcategory and all items related to it */
+  fun deleteSubCategoryInBalance() {
+    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
+    _uiState.value = _uiState.value.copy(balanceList = emptyList())
+    _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 }
 
@@ -101,12 +143,18 @@ class BalanceDetailedViewModel(
  * The state for the balance item
  *
  * @param balanceList the current list of balance items
+ * @param subCategory the current subcategory
+ * @param categoryList the current list of categories
  * @param status the current status
+ * @param subCatEditing whether the subcategory is being edited
  * @param year the current year
  */
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
+    val categoryList: List<AccountingCategory> = emptyList(),
+    val loadingCategory: Boolean = false,
     val status: Status? = null,
+    val subCatEditing: Boolean = false,
     val year: Int = 2023
 )
