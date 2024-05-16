@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,8 +64,8 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               amount = 0,
               tva = TVA.TVA_0,
               description = "",
-              subcategoryUID = "",
-              year = Year.now().value.toInt())
+              subcategoryUID = budgetModel.subCategory.uid,
+              year = Year.now().value)
       else budgetModel.editedBudgetItem!!
   var nameString by remember { mutableStateOf(budget.nameItem) }
   var amountString by remember { mutableStateOf(budget.amount.toString()) }
@@ -157,6 +158,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                           subcategoryUID = budget.subcategoryUID,
                           year = yearString.toInt()))
                 } else {
+                  Log.e("Error", budget.toString())
                   budgetViewModel.saveCreating(
                       BudgetItem(
                           budget.uid,
