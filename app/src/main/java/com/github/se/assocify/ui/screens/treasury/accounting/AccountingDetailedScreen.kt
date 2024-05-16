@@ -60,6 +60,7 @@ import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -207,7 +208,6 @@ fun AccountingDetailedScreen(
  */
 @Composable
 fun TotalItems(totalAmount: Int) {
-  val totalAmountDouble = totalAmount.toDouble() / 100.0
   ListItem(
       modifier = Modifier.fillMaxWidth().testTag("totalItems"),
       headlineContent = {
@@ -217,7 +217,7 @@ fun TotalItems(totalAmount: Int) {
       },
       trailingContent = {
         Text(
-            text = "$totalAmountDouble €",
+            text = PriceUtil.fromCents(totalAmount),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
@@ -238,7 +238,7 @@ fun DisplayBudgetItem(
 ) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
-      trailingContent = { Text("${budgetItem.amount.toDouble()/100.0} €") },
+      trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount)) },
       supportingContent = { Text(budgetItem.description) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
@@ -256,7 +256,7 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text("${balanceItem.amount}", modifier = Modifier.padding(end = 4.dp))
+          Text(PriceUtil.fromCents(balanceItem.amount), modifier = Modifier.padding(end = 4.dp))
           /*Icon(
           balanceItem.receipt!!.status.getIcon(),
           contentDescription = "Create") // TODO: add logo depending on the phase*/

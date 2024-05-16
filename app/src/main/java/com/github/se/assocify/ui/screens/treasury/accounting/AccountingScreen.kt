@@ -26,6 +26,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -115,7 +116,6 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
  */
 @Composable
 fun TotalLine(totalAmount: Int) {
-  val totalAmountDouble = totalAmount.toDouble() / 100.0
   ListItem(
       modifier = Modifier.fillMaxWidth().testTag("totalLine"),
       headlineContent = {
@@ -125,7 +125,7 @@ fun TotalLine(totalAmount: Int) {
       },
       trailingContent = {
         Text(
-            text = "$totalAmountDouble €",
+            text = PriceUtil.fromCents(totalAmount),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
@@ -148,7 +148,7 @@ fun DisplayLine(
 ) {
   ListItem(
       headlineContent = { Text(category.name) },
-      trailingContent = { Text("${category.amount.toDouble()/100.0} €") },
+      trailingContent = { Text(PriceUtil.fromCents(category.amount)) },
       modifier =
           Modifier.clickable {
                 if (page == AccountingPage.BUDGET) {
