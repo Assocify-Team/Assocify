@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +30,7 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.util.DateUtil
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -51,8 +54,11 @@ fun AccountingScreen(
   val model by accountingViewModel.uiState.collectAsState()
   val subCategoryList = model.subCategoryList
 
-  LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
-
+  LazyColumn(
+      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
+  ) {
     // display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
       items(subCategoryList) {
@@ -63,8 +69,9 @@ fun AccountingScreen(
     } else {
       item {
         Text(
-            text = "No data available with this tag",
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+            text = "No data available with these tags",
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+        )
       }
     }
 
@@ -82,7 +89,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   val model by accountingViewModel.uiState.collectAsState()
 
   // filter bar lists
-  val yearList = listOf("2023", "2022", "2021")
+  val yearList = DateUtil.getYearList().reversed()
   val tvaList: List<String> = listOf("TTC", "HT")
   val categoryList = listOf("Global") + model.categoryList.map { it.name }
 
@@ -93,7 +100,10 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 
   // Row of dropdown filters
   Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
-    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") { selectedYear = it }
+    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") {
+      selectedYear = it
+      accountingViewModel.onYearFilter(selectedYear.toInt())
+    }
     DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
       selectedCategory = it
       accountingViewModel.onSelectedCategory(selectedCategory)
@@ -142,7 +152,7 @@ fun DisplayLine(
 ) {
   ListItem(
       headlineContent = { Text(category.name) },
-      trailingContent = { Text("${category.amount}") },
+      trailingContent = { Text("${category.amount}", style = MaterialTheme.typography.bodyMedium) },
       modifier =
           Modifier.clickable {
                 if (page == AccountingPage.BUDGET) {

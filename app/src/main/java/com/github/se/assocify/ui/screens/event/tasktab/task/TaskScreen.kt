@@ -158,7 +158,17 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                   value = taskState.time,
                   onTimeSelect = { viewModel.setTime(it) },
                   label = { Text("Time") },
-                  errorText = taskState.timeError?.let { { Text(it) } })
+                  isError = taskState.timeError != null,
+                  errorText = { taskState.timeError?.let { Text(it) } })
+              TimePickerWithDialog(
+                  modifier = Modifier.testTag("durationField").fillMaxWidth(),
+                  value = taskState.duration,
+                  onTimeSelect = { viewModel.setDuration(it) },
+                  label = { Text("Duration") },
+                  isError = taskState.durationError != null,
+                  errorText = { taskState.durationError?.let { Text(it) } },
+                  dialogTitle = "Select Duration",
+                  switchModes = false)
               Column {
                 Button(
                     modifier = Modifier.testTag("saveButton").fillMaxWidth(),

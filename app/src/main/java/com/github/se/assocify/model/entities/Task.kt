@@ -9,7 +9,8 @@ import java.time.OffsetDateTime
  * @param title name of the task
  * @param description description of the task
  * @param isCompleted whether the task is completed
- * @param startTime time when the task should start
+ * @param startTime date and time when the task starts
+ * @param duration how long the task takes in minutes
  * @param peopleNeeded number of people needed to complete the task
  * @param category what the task is for (catering, committee...)
  * @param location location where the task should be completed
@@ -21,6 +22,7 @@ data class Task(
     val description: String,
     val isCompleted: Boolean,
     val startTime: OffsetDateTime,
+    val duration: Int,
     val peopleNeeded: Int,
     val category: String,
     val location: String,

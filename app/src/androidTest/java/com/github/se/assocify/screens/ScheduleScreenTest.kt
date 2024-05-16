@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
+import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -33,6 +34,7 @@ class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               "Event 1",
               false,
               OffsetDateTime.now(),
+              60,
               5,
               "Category",
               "Location",
@@ -53,7 +55,8 @@ class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       mockk<TaskAPI>() {
         every { getTasks(any(), any()) } answers { firstArg<(List<Task>) -> Unit>().invoke(tasks) }
       }
-  private val viewModel = EventScheduleViewModel(taskAPI)
+  private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
+  private val viewModel = EventScheduleViewModel(navActions, taskAPI)
 
   @Before
   fun testSetup() {
