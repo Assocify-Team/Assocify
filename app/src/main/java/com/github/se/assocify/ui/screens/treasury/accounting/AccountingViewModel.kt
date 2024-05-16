@@ -27,47 +27,6 @@ class AccountingViewModel(
 
   /** Initialize the view model */
   init {
-    val poleUUID = "cb7b1079-cb62-40b9-9f35-7667fea4748d"
-    val eventsUUId = "f2a6c184-cc47-4b44-ab03-950927b7e10d"
-    val commissionsUUID = "efbc3aba-33bf-4b03-aea7-e481e3126639"
-    accountingSubCategoryAPI.addSubCategory(
-        CurrentUser.associationUid!!,
-        AccountingSubCategory(UUID.randomUUID().toString(), poleUUID, "Administration", 0, 2024),
-        {},
-        {})
-    accountingSubCategoryAPI.addSubCategory(
-        CurrentUser.associationUid!!,
-        AccountingSubCategory(UUID.randomUUID().toString(), poleUUID, "Presidence", 0, 2024),
-        {},
-        {})
-
-    accountingSubCategoryAPI.addSubCategory(
-        CurrentUser.associationUid!!,
-        AccountingSubCategory(
-            UUID.randomUUID().toString(), poleUUID, "Delete this for test", 0, 2024),
-        {},
-        {})
-
-    accountingSubCategoryAPI.addSubCategory(
-        CurrentUser.associationUid!!,
-        AccountingSubCategory(
-            UUID.randomUUID().toString(), poleUUID, "Delete this for test 2", 0, 2024),
-        {},
-        {})
-
-    accountingSubCategoryAPI.addSubCategory(
-        CurrentUser.associationUid!!,
-        AccountingSubCategory(
-            UUID.randomUUID().toString(), poleUUID, "Delete this for test 3", 0, 2024),
-        {},
-        {})
-
-    accountingSubCategoryAPI.addSubCategory(
-        CurrentUser.associationUid!!,
-        AccountingSubCategory(
-            UUID.randomUUID().toString(), poleUUID, "Delete this for test 4", 0, 2024),
-        {},
-        {})
     updateDatabaseValues()
     uiState = _uiState
   }
