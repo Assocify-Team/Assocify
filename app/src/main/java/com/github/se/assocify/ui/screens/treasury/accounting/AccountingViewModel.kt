@@ -66,25 +66,17 @@ class AccountingViewModel(
         },
         { Log.d("BudgetViewModel", "Error getting subcategories") })
 
+    // update the budgetItem List
+    budgetAPI.getBudget(
+        CurrentUser.associationUid!!,
+        { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList) },
+        { Log.d("BudgetViewModel", "Error getting budget items") })
 
-      //update the budgetItem List
-        budgetAPI.getBudget(
-            CurrentUser.associationUid!!,
-            { budgetList ->
-            _uiState.value = _uiState.value.copy(budgetItemsList = budgetList)
-            },
-            { Log.d("BudgetViewModel", "Error getting budget items") }
-        )
-
-
-      //update the balanceItem List
-        balanceAPI.getBalance(
-            CurrentUser.associationUid!!,
-            { balanceList ->
-            _uiState.value = _uiState.value.copy(balanceItemList = balanceList)
-            },
-            { Log.d("BudgetViewModel", "Error getting balance items") }
-        )
+    // update the balanceItem List
+    balanceAPI.getBalance(
+        CurrentUser.associationUid!!,
+        { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList) },
+        { Log.d("BudgetViewModel", "Error getting balance items") })
   }
 
   /**
