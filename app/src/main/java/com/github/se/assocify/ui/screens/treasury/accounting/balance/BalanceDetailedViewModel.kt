@@ -110,7 +110,7 @@ class BalanceDetailedViewModel(
   }
 
   /** Start editing the Subcategory */
-  fun startSubCategoryBalanceEditing() {
+  fun startSubCategoryEditingInBalance() {
     _uiState.value = _uiState.value.copy(subCatEditing = true)
   }
 
@@ -121,20 +121,19 @@ class BalanceDetailedViewModel(
    * @param categoryUid the new category uid associated with the subCategory
    * @param year the new year of the subCategory
    */
-  fun saveSubCategoryBalanceEditing(name: String, categoryUid: String, year: Int) {
+  fun saveSubCategoryEditingInBalance(name: String, categoryUid: String, year: Int) {
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
     accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
     _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
   }
 
   /** Cancel the Subcategory editing */
-  fun cancelSubCategoryBalanceEditing() {
+  fun cancelSubCategoryEditingInBalance() {
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBalance() {
-    // delete subcategory
     accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
     _uiState.value = _uiState.value.copy(balanceList = emptyList())
     _uiState.value = _uiState.value.copy(subCatEditing = false)

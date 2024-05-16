@@ -119,7 +119,7 @@ fun AccountingDetailedScreen(
                     // Sets the editing state to true
                     when (page) {
                       AccountingPage.BALANCE ->
-                          balanceDetailedViewModel.startSubCategoryBalanceEditing()
+                          balanceDetailedViewModel.startSubCategoryEditingInBalance()
                       AccountingPage.BUDGET ->
                           budgetDetailedViewModel.startSubCategoryEditingInBudget()
                     }
@@ -438,7 +438,7 @@ fun DisplayEditSubCategory(
   Dialog(
       onDismissRequest = {
         when (page) {
-          AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryBalanceEditing()
+          AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditingInBalance()
           AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditingInBudget()
         }
       },
@@ -465,7 +465,7 @@ fun DisplayEditSubCategory(
                           Modifier.clickable {
                                 when (page) {
                                   AccountingPage.BALANCE ->
-                                      balanceViewModel.cancelSubCategoryBalanceEditing()
+                                      balanceViewModel.cancelSubCategoryEditingInBalance()
                                   AccountingPage.BUDGET ->
                                       budgetViewModel.cancelSubCategoryEditingInBudget()
                                 }
@@ -538,7 +538,7 @@ fun DisplayEditSubCategory(
                     onClick = {
                       when (page) {
                         AccountingPage.BALANCE ->
-                            balanceViewModel.saveSubCategoryBalanceEditing(
+                            balanceViewModel.saveSubCategoryEditingInBalance(
                                 name, categoryUid, year.toInt())
                         AccountingPage.BUDGET ->
                             budgetViewModel.saveSubCategoryEditingInBudget(
