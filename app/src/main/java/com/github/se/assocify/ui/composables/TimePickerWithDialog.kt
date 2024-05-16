@@ -57,7 +57,10 @@ import java.time.LocalTime
  * @param modifier The modifier to be applied to the composable.
  * @param label The label to be displayed above the text field.
  * @param isError Whether the DatePicker is in an error state.
- * @param supportingText Additional supporting text to be displayed below the DatePicker.
+ * @param errorText Additional supporting text to be displayed below the DatePicker.
+ * @param dialogTitle The title of the dialog.
+ * @param switchModes Whether to show the toggle button to switch between dial and text input or not
+ *   : If not, the dialog will only show the text input.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +69,10 @@ fun TimePickerWithDialog(
     onTimeSelect: (LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
-    errorText: @Composable (() -> Unit)? = null
+    isError: Boolean = false,
+    errorText: @Composable (() -> Unit)? = null,
+    dialogTitle: String = "Select Time",
+    switchModes: Boolean = true,
 ) {
   var showDialog by remember { mutableStateOf(false) }
   val timePickerState = rememberTimePickerState(initialHour = 8, initialMinute = 0, is24Hour = true)
@@ -80,12 +86,12 @@ fun TimePickerWithDialog(
         readOnly = true,
         label = label,
         placeholder = { Text(TimeUtil.NULL_TIME_STRING) },
-        isError = errorText != null,
+        isError = isError,
         supportingText = errorText)
     Box(modifier = Modifier.matchParentSize().alpha(0f).clickable(onClick = { showDialog = true }))
   }
 
-  val showingPicker = remember { mutableStateOf(true) }
+  val dialMode = remember { mutableStateOf(switchModes) }
 
   if (!showDialog) {
     return
@@ -106,17 +112,17 @@ fun TimePickerWithDialog(
                     shape = MaterialTheme.shapes.extraLarge,
                     color = MaterialTheme.colorScheme.surface),
     ) {
-      TimePickerToggle(
-          showingPicker = showingPicker.value,
-          onToggle = { showingPicker.value = !showingPicker.value })
+      if (switchModes) {
+        TimePickerToggle(dialMode = dialMode.value, onToggle = { dialMode.value = !dialMode.value })
+      }
       Column(
           modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
-                text = "Select time",
+                text = dialogTitle,
                 style = MaterialTheme.typography.labelMedium)
 
-            if (showingPicker.value) {
+            if (dialMode.value && switchModes) {
               TimePicker(state = timePickerState)
             } else {
               TimeInput(state = timePickerState)
@@ -143,17 +149,17 @@ fun TimePickerWithDialog(
 }
 
 @Composable
-fun TimePickerToggle(showingPicker: Boolean, onToggle: () -> Unit) {
+fun TimePickerToggle(dialMode: Boolean, onToggle: () -> Unit) {
 
   val description =
-      if (showingPicker) {
+      if (dialMode) {
         "Switch to Text Input"
       } else {
         "Switch to Touch Input"
       }
 
   val icon =
-      if (showingPicker) {
+      if (dialMode) {
         Icons.Outlined.Keyboard
       } else {
         Icons.Outlined.Schedule
