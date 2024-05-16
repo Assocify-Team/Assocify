@@ -5,8 +5,12 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.BudgetItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -18,7 +22,9 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class AccountingViewModel(
     private var accountingCategoryAPI: AccountingCategoryAPI,
-    private var accountingSubCategoryAPI: AccountingSubCategoryAPI
+    private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    private var balanceAPI: BalanceAPI,
+    private var budgetAPI: BudgetAPI
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<AccountingState> = MutableStateFlow(AccountingState())
@@ -59,6 +65,26 @@ class AccountingViewModel(
           }
         },
         { Log.d("BudgetViewModel", "Error getting subcategories") })
+
+
+      //update the budgetItem List
+        budgetAPI.getBudget(
+            CurrentUser.associationUid!!,
+            { budgetList ->
+            _uiState.value = _uiState.value.copy(budgetItemsList = budgetList)
+            },
+            { Log.d("BudgetViewModel", "Error getting budget items") }
+        )
+
+
+      //update the balanceItem List
+        balanceAPI.getBalance(
+            CurrentUser.associationUid!!,
+            { balanceList ->
+            _uiState.value = _uiState.value.copy(balanceItemList = balanceList)
+            },
+            { Log.d("BudgetViewModel", "Error getting balance items") }
+        )
   }
 
   /**
@@ -99,6 +125,8 @@ data class AccountingState(
     val categoryList: List<AccountingCategory> = emptyList(),
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
+    val budgetItemsList: List<BudgetItem> = emptyList(),
+    val balanceItemList: List<BalanceItem> = emptyList(),
     val globalSelected: Boolean = true,
     val yearFilter: Int = 2024
 )
