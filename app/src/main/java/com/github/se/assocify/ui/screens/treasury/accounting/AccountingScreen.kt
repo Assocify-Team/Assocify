@@ -3,6 +3,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,9 +20,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
@@ -50,7 +53,11 @@ fun AccountingScreen(
   val model by accountingViewModel.uiState.collectAsState()
   val subCategoryList = model.subCategoryList
 
-  LazyColumn(modifier = Modifier.fillMaxWidth().testTag("AccountingScreen")) {
+  LazyColumn(
+      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
+  ) {
     // display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
       items(subCategoryList) {
@@ -62,7 +69,8 @@ fun AccountingScreen(
       item {
         Text(
             text = "No data available with this tag",
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+        )
       }
     }
   }
