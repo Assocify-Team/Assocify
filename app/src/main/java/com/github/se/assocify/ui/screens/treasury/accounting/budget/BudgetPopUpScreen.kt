@@ -70,7 +70,8 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
       shape = RoundedCornerShape(16.dp),
     ) {
       Column() {
-        Text("Edit Budget Item", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+        val mainText = if (budgetModel.editedBudgetItem == null) "Create Budget Item" else "Edit Budget Item"
+        Text(mainText, fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         OutlinedTextField(
           modifier = Modifier.padding(8.dp).testTag("editNameBox"),
           value = nameString,
@@ -136,16 +137,29 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
           }
           Button(
             onClick = {
-              budgetViewModel.saveEditing(
-                BudgetItem(
-                  budget.uid,
-                  nameItem = nameString,
-                  amount = amountString.toInt(),
-                  tva = TVA.floatToTVA(tvaString.toFloat()),
-                  description = descriptionString,
-                  subcategoryUID = budget.subcategoryUID,
-                  year = yearString.toInt())
-              )
+              if(budgetModel.editedBudgetItem != null){
+                budgetViewModel.saveEditing(
+                  BudgetItem(
+                    budget.uid,
+                    nameItem = nameString,
+                    amount = amountString.toInt(),
+                    tva = TVA.floatToTVA(tvaString.toFloat()),
+                    description = descriptionString,
+                    subcategoryUID = budget.subcategoryUID,
+                    year = yearString.toInt())
+                )
+              } else{
+                budgetViewModel.saveCreating(
+                  BudgetItem(
+                    budget.uid,
+                    nameItem = nameString,
+                    amount = amountString.toInt(),
+                    tva = TVA.floatToTVA(tvaString.toFloat()),
+                    description = descriptionString,
+                    subcategoryUID = budget.subcategoryUID,
+                    year = yearString.toInt())
+                )
+              }
             },
             modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
           ) {

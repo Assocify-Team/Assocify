@@ -163,7 +163,12 @@ fun AccountingDetailedScreen(
             modifier = Modifier.testTag("createNewItem"),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
-            onClick = { /*TODO: create new item*/}) {
+            onClick = {
+              when(page){
+                AccountingPage.BUDGET -> budgetDetailedViewModel.startCreating()
+                AccountingPage.BALANCE -> /*TODO: implement the balance popup*/ TODO()
+              }
+            }) {
               Icon(Icons.Outlined.Add, "Create")
             }
       },
