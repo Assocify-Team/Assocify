@@ -119,9 +119,15 @@ fun AccountingDetailedScreen(
                     // Sets the editing state to true
                     when (page) {
                       AccountingPage.BALANCE ->
-                          balanceDetailedViewModel.startSubCategoryEditingInBalance()
+                          if (balanceState.subCategory.name !=
+                              "") { // TODO: modify this with loading
+                            balanceDetailedViewModel.startSubCategoryEditingInBalance()
+                          }
                       AccountingPage.BUDGET ->
-                          budgetDetailedViewModel.startSubCategoryEditingInBudget()
+                          if (budgetState.subCategory.name !=
+                              "") { // TODO: modify this with loading
+                            budgetDetailedViewModel.startSubCategoryEditingInBudget()
+                          }
                     }
                   },
                   modifier = Modifier.testTag("editSubCat")) {
@@ -437,7 +443,7 @@ fun DisplayEditSubCategory(
   var year by remember { mutableStateOf(subCategory.year.toString()) }
   var expanded by remember { mutableStateOf(false) }
   var selectedCategory by remember {
-    mutableStateOf(categoryList.filter { it.uid == subCategory.categoryUID }[0].name)
+    mutableStateOf(categoryList.find { it.uid == subCategory.categoryUID }?.name ?: "No tag")
   }
   Dialog(
       onDismissRequest = {

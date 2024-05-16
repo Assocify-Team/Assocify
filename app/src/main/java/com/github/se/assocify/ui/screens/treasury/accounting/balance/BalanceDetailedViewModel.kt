@@ -30,7 +30,6 @@ class BalanceDetailedViewModel(
   val uiState: StateFlow<BalanceItemState>
 
   init {
-
     updateDatabaseValuesInBalance()
     setSubCategoryInBalance(subCategoryUid)
     uiState = _uiState
@@ -117,7 +116,7 @@ class BalanceDetailedViewModel(
   /**
    * Save the Subcategory editing
    *
-   * @param name the new name of the Subategory
+   * @param name the new name of the subCategory
    * @param categoryUid the new category uid associated with the subCategory
    * @param year the new year of the subCategory
    */
@@ -145,6 +144,7 @@ class BalanceDetailedViewModel(
  *
  * @param balanceList the current list of balance items
  * @param subCategory the current subcategory
+ * @param categoryList the current list of categories
  * @param status the current status
  * @param subCatEditing whether the subcategory is being edited
  * @param year the current year
@@ -153,6 +153,7 @@ data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
     val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
     val categoryList: List<AccountingCategory> = emptyList(),
+    val loadingCategory: Boolean = false,
     val status: Status? = null,
     val subCatEditing: Boolean = false,
     val year: Int = 2023
