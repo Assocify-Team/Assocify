@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -8,8 +9,12 @@ import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.navigation.NavigationActions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * The view model for the budget detailed screen
@@ -20,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @param subCategoryUid the subcategory uid
  */
 class BudgetDetailedViewModel(
+    private var navigationActions: NavigationActions,
     private var budgetApi: BudgetAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
@@ -151,7 +157,16 @@ class BudgetDetailedViewModel(
    */
   fun saveSubCategoryEditingInBudget(name: String, categoryUid: String, year: Int) {
     val subCategoryBudget = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-    accountingSubCategoryAPI.updateSubCategory(subCategoryBudget, {}, {})
+    accountingSubCategoryAPI.updateSubCategory(
+        subCategoryBudget,
+        { navigationActions.back() },
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to update category",
+            )
+          }
+        })
     _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategoryBudget)
   }
 
@@ -164,7 +179,16 @@ class BudgetDetailedViewModel(
   fun deleteSubCategoryInBudget() {
     if (_uiState.value.subCategory == null) return
     _uiState.value = _uiState.value.copy(budgetList = emptyList())
-    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory!!, {}, {})
+    accountingSubCategoryAPI.deleteSubCategory(
+        _uiState.value.subCategory!!,
+        { navigationActions.back() },
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to delete category",
+            )
+          }
+        })
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 }
@@ -189,5 +213,6 @@ data class BudgetItemState(
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
     val subCatEditing: Boolean = false,
-    val editedBudgetItem: BudgetItem? = null
+    val editedBudgetItem: BudgetItem? = null,
+    val snackbarState: SnackbarHostState = SnackbarHostState()
 )

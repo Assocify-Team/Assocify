@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -9,8 +10,12 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Status
+import com.github.se.assocify.navigation.NavigationActions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * View model for the balance detailed screen
@@ -21,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @param subCategoryUid the subcategory uid
  */
 class BalanceDetailedViewModel(
+    private var navigationActions: NavigationActions,
     private var balanceApi: BalanceAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
@@ -146,7 +152,16 @@ class BalanceDetailedViewModel(
    */
   fun saveSubCategoryEditingInBalance(name: String, categoryUid: String, year: Int) {
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-    accountingSubCategoryAPI.updateSubCategory(subCategory, {}, {})
+    accountingSubCategoryAPI.updateSubCategory(
+        subCategory,
+        { navigationActions.back() },
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to update category",
+            )
+          }
+        })
     _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
   }
 
@@ -158,7 +173,16 @@ class BalanceDetailedViewModel(
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBalance() {
     if (_uiState.value.subCategory == null) return
-    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory!!, {}, {})
+    accountingSubCategoryAPI.deleteSubCategory(
+        _uiState.value.subCategory!!,
+        { navigationActions.back() },
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to delete category",
+            )
+          }
+        })
     _uiState.value = _uiState.value.copy(balanceList = emptyList())
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
@@ -183,5 +207,6 @@ data class BalanceItemState(
     val loadingCategory: Boolean = false,
     val status: Status? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = 2023
+    val year: Int = 2023,
+    val snackbarState: SnackbarHostState = SnackbarHostState()
 )

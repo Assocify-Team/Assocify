@@ -40,6 +40,8 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -144,7 +146,15 @@ fun AccountingDetailedScreen(
               Icon(Icons.Outlined.Add, "Create")
             }
       },
-      content = { innerPadding ->
+      snackbarHost = {
+        SnackbarHost(
+            hostState =
+                when (page) {
+                  AccountingPage.BALANCE -> balanceState.snackbarState
+                  AccountingPage.BUDGET -> budgetState.snackbarState
+                },
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+      }) { innerPadding ->
         // Call the various editing popups
         if (budgetState.editing && page == AccountingPage.BUDGET) {
           DisplayEditBudget(budgetDetailedViewModel)
@@ -231,7 +241,7 @@ fun AccountingDetailedScreen(
             }
           }
         }
-      })
+      }
 }
 
 /**
@@ -538,7 +548,6 @@ fun DisplayEditSubCategory(
                         AccountingPage.BALANCE -> balanceViewModel.deleteSubCategoryInBalance()
                         AccountingPage.BUDGET -> budgetViewModel.deleteSubCategoryInBudget()
                       }
-                      navigationActions.back()
                     },
                     modifier = Modifier.testTag("editSubCategoryDeleteButton")) {
                       Text("Delete", color = MaterialTheme.colorScheme.error)
