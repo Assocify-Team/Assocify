@@ -178,7 +178,6 @@ class CreateAssociationViewmodel(
               _uiState.value.members,
               {
                 CurrentUser.associationUid = association.uid
-                assoAPI
                 userAPI.updateCurrentUserAssociationCache({ navActions.goFromCreateAsso() }, {})
               },
               {})
