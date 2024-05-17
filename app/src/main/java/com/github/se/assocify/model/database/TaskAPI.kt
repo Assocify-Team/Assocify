@@ -143,6 +143,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
                   description = description,
                   isCompleted = isCompleted,
                   startTime = startTime,
+                  duration = duration,
                   peopleNeeded = peopleNeeded,
                   category = category,
                   location = location)
