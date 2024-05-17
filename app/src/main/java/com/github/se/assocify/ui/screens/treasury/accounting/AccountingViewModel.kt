@@ -31,16 +31,17 @@ class AccountingViewModel(
 
   private var loadCounter = 0
 
-  fun startLoad(count: Int) {
+  private fun startLoad(count: Int) {
     loadCounter = count
     _uiState.value = _uiState.value.copy(loading = true, error = null)
   }
 
-  fun endLoad(error: String? = null) {
+  private fun endLoad(error: String? = null) {
     loadCounter--
     if (error != null) {
       _uiState.value = _uiState.value.copy(loading = false, error = error)
     } else if (loadCounter == 0) {
+      filterSubCategories()
       _uiState.value = _uiState.value.copy(loading = false, error = null)
     }
   }
@@ -48,15 +49,23 @@ class AccountingViewModel(
   /** Function to load categories and subcategories */
   fun loadAccounting() {
     startLoad(2)
+    getCategories()
+    getSubCategories()
+  }
 
+  /** Function to get the categories from the database */
+  private fun getCategories() {
     // Sets the category list in the state from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList ->
-          _uiState.value = _uiState.value.copy(categoryList = categoryList)
-          endLoad()
+        {
+            categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList)
+            endLoad()
         },
-        { endLoad("Error loading tags") })
+        {
+            endLoad("Error loading tags")
+        })
+  }
 
   /** Function to get the subcategories from the database */
   private fun getSubCategories() {
@@ -65,8 +74,11 @@ class AccountingViewModel(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)
+            endLoad()
         },
-        { Log.d("BudgetViewModel", "Error getting subcategories") })
+        {
+            endLoad("Error loading categories")
+        })
   }
 
   /** Function to filter the subCategoryList */

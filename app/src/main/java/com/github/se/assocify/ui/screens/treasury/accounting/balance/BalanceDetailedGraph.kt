@@ -28,8 +28,7 @@ fun NavGraphBuilder.balanceDetailedGraph(
       }
       val balanceDetailedViewModel = remember {
         BalanceDetailedViewModel(
-            navigationActions, 
-              balanceAPI, receiptAPI, subCategoryAPI, accountingCategoryAPI, it)
+            navigationActions, balanceAPI, receiptAPI, subCategoryAPI, accountingCategoryAPI, it)
       }
       BalanceDetailedScreen(navigationActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }

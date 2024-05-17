@@ -134,6 +134,7 @@ class BudgetDetailedScreenTest :
             mockBalanceAPI,
             mockReceiptAPI,
             mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
             subCategoryUid)
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
