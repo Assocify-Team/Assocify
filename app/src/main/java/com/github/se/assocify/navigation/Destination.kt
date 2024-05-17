@@ -31,7 +31,7 @@ sealed class Destination(
 
   //  data object ProfileRoles : Destination("profile/roles")
 
-  data object ProfileTreasury : Destination("profile/treasury")
+  data object ProfileTreasuryTags : Destination("profile/treasuryTags")
 
   data object ProfileEvents : Destination("profile/events")
 

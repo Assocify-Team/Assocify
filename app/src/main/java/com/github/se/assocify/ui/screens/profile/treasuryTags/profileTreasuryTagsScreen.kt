@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.profile.treasury
+package com.github.se.assocify.ui.screens.profile.treasuryTags
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -16,12 +16,12 @@ import com.github.se.assocify.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileTreasuryScreen(navActions: NavigationActions) {
+fun ProfileTreasuryTagsScreen(navActions: NavigationActions) {
   Scaffold(
-      modifier = Modifier.testTag("ProfileTreasury Screen"),
+      modifier = Modifier.testTag("TreasuryTags Screen"),
       topBar = {
         CenterAlignedTopAppBar(
-            title = { Text("Treasury Management") },
+            title = { Text("Treasury Tags Management") },
             navigationIcon = {
               IconButton(
                   onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
@@ -33,6 +33,6 @@ fun ProfileTreasuryScreen(navActions: NavigationActions) {
       }) {
         Text(
             modifier = Modifier.padding(it),
-            text = "Treasury settings Screen : not yet implemented")
+            text = "Treasury tags settings Screen : not yet implemented")
       }
 }

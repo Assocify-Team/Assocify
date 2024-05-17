@@ -10,7 +10,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.events.profileEventsGraph
 import com.github.se.assocify.ui.screens.profile.members.profileMembersGraph
 import com.github.se.assocify.ui.screens.profile.preferences.profilePreferencesGraph
-import com.github.se.assocify.ui.screens.profile.treasury.profileTreasuryGraph
+import com.github.se.assocify.ui.screens.profile.treasuryTags.profileTreasuryTagsGraph
 
 fun NavGraphBuilder.profileGraph(
     navigationActions: NavigationActions,
@@ -29,6 +29,6 @@ fun NavGraphBuilder.profileGraph(
   profilePreferencesGraph(navigationActions)
   //  profileRolesGraph(navigationActions)
   profileMembersGraph(navigationActions)
-  profileTreasuryGraph(navigationActions)
+  profileTreasuryTagsGraph(navigationActions)
   profileEventsGraph(navigationActions)
 }

@@ -312,23 +312,31 @@ enum class MySettings {
 enum class AssociationSettings {
   Members,
   //  Roles;
-  Treasury,
+  TreasuryTags,
   Events;
 
   fun getIcon(): ImageVector {
     return when (this) {
       Members -> Icons.Default.People
       //      Roles -> Icons.Default.ManageAccounts
-      Treasury -> Icons.Default.Savings
+      TreasuryTags -> Icons.Default.Savings
       Events -> Icons.Default.Event
     }
   }
+
+    override fun toString() : String {
+        return when (this) {
+            Members -> "Members"
+            TreasuryTags -> "Treasury Tags"
+            Events -> "Events"
+        }
+    }
 
   fun getDestination(): Destination {
     return when (this) {
       Members -> Destination.ProfileMembers
       //      Roles -> Destination.ProfileRoles
-      Treasury -> Destination.ProfileTreasury
+      TreasuryTags -> Destination.ProfileTreasuryTags
       Events -> Destination.ProfileEvents
     }
   }
