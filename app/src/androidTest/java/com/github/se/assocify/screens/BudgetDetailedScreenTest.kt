@@ -12,8 +12,11 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
@@ -41,13 +44,19 @@ class BudgetDetailedScreenTest :
   @get:Rule val mockkRule = MockKRule(this)
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
-  @RelaxedMockK lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
+  @RelaxedMockK lateinit var mockBalanceAPI: BalanceAPI
   val subCategoryUid = "subCategoryUid"
   val subCategoryList =
       listOf(
-          AccountingSubCategory(subCategoryUid, "categoryUid", "Logistics", 1205, 2023),
+          AccountingSubCategory(subCategoryUid, "2", "Logistics", 1205, 2023),
           AccountingSubCategory("2", "categoryUid", "Administration", 100, 2023),
           AccountingSubCategory("3", "categoryUid", "Balelec", 399, 2023))
+  val categoryList =
+      listOf(
+          AccountingCategory("1", "Events"),
+          AccountingCategory("2", "Pole"),
+          AccountingCategory("3", "Commissions"),
+          AccountingCategory("4", "Sponsorship"))
 
   val budgetItems =
       listOf(
@@ -73,23 +82,40 @@ class BudgetDetailedScreenTest :
         every { updateBudgetItem(any(), any(), any(), any()) } answers {}
       }
 
-  val mockAccountingSubCategoryApi: AccountingSubCategoryAPI =
+  val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
       mockk<AccountingSubCategoryAPI>() {
         every { getSubCategories(any(), any(), any()) } answers
             {
               val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
               onSuccessCallback(subCategoryList)
             }
+        every { updateSubCategory(any(), any(), any()) } answers {}
+        every { deleteSubCategory(any(), any(), any()) } answers {}
+      }
+
+  val mockAccountingCategoryAPI: AccountingCategoryAPI =
+      mockk<AccountingCategoryAPI>() {
+        every { updateCategory(any(), any(), any(), any()) } answers {}
+        every { getCategories(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
+              onSuccessCallback(categoryList)
+            }
       }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
+  lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
   @Before
   fun setup() {
     CurrentUser.userUid = "userId"
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
-        BudgetDetailedViewModel(mockBudgetAPI, mockAccountingSubCategoryApi, "subCategoryUid")
+        BudgetDetailedViewModel(
+            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+    balanceDetailedViewModel =
+        BalanceDetailedViewModel(
+            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -111,6 +137,8 @@ class BudgetDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
@@ -130,7 +158,7 @@ class BudgetDetailedScreenTest :
   fun testEmptyList() {
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2021").performClick()
+      onNodeWithText("2024").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
       onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
           .assertIsDisplayed()
@@ -151,6 +179,7 @@ class BudgetDetailedScreenTest :
   fun testFilterByYear() {
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").assertIsDisplayed()
       onNodeWithText("2022").performClick()
 
       onNodeWithText("sweaters").assertDoesNotExist()
@@ -180,6 +209,7 @@ class BudgetDetailedScreenTest :
     }
   }
 
+  /** Tests if the budget Item pop up is displayed and can cancel */
   @Test
   fun testEditDismissWorks() {
     with(composeTestRule) {
@@ -196,6 +226,7 @@ class BudgetDetailedScreenTest :
     }
   }
 
+  /** Tests if the budget item edit pop up is displayed and working correctly */
   @Test
   fun testEditModifyWorks() {
     with(composeTestRule) {
@@ -209,6 +240,81 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editDialogBox").assertIsNotDisplayed()
       onNodeWithText("pair of scissors ").assertIsNotDisplayed()
       onNodeWithText("scotch").assertIsDisplayed()
+    }
+  }
+
+  /** Tests if the subCategory edit pop up is displayed and working correctly */
+  @Test
+  fun testSubCatEditPopUp() {
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      assert(budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategoryYearBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryYearBox").performTextClearance()
+      onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
+      onNodeWithTag("categoryDropdown").assertIsDisplayed()
+      onNodeWithTag("categoryDropdown").performClick()
+      onNodeWithText("Events").performClick()
+      onNodeWithTag("editSubCategorySaveButton").performClick()
+      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
+      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithText("newName").assertIsDisplayed()
+      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "newName")
+      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2024)
+    }
+  }
+
+  /** Tests if the subCategory edit pop up is canceled correctly */
+  @Test
+  fun testSubCatEditCancel() {
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      assert(budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategoryYearBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryYearBox").performTextClearance()
+      onNodeWithTag("editSubCategoryYearBox").performTextInput("2024")
+      onNodeWithTag("categoryDropdown").performClick()
+      onNodeWithText("Sponsorship").performClick()
+      onNodeWithTag("editSubCategoryCancelButton").performClick()
+      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
+      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithText("newName").assertIsNotDisplayed()
+      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "Logistics")
+      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2023)
+      assert(budgetDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
+    }
+  }
+
+  @Test
+  fun testDeleteSubCategory() {
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      assert(budgetDetailedViewModel.uiState.value.subCatEditing)
+      onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryDeleteButton").performClick()
+      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
+      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
+      assert(budgetDetailedViewModel.uiState.value.budgetList.isEmpty())
+    }
+  }
+
+  @Test
+  fun tvaFilterWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
+      onNodeWithText("HT").performClick()
+      onNodeWithText("12.00").assertIsDisplayed()
+      onNodeWithText("TTC").performClick()
+      onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
     }
   }
 }

@@ -10,6 +10,7 @@ import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateTimeUtil
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.DurationUtil
 import com.github.se.assocify.ui.util.TimeUtil
 import java.time.LocalDate
 import java.time.LocalTime
@@ -75,8 +76,9 @@ class TaskViewModel {
     taskApi.getTask(
         taskUid,
         {
-          val date = it.startTime.toLocalDate()
-          val time = it.startTime.toLocalTime()
+          val dateTime = DateTimeUtil.toLocalDateTime(it.startTime)
+          val date = dateTime.toLocalDate()
+          val time = dateTime.toLocalTime()
           eventUid = it.eventUid
 
           _uiState.value =
@@ -87,7 +89,8 @@ class TaskViewModel {
                   category = it.category,
                   staffNumber = it.peopleNeeded.toString(),
                   date = DateUtil.formatDate(date),
-                  time = TimeUtil.formatTime(time))
+                  time = TimeUtil.formatTime(time),
+                  duration = DurationUtil.formatTime(it.duration))
 
           loadEvents()
         },
@@ -158,15 +161,26 @@ class TaskViewModel {
     }
   }
 
+  fun setDuration(duration: LocalTime?) {
+    _uiState.value = _uiState.value.copy(duration = DurationUtil.formatTime(duration))
+    if (duration == null) {
+      _uiState.value = _uiState.value.copy(durationError = "Duration cannot be empty")
+    } else {
+      _uiState.value = _uiState.value.copy(durationError = null)
+    }
+  }
+
   fun saveTask() {
     setTitle(_uiState.value.title)
     setDate(DateUtil.toDate(_uiState.value.date))
     setTime(TimeUtil.toTime(_uiState.value.time))
+    setDuration(DurationUtil.toTime(_uiState.value.duration))
     setStaffNumber(_uiState.value.staffNumber)
 
     if (_uiState.value.titleError != null ||
         _uiState.value.dateError != null ||
         _uiState.value.timeError != null ||
+        _uiState.value.durationError != null ||
         _uiState.value.staffNumberError != null) {
       return
     }
@@ -183,6 +197,7 @@ class TaskViewModel {
 
     val date = DateUtil.toDate(_uiState.value.date) ?: return
     val time = TimeUtil.toTime(_uiState.value.time) ?: return
+    val duration = DurationUtil.toDuration(_uiState.value.duration)
 
     val startTime = DateTimeUtil.toOffsetDateTime(date, time)
 
@@ -193,6 +208,7 @@ class TaskViewModel {
             description = _uiState.value.description,
             isCompleted = false,
             startTime = startTime,
+            duration = duration,
             peopleNeeded = _uiState.value.staffNumber.toInt(),
             category = _uiState.value.category,
             location = "", // TODO: Add location
@@ -250,11 +266,13 @@ data class TaskState(
     val staffNumber: String = "",
     val date: String = "",
     val time: String = "",
+    val duration: String = "",
     val event: Event? = null,
     val eventList: List<Event> = emptyList(),
     val titleError: String? = null,
     val staffNumberError: String? = null,
     val dateError: String? = null,
     val timeError: String? = null,
+    val durationError: String? = null,
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 )

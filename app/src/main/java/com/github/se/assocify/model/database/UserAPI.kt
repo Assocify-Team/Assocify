@@ -22,24 +22,40 @@ import kotlinx.serialization.json.JsonObject
  */
 class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
 
+  private var userCache = mutableMapOf<String, User>()
+
+  init {
+    updateUserCache({}, {})
+    updateCurrentUserAssociationCache({}, {})
+  }
+
+  /**
+   * Updates the user cache
+   *
+   * @param onSuccess called on success with the list of users
+   * @param onFailure called on failure
+   */
+  fun updateUserCache(onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure, tag = "UserAPI[USER_CACHE]") {
+      val users = db.from("users").select().decodeList<User>()
+      userCache = users.associateBy { it.uid }.toMutableMap()
+      onSuccess(users)
+    }
+  }
+
   /**
    * Gets a user from the database
    *
    * @param id the id of the user to get
    * @param onSuccess called on success with the user
-   * @return the user with the given id
    */
   fun getUser(id: String, onSuccess: (User) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      val user =
-          db.from("users")
-              .select {
-                filter { User::uid eq id }
-                limit(1)
-                single()
-              }
-              .decodeAs<User>()
-      onSuccess(user)
+    if (userCache.isNotEmpty()) {
+      userCache[id]?.let { onSuccess(it) } ?: onFailure(Exception("User not found"))
+    } else {
+      updateUserCache(
+          { userCache[id]?.let { onSuccess(it) } ?: onFailure(Exception("User not found")) },
+          onFailure)
     }
   }
   /**
@@ -47,12 +63,12 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
    *
    * @param onSuccess called on success with the list of users
    * @param onFailure called on failure
-   * @return a list of all users
    */
   fun getAllUsers(onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      val users = db.from("users").select().decodeList<User>()
-      onSuccess(users)
+    if (userCache.isNotEmpty()) {
+      onSuccess(userCache.values.toList())
+    } else {
+      updateUserCache(onSuccess, onFailure)
     }
   }
 
@@ -66,6 +82,8 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun addUser(user: User, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("users").insert(user)
+
+      userCache[user.uid] = user
       onSuccess()
     }
   }
@@ -86,6 +104,11 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
   ) {
     tryAsync(onFailure) {
       db.from("users").update({ User::name setTo newName }) { filter { User::uid eq userId } }
+
+      val cachedValue = userCache[userId]
+      if (cachedValue != null) {
+        userCache[userId] = cachedValue.copy(name = newName)
+      }
       onSuccess()
     }
   }
@@ -185,7 +208,30 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun deleteUser(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("users").delete { filter { User::uid eq id } }
+
+      userCache.remove(id)
       onSuccess()
+    }
+  }
+
+  private var currentUserAssociationCache: Map<String, Pair<Association, PermissionRole>>? = null
+  private var currentUserId: String? = null
+
+  fun updateCurrentUserAssociationCache(
+      onSuccess: (Map<String, Pair<Association, PermissionRole>>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure, tag = "UserAPI[ASSOCIATION_CACHE]") {
+      val associations =
+          db.from("member_role_association_view")
+              .select { filter { Membership::userId eq CurrentUser.userUid!! } }
+              .decodeList<Membership>()
+              .associate { it.associationId to (it.getAssociation() to it.getRole()) }
+
+      currentUserAssociationCache = associations
+      currentUserId = CurrentUser.userUid
+
+      onSuccess(associations)
     }
   }
 
@@ -199,12 +245,10 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<Association>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
-      val associations =
-          db.from("member_role_association_view")
-              .select { filter { Membership::userId eq CurrentUser.userUid!! } }
-              .decodeList<Membership>()
-      onSuccess(associations.map { it.getAssociation() })
+    if (currentUserAssociationCache != null && currentUserId == CurrentUser.userUid) {
+      onSuccess(currentUserAssociationCache!!.values.map { it.first })
+    } else {
+      updateCurrentUserAssociationCache({ onSuccess(it.values.map { it.first }) }, onFailure)
     }
   }
 
@@ -215,17 +259,17 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getCurrentUserRole(onSuccess: (PermissionRole) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      val membership =
-          db.from("member_role_association_view")
-              .select {
-                filter {
-                  Membership::userId eq CurrentUser.userUid!!
-                  Membership::associationId eq CurrentUser.associationUid!!
-                }
-              }
-              .decodeSingle<Membership>()
-      onSuccess(membership.getRole())
+    if (currentUserAssociationCache != null && currentUserId == CurrentUser.userUid) {
+      val associationUid = CurrentUser.associationUid!!
+      currentUserAssociationCache!![associationUid]?.let { onSuccess(it.second) }
+          ?: onFailure(Exception("Association not found"))
+    } else {
+      updateCurrentUserAssociationCache(
+          { map ->
+            map[CurrentUser.associationUid]?.let { onSuccess(it.second) }
+                ?: onFailure(Exception("Association not found"))
+          },
+          onFailure)
     }
   }
 
