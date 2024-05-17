@@ -112,10 +112,18 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockNavActions,
+            mockBudgetAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockNavActions,
+            mockBalanceAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -263,8 +271,8 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsDisplayed()
-      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "newName")
-      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2024)
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.name == "newName")
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.year == 2024)
     }
   }
 
@@ -287,9 +295,9 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsNotDisplayed()
-      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "Logistics")
-      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2023)
-      assert(budgetDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.name == "Logistics")
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.year == 2023)
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.categoryUID == "2")
     }
   }
 
