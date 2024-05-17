@@ -20,6 +20,8 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -82,14 +84,14 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             }
       }
   var receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions, mockReceiptAPI)
+    lateinit var accountingViewModel: AccountingViewModel
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    val viewModel = TreasuryViewModel(navActions, receiptListViewModel)
-    val accountingViewModel =
-        AccountingViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
+      accountingViewModel = AccountingViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
+    val viewModel = TreasuryViewModel(navActions, receiptListViewModel, accountingViewModel )
     composeTestRule.setContent {
       TreasuryScreen(navActions, accountingViewModel, receiptListViewModel, viewModel)
     }
@@ -158,6 +160,31 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     }
   }
 
+    @Test
+    fun searchBarInBudgetAndBalance(){
+        with(composeTestRule){
+            onNodeWithTag("budgetTab").assertIsDisplayed()
+            onNodeWithTag("budgetTab").performClick()
+
+            onNodeWithTag("searchIconButton").performClick()
+            onNodeWithTag("searchBar").assertIsDisplayed()
+            onNodeWithTag("searchBar").onChild().assertIsDisplayed()
+            onNodeWithTag("searchBar").onChild().performTextInput("Presidency")
+            onNodeWithTag("searchBar").onChild().assertTextContains("Presidency")
+            onNodeWithTag("searchClearButton").performClick()
+            onNodeWithTag("searchBar").onChild().assertTextContains("")
+            onNodeWithTag("searchBackButton").performClick()
+            onNodeWithTag("searchBar").assertIsNotDisplayed()
+
+            onNodeWithTag("balanceTab").assertIsDisplayed()
+            onNodeWithTag("balanceTab").performClick()
+
+            onNodeWithTag("searchIconButton").performClick()
+            onNodeWithTag("searchBar").onChild().performTextInput("Presidency")
+            onNodeWithTag("searchBar").onChild().assertTextContains("Presidency")
+
+        }
+    }
   @Test
   fun receiptLoading() {
     every { mockReceiptAPI.getAllReceipts(any(), any()) } answers
