@@ -167,24 +167,7 @@ fun DisplayLine(
     accountingViewModel: AccountingViewModel,
     accountingState: AccountingState
 ) {
-
-    val amount =
-        when(page){
-            AccountingPage.BUDGET -> accountingState.budgetItemsList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
-            AccountingPage.BALANCE -> accountingState.balanceItemList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
-        }
-
-    //set the amount of the subcategory
-    accountingViewModel.setSubcategoryAmount(
-        AccountingSubCategory(
-            category.uid,
-            category.categoryUID,
-            category.name,
-            amount,
-            category.year
-        )
-    )
-
+    val amount = 0 //TODO: get right amount
   ListItem(
       headlineContent = { Text(category.name) },
       trailingContent = {

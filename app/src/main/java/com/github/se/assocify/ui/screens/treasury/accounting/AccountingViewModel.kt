@@ -36,6 +36,7 @@ class AccountingViewModel(
     getSubCategories()
       getAccountingList()
     filterSubCategories()
+      setSubcategoriesAmount()
     uiState = _uiState
   }
 
@@ -97,17 +98,49 @@ class AccountingViewModel(
             { Log.d("BudgetViewModel", "Error getting balance items") })
     }
 
-    /** Updates the amount of a subcategory */
-    fun setSubcategoryAmount(subCategory: AccountingSubCategory){
-        val allSubcategoryList = emptyList<AccountingSubCategory>()
-        allSubcategoryList.forEach {
+    /** Set the amount of a subcategory */
+    private fun setSubcategoriesAmount(){
+        val updatedAmountBalanceHT = _uiState.value.amountBalanceHT.toMutableMap()
+        val updatedAmountBalanceTTC = _uiState.value.amountBalanceTTC.toMutableMap()
+        val updatedAmountBudgetHT = _uiState.value.amountBudgetHT.toMutableMap()
+        val updatedAmountBudgetTTC = _uiState.value.amountBudgetTTC.toMutableMap()
+
+        //For each subcategory, we calculate their amount given the budget and balance items (with and without VAT)
+        _uiState.value.allSubCategoryList.forEach {
             subCategory ->
-            _uiState.value.balanceItemList.filter {
-                balanceItem -> subCategory.uid ==  balanceItem.uid
+
+            //Calculate the amount for the balance screen
+            _uiState.value.balanceItemList.filter { balanceItem ->
+                subCategory.uid == balanceItem.uid
+            }.forEach { balanceItem ->
+                // Add to map the balance amount of the subcategory
+                updatedAmountBalanceHT[subCategory.uid] = updatedAmountBalanceHT.getOrPut(subCategory.uid) { 0 } + balanceItem.amount
+
+                // Add to map the balance amount of the subcategory with TVA
+                val amountWithTVA = balanceItem.amount + (balanceItem.amount * balanceItem.tva.rate / 100f).toInt()
+                updatedAmountBalanceTTC[subCategory.uid] = updatedAmountBalanceTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
+            }
+
+            //Calculate the amount for the budget screen
+            _uiState.value.budgetItemsList.filter { budgetItem ->
+                subCategory.uid == budgetItem.uid
+            }.forEach { budgetItem ->
+                // Add to map the budget amount of the subcategory
+                updatedAmountBudgetHT[subCategory.uid] = updatedAmountBudgetHT.getOrPut(subCategory.uid) { 0 } + budgetItem.amount
+
+                // Add to map the budget amount of the subcategory with TVA
+                val amountWithTVA = budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt()
+                updatedAmountBudgetTTC[subCategory.uid] = updatedAmountBudgetTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
             }
         }
 
-        //updateDatabaseValues()
+        // Update the state with the new maps
+        _uiState.value = _uiState.value.copy(
+            amountBalanceHT = updatedAmountBalanceHT,
+            amountBalanceTTC = updatedAmountBalanceTTC,
+            amountBudgetHT = updatedAmountBudgetHT,
+            amountBudgetTTC = updatedAmountBudgetTTC
+        )
     }
 
   /**
@@ -145,7 +178,7 @@ class AccountingViewModel(
   }
 
   fun modifyTVAFilter(tvaActive: Boolean) {
-    _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+    _uiState.value = _uiState.value.copy(tvaFilterActive = tvaActive)
   }
 }
 
@@ -170,12 +203,12 @@ data class AccountingState(
     val allSubCategoryList: List<AccountingSubCategory> = emptyList(),
     val budgetItemsList: List<BudgetItem> = emptyList(),
     val balanceItemList: List<BalanceItem> = emptyList(),
-    val amountBudgetHT: Map<String, Int> = emptyMap(),
-    val amountBudgetTTC: Map<String, Int> = emptyMap(),
-    val amountBalanceHT: Map<String, Int> = emptyMap(),
-    val amountBalanceTTC: Map<String, Int> = emptyMap(),
+    val amountBudgetHT: MutableMap<String, Int> = mutableMapOf(),
+    val amountBudgetTTC: MutableMap<String, Int> = mutableMapOf(),
+    val amountBalanceHT: MutableMap<String, Int> = mutableMapOf(),
+    val amountBalanceTTC: MutableMap<String, Int> = mutableMapOf(),
     val globalSelected: Boolean = true,
     val yearFilter: Int = 2024,
-    val filterActive: Boolean = false,
+    val tvaFilterActive: Boolean = false,
     val searchQuery: String = ""
 )
