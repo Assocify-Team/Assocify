@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.selectAssociation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -50,32 +49,24 @@ class SelectAssociationViewModel(
 
   /** Confirms selection of an association and moves to the home screen. */
   fun selectAssoc(uid: String) {
-    Log.e("SelectAssociationViewModel", "selectAssoc: $uid")
     CurrentUser.associationUid = uid
     userAPI.requestJoin(
         uid,
         {
-          Log.e("requestjoin", "success")
           associationAPI.getRoles(
               uid,
               { roles ->
-                Log.e("getRoles", "success")
                 val role = roles.find { it.type == RoleType.MEMBER }
                 if (role != null) {
-                  Log.e("getroles", "not null")
                   associationAPI.acceptUser(
                       CurrentUser.userUid!!,
                       role,
                       {
-                        Log.e("acceptUser", "success")
                         userAPI.updateCurrentUserAssociationCache(
                             {
-                              Log.e("updateCurrentUserAssociationCache", "success")
                               if (navActions.backFromSelectAsso()) {
-
                                 navActions.back()
                               } else {
-                                Log.e("backFromSelectAsso", "onLogin(true)")
                                 navActions.onLogin(true)
                               }
                             },
