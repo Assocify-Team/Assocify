@@ -72,7 +72,7 @@ fun AccountingScreen(
         TotalLine(
             totalAmount =
                 subCategoryList.sumOf {
-                  if (!accountingState.filterActive) it.amount
+                  if (!accountingState.tvaFilterActive) it.amount
                   else it.amount + it.amount /*TODO: have to find the TVA*/
                 })
       }
@@ -177,12 +177,12 @@ fun DisplayLine(
     //set the amount of the subcategory
     accountingViewModel.setSubcategoryAmount(
         AccountingSubCategory(
-        category.uid,
-        category.categoryUID,
-        category.name,
-        amount,
-        category.year
-    )
+            category.uid,
+            category.categoryUID,
+            category.name,
+            amount,
+            category.year
+        )
     )
 
   ListItem(

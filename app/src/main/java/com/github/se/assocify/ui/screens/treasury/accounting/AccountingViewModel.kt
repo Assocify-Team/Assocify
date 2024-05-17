@@ -120,7 +120,7 @@ class AccountingViewModel(
   }
 
   fun modifyTVAFilter(tvaActive: Boolean) {
-    _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+    _uiState.value = _uiState.value.copy(tvaFilterActive = tvaActive)
   }
 }
 
@@ -134,6 +134,7 @@ class AccountingViewModel(
  * @param balanceItemList: The list of balance items
  * @param globalSelected: Whether the global category is selected
  * @param yearFilter: The year filter
+ * @param tvaFilterActive: Whether the tva filter is active
  */
 data class AccountingState(
     val categoryList: List<AccountingCategory> = emptyList(),
@@ -143,5 +144,5 @@ data class AccountingState(
     val balanceItemList: List<BalanceItem> = emptyList(),
     val globalSelected: Boolean = true,
     val yearFilter: Int = 2024,
-    val filterActive: Boolean = false
+    val tvaFilterActive: Boolean = false
 )
