@@ -45,9 +45,21 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balance = balanceModel.editedBalanceItem!!
   var nameString by remember { mutableStateOf(balance.nameItem) }
   var subCategoryUid by remember { mutableStateOf(balance.subcategoryUID) }
-  var subCategoryName by remember { mutableStateOf("") }
+  var subCategoryName by remember {
+    mutableStateOf(
+        balanceModel.subCategoryList
+            .filter { it.uid == balance.subcategoryUID }
+            .map { it.name }
+            .getOrElse(0) { "" })
+  }
   var receiptUid by remember { mutableStateOf(balance.receiptUID) }
-  var receiptName by remember { mutableStateOf("") }
+  var receiptName by remember {
+    mutableStateOf(
+        balanceModel.receiptList
+            .filter { it.uid == balance.receiptUID }
+            .map { it.title }
+            .getOrElse(0) { "" })
+  }
   var amountString by remember { mutableStateOf(balance.amount.toString()) }
   var tvaString by remember { mutableStateOf(balance.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(balance.description) }
@@ -92,7 +104,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { subcategoryExpanded = !subcategoryExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
-                        value = subCategoryUid,
+                        value = subCategoryName,
                         onValueChange = {},
                         label = { Text("SubCategory") },
                         trailingIcon = {
@@ -127,7 +139,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { receiptExpanded = !receiptExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
-                        value = receiptUid,
+                        value = receiptName,
                         onValueChange = {},
                         label = { Text("Receipt") },
                         trailingIcon = {
@@ -277,8 +289,8 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                           BalanceItem(
                               balance.uid,
                               nameString,
-                              "",
-                              "",
+                              subCategoryUid,
+                              receiptUid,
                               amountString.toInt(),
                               TVA.floatToTVA(tvaString.toFloat()),
                               descriptionString,

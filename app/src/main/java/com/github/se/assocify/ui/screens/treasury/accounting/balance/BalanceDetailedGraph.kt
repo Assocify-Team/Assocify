@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
@@ -15,13 +16,16 @@ fun NavGraphBuilder.balanceDetailedGraph(
     budgetAPI: BudgetAPI,
     balanceAPI: BalanceAPI,
     receiptAPI: ReceiptAPI,
-    subCategoryAPI: AccountingSubCategoryAPI
+    subCategoryAPI: AccountingSubCategoryAPI,
+    accountingCategoryAPI: AccountingCategoryAPI
 ) {
   composable(Destination.BalanceDetailed("{subCategoryUid}").route) { backStackEntry ->
     backStackEntry.arguments?.getString("subCategoryUid")?.let {
-      val budgetDetailedViewModel = BudgetDetailedViewModel(budgetAPI, subCategoryAPI, it)
+      val budgetDetailedViewModel =
+          BudgetDetailedViewModel(budgetAPI, subCategoryAPI, accountingCategoryAPI, it)
       val balanceDetailedViewModel =
-          BalanceDetailedViewModel(balanceAPI, receiptAPI, subCategoryAPI, it)
+          BalanceDetailedViewModel(
+              balanceAPI, receiptAPI, subCategoryAPI, accountingCategoryAPI, it)
       BalanceDetailedScreen(navigationActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }
