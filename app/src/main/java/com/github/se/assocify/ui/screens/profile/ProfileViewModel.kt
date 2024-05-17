@@ -2,12 +2,11 @@ package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -285,23 +284,23 @@ data class ProfileUIState(
  * icon corresponding to the setting.
  */
 enum class MySettings {
-  Preferences,
+  Preferences /*,
   Privacy,
-  Notifications;
+  Notifications*/;
 
   fun getIcon(): ImageVector {
     return when (this) {
       Preferences -> Icons.Default.LightMode
-      Privacy -> Icons.Default.Lock
-      Notifications -> Icons.Default.Notifications
+    /*Privacy -> Icons.Default.Lock
+    Notifications -> Icons.Default.Notifications*/
     }
   }
 
   fun getDestination(): Destination {
     return when (this) {
       Preferences -> Destination.ProfilePreferences
-      Privacy -> Destination.ProfileSecurityPrivacy
-      Notifications -> Destination.ProfileNotifications
+    /*Privacy -> Destination.ProfileSecurityPrivacy
+    Notifications -> Destination.ProfileNotifications*/
     }
   }
 }
@@ -312,19 +311,25 @@ enum class MySettings {
  */
 enum class AssociationSettings {
   Members,
-  Roles;
+  //  Roles;
+  Treasury,
+  Events;
 
   fun getIcon(): ImageVector {
     return when (this) {
       Members -> Icons.Default.People
-      Roles -> Icons.Default.ManageAccounts
+      //      Roles -> Icons.Default.ManageAccounts
+      Treasury -> Icons.Default.Savings
+      Events -> Icons.Default.Event
     }
   }
 
   fun getDestination(): Destination {
     return when (this) {
       Members -> Destination.ProfileMembers
-      Roles -> Destination.ProfileRoles
+      //      Roles -> Destination.ProfileRoles
+      Treasury -> Destination.ProfileTreasury
+      Events -> Destination.ProfileEvents
     }
   }
 }

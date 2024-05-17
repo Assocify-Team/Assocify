@@ -7,11 +7,10 @@ import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.profile.events.profileEventsGraph
 import com.github.se.assocify.ui.screens.profile.members.profileMembersGraph
-import com.github.se.assocify.ui.screens.profile.notifications.profileNotificationsGraph
 import com.github.se.assocify.ui.screens.profile.preferences.profilePreferencesGraph
-import com.github.se.assocify.ui.screens.profile.roles.profileRolesGraph
-import com.github.se.assocify.ui.screens.profile.securityPrivacy.profileSecurityPrivacyGraph
+import com.github.se.assocify.ui.screens.profile.treasury.profileTreasuryGraph
 
 fun NavGraphBuilder.profileGraph(
     navigationActions: NavigationActions,
@@ -25,9 +24,11 @@ fun NavGraphBuilder.profileGraph(
     ProfileScreen(navigationActions, profileViewModel)
   }
 
-  profileNotificationsGraph(navigationActions)
-  profileSecurityPrivacyGraph(navigationActions)
+  //  profileNotificationsGraph(navigationActions)
+  //  profileSecurityPrivacyGraph(navigationActions)
   profilePreferencesGraph(navigationActions)
-  profileRolesGraph(navigationActions)
+  //  profileRolesGraph(navigationActions)
   profileMembersGraph(navigationActions)
+  profileTreasuryGraph(navigationActions)
+  profileEventsGraph(navigationActions)
 }
