@@ -129,7 +129,6 @@ class BudgetDetailedViewModel(
    * @param budgetItem the new edited budgetItem
    */
   fun saveEditing(budgetItem: BudgetItem) {
-    budgetApi.updateBudgetItem(CurrentUser.associationUid!!, budgetItem, {}, {})
     _uiState.value =
         _uiState.value.copy(
             editing = false,

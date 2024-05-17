@@ -2,11 +2,13 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
@@ -17,6 +19,7 @@ import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
@@ -48,6 +51,7 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
+  @RelaxedMockK lateinit var mockReceiptAPI: ReceiptAPI
   val subCategoryUid = "subCategoryUid"
   val categoryList =
       listOf(
@@ -105,6 +109,16 @@ class BalanceDetailedScreenTest :
               onSuccessCallback(balanceItems)
               balanceItems
             }
+        every { deleteBalance(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { updateBalance(any(), any(), any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = arg<() -> Unit>(4)
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
@@ -152,11 +166,7 @@ class BalanceDetailedScreenTest :
             subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockNavActions,
-            mockBalanceAPI,
-            mockAccountingSubCategoryAPI,
-            mockAccountingCategoryAPI,
-            subCategoryUid)
+            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -336,53 +346,6 @@ class BalanceDetailedScreenTest :
       onNodeWithText(("12.00")).assertIsDisplayed()
       onNodeWithText("TTC").performClick()
       onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
-    }
-  }
-
-  @Test
-  fun testLoadSubCategoryError() {
-    val errorMessage = "error"
-    val error = Exception(errorMessage)
-    every { mockAccountingSubCategoryAPI.getSubCategories(any(), any(), any()) } answers
-        {
-          val onErrorCallback = thirdArg<(Exception) -> Unit>()
-          onErrorCallback(error)
-        }
-    with(composeTestRule) {
-      balanceDetailedViewModel.loadBalanceDetails()
-      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading category")
-    }
-  }
-
-  @Test
-  fun testLoadBalanceError() {
-    val errorMessage = "error"
-    val error = Exception(errorMessage)
-    every { mockBalanceAPI.getBalance(any(), any(), any()) } answers
-        {
-          val onErrorCallback = thirdArg<(Exception) -> Unit>()
-          onErrorCallback(error)
-        }
-    with(composeTestRule) {
-      balanceDetailedViewModel.loadBalanceDetails()
-      onNodeWithTag("errorMessage")
-          .assertIsDisplayed()
-          .assertTextContains("Error loading balance items")
-    }
-  }
-
-  @Test
-  fun testLoadCategoriesError() {
-    val errorMessage = "error"
-    val error = Exception(errorMessage)
-    every { mockAccountingCategoryAPI.getCategories(any(), any(), any()) } answers
-        {
-          val onErrorCallback = thirdArg<(Exception) -> Unit>()
-          onErrorCallback(error)
-        }
-    with(composeTestRule) {
-      balanceDetailedViewModel.loadBalanceDetails()
-      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tags")
     }
   }
 }

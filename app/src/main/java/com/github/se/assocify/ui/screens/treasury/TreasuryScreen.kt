@@ -60,7 +60,14 @@ fun TreasuryScreen(
             query = treasuryState.searchQuery,
             onQueryChange = { treasuryViewModel.setSearchQuery(it) },
             onSearch = { treasuryViewModel.onSearch(pagerState.currentPage) },
-            page = pagerState.currentPage)
+            page = pagerState.currentPage,
+            searchTitle =
+                when (pagerState.currentPage) {
+                  TreasuryPageIndex.Receipts.ordinal -> "receipts"
+                  TreasuryPageIndex.Budget.ordinal -> "budget"
+                  TreasuryPageIndex.Balance.ordinal -> "balance"
+                  else -> ""
+                })
       },
       bottomBar = {
         MainNavigationBar(

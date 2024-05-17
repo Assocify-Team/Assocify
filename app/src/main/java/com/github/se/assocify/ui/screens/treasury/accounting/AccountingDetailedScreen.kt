@@ -69,6 +69,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceItemState
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEditBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetItemState
 import com.github.se.assocify.ui.util.DateUtil
@@ -93,6 +94,11 @@ fun AccountingDetailedScreen(
 
   val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
+  val subCategory =
+      when (page) {
+        AccountingPage.BALANCE -> balanceState.subCategory
+        AccountingPage.BUDGET -> budgetState.subCategory
+      }
 
   val yearList = DateUtil.getYearList()
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
@@ -185,6 +191,8 @@ fun AccountingDetailedScreen(
               navigationActions,
               balanceState,
               budgetState)
+        } else if (balanceState.editing && page == AccountingPage.BALANCE) {
+          DisplayEditBalance(balanceDetailedViewModel)
         }
 
         LazyColumn(
@@ -192,7 +200,6 @@ fun AccountingDetailedScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-          // Display the filter chips
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
               // Year filter
@@ -227,7 +234,7 @@ fun AccountingDetailedScreen(
           when (page) {
             AccountingPage.BALANCE -> {
               items(balanceState.balanceList) {
-                DisplayBalanceItem(it, "displayItem${it.uid}")
+                DisplayBalanceItem(balanceDetailedViewModel, it, "displayItem${it.uid}")
                 HorizontalDivider(Modifier.fillMaxWidth())
               }
 
@@ -315,7 +322,11 @@ fun DisplayBudgetItem(
  * @param testTag: The test tag of the item
  */
 @Composable
-fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
+fun DisplayBalanceItem(
+    balanceDetailedViewModel: BalanceDetailedViewModel,
+    balanceItem: BalanceItem,
+    testTag: String
+) {
   ListItem(
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
@@ -331,7 +342,9 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       },
       supportingContent = { Text(balanceItem.assignee) },
       overlineContent = { Text(balanceItem.date.toString()) },
-      modifier = Modifier.clickable {}.testTag(testTag))
+      modifier =
+          Modifier.clickable { balanceDetailedViewModel.startEditing(balanceItem) }
+              .testTag(testTag))
 }
 
 /**

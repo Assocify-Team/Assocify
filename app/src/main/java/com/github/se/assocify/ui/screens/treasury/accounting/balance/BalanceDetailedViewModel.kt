@@ -6,9 +6,11 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +30,8 @@ import kotlinx.coroutines.launch
 class BalanceDetailedViewModel(
     private var navigationActions: NavigationActions,
     private var balanceApi: BalanceAPI,
-    private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    private var receiptAPI: ReceiptAPI,
+    private var subCategoryAPI: AccountingSubCategoryAPI,
     private var accountingCategoryAPI: AccountingCategoryAPI,
     private var subCategoryUid: String
 ) : ViewModel() {
@@ -64,7 +67,7 @@ class BalanceDetailedViewModel(
    * @param subCategoryUid the subcategory uid
    */
   private fun setSubCategoryInBalance(subCategoryUid: String) {
-    accountingSubCategoryAPI.getSubCategories(
+    subCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           val subCategory = subCategoryList.find { it.uid == subCategoryUid }
@@ -79,7 +82,17 @@ class BalanceDetailedViewModel(
   /** Update the database values */
   private fun updateDatabaseValuesInBalance() {
     var innerLoadCounter = 2
-    // Get the balance items from the database
+
+    receiptAPI.getUserReceipts(
+        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
+
+    subCategoryAPI.getSubCategories(
+        CurrentUser.associationUid!!,
+        { subCategoryList ->
+          _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
+        },
+        {})
+
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
@@ -151,7 +164,7 @@ class BalanceDetailedViewModel(
    */
   fun saveSubCategoryEditingInBalance(name: String, categoryUid: String, year: Int) {
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-    accountingSubCategoryAPI.updateSubCategory(
+    subCategoryAPI.updateSubCategory(
         subCategory,
         {
           _uiState.value = _uiState.value.copy(subCategory = subCategory)
@@ -175,7 +188,7 @@ class BalanceDetailedViewModel(
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBalance() {
     if (_uiState.value.subCategory == null) return
-    accountingSubCategoryAPI.deleteSubCategory(
+    subCategoryAPI.deleteSubCategory(
         _uiState.value.subCategory!!,
         { navigationActions.back() },
         {
@@ -195,6 +208,55 @@ class BalanceDetailedViewModel(
    */
   fun modifyTVAFilter(tvaActive: Boolean) {
     _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+  }
+
+  /**
+   * Enter in the edit state so the popup appears
+   *
+   * @param balanceItem the item we want to edit
+   */
+  fun startEditing(balanceItem: BalanceItem) {
+    _uiState.value = _uiState.value.copy(editing = true, editedBalanceItem = balanceItem)
+  }
+
+  /**
+   * Exit the edit state while saving the modifications performed
+   *
+   * @param balanceItem the new edited budgetItem
+   */
+  fun saveEditing(balanceItem: BalanceItem) {
+    balanceApi.updateBalance(
+        CurrentUser.associationUid!!,
+        balanceItem,
+        balanceItem.receiptUID,
+        balanceItem.subcategoryUID,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  editing = false,
+                  balanceList =
+                      _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
+                  editedBalanceItem = null)
+        },
+        { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
+  }
+
+  /** Exit the edit state without keeping the modifications done */
+  fun cancelEditing() {
+    _uiState.value = _uiState.value.copy(editing = false, editedBalanceItem = null)
+  }
+
+  fun deleteBalanceItem(balanceItemUid: String) {
+    balanceApi.deleteBalance(
+        balanceItemUid,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  balanceList = _uiState.value.balanceList.filter { it.uid != balanceItemUid },
+                  editedBalanceItem = null,
+                  editing = false)
+        },
+        { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
   }
 }
 
@@ -219,6 +281,10 @@ data class BalanceItemState(
     val categoryList: List<AccountingCategory> = emptyList(),
     val loadingCategory: Boolean = false,
     val status: Status? = null,
+    val receiptList: List<Receipt> = emptyList(),
+    val subCategoryList: List<AccountingSubCategory> = emptyList(),
+    val editing: Boolean = false,
+    val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
     val year: Int = 2023,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
