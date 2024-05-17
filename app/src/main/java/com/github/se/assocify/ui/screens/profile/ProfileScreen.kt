@@ -212,7 +212,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                           leadingContent = {
                             Icon(imageVector = s.getIcon(), contentDescription = "${s.name} icon")
                           },
-                          headlineContent = { Text(text = s.name) },
+                          headlineContent = { Text(text = s.toString()) },
                           trailingContent = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowRight,

@@ -129,7 +129,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       //      onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Members").performScrollTo().assertIsDisplayed()
       //      onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("Treasury Tags").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("TreasuryTags").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Events").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
