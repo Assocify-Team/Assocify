@@ -137,6 +137,8 @@ class BudgetDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
@@ -156,7 +158,7 @@ class BudgetDetailedScreenTest :
   fun testEmptyList() {
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2021").performClick()
+      onNodeWithText("2024").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
       onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
           .assertIsDisplayed()
@@ -177,6 +179,7 @@ class BudgetDetailedScreenTest :
   fun testFilterByYear() {
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").assertIsDisplayed()
       onNodeWithText("2022").performClick()
 
       onNodeWithText("sweaters").assertDoesNotExist()
@@ -300,6 +303,18 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
       assert(budgetDetailedViewModel.uiState.value.budgetList.isEmpty())
+    }
+  }
+
+  @Test
+  fun tvaFilterWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
+      onNodeWithText("HT").performClick()
+      onNodeWithText("12.00").assertIsDisplayed()
+      onNodeWithText("TTC").performClick()
+      onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
     }
   }
 }
