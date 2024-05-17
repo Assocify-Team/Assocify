@@ -15,6 +15,7 @@ import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
@@ -52,7 +53,7 @@ class ReceiptsAPITest {
 
   private val localReceipt =
       Receipt(
-          uid = "00000000-ABCD-0000-0000-000000000001",
+          uid = "00000001-ABCD-0000-0000-000000000001",
           date = LocalDate.EPOCH,
           cents = -100,
           status = Status.Approved,
@@ -188,12 +189,14 @@ class ReceiptsAPITest {
     api.getReceipt(remoteReceipt.uid, successMock, { fail("Should not fail, failed with $it") })
 
     verify(timeout = 1000) { successMock(remoteReceipt) }
+    clearMocks(successMock)
 
     error = true
 
     // Test the cache; this shouldn't ping remote
     api.getReceipt(remoteReceipt.uid, successMock, { fail("Should not fail, failed with $it") })
     verify(timeout = 1000) { successMock(remoteReceipt) }
+    clearMocks(successMock)
 
     val failureMock1 = mockk<(Exception) -> Unit>(relaxed = true)
     api.getReceipt(localReceipt.uid, { fail("Should not succeed") }, failureMock1)
@@ -214,7 +217,7 @@ class ReceiptsAPITest {
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     error = true
-    api.getReceiptImage(remoteReceipt, { fail("Should not succeed") }, failureMock)
+    api.getReceiptImage(remoteReceipt.uid, { fail("Should not succeed") }, failureMock)
     verify(timeout = 1000) { failureMock.invoke(any()) }
   }
 
