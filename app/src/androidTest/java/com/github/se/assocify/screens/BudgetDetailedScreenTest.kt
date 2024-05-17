@@ -382,4 +382,39 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tags")
     }
   }
+
+  @Test
+  fun testSaveSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.updateSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategorySaveButton").performClick()
+      onNodeWithText("Failed to update category").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testDeleteSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.deleteSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryDeleteButton").performClick()
+      onNodeWithText("Failed to delete category").assertIsDisplayed()
+    }
+  }
 }
