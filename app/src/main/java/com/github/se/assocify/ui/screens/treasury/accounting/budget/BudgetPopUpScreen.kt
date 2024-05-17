@@ -90,7 +90,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
             label = { Text("Name") },
             supportingText = {})
         OutlinedTextField(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp).testTag("editYearBox"),
             value = amountString,
             onValueChange = { amountString = it },
             label = { Text("Amount") },

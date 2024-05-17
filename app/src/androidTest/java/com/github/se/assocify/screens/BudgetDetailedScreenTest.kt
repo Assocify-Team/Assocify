@@ -80,6 +80,11 @@ class BudgetDetailedScreenTest :
               onSuccessCallback(budgetItems)
             }
         every { updateBudgetItem(any(), any(), any(), any()) } answers {}
+        every { addBudgetItem(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
@@ -315,6 +320,25 @@ class BudgetDetailedScreenTest :
       onNodeWithText("12.00").assertIsDisplayed()
       onNodeWithText("TTC").performClick()
       onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun createTest() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("fees")
+      onNodeWithTag("editYearBox").performTextClearance()
+      onNodeWithTag("editYearBox").performTextInput("2022")
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithText("fees").assertIsDisplayed()
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
+      onNodeWithText("fees").assertIsNotDisplayed()
     }
   }
 }
