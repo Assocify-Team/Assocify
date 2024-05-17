@@ -16,6 +16,7 @@ import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
@@ -45,6 +46,7 @@ class BudgetDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBalanceAPI: BalanceAPI
+  @RelaxedMockK lateinit var mockReceiptAPI: ReceiptAPI
   val subCategoryUid = "subCategoryUid"
   val subCategoryList =
       listOf(
@@ -115,7 +117,11 @@ class BudgetDetailedScreenTest :
             mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockBalanceAPI,
+            mockReceiptAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     composeTestRule.setContent {
       BudgetDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }

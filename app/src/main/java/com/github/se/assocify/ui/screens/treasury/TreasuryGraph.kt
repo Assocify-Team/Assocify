@@ -40,8 +40,18 @@ fun NavGraphBuilder.treasuryGraph(
   }
   receiptGraph(navigationActions, receiptsAPI)
   budgetDetailedGraph(
-      navigationActions, budgetAPI, balanceAPI, accountingSubCategoryAPI, accountingCategoryAPI)
+      navigationActions,
+      budgetAPI,
+      balanceAPI,
+      receiptsAPI,
+      accountingSubCategoryAPI,
+      accountingCategoryAPI)
   balanceDetailedGraph(
-      navigationActions, budgetAPI, balanceAPI, accountingSubCategoryAPI, accountingCategoryAPI)
+      navigationActions,
+      budgetAPI,
+      balanceAPI,
+      receiptsAPI,
+      accountingSubCategoryAPI,
+      accountingCategoryAPI)
   addAccountingCategory(navigationActions)
 }
