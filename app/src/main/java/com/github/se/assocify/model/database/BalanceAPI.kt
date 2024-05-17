@@ -107,7 +107,7 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   private data class SupabaseBalanceItem(
-      @SerialName("item_uid") val uid: String,
+      @SerialName("uid") val uid: String,
       @SerialName("name") val nameItem: String,
       @SerialName("association_uid") val associationUID: String,
       @SerialName("receipt_uid") val receiptUID: String,
