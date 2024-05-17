@@ -230,7 +230,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       return
     }
 
-    updateUserCache(getReceiptFromCache, onFailure)
+    updateCache(getReceiptFromCache, onFailure)
   }
 
   /**
