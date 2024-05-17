@@ -86,6 +86,7 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           val associations = listOf(testAssociation)
           onSuccessCallback(associations)
         }
+    every { mockUserAPI.requestJoin(any(), any(), any()) } answers { mockNavActions.onLogin(true) }
   }
 
   /** This test checks if the "Create new organization" button is displayed */
