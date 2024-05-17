@@ -89,8 +89,16 @@ class BudgetDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
               onSuccessCallback(subCategoryList)
             }
-        every { updateSubCategory(any(), any(), any()) } answers {}
-        every { deleteSubCategory(any(), any(), any()) } answers {}
+        every { updateSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { deleteSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -308,9 +316,7 @@ class BudgetDetailedScreenTest :
       assert(budgetDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
       onNodeWithTag("editSubCategoryDeleteButton").performClick()
-      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
-      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
-      assert(budgetDetailedViewModel.uiState.value.budgetList.isEmpty())
+      verify { mockNavActions.back() }
     }
   }
 

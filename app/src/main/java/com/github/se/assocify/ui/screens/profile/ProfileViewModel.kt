@@ -53,7 +53,7 @@ class ProfileViewModel(
   /** This function is used to start loading. It increments the load counter. */
   private fun startLoading() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
-    loadCounter = 4
+    loadCounter += 4
   }
 
   /**
@@ -67,7 +67,7 @@ class ProfileViewModel(
         _uiState.value = _uiState.value.copy(loading = false, error = error)
       }
       loadCounter = 0
-    } else if (--loadCounter <= 0) {
+    } else if (--loadCounter == 0) {
       _uiState.value = _uiState.value.copy(loading = false, error = null)
       loadCounter = 0
     }

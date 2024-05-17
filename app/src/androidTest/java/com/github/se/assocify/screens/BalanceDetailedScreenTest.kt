@@ -113,8 +113,16 @@ class BalanceDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
               onSuccessCallback(subCategoryList)
             }
-        every { updateSubCategory(any(), any(), any()) } answers {}
-        every { deleteSubCategory(any(), any(), any()) } answers {}
+        every { updateSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { deleteSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -314,9 +322,7 @@ class BalanceDetailedScreenTest :
       assert(balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
       onNodeWithTag("editSubCategoryDeleteButton").performClick()
-      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
-      assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
-      assert(balanceDetailedViewModel.uiState.value.balanceList.isEmpty())
+      verify { mockNavActions.back() }
     }
   }
 
