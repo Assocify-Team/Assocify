@@ -7,7 +7,7 @@ import java.time.LocalDate
  *
  * @param uid unique identifier of the item
  * @param nameItem name of the item (for example: sweater)
- * @param categoryUID unique identifier of the category of the item
+ * @param subcategoryUID unique identifier of the category of the item
  * @param receiptUID unique identifier of the receipt of the item
  * @param amount amount of the item
  * @param tva TVA of the item
