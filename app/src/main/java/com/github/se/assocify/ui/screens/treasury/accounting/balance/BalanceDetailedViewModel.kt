@@ -202,11 +202,14 @@ class BalanceDetailedViewModel(
 /**
  * The state for the balance item
  *
+ * @param loading whether the page is loading
+ * @param error the error message, if any
  * @param balanceList the current list of balance items
  * @param subCategory the current subcategory of the item
  * @param status the current status
  * @param subCatEditing whether the subcategory is being edited
  * @param year the current year
+ * @param snackbarState the snackbar state
  * @param filterActive if the tva filter is active or not
  */
 data class BalanceItemState(

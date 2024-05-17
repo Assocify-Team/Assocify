@@ -202,6 +202,8 @@ class BudgetDetailedViewModel(
 /**
  * The state for the budget item
  *
+ * @param loading weather the page is loading
+ * @param error the current error message
  * @param budgetList the current list of budget items
  * @param subCategory the current subcategory
  * @param categoryList the current list of categories
@@ -209,6 +211,7 @@ class BudgetDetailedViewModel(
  * @param editing the current editing state
  * @param subCatEditing the current category editing state
  * @param editedBudgetItem the current edited budget item
+ * @param snackbarState the snackbar state
  */
 data class BudgetItemState(
     val loading: Boolean = false,
