@@ -86,11 +86,14 @@ class AccountingViewModel(
 
     /** Updates the amount of a subcategory */
     fun setSubcategoryAmount(subCategory: AccountingSubCategory){
-        accountingSubCategoryAPI.updateSubCategory(
-            subCategory,
-            {},
-            {}
-        )
+        val allSubcategoryList = emptyList<AccountingSubCategory>()
+        allSubcategoryList.forEach {
+            subCategory ->
+            _uiState.value.balanceItemList.filter {
+                balanceItem -> subCategory.uid ==  balanceItem.uid
+            }
+        }
+
         updateDatabaseValues()
     }
 
@@ -142,6 +145,10 @@ data class AccountingState(
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val budgetItemsList: List<BudgetItem> = emptyList(),
     val balanceItemList: List<BalanceItem> = emptyList(),
+    val amountBudgetHT: Map<String, Int> = emptyMap(),
+    val amountBudgetTTC: Map<String, Int> = emptyMap(),
+    val amountBalanceHT: Map<String, Int> = emptyMap(),
+    val amountBalanceTTC: Map<String, Int> = emptyMap(),
     val globalSelected: Boolean = true,
     val yearFilter: Int = 2024,
     val tvaFilterActive: Boolean = false
