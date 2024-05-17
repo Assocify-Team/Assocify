@@ -13,6 +13,8 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.selectAssociation.DisplayOrganization
@@ -86,7 +88,28 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
           val associations = listOf(testAssociation)
           onSuccessCallback(associations)
         }
-    every { mockUserAPI.requestJoin(any(), any(), any()) } answers { mockNavActions.onLogin(true) }
+    every { mockAssocAPI.getRoles(any(), any(), any()) } answers
+        {
+          val onSuccessCallback = secondArg<(List<PermissionRole>) -> Unit>()
+          onSuccessCallback(listOf(PermissionRole("testRole", "testAssociation", RoleType.MEMBER)))
+        }
+    every { mockAssocAPI.acceptUser(any(), any(), any(), any()) } answers
+        {
+          val onSuccessCallback = thirdArg<() -> Unit>()
+          onSuccessCallback()
+        }
+    every { mockUserAPI.updateCurrentUserAssociationCache(any(), any()) } answers
+        {
+          val onSuccessCallback =
+              firstArg<(Map<String, Pair<Association, PermissionRole>>) -> Unit>()
+          onSuccessCallback(emptyMap())
+        }
+    every { mockNavActions.backFromSelectAsso() } returns false
+    every { mockUserAPI.requestJoin(any(), any(), any()) } answers
+        {
+          val onSuccessCallback = secondArg<() -> Unit>()
+          onSuccessCallback()
+        }
   }
 
   /** This test checks if the "Create new organization" button is displayed */
