@@ -11,6 +11,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
 import io.ktor.http.Headers
+import io.mockk.clearMocks
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -363,5 +364,40 @@ class AssociationAPITest {
         onFailure)
 
     verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testAssociationNameValid() {
+    // First, fill cache
+    val onSuccess: (List<Association>) -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    response =
+        """
+          [{
+            "uid": "$uuid1",
+            "name": "Test",
+            "description": "Test",
+            "creation_date": "2022-01-01"
+          }, {
+            "uid": "$uuid2",
+            "name": "Test2",
+            "description": "Test2",
+            "creation_date": "2022-01-02"
+          }]
+        """
+            .trimIndent()
+
+    assoAPI.getAssociations(onSuccess, onFailure)
+    verify(timeout = 1000) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
+
+    // Now, test the function
+    assert(!assoAPI.associationNameValid("Test"))
+    assert(assoAPI.associationNameValid("Test3"))
+    assert(!assoAPI.associationNameValid("   "))
+    assert(!assoAPI.associationNameValid(""))
+    assert(!assoAPI.associationNameValid("\t"))
   }
 }

@@ -70,6 +70,7 @@ import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceItem
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetItemState
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 
 /**
  * The detailed screen of a subcategory in the accounting screen
@@ -91,9 +92,25 @@ fun AccountingDetailedScreen(
   val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
 
-  val yearList = DateUtil.getYearList().reversed()
+  val yearList = DateUtil.getYearList()
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
-  val tvaList: List<String> = listOf("TTC", "HT")
+  val tvaList: List<String> = listOf("HT", "TTC")
+
+  val totalAmount =
+      when (page) {
+        AccountingPage.BUDGET ->
+            if (!budgetState.filterActive) budgetState.budgetList.sumOf { it.amount }
+            else
+                budgetState.budgetList.sumOf {
+                  it.amount + (it.amount * it.tva.rate / 100f).toInt()
+                }
+        AccountingPage.BALANCE ->
+            if (!balanceState.filterActive) balanceState.balanceList.sumOf { it.amount }
+            else
+                balanceState.balanceList.sumOf {
+                  it.amount + (it.amount * it.tva.rate / 100f).toInt()
+                }
+      }
 
   Scaffold(
       topBar = {
@@ -192,7 +209,8 @@ fun AccountingDetailedScreen(
 
               // Tva filter
               DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-                // TODO: budgetDetailedViewModel.onTVAFilter(it)
+                balanceDetailedViewModel.modifyTVAFilter(it == "TTC")
+                budgetDetailedViewModel.modifyTVAFilter(it == "TTC")
               }
             }
           }
@@ -207,7 +225,7 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (balanceState.balanceList.isNotEmpty()) {
-                item { TotalItems(balanceState.balanceList.sumOf { it.amount }) }
+                item { TotalItems(totalAmount) }
               } else {
                 item {
                   Text("No items for the ${balanceState.subCategory.name} sheet with these filters")
@@ -222,7 +240,7 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (budgetState.budgetList.isNotEmpty()) {
-                item { TotalItems(budgetState.budgetList.sumOf { it.amount }) }
+                item { TotalItems(totalAmount) }
               } else {
                 item {
                   Text(
@@ -254,7 +272,7 @@ fun TotalItems(totalAmount: Int) {
       },
       trailingContent = {
         Text(
-            text = "$totalAmount",
+            text = PriceUtil.fromCents(totalAmount),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
@@ -275,9 +293,7 @@ fun DisplayBudgetItem(
 ) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
-      trailingContent = {
-        Text("${budgetItem.amount}", style = MaterialTheme.typography.bodyMedium)
-      },
+      trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount)) },
       supportingContent = { Text(budgetItem.description) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
@@ -295,7 +311,10 @@ fun DisplayBalanceItem(balanceItem: BalanceItem, testTag: String) {
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text("${balanceItem.amount}", style = MaterialTheme.typography.bodyMedium)
+          Text(
+              PriceUtil.fromCents(balanceItem.amount),
+              modifier = Modifier.padding(end = 4.dp),
+              style = MaterialTheme.typography.bodyMedium)
           /*Icon(
           balanceItem.receipt!!.status.getIcon(),
           contentDescription = "Create") // TODO: add logo depending on the phase*/

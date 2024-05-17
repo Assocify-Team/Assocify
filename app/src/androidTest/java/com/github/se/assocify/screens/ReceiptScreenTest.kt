@@ -25,9 +25,7 @@ import com.github.se.assocify.ui.util.DateUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
@@ -284,7 +282,10 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
             {
               secondArg<(Receipt) -> Unit>()(expectedReceipt)
             }
-        every { getReceiptImage(any(), any(), any()) } just Runs
+        every { getReceiptImage(any(), any(), any()) } answers
+            {
+              secondArg<(Uri) -> Unit>().invoke(testUri)
+            }
       }
 
   init {
@@ -315,7 +316,6 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       onNodeWithTag("amountField").assertTextContains("100.00")
       onNodeWithTag("dateField").assertTextContains("01/01/2021")
 
-      viewModel.setImage(testUri)
       assert(viewModel.uiState.value.receiptImageURI != null)
 
       onNodeWithTag("saveButton").performScrollTo().performClick()

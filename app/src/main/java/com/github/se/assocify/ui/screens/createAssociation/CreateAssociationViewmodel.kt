@@ -35,9 +35,14 @@ class CreateAssociationViewmodel(
    * Sets the name of the association : can be any string
    */
   fun setName(name: String) {
-    // TODO check if name is valid (sprint 5)
-    association = association.copy(name = name)
+    association = association.copy(name = name.trim())
     _uiState.value = _uiState.value.copy(name = name)
+    if (assoAPI.associationNameValid(name)) {
+      _uiState.value = _uiState.value.copy(nameError = null)
+    } else {
+      val error = if (name.isBlank()) "Name is required" else "Name is invalid or already used"
+      _uiState.value = _uiState.value.copy(nameError = error)
+    }
     updateSavable()
   }
 
@@ -163,7 +168,7 @@ class CreateAssociationViewmodel(
         _uiState.value.copy(
             savable =
                 (_uiState.value.members.any { member -> member.user.uid == CurrentUser.userUid }) &&
-                    _uiState.value.name.isNotBlank())
+                    _uiState.value.nameError == null)
   }
 
   /*
@@ -198,6 +203,7 @@ data class CreateAssoUIState(
     val memberError: String? = null, // error message when no member is found
     val savable: Boolean =
         (members.any { member -> member.user.uid == CurrentUser.userUid }) &&
-            name.isNotBlank() // whether the association can be saved
+            name.isNotBlank(), // whether the association can be saved
+    val nameError: String? = null, // error message when the name is invalid
     // there should be a logo val but not implemented yet
 )

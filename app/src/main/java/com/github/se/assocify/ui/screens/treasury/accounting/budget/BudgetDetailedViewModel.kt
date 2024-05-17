@@ -113,6 +113,10 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
 
+  fun modifyTVAFilter(tvaActive: Boolean) {
+    _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+  }
+
   /** Start editing the Subcategory */
   fun startSubCategoryEditingInBudget() {
     _uiState.value = _uiState.value.copy(subCatEditing = true)
@@ -162,5 +166,6 @@ data class BudgetItemState(
     val yearFilter: Int = 2023,
     val editing: Boolean = false,
     val subCatEditing: Boolean = false,
-    val editedBudgetItem: BudgetItem? = null
+    val editedBudgetItem: BudgetItem? = null,
+    val filterActive: Boolean = false
 )

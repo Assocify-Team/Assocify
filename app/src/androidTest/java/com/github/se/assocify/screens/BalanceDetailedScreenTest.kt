@@ -164,7 +164,7 @@ class BalanceDetailedScreenTest :
   fun testEmptyList() {
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2021").performClick()
+      onNodeWithText("2024").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
       onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
           .assertIsDisplayed()
@@ -309,6 +309,18 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
       assert(balanceDetailedViewModel.uiState.value.balanceList.isEmpty())
+    }
+  }
+
+  @Test
+  fun tvaFilterWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
+      onNodeWithText("HT").performClick()
+      onNodeWithText(("12.00")).assertIsDisplayed()
+      onNodeWithText("TTC").performClick()
+      onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
     }
   }
 }
