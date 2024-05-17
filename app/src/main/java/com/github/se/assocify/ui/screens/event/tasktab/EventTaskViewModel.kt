@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.event.tasktab
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
@@ -15,7 +14,6 @@ class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : 
   init {
     uiState = _uiState
     updateTasks()
-    Log.w("mdrr: ", _uiState.value.tasks.size.toString())
   }
 
   /** Updates the list of tasks in the UI. */
