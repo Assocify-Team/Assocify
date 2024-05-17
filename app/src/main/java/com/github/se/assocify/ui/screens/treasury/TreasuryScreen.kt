@@ -16,6 +16,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
+import com.github.se.assocify.ui.screens.treasury.accounting.newcategory.AddCategoryPopUp
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 
@@ -51,6 +54,7 @@ fun TreasuryScreen(
   val treasuryState by treasuryViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
+    var showNewCategoryPopUp = false
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = {
@@ -84,16 +88,18 @@ fun TreasuryScreen(
               when (pagerState.currentPage) {
                 TreasuryPageIndex.Receipts.ordinal -> navActions.navigateTo(Destination.NewReceipt)
                 TreasuryPageIndex.Budget.ordinal ->
-                    navActions.navigateTo(Destination.NewBalanceCategory)
+                    showNewCategoryPopUp = true
                 TreasuryPageIndex.Balance.ordinal ->
-                    navActions.navigateTo(Destination.NewBalanceCategory)
+                    showNewCategoryPopUp = true
               }
             }) {
               Icon(Icons.Outlined.Add, "Create")
             }
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()) {
           InnerTabRow(
               tabList = TreasuryPageIndex.entries,
               pagerState = pagerState,
@@ -101,8 +107,18 @@ fun TreasuryScreen(
 
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(accountingViewModel)
-            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(accountingViewModel)
+            TreasuryPageIndex.Budget.ordinal -> {
+                AccountingFilterBar(accountingViewModel)
+                if (showNewCategoryPopUp) {
+                    AddCategoryPopUp()
+                }
+            }
+            TreasuryPageIndex.Balance.ordinal -> {
+                AccountingFilterBar(accountingViewModel)
+                if (showNewCategoryPopUp) {
+                    AddCategoryPopUp()
+                }
+            }
           }
 
           // Pages content

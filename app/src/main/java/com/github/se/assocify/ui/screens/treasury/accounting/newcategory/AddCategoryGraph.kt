@@ -7,6 +7,7 @@ import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.addAccountingCategory(navigationActions: NavigationActions) {
   composable(route = Destination.NewBalanceCategory.route) {
-    AddAccountingSubCategory(navigationActions)
+    //AddAccountingSubCategory(navigationActions)
+    AddCategoryPopUp()
   }
 }
