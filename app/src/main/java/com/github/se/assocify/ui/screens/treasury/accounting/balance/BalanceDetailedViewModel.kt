@@ -98,9 +98,7 @@ class BalanceDetailedViewModel(
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(balanceList = statusFilteredBalanceList)
-          if (--innerLoadCounter == 0) {
-            endLoad()
-          }
+          if (--innerLoadCounter == 0) endLoad()
         },
         { endLoad("Error loading balance items") })
 
@@ -109,9 +107,7 @@ class BalanceDetailedViewModel(
         CurrentUser.associationUid!!,
         { categoryList ->
           _uiState.value = _uiState.value.copy(categoryList = categoryList)
-          if (--innerLoadCounter == 0) {
-            endLoad()
-          }
+          if (--innerLoadCounter == 0) endLoad()
         },
         { endLoad("Error loading tags") })
   }

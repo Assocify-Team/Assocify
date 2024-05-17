@@ -29,9 +29,27 @@ class BudgetDetailedViewModel(
   val uiState: StateFlow<BudgetItemState>
 
   init {
-    updateDatabaseBudgetValues()
-    setSubCategoryInBudget(subCategoryUid)
+    loadBudgetDetails()
     uiState = _uiState
+  }
+
+  private var loadCounter = 0
+
+  fun loadBudgetDetails() {
+    loadCounter = 2
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+    setSubCategoryInBudget(subCategoryUid)
+    updateDatabaseBudgetValues()
+  }
+
+  private fun endLoad(error: String? = null) {
+    loadCounter--
+    if (error != null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = error)
+    } else if (loadCounter <= 0) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+      loadCounter = 0
+    }
   }
 
   /**
@@ -47,11 +65,13 @@ class BudgetDetailedViewModel(
           if (subCategoryInBudget != null) {
             _uiState.value = _uiState.value.copy(subCategory = subCategoryInBudget)
           }
+          endLoad()
         },
-        {})
+        { endLoad("Error loading category") })
   }
   /** Update the database values */
   private fun updateDatabaseBudgetValues() {
+    var innerLoadCounter = 2
     // Get the budget items from the database
     budgetApi.getBudget(
         CurrentUser.associationUid!!,
@@ -65,14 +85,18 @@ class BudgetDetailedViewModel(
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(budgetList = filteredList)
+          if (--innerLoadCounter == 0) endLoad()
         },
-        {})
+        { endLoad("Error loading budget items") })
 
     // Get the categories from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-        {})
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(categoryList = categoryList)
+          if (--innerLoadCounter == 0) endLoad()
+        },
+        { endLoad("Error loading tags") })
   }
 
   /**
@@ -138,8 +162,9 @@ class BudgetDetailedViewModel(
 
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBudget() {
+    if (_uiState.value.subCategory == null) return
     _uiState.value = _uiState.value.copy(budgetList = emptyList())
-    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
+    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory!!, {}, {})
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 }
@@ -156,8 +181,10 @@ class BudgetDetailedViewModel(
  * @param editedBudgetItem the current edited budget item
  */
 data class BudgetItemState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val budgetList: List<BudgetItem> = emptyList(),
-    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
+    val subCategory: AccountingSubCategory? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
     val yearFilter: Int = 2023,
     val editing: Boolean = false,

@@ -102,7 +102,7 @@ fun AccountingDetailedScreen(
                   text =
                       when (page) {
                         AccountingPage.BALANCE -> balanceState.subCategory!!.name
-                        AccountingPage.BUDGET -> budgetState.subCategory.name
+                        AccountingPage.BUDGET -> budgetState.subCategory!!.name
                       },
                   style = MaterialTheme.typography.titleLarge)
             },
@@ -119,13 +119,11 @@ fun AccountingDetailedScreen(
                     // Sets the editing state to true
                     when (page) {
                       AccountingPage.BALANCE ->
-                          if (balanceState.subCategory!!.name !=
-                              "") { // TODO: modify this with loading
+                          if (balanceState.subCategory != null) {
                             balanceDetailedViewModel.startSubCategoryEditingInBalance()
                           }
                       AccountingPage.BUDGET ->
-                          if (budgetState.subCategory.name !=
-                              "") { // TODO: modify this with loading
+                          if (budgetState.subCategory != null) {
                             budgetDetailedViewModel.startSubCategoryEditingInBudget()
                           }
                     }
