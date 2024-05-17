@@ -58,13 +58,11 @@ class AccountingViewModel(
     // Sets the category list in the state from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        {
-            categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList)
-            endLoad()
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(categoryList = categoryList)
+          endLoad()
         },
-        {
-            endLoad("Error loading tags")
-        })
+        { endLoad("Error loading tags") })
   }
 
   /** Function to get the subcategories from the database */
@@ -74,11 +72,9 @@ class AccountingViewModel(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)
-            endLoad()
+          endLoad()
         },
-        {
-            endLoad("Error loading categories")
-        })
+        { endLoad("Error loading categories") })
   }
 
   /** Function to filter the subCategoryList */
