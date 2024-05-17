@@ -132,4 +132,25 @@ class BalanceAPITest {
     balanceAPI.deleteBalance("00000000-0000-0000-0000-000000000000", onSuccess, onFailure)
     verify(timeout = 400) { onSuccess() }
   }
+
+  @Test
+  fun testUpdateBalance() {
+    // Coverage test
+
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    error = false
+    response = ""
+
+    balanceAPI.updateBalance(
+        "00000000-0000-0000-0000-000000000000",
+        balanceItem,
+        "00000000-0000-0000-0000-000000000000",
+        "00000000-0000-0000-0000-000000000000",
+        onSuccess,
+        onFailure)
+    verify(timeout = 400) { onSuccess() }
+    verify(exactly = 0) { onFailure(any()) }
+  }
 }

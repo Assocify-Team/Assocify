@@ -51,7 +51,7 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     if (balanceCacheAssociationUID == associationUID && balanceCache != null) {
-      balanceCache?.let { onSuccess(it) }
+      onSuccess(balanceCache!!)
     } else {
       updateBalanceCache(associationUID, onSuccess, onFailure)
     }
