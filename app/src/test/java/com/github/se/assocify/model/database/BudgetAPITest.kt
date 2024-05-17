@@ -8,15 +8,16 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.clearMocks
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.lang.Thread.sleep
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -42,7 +43,9 @@ class BudgetAPITest {
   @Before
   @OptIn(ExperimentalCoroutinesApi::class)
   fun setup() {
+    APITestUtils.setup()
     Dispatchers.setMain(UnconfinedTestDispatcher())
+    error = true
     budgetAPI =
         BudgetAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -55,6 +58,7 @@ class BudgetAPITest {
                 }
               }
             })
+    error = false
   }
 
   @Test
@@ -82,6 +86,13 @@ class BudgetAPITest {
     budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess, onFailure)
     verify(timeout = 300) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
+
+    clearMocks(onSuccess, onFailure)
+    // Test cache
+    error = true
+    budgetAPI.getBudget("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess, onFailure)
+    verify(timeout = 300) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -92,8 +103,10 @@ class BudgetAPITest {
     response = ""
     val budgetItemUpdt = budgetItem.copy(uid = UUID.randomUUID().toString())
     budgetAPI.addBudgetItem(
-        "aa3d4ad7-c901-435a-b089-bb835f6ec560", budgetItemUpdt, onSuccess, onFailure)
-    sleep(1000)
+        "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+        budgetItemUpdt,
+        onSuccess,
+        { fail("Should not fail, failed with $it") })
     verify(timeout = 1000) { onSuccess() }
     verify(exactly = 0) { onFailure(any()) }
   }
@@ -121,5 +134,32 @@ class BudgetAPITest {
     response = ""
     budgetAPI.deleteBudgetItem("uiiddddd", onSuccess, onFailure)
     verify(timeout = 1000) { onSuccess() }
+  }
+
+  @Test
+  fun testUpdateBudgetCache() {
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    val onSuccess: (List<BudgetItem>) -> Unit = mockk(relaxed = true)
+
+    error = false
+    response =
+        """
+        [
+          {
+            "uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            "association_uid": "aa3d4ad7-c901-435a-b089-bb835f6ec560",
+            "name": "name",
+            "amount": 1,
+            "tva": 2.6,
+            "description": "lala",
+            "subcategory_uid": "00000000-0000-0000-0000-000000000000",
+            "year": 2022
+          }
+        ]
+        """
+            .trimIndent()
+
+    budgetAPI.updateBudgetCache("aa3d4ad7-c901-435a-b089-bb835f6ec560", onSuccess, onFailure)
+    verify(timeout = 1000) { onSuccess(any()) }
   }
 }

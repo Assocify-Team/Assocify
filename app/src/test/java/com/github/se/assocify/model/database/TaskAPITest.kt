@@ -7,6 +7,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.clearMocks
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -34,6 +35,7 @@ class TaskAPITest {
   @Before
   fun setup() {
     APITestUtils.setup()
+    error = true
     taskAPI =
         TaskAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -46,6 +48,7 @@ class TaskAPITest {
                 }
               }
             })
+    error = false
   }
 
   @Test
@@ -56,7 +59,7 @@ class TaskAPITest {
     error = false
     response =
         """  
-        {
+        [{
           "uid": "$uuid1"
           "title": "testName",
           "description": "description",
@@ -67,7 +70,7 @@ class TaskAPITest {
           "category": "Committee",
           "location": "Here",
           "event_id": "eventUid"
-        }
+        }]
     """
             .trimIndent()
 
@@ -88,6 +91,13 @@ class TaskAPITest {
   fun testGetAllTasks() {
     val onSuccess: (List<Task>) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    // Test failure
+    error = true
+    taskAPI.getTasks({ fail("should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
 
     error = false
     response =
@@ -125,12 +135,14 @@ class TaskAPITest {
 
     verify(timeout = 1000) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
 
-    // Test failure
     error = true
-    taskAPI.getTasks({ fail("should not succeed") }, onFailure)
+    // Test cache
+    taskAPI.getTasks(onSuccess, onFailure)
 
-    verify(timeout = 1000) { onFailure(any()) }
+    verify(timeout = 1000) { onSuccess(any()) }
+    verify(exactly = 0) { onFailure(any()) }
   }
 
   @Test
@@ -168,6 +180,26 @@ class TaskAPITest {
 
   @Test
   fun testEditTask() {
+    response =
+        """
+          [{
+          "uid": "$uuid1",
+          "title": "testName",
+          "description": "description",
+          "is_completed": false,
+          "start_time": "$responseTime",
+          "duration": "60",
+          "people_needed": 0,
+          "category": "Committee",
+          "location": "Here",
+          "event_id": "eventUid"
+        }]
+      """
+            .trimIndent()
+    val successMockCache: (List<Task>) -> Unit = mockk(relaxed = true)
+    taskAPI.updateTaskCache(successMockCache, { fail("should not fail") })
+    verify(timeout = 1000) { successMockCache(any()) }
+
     val onSuccess: () -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
     error = false
@@ -223,6 +255,14 @@ class TaskAPITest {
   fun testTaskOfEvent() {
     val onSuccess: (List<Task>) -> Unit = mockk(relaxed = true)
     val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    // Test failure
+    error = true
+    taskAPI.getTasksOfEvent("eventUid", { fail("should not succeed") }, onFailure)
+
+    verify(timeout = 1000) { onFailure(any()) }
+    clearMocks(onSuccess, onFailure)
+
     // Test success
     error = false
     response =
@@ -260,11 +300,5 @@ class TaskAPITest {
 
     verify(timeout = 1000) { onSuccess(any()) }
     verify(exactly = 0) { onFailure(any()) }
-
-    // Test failure
-    error = true
-    taskAPI.getTasksOfEvent("eventUid", { fail("should not succeed") }, onFailure)
-
-    verify(timeout = 1000) { onFailure(any()) }
   }
 }

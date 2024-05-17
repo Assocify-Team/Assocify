@@ -75,6 +75,20 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   /**
+   * Checks if the association name is valid. This means that the name is not empty and is not
+   * already taken. This function does not send any requests to the database, because it might be
+   * called multiple times in quick succession. As such, call `updateCache` before calling this if
+   * you want to ensure the cache is up to date.
+   *
+   * @param name the name to check
+   * @return true if the name is valid, false otherwise
+   */
+  fun associationNameValid(name: String): Boolean {
+    val trimmed = name.trim()
+    return name.isNotBlank() && associationCache.values.none { it.name == trimmed }
+  }
+
+  /**
    * Adds an association to the database.
    *
    * @param association the association to add.

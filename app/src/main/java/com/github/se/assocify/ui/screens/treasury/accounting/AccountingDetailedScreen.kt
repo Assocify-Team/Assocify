@@ -360,6 +360,7 @@ fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
         OutlinedTextField(
             modifier = Modifier.padding(8.dp).testTag("editNameBox"),
             value = nameString,
+            singleLine = true,
             onValueChange = { nameString = it },
             label = { Text("Name") },
             supportingText = {})
@@ -520,12 +521,14 @@ fun DisplayEditSubCategory(
                 OutlinedTextField(
                     modifier = Modifier.testTag("editSubCategoryNameBox").padding(8.dp),
                     value = name,
+                    singleLine = true,
                     onValueChange = { name = it },
                     label = { Text("Name") },
                     supportingText = {})
                 OutlinedTextField(
                     modifier = Modifier.testTag("editSubCategoryYearBox").padding(8.dp),
                     value = year,
+                    singleLine = true,
                     onValueChange = { year = it },
                     label = { Text("Year") },
                     supportingText = {})
@@ -536,6 +539,7 @@ fun DisplayEditSubCategory(
                     modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                       OutlinedTextField(
                           value = selectedCategory,
+                          singleLine = true,
                           onValueChange = {},
                           label = { Text("Tag") },
                           trailingIcon = {

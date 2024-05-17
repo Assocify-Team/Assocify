@@ -106,6 +106,7 @@ fun AddAccountingSubCategory(
               OutlinedTextField(
                   modifier = Modifier.testTag("categoryNameField").fillMaxWidth(),
                   value = subCategoryTitle,
+                  singleLine = true,
                   onValueChange = { subCategoryTitle = it },
                   label = { Text("Category name") },
                   supportingText = { /* TODO: Error management */})
@@ -113,6 +114,7 @@ fun AddAccountingSubCategory(
               OutlinedTextField(
                   modifier = Modifier.testTag("valueField").fillMaxWidth(),
                   value = selectedValue.toString(),
+                  singleLine = true,
                   onValueChange = { selectedValue = it.toIntOrNull() ?: 0 },
                   label = { Text("Value") },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -126,6 +128,7 @@ fun AddAccountingSubCategory(
                   modifier = Modifier.testTag("categoryDropdown")) {
                     OutlinedTextField(
                         value = selectedSubCategory,
+                        singleLine = true,
                         onValueChange = {},
                         label = { Text("Tag") },
                         trailingIcon = {
@@ -186,6 +189,7 @@ fun AddCategoryDialog(
               OutlinedTextField(
                   modifier = Modifier.testTag("newTagFieldPopup").fillMaxWidth(),
                   value = newTagName,
+                  singleLine = true,
                   onValueChange = onNewTagChange,
                   label = { Text("Tag name") },
                   supportingText = { /* TODO: Error management */})
