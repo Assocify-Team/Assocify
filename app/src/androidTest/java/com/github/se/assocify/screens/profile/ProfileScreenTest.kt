@@ -205,7 +205,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       //      onNodeWithTag("Roles").performScrollTo().performClick()
       //      assert(goRoles)
 
-      onNodeWithTag("Treasury Tags").performScrollTo().performClick()
+      onNodeWithTag("TreasuryTags").performScrollTo().performClick()
       assert(goTreasTags)
 
       onNodeWithTag("Events").performScrollTo().performClick()
