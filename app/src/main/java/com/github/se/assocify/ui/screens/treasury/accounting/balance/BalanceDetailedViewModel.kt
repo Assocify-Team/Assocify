@@ -222,6 +222,6 @@ data class BalanceItemState(
     val status: Status? = null,
     val subCatEditing: Boolean = false,
     val year: Int = 2023,
-    val snackbarState: SnackbarHostState = SnackbarHostState()
+    val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false
 )

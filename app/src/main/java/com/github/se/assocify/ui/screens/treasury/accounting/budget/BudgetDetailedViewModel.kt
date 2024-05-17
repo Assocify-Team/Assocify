@@ -223,6 +223,6 @@ data class BudgetItemState(
     val editing: Boolean = false,
     val subCatEditing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null,
-    val snackbarState: SnackbarHostState = SnackbarHostState()
+    val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false
 )
