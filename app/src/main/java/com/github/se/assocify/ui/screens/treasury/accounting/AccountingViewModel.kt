@@ -26,54 +26,54 @@ class AccountingViewModel(
 
   /** Initialize the view model */
   init {
-      getCategories()
+    getCategories()
     getSubCategories()
-      filterSubCategories()
+    filterSubCategories()
     uiState = _uiState
   }
 
-    /** Function to get the categories from the database */
-    private fun getCategories(){
-        // Sets the category list in the state from the database
-        accountingCategoryAPI.getCategories(
-            CurrentUser.associationUid!!,
-            { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-            {})
-    }
+  /** Function to get the categories from the database */
+  private fun getCategories() {
+    // Sets the category list in the state from the database
+    accountingCategoryAPI.getCategories(
+        CurrentUser.associationUid!!,
+        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
+        {})
+  }
 
-
-    /** Function to get the subcategories from the database */
-    private fun getSubCategories(){
-        // Sets the subcategory list in the state from the database if a category is selected
-        accountingSubCategoryAPI.getSubCategories(
-            CurrentUser.associationUid!!,
-            { subCategoryList -> _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)},
-            { Log.d("BudgetViewModel", "Error getting subcategories") })
-    }
+  /** Function to get the subcategories from the database */
+  private fun getSubCategories() {
+    // Sets the subcategory list in the state from the database if a category is selected
+    accountingSubCategoryAPI.getSubCategories(
+        CurrentUser.associationUid!!,
+        { subCategoryList ->
+          _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)
+        },
+        { Log.d("BudgetViewModel", "Error getting subcategories") })
+  }
 
   /** Function to filter the subCategoryList */
   private fun filterSubCategories() {
     val allSubCategoryList = _uiState.value.allSubCategoryList
-      // If the global category is selected, display all subcategories
-      if (_uiState.value.globalSelected) {
-        _uiState.value =
-            _uiState.value.copy(
-                subCategoryList =
-                    allSubCategoryList.filter {
-                        it.year == _uiState.value.yearFilter
-                                && it.name.contains(_uiState.value.searchQuery, ignoreCase = true)
-                    })
-      } else {
-        _uiState.value =
-            _uiState.value.copy(
-                subCategoryList =
-                    allSubCategoryList.filter {
-                      it.categoryUID == _uiState.value.selectedCatUid &&
-                          it.year == _uiState.value.yearFilter
-                              && it.name.contains(_uiState.value.searchQuery, ignoreCase = true)
-                    })
-      }
-
+    // If the global category is selected, display all subcategories
+    if (_uiState.value.globalSelected) {
+      _uiState.value =
+          _uiState.value.copy(
+              subCategoryList =
+                  allSubCategoryList.filter {
+                    it.year == _uiState.value.yearFilter &&
+                        it.name.contains(_uiState.value.searchQuery, ignoreCase = true)
+                  })
+    } else {
+      _uiState.value =
+          _uiState.value.copy(
+              subCategoryList =
+                  allSubCategoryList.filter {
+                    it.categoryUID == _uiState.value.selectedCatUid &&
+                        it.year == _uiState.value.yearFilter &&
+                        it.name.contains(_uiState.value.searchQuery, ignoreCase = true)
+                  })
+    }
   }
 
   /**
@@ -91,7 +91,7 @@ class AccountingViewModel(
           _uiState.value.copy(
               selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid)
     }
-      filterSubCategories()
+    filterSubCategories()
   }
 
   /** Function to update the year filter */
@@ -100,18 +100,17 @@ class AccountingViewModel(
     filterSubCategories()
   }
 
-    /**
-     * Filter the list of receipts when the user uses the search bar.
-     *
-     * @param searchQuery: Search query in the search bar
-     */
-    fun onSearch(searchQuery: String) {
-        _uiState.value = _uiState.value.copy(searchQuery = searchQuery)
-        filterSubCategories()
-    }
+  /**
+   * Filter the list of receipts when the user uses the search bar.
+   *
+   * @param searchQuery: Search query in the search bar
+   */
+  fun onSearch(searchQuery: String) {
+    _uiState.value = _uiState.value.copy(searchQuery = searchQuery)
+    filterSubCategories()
+  }
 
-
-    fun modifyTVAFilter(tvaActive: Boolean) {
+  fun modifyTVAFilter(tvaActive: Boolean) {
     _uiState.value = _uiState.value.copy(filterActive = tvaActive)
   }
 }
@@ -122,7 +121,11 @@ class AccountingViewModel(
  * @param categoryList: The list of accounting categories
  * @param selectedCatUid: The selected category unique identifier
  * @param subCategoryList: The list of accounting subcategories
+ * @param allSubCategoryList: The list of all accounting subcategories
  * @param globalSelected: Whether the global category is selected
+ * @param yearFilter: The year filter
+ * @param filterActive: Whether the filter is active
+ * @param searchQuery: The search query
  */
 data class AccountingState(
     val categoryList: List<AccountingCategory> = emptyList(),
