@@ -56,10 +56,11 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.from(collectionName)
-          .update(
-              SupabaseBalanceItem.fromBalanceItem(
-                  balanceItem, associationUID, receiptUID, categoryUID))
+      db.from(collectionName).update(
+          SupabaseBalanceItem.fromBalanceItem(
+              balanceItem, associationUID, receiptUID, categoryUID)) {
+            filter { SupabaseBalanceItem::uid eq balanceItem.uid }
+          }
       onSuccess()
     }
   }

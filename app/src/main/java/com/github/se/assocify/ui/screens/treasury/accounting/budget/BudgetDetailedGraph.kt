@@ -6,6 +6,7 @@ import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
@@ -14,6 +15,7 @@ fun NavGraphBuilder.budgetDetailedGraph(
     navigationActions: NavigationActions,
     budgetAPI: BudgetAPI,
     balanceAPI: BalanceAPI,
+    receiptAPI: ReceiptAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI,
     accountingCategoryAPI: AccountingCategoryAPI
 ) {
@@ -22,7 +24,8 @@ fun NavGraphBuilder.budgetDetailedGraph(
       val budgetDetailedViewModel =
           BudgetDetailedViewModel(budgetAPI, accountingSubCategoryAPI, accountingCategoryAPI, it)
       val balanceDetailedViewModel =
-          BalanceDetailedViewModel(balanceAPI, accountingSubCategoryAPI, accountingCategoryAPI, it)
+          BalanceDetailedViewModel(
+              balanceAPI, receiptAPI, accountingSubCategoryAPI, accountingCategoryAPI, it)
       BudgetDetailedScreen(navigationActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
   }

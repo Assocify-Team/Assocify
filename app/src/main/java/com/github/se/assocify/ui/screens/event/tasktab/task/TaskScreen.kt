@@ -120,6 +120,7 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
               OutlinedTextField(
                   modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = taskState.title,
+                  singleLine = true,
                   onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") },
                   isError = taskState.titleError != null,
@@ -134,12 +135,14 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
               OutlinedTextField(
                   modifier = Modifier.testTag("categoryField").fillMaxWidth(),
                   value = taskState.category,
+                  singleLine = true,
                   onValueChange = { viewModel.setCategory(it) },
                   label = { Text("Category") },
                   supportingText = {})
               OutlinedTextField(
                   modifier = Modifier.testTag("staffNumberField").fillMaxWidth(),
                   value = taskState.staffNumber,
+                  singleLine = true,
                   onValueChange = { viewModel.setStaffNumber(it) },
                   label = { Text("Number of Staff") },
                   keyboardOptions =

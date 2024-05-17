@@ -73,7 +73,8 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
             query = state.searchQuery,
             onQueryChange = { eventScreenViewModel.setSearchQuery(it) },
             onSearch = { eventScreenViewModel.searchTaskLists() },
-            page = pagerState.currentPage)
+            page = pagerState.currentPage,
+            searchTitle = "tasks")
       },
       bottomBar = {
         MainNavigationBar(

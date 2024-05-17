@@ -2,10 +2,12 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
@@ -16,6 +18,7 @@ import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
@@ -47,6 +50,7 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
+  @RelaxedMockK lateinit var mockReceiptAPI: ReceiptAPI
   val subCategoryUid = "subCategoryUid"
   val categoryList =
       listOf(
@@ -104,6 +108,16 @@ class BalanceDetailedScreenTest :
               onSuccessCallback(balanceItems)
               balanceItems
             }
+        every { deleteBalance(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { updateBalance(any(), any(), any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = arg<() -> Unit>(4)
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
@@ -139,7 +153,11 @@ class BalanceDetailedScreenTest :
             mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockBalanceAPI,
+            mockReceiptAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
@@ -321,6 +339,67 @@ class BalanceDetailedScreenTest :
       onNodeWithText(("12.00")).assertIsDisplayed()
       onNodeWithText("TTC").performClick()
       onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testEditDeleteScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("Pending").performClick()
+
+      // Assert that only the item "pair of scissors" is displayed
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("François Théron").assertIsDisplayed()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editDeleteButton"))
+      onNodeWithTag("editDeleteButton").performClick()
+      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun testEditModifyScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("Pending").performClick()
+
+      // Assert that only the item "pair of scissors" is displayed
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("François Théron").assertIsDisplayed()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogName").assertIsDisplayed()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("money")
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithText("money").assertIsDisplayed()
+      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun testCancelModifyScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("Pending").performClick()
+
+      // Assert that only the item "pair of scissors" is displayed
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("François Théron").assertIsDisplayed()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogName").assertIsDisplayed()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("money")
+      onNodeWithTag("editSubCategoryCancelButton").performClick()
+      onNodeWithText("money").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
     }
   }
 }

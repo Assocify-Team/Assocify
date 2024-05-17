@@ -47,6 +47,7 @@ fun UserSearchTextField(
   Column {
     OutlinedTextField(
         value = value,
+        singleLine = true,
         onValueChange = { onUserSearch(it) },
         modifier = modifier then Modifier.onSizeChanged { textfieldSize = it.width },
         readOnly = state.user != null,

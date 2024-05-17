@@ -146,6 +146,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
               OutlinedTextField(
                   modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = receiptState.title,
+                  singleLine = true,
                   onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") },
                   isError = receiptState.titleError != null,
@@ -160,6 +161,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
               OutlinedTextField(
                   modifier = Modifier.testTag("amountField").fillMaxWidth(),
                   value = receiptState.amount,
+                  singleLine = true,
                   onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
                   keyboardOptions =
