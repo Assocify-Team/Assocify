@@ -35,7 +35,7 @@ class CreateAssociationViewmodel(
    * Sets the name of the association : can be any string
    */
   fun setName(name: String) {
-    association = association.copy(name = name)
+    association = association.copy(name = name.trim())
     _uiState.value = _uiState.value.copy(name = name)
     if (assoAPI.associationNameValid(name)) {
       _uiState.value = _uiState.value.copy(nameError = null)

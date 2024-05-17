@@ -84,7 +84,8 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @return true if the name is valid, false otherwise
    */
   fun associationNameValid(name: String): Boolean {
-    return name.isNotBlank() && associationCache.values.none { it.name == name }
+    val trimmed = name.trim()
+    return name.isNotBlank() && associationCache.values.none { it.name == trimmed }
   }
 
   /**
