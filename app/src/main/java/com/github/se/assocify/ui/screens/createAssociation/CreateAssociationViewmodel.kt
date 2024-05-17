@@ -173,17 +173,15 @@ class CreateAssociationViewmodel(
     assoAPI.addAssociation(
         association,
         onSuccess = {
-          CurrentUser.associationUid = association.uid
           assoAPI.initAssociation(
               roles.values,
               _uiState.value.members,
               {
-                userAPI.updateCurrentUserAssociationCache(
-                    {   Log.e("lalala", "update current : ${it}")
-                        navActions.goFromCreateAsso() },
-                    { Log.e("error", "update current : ${it.message}") })
+                CurrentUser.associationUid = association.uid
+                assoAPI
+                userAPI.updateCurrentUserAssociationCache({ navActions.goFromCreateAsso() }, {})
               },
-              { Log.e("error", "init asso : ${it.message}") })
+              {})
         },
         onFailure = { exception ->
           Log.e("CreateAssoViewModel", "Failed to add asso: ${exception.message}")

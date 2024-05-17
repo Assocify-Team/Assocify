@@ -22,16 +22,22 @@ import kotlinx.serialization.json.JsonObject
 class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   private var associationCache = mapOf<String, Association>()
 
-  private fun fillCache(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure, tag = "fillCache") {
-      val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
-      associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
-      onSuccess()
-    }
+  init {
+    updateCache({}, {}) // Try and fill the cache as quickly as possible
   }
 
-  init {
-    fillCache({}, {}) // Try and fill the cache as quickly as possible
+  /**
+   * Updates the cache of associations from the database.
+   *
+   * @param onSuccess called on success with the map of associations (id, association)
+   * @param onFailure called on failure
+   */
+  fun updateCache(onSuccess: (Map<String, Association>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure, tag = "updateCache") {
+      val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
+      associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
+      onSuccess(associationCache)
+    }
   }
 
   /**
@@ -55,7 +61,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     if (associationCache.isNotEmpty()) {
       getFromCache()
     } else {
-      fillCache(getFromCache, onFailure)
+      updateCache({ getFromCache() }, onFailure)
     }
   }
 
@@ -70,7 +76,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     if (associationCache.isNotEmpty()) {
       onSuccess(associationCache.values.toList())
     } else {
-      fillCache({ onSuccess(associationCache.values.toList()) }, onFailure)
+      updateCache({ onSuccess(associationCache.values.toList()) }, onFailure)
     }
   }
 
@@ -94,6 +100,8 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
                   association.name,
                   association.description,
                   association.creationDate.toString()))
+
+      associationCache = associationCache + (association.uid to association)
       onSuccess()
     }
   }
@@ -121,6 +129,10 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       }) {
         filter { SupabaseAssociation::uid eq uid }
       }
+
+      associationCache =
+          associationCache +
+              (uid to associationCache[uid]!!.copy(name = name, description = description))
       onSuccess()
     }
   }
@@ -135,6 +147,8 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun deleteAssociation(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure, tag = "deleteAssociation") {
       db.from("association").delete { filter { SupabaseAssociation::uid eq id } }
+
+      associationCache = associationCache - id
       onSuccess()
     }
   }
