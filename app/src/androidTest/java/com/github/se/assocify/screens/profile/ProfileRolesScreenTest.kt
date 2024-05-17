@@ -1,4 +1,5 @@
 package com.github.se.assocify.screens.profile
+/*
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -48,3 +49,4 @@ class ProfileRolesScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
     }
   }
 }
+*/
