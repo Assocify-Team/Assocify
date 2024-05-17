@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
  * @param onQueryChange The action to perform when the query changes
  * @param onSearch The action to perform when the search is performed
  * @param page The current page. This is used to hide the search bar when the page is changed
+ * @param searchTitle The title that will be displayed in the search bar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +40,8 @@ fun MainTopBar(
     query: String = "",
     onQueryChange: (String) -> Unit = {},
     onSearch: (String) -> Unit = {},
-    page: Int = 0
+    page: Int = 0,
+    searchTitle: String = ""
 ) {
   // Search bar state
   var searchBarVisible by remember { mutableStateOf(false) }
@@ -74,7 +76,6 @@ fun MainTopBar(
                   searchBarVisible = true
                 }) {
                   Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
-                  Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
                 }
           }
         },
@@ -88,14 +89,7 @@ fun MainTopBar(
         onSearch = onSearch,
         active = false,
         onActiveChange = {},
-        placeholder = {
-          when (page) {
-            0 -> Text("Search receipts")
-            1 -> Text("Search accounting categories")
-            2 -> Text("Search accounting categories")
-            else -> Text("Search")
-          }
-        },
+        placeholder = { Text(text = "Search $searchTitle") },
         leadingIcon = {
           IconButton(
               modifier = Modifier.testTag("searchBackButton"),
