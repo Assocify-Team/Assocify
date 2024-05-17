@@ -101,7 +101,7 @@ fun AccountingDetailedScreen(
               Text(
                   text =
                       when (page) {
-                        AccountingPage.BALANCE -> balanceState.subCategory.name
+                        AccountingPage.BALANCE -> balanceState.subCategory!!.name
                         AccountingPage.BUDGET -> budgetState.subCategory.name
                       },
                   style = MaterialTheme.typography.titleLarge)
@@ -119,7 +119,7 @@ fun AccountingDetailedScreen(
                     // Sets the editing state to true
                     when (page) {
                       AccountingPage.BALANCE ->
-                          if (balanceState.subCategory.name !=
+                          if (balanceState.subCategory!!.name !=
                               "") { // TODO: modify this with loading
                             balanceDetailedViewModel.startSubCategoryEditingInBalance()
                           }
@@ -209,7 +209,8 @@ fun AccountingDetailedScreen(
                 item { TotalItems(balanceState.balanceList.sumOf { it.amount }) }
               } else {
                 item {
-                  Text("No items for the ${balanceState.subCategory.name} sheet with these filters")
+                  Text(
+                      "No items for the ${balanceState.subCategory!!.name} sheet with these filters")
                 }
               }
             }
@@ -225,7 +226,7 @@ fun AccountingDetailedScreen(
               } else {
                 item {
                   Text(
-                      "No items for the ${balanceState.subCategory.name} sheet with these filters",
+                      "No items for the ${balanceState.subCategory!!.name} sheet with these filters",
                   )
                 }
               }
@@ -440,12 +441,12 @@ fun DisplayEditSubCategory(
         AccountingPage.BALANCE -> balanceState.categoryList
         AccountingPage.BUDGET -> budgetState.categoryList
       }
-  var name by remember { mutableStateOf(subCategory.name) }
-  var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
-  var year by remember { mutableStateOf(subCategory.year.toString()) }
+  var name by remember { mutableStateOf(subCategory!!.name) }
+  var categoryUid by remember { mutableStateOf(subCategory!!.categoryUID) }
+  var year by remember { mutableStateOf(subCategory!!.year.toString()) }
   var expanded by remember { mutableStateOf(false) }
   var selectedCategory by remember {
-    mutableStateOf(categoryList.find { it.uid == subCategory.categoryUID }?.name ?: "No tag")
+    mutableStateOf(categoryList.find { it.uid == subCategory!!.categoryUID }?.name ?: "No tag")
   }
   Dialog(
       onDismissRequest = {
@@ -469,7 +470,7 @@ fun DisplayEditSubCategory(
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                  Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
+                  Text("Edit ${subCategory!!.name}", style = MaterialTheme.typography.titleLarge)
                   Icon(
                       Icons.Default.Close,
                       contentDescription = "Close dialog",

@@ -30,9 +30,27 @@ class BalanceDetailedViewModel(
   val uiState: StateFlow<BalanceItemState>
 
   init {
-    updateDatabaseValuesInBalance()
-    setSubCategoryInBalance(subCategoryUid)
+    loadBalanceDetails()
     uiState = _uiState
+  }
+
+  private var loadCounter = 0
+
+  fun loadBalanceDetails() {
+    loadCounter = 2
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+    setSubCategoryInBalance(subCategoryUid)
+    updateDatabaseValuesInBalance()
+  }
+
+  private fun endLoad(error: String? = null) {
+    loadCounter--
+    if (error != null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = error)
+    } else if (loadCounter <= 0) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+      loadCounter = 0
+    }
   }
 
   /**
@@ -48,12 +66,14 @@ class BalanceDetailedViewModel(
           if (subCategory != null) {
             _uiState.value = _uiState.value.copy(subCategory = subCategory)
           }
+          endLoad()
         },
-        {})
+        { endLoad("Error loading category") })
   }
 
   /** Update the database values */
   private fun updateDatabaseValuesInBalance() {
+    var innerLoadCounter = 2
     // Get the balance items from the database
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
@@ -78,14 +98,22 @@ class BalanceDetailedViewModel(
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(balanceList = statusFilteredBalanceList)
+          if (--innerLoadCounter == 0) {
+            endLoad()
+          }
         },
-        {})
+        { endLoad("Error loading balance items") })
 
     // Get the categories from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-        {})
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(categoryList = categoryList)
+          if (--innerLoadCounter == 0) {
+            endLoad()
+          }
+        },
+        { endLoad("Error loading tags") })
   }
 
   /**
@@ -133,7 +161,8 @@ class BalanceDetailedViewModel(
 
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBalance() {
-    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
+    if (_uiState.value.subCategory == null) return
+    accountingSubCategoryAPI.deleteSubCategory(_uiState.value.subCategory!!, {}, {})
     _uiState.value = _uiState.value.copy(balanceList = emptyList())
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
@@ -150,8 +179,10 @@ class BalanceDetailedViewModel(
  * @param year the current year
  */
 data class BalanceItemState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val balanceList: List<BalanceItem> = emptyList(),
-    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
+    val subCategory: AccountingSubCategory? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
     val loadingCategory: Boolean = false,
     val status: Status? = null,
