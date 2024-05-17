@@ -103,6 +103,8 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = secondArg<(Association) -> Unit>()
               onSuccessCallback.invoke(listAsso[1])
             }
+
+        every { associationNameValid(any()) } returns true
       }
 
   private val userAPI =
