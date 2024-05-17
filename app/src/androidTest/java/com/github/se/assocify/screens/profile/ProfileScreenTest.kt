@@ -42,15 +42,13 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   private val navActions = mockk<NavigationActions>()
   private var tabSelected = false
-//  private var goNotif = false
-//  private var goSecu = false
+  //  private var goNotif = false
+  //  private var goSecu = false
   private var goPref = false
   private var goMembers = false
-//  private var goRoles = false
+  //  private var goRoles = false
   private var goTreasTags = false
   private var goEvents = false
-
-
 
   private val uid = "1"
   private val asso1 = Association("asso", "test", "test", LocalDate.EPOCH)
@@ -104,13 +102,15 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     mViewmodel = ProfileViewModel(mockAssocAPI, mockUserAPI, navActions)
 
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-//    every { navActions.navigateTo(Destination.ProfileNotifications) } answers { goNotif = true }
-//    every { navActions.navigateTo(Destination.ProfileSecurityPrivacy) } answers { goSecu = true }
+    //    every { navActions.navigateTo(Destination.ProfileNotifications) } answers { goNotif = true
+    // }
+    //    every { navActions.navigateTo(Destination.ProfileSecurityPrivacy) } answers { goSecu =
+    // true }
     every { navActions.navigateTo(Destination.ProfilePreferences) } answers { goPref = true }
     every { navActions.navigateTo(Destination.ProfileMembers) } answers { goMembers = true }
-//    every { navActions.navigateTo(Destination.ProfileRoles) } answers { goRoles = true }
+    //    every { navActions.navigateTo(Destination.ProfileRoles) } answers { goRoles = true }
     every { navActions.navigateTo(Destination.ProfileEvents) } answers { goEvents = true }
-    every { navActions.navigateTo(Destination.ProfileTreasuryTags) } answers { goTreasTags = true}
+    every { navActions.navigateTo(Destination.ProfileTreasuryTags) } answers { goTreasTags = true }
 
     composeTestRule.setContent { ProfileScreen(navActions = navActions, mViewmodel) }
   }
@@ -125,10 +125,10 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("editProfile").assertIsDisplayed()
       onNodeWithTag("associationDropdown").assertIsDisplayed()
       onNodeWithTag("Preferences").performScrollTo().assertIsDisplayed()
-//      onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
-//      onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
+      //      onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
+      //      onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Members").performScrollTo().assertIsDisplayed()
-//      onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
+      //      onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Treasury Tags").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Events").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
@@ -193,17 +193,17 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Preferences").performClick()
       assert(goPref)
 
-//      onNodeWithTag("Privacy").performClick()
-//      assert(goSecu)
+      //      onNodeWithTag("Privacy").performClick()
+      //      assert(goSecu)
 
-//      onNodeWithTag("Notifications").performClick()
-//      assert(goNotif)
+      //      onNodeWithTag("Notifications").performClick()
+      //      assert(goNotif)
 
       onNodeWithTag("Members").performScrollTo().performClick()
       assert(goMembers)
 
-//      onNodeWithTag("Roles").performScrollTo().performClick()
-//      assert(goRoles)
+      //      onNodeWithTag("Roles").performScrollTo().performClick()
+      //      assert(goRoles)
 
       onNodeWithTag("Treasury Tags").performScrollTo().performClick()
       assert(goTreasTags)

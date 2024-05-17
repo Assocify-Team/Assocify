@@ -324,13 +324,13 @@ enum class AssociationSettings {
     }
   }
 
-    override fun toString() : String {
-        return when (this) {
-            Members -> "Members"
-            TreasuryTags -> "Treasury Tags"
-            Events -> "Events"
-        }
+  override fun toString(): String {
+    return when (this) {
+      Members -> "Members"
+      TreasuryTags -> "Treasury Tags"
+      Events -> "Events"
     }
+  }
 
   fun getDestination(): Destination {
     return when (this) {

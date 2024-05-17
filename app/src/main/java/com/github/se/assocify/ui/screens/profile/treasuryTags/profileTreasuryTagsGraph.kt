@@ -6,5 +6,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
 fun NavGraphBuilder.profileTreasuryTagsGraph(navigationActions: NavigationActions) {
-  composable(route = Destination.ProfileTreasuryTags.route) { ProfileTreasuryTagsScreen(navigationActions) }
+  composable(route = Destination.ProfileTreasuryTags.route) {
+    ProfileTreasuryTagsScreen(navigationActions)
+  }
 }
