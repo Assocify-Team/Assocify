@@ -72,13 +72,17 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
         shape = RoundedCornerShape(16.dp),
     ) {
       LazyColumn(
-          horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
+          horizontalAlignment = Alignment.CenterHorizontally,
+          modifier = Modifier.padding(8.dp).testTag("editDialogColumn")) {
             item {
               Row(
                   modifier = Modifier.fillMaxWidth().padding(8.dp),
                   horizontalArrangement = Arrangement.SpaceBetween,
                   verticalAlignment = Alignment.CenterVertically) {
-                    Text("Edit Balance Detail", style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        "Edit Balance Detail",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.testTag("editDialogTitle"))
                     Icon(
                         Icons.Default.Close,
                         contentDescription = "Close dialog",
@@ -90,7 +94,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The name box
             item {
               OutlinedTextField(
-                  modifier = Modifier.padding(8.dp),
+                  modifier = Modifier.padding(8.dp).testTag("editDialogName"),
                   value = nameString,
                   onValueChange = { nameString = it },
                   label = { Text("Name") },
