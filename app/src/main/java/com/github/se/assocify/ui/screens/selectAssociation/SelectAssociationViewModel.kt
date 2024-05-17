@@ -58,18 +58,26 @@ class SelectAssociationViewModel(
               { roles ->
                 val role = roles.find { it.type == RoleType.MEMBER }
                 if (role != null) {
-                  associationAPI.acceptUser(CurrentUser.userUid!!, role, {}, {})
-                  userAPI.updateCurrentUserAssociationCache({}, {})
+                  associationAPI.acceptUser(
+                      CurrentUser.userUid!!,
+                      role,
+                      {
+                        userAPI.updateCurrentUserAssociationCache(
+                            {
+                              if (navActions.backFromSelectAsso()) {
+                                navActions.back()
+                              } else {
+                                navActions.onLogin(true)
+                              }
+                            },
+                            {})
+                      },
+                      {})
                 }
               },
               {})
         },
         {}) // TODO: handle joining assoc (non immediate approval)
-    if (navActions.backFromSelectAsso()) {
-      navActions.back()
-    } else {
-      navActions.onLogin(true)
-    }
   }
 }
 
