@@ -92,6 +92,7 @@ fun CreateAssociationScreen(
                     }
                 OutlinedTextField(
                     value = state.name,
+                    singleLine = true,
                     onValueChange = { viewmodel.setName(it) },
                     label = { Text("Association Name") },
                     modifier = Modifier.fillMaxWidth().testTag("name"))
