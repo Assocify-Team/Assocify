@@ -21,15 +21,19 @@ sealed class Destination(
   data object Profile :
       Destination("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
 
-  data object ProfileNotifications : Destination("profile/notifications")
+  //  data object ProfileNotifications : Destination("profile/notifications")
 
-  data object ProfileSecurityPrivacy : Destination("profile/securityPrivacy")
+  //  data object ProfileSecurityPrivacy : Destination("profile/securityPrivacy")
 
   data object ProfilePreferences : Destination("profile/preferences")
 
   data object ProfileMembers : Destination("profile/members")
 
-  data object ProfileRoles : Destination("profile/roles")
+  //  data object ProfileRoles : Destination("profile/roles")
+
+  data object ProfileTreasury : Destination("profile/treasury")
+
+  data object ProfileEvents : Destination("profile/events")
 
   data object Login : Destination("login/authentication")
 
