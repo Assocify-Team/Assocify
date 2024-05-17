@@ -381,4 +381,25 @@ class BalanceDetailedScreenTest :
       onNodeWithText("pair of scissors").assertIsNotDisplayed()
     }
   }
+
+  @Test
+  fun testCancelModifyScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("Pending").performClick()
+
+      // Assert that only the item "pair of scissors" is displayed
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("François Théron").assertIsDisplayed()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("editDialogName").assertIsDisplayed()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("money")
+      onNodeWithTag("editSubCategoryCancelButton").performClick()
+      onNodeWithText("money").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+    }
+  }
 }
