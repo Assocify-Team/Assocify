@@ -43,7 +43,7 @@ class BalanceDetailedViewModel(
   private var loadCounter = 0
 
   fun loadBalanceDetails() {
-    loadCounter = 2
+    loadCounter += 2
     _uiState.value = _uiState.value.copy(loading = true, error = null)
     setSubCategoryInBalance(subCategoryUid)
     updateDatabaseValuesInBalance()
@@ -53,9 +53,8 @@ class BalanceDetailedViewModel(
     loadCounter--
     if (error != null) {
       _uiState.value = _uiState.value.copy(loading = false, error = error)
-    } else if (loadCounter <= 0) {
+    } else if (loadCounter == 0 && _uiState.value.error == null) {
       _uiState.value = _uiState.value.copy(loading = false, error = null)
-      loadCounter = 0
     }
   }
 

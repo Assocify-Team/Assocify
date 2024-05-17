@@ -2,6 +2,7 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -329,6 +330,53 @@ class BudgetDetailedScreenTest :
       onNodeWithText("12.00").assertIsDisplayed()
       onNodeWithText("TTC").performClick()
       onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testLoadSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.getSubCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      budgetDetailedViewModel.loadBudgetDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading category")
+    }
+  }
+
+  @Test
+  fun testLoadBudgetError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockBudgetAPI.getBudget(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      budgetDetailedViewModel.loadBudgetDetails()
+      onNodeWithTag("errorMessage")
+          .assertIsDisplayed()
+          .assertTextContains("Error loading budget items")
+    }
+  }
+
+  @Test
+  fun testLoadCategoriesError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingCategoryAPI.getCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      budgetDetailedViewModel.loadBudgetDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tags")
     }
   }
 }
