@@ -146,7 +146,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   data class SupabaseBudgetItem(
-      @SerialName("item_uid") val itemUID: String,
+      @SerialName("uid") val itemUID: String,
       @SerialName("association_uid") val associationUID: String,
       @SerialName("name") val name: String,
       @SerialName("description") val description: String,

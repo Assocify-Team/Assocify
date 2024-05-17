@@ -133,7 +133,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       // Tests if a message is shown when no subCategory
       onNodeWithTag("categoryFilterChip").performClick()
       onNodeWithText("Sponsorship").performClick()
-      onNodeWithText("No data available with this tag").assertIsDisplayed()
+      onNodeWithText("No data available with these tags").assertIsDisplayed()
     }
   }
 
