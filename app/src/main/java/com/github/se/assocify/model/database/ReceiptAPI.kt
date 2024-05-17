@@ -140,11 +140,17 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
     val tmpImageCacheFile = cachePath.resolve("$receiptUid.jpg.tmp").toFile()
 
     tryAsync({
-      tmpImageCacheFile.delete()
+      val deleted = tmpImageCacheFile.delete()
+      if (!deleted) {
+        Log.w(this.javaClass.simpleName, "Failed to delete temporary image cache file")
+      }
       onFailure(it)
     }) {
       bucket.downloadAuthenticatedTo(receiptUid, tmpImageCacheFile.toPath())
-      tmpImageCacheFile.renameTo(imageCacheFile)
+      val renamed = tmpImageCacheFile.renameTo(imageCacheFile)
+      if (!renamed) {
+        Log.w(this.javaClass.simpleName, "Failed to rename temporary image cache file")
+      }
       onSuccess(Uri.fromFile(imageCacheFile))
     }
   }
