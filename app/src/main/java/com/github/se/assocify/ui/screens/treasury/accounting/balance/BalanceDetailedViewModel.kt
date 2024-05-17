@@ -137,17 +137,26 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(balanceList = emptyList())
     _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
+
+  /**
+   * Set the TVA filter as active or inactive
+   *
+   * @param tvaActive the new status of the TVA filter
+   */
+  fun modifyTVAFilter(tvaActive: Boolean) {
+    _uiState.value = _uiState.value.copy(filterActive = tvaActive)
+  }
 }
 
 /**
  * The state for the balance item
  *
  * @param balanceList the current list of balance items
- * @param subCategory the current subcategory
- * @param categoryList the current list of categories
+ * @param subCategory the current subcategory of the item
  * @param status the current status
  * @param subCatEditing whether the subcategory is being edited
  * @param year the current year
+ * @param filterActive if the tva filter is active or not
  */
 data class BalanceItemState(
     val balanceList: List<BalanceItem> = emptyList(),
@@ -156,5 +165,6 @@ data class BalanceItemState(
     val loadingCategory: Boolean = false,
     val status: Status? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = 2023
+    val year: Int = 2023,
+    val filterActive: Boolean = false
 )

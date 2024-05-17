@@ -31,6 +31,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -67,7 +68,14 @@ fun AccountingScreen(
         DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingViewModel, accountingState)
         HorizontalDivider(Modifier.fillMaxWidth())
       }
-      item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
+      item {
+        TotalLine(
+            totalAmount =
+                subCategoryList.sumOf {
+                  if (!accountingState.filterActive) it.amount
+                  else it.amount + it.amount /*TODO: have to find the TVA*/
+                })
+      }
     } else {
       item {
         Text(
@@ -136,7 +144,7 @@ fun TotalLine(totalAmount: Int) {
       },
       trailingContent = {
         Text(
-            text = "$totalAmount",
+            text = PriceUtil.fromCents(totalAmount),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
@@ -180,11 +188,8 @@ fun DisplayLine(
   ListItem(
       headlineContent = { Text(category.name) },
       trailingContent = {
-            Text(
-                text = "$amount",
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-            )
-        },
+        Text(PriceUtil.fromCents(amount), style = MaterialTheme.typography.bodyMedium)
+      },
       modifier =
       Modifier
           .clickable {
