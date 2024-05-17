@@ -159,15 +159,18 @@ class BudgetDetailedViewModel(
     val subCategoryBudget = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
     accountingSubCategoryAPI.updateSubCategory(
         subCategoryBudget,
-        { navigationActions.back() },
         {
+          _uiState.value = _uiState.value.copy(subCategory = subCategoryBudget)
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+        },
+        {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
           CoroutineScope(Dispatchers.Main).launch {
             _uiState.value.snackbarState.showSnackbar(
                 message = "Failed to update category",
             )
           }
         })
-    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategoryBudget)
   }
 
   /** Cancel the Subcategory editing */
@@ -178,18 +181,17 @@ class BudgetDetailedViewModel(
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBudget() {
     if (_uiState.value.subCategory == null) return
-    _uiState.value = _uiState.value.copy(budgetList = emptyList())
     accountingSubCategoryAPI.deleteSubCategory(
         _uiState.value.subCategory!!,
         { navigationActions.back() },
         {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
           CoroutineScope(Dispatchers.Main).launch {
             _uiState.value.snackbarState.showSnackbar(
                 message = "Failed to delete category",
             )
           }
         })
-    _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 }
 

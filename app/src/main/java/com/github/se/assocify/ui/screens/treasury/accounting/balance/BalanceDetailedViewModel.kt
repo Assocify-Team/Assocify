@@ -154,15 +154,18 @@ class BalanceDetailedViewModel(
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
     accountingSubCategoryAPI.updateSubCategory(
         subCategory,
-        { navigationActions.back() },
         {
+          _uiState.value = _uiState.value.copy(subCategory = subCategory)
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+        },
+        {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
           CoroutineScope(Dispatchers.Main).launch {
             _uiState.value.snackbarState.showSnackbar(
                 message = "Failed to update category",
             )
           }
         })
-    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
   }
 
   /** Cancel the Subcategory editing */
@@ -177,14 +180,13 @@ class BalanceDetailedViewModel(
         _uiState.value.subCategory!!,
         { navigationActions.back() },
         {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
           CoroutineScope(Dispatchers.Main).launch {
             _uiState.value.snackbarState.showSnackbar(
                 message = "Failed to delete category",
             )
           }
         })
-    _uiState.value = _uiState.value.copy(balanceList = emptyList())
-    _uiState.value = _uiState.value.copy(subCatEditing = false)
   }
 }
 
