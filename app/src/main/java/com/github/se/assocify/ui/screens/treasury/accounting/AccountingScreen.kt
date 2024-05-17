@@ -51,18 +51,20 @@ fun AccountingScreen(
     navigationActions: NavigationActions,
     accountingViewModel: AccountingViewModel
 ) {
-  val model by accountingViewModel.uiState.collectAsState()
-  val subCategoryList = model.subCategoryList
+  val accountingState by accountingViewModel.uiState.collectAsState()
+  val subCategoryList = accountingState.subCategoryList
 
   LazyColumn(
-      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .testTag("AccountingScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
   ) {
     // display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
       items(subCategoryList) {
-        DisplayLine(it, "displayLine${it.name}", page, navigationActions, model)
+        DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingViewModel, accountingState)
         HorizontalDivider(Modifier.fillMaxWidth())
       }
       item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
@@ -99,7 +101,10 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
   // Row of dropdown filters
-  Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
+  Row(
+      Modifier
+          .testTag("filterRow")
+          .horizontalScroll(rememberScrollState())) {
     DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") {
       selectedYear = it
       accountingViewModel.onYearFilter(selectedYear.toInt())
@@ -121,7 +126,9 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 @Composable
 fun TotalLine(totalAmount: Int) {
   ListItem(
-      modifier = Modifier.fillMaxWidth().testTag("totalLine"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .testTag("totalLine"),
       headlineContent = {
         Text(
             text = "Total",
@@ -149,26 +156,52 @@ fun DisplayLine(
     testTag: String,
     page: AccountingPage,
     navigationActions: NavigationActions,
+    accountingViewModel: AccountingViewModel,
     accountingState: AccountingState
 ) {
-    val budgetItemList = accountingState.budgetItemsList
-    val balanceItemList = accountingState.balanceItemList
-    val amountBudget = budgetItemList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
-    val amountBalance = balanceItemList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
+
+    val amount =
+        when(page){
+            AccountingPage.BUDGET -> accountingState.budgetItemsList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
+            AccountingPage.BALANCE -> accountingState.balanceItemList.filter{ it.subcategoryUID == category.uid }.sumOf { it.amount }
+        }
+
+    //set the amount of the subcategory
+    accountingViewModel.setSubcategoryAmount(
+        AccountingSubCategory(
+        category.uid,
+        category.categoryUID,
+        category.name,
+        amount,
+        category.year
+    )
+    )
+
   ListItem(
       headlineContent = { Text(category.name) },
       trailingContent = {
-          when(page){
-              AccountingPage.BUDGET -> Text("$amountBudget", style = MaterialTheme.typography.bodyMedium)
-              AccountingPage.BALANCE -> Text("$amountBalance", style = MaterialTheme.typography.bodyMedium)
-          }
+            Text(
+                text = "$amount",
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+            )
         },
       modifier =
-          Modifier.clickable {
-              when(page){
-                    AccountingPage.BUDGET -> navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
-                    AccountingPage.BALANCE -> navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
+      Modifier
+          .clickable {
+              when (page) {
+                  AccountingPage.BUDGET -> navigationActions.navigateTo(
+                      Destination.BudgetDetailed(
+                          category.uid
+                      )
+                  )
+
+                  AccountingPage.BALANCE -> navigationActions.navigateTo(
+                      Destination.BalanceDetailed(
+                          category.uid
+                      )
+                  )
               }
-          }.testTag(testTag)
+          }
+          .testTag(testTag)
   )
 }

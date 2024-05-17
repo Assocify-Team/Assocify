@@ -32,7 +32,9 @@ class AccountingViewModel(
 
   /** Initialize the view model */
   init {
+
     updateDatabaseValues()
+      getAccountingList()
     uiState = _uiState
   }
 
@@ -66,18 +68,31 @@ class AccountingViewModel(
         },
         { Log.d("BudgetViewModel", "Error getting subcategories") })
 
-    // update the budgetItem List
-    budgetAPI.getBudget(
-        CurrentUser.associationUid!!,
-        { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList) },
-        { Log.d("BudgetViewModel", "Error getting budget items") })
-
-    // update the balanceItem List
-    balanceAPI.getBalance(
-        CurrentUser.associationUid!!,
-        { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList) },
-        { Log.d("BudgetViewModel", "Error getting balance items") })
   }
+
+    private fun getAccountingList(){
+        // get the budgetItem List
+        budgetAPI.getBudget(
+            CurrentUser.associationUid!!,
+            { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList) },
+            { Log.d("BudgetViewModel", "Error getting budget items") })
+
+        // get the balanceItem List
+        balanceAPI.getBalance(
+            CurrentUser.associationUid!!,
+            { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList) },
+            { Log.d("BudgetViewModel", "Error getting balance items") })
+    }
+
+    /** Updates the amount of a subcategory */
+    fun setSubcategoryAmount(subCategory: AccountingSubCategory){
+        accountingSubCategoryAPI.updateSubCategory(
+            subCategory,
+            {},
+            {}
+        )
+        updateDatabaseValues()
+    }
 
   /**
    * Function to update the subcategories list when a category is selected
@@ -111,7 +126,10 @@ class AccountingViewModel(
  * @param categoryList: The list of accounting categories
  * @param selectedCatUid: The selected category unique identifier
  * @param subCategoryList: The list of accounting subcategories
+ * @param budgetItemsList: The list of budget items
+ * @param balanceItemList: The list of balance items
  * @param globalSelected: Whether the global category is selected
+ * @param yearFilter: The year filter
  */
 data class AccountingState(
     val categoryList: List<AccountingCategory> = emptyList(),
@@ -120,5 +138,5 @@ data class AccountingState(
     val budgetItemsList: List<BudgetItem> = emptyList(),
     val balanceItemList: List<BalanceItem> = emptyList(),
     val globalSelected: Boolean = true,
-    val yearFilter: Int = 2024
+    val yearFilter: Int = 2024,
 )
