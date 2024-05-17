@@ -1,5 +1,5 @@
 package com.github.se.assocify.ui.screens.profile.notifications
-
+/*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -33,4 +33,4 @@ fun ProfileNotificationsScreen(navActions: NavigationActions) {
       }) {
         Text(modifier = Modifier.padding(it), text = "Notifications Screen : not yet implemented")
       }
-}
+}*/

@@ -1,5 +1,5 @@
 package com.github.se.assocify.ui.screens.profile.securityPrivacy
-
+/*
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.se.assocify.navigation.Destination
@@ -9,4 +9,4 @@ fun NavGraphBuilder.profileSecurityPrivacyGraph(navigationActions: NavigationAct
   composable(route = Destination.ProfileSecurityPrivacy.route) {
     ProfileSecurityPrivacyScreen(navActions = navigationActions)
   }
-}
+}*/

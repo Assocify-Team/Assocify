@@ -1,5 +1,5 @@
 package com.github.se.assocify.ui.screens.profile.roles
-
+/*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -33,4 +33,4 @@ fun ProfileRolesScreen(navActions: NavigationActions) {
       }) {
         Text(modifier = Modifier.padding(it), text = "Roles Screen : not yet implemented")
       }
-}
+}*/
