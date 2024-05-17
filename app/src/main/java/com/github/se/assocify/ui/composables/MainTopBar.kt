@@ -74,6 +74,7 @@ fun MainTopBar(
                   searchBarVisible = true
                 }) {
                   Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+                  Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
                 }
           }
         },
@@ -87,7 +88,14 @@ fun MainTopBar(
         onSearch = onSearch,
         active = false,
         onActiveChange = {},
-        placeholder = { Text("Search receipts") },
+        placeholder = {
+            when(page){
+                0 -> Text("Search receipts")
+                1 -> Text("Search accounting categories")
+                2 -> Text("Search accounting categories")
+                else -> Text("Search")
+            }
+        },
         leadingIcon = {
           IconButton(
               modifier = Modifier.testTag("searchBackButton"),
