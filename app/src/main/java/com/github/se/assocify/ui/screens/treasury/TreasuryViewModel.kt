@@ -1,13 +1,15 @@
 package com.github.se.assocify.ui.screens.treasury
 
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class TreasuryViewModel(
     private val navActions: NavigationActions,
-    private val receiptListViewModel: ReceiptListViewModel
+    private val receiptListViewModel: ReceiptListViewModel,
+    private val accountingViewModel: AccountingViewModel
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<TreasuryUIState> = MutableStateFlow(TreasuryUIState())
@@ -36,8 +38,12 @@ class TreasuryViewModel(
       TreasuryPageIndex.Receipts.ordinal -> {
         receiptListViewModel.onSearch(_uiState.value.searchQuery)
       }
-      TreasuryPageIndex.Budget.ordinal -> {}
-      TreasuryPageIndex.Balance.ordinal -> {}
+      TreasuryPageIndex.Budget.ordinal -> {
+        accountingViewModel.onSearch(_uiState.value.searchQuery)
+      }
+      TreasuryPageIndex.Balance.ordinal -> {
+        accountingViewModel.onSearch(_uiState.value.searchQuery)
+      }
     }
   }
 }

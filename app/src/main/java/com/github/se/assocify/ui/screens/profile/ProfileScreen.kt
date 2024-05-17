@@ -253,6 +253,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     OutlinedTextField(
                         value = state.modifyingName,
+                        singleLine = true,
                         onValueChange = { viewmodel.modifyName(it) },
                         label = { Text("Edit your name") },
                         modifier = Modifier.fillMaxWidth().testTag("editName"))

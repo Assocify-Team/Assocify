@@ -1,7 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.database.ReceiptAPI
@@ -49,6 +48,10 @@ class ReceiptViewModel {
     loadReceipt()
   }
 
+  /**
+   * Load receipt from database If successful, update the UI state with the receipt data If failed,
+   * update the UI state with an error message
+   */
   fun loadReceipt() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
     this.receiptApi.getReceipt(
@@ -61,17 +64,32 @@ class ReceiptViewModel {
                   description = receipt.description,
                   amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
                   date = DateUtil.formatDate(receipt.date),
-                  incoming = receipt.cents >= 0,
-                  loading = false,
-                  error = null)
+                  incoming = receipt.cents >= 0)
 
-          receiptApi.getReceiptImage(
-              receipt,
-              { _uiState.value = _uiState.value.copy(receiptImageURI = it) },
-              { Log.e("ReceiptViewModel", "Failed to load receipt image", it) })
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
+
+          loadImage()
         },
         onFailure = {
           _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
+        })
+  }
+
+  /**
+   * Load receipt image from database If successful, update the UI state with the image URI If
+   * failed, update the UI state with an error message
+   */
+  fun loadImage() {
+    _uiState.value = _uiState.value.copy(imageLoading = true, imageError = null)
+    receiptApi.getReceiptImage(
+        receiptUid,
+        {
+          _uiState.value = _uiState.value.copy(receiptImageURI = it)
+          _uiState.value = _uiState.value.copy(imageLoading = false, imageError = null)
+        },
+        {
+          _uiState.value =
+              _uiState.value.copy(imageLoading = false, imageError = "Error loading image")
         })
   }
 
@@ -229,6 +247,8 @@ class ReceiptViewModel {
 data class ReceiptState(
     val loading: Boolean = false,
     val error: String? = null,
+    val imageLoading: Boolean = false,
+    val imageError: String? = null,
     val isNewReceipt: Boolean,
     val status: Status = Status.Pending,
     val pageTitle: String,

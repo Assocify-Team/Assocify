@@ -146,6 +146,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
               OutlinedTextField(
                   modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = receiptState.title,
+                  singleLine = true,
                   onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") },
                   isError = receiptState.titleError != null,
@@ -160,6 +161,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
               OutlinedTextField(
                   modifier = Modifier.testTag("amountField").fillMaxWidth(),
                   value = receiptState.amount,
+                  singleLine = true,
                   onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
                   keyboardOptions =
@@ -180,17 +182,28 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
                           .aspectRatio(1f)
                           .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                      if (receiptState.receiptImageURI != null) {
-                        AsyncImage(
-                            model = receiptState.receiptImageURI,
-                            modifier = Modifier.align(Alignment.Center),
-                            contentDescription = "receipt image",
-                        )
-                      } else {
-                        Image(
-                            modifier = Modifier.align(Alignment.Center).size(100.dp),
-                            imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
-                            contentDescription = "receipt icon")
+                      when {
+                        receiptState.imageLoading -> {
+                          CenteredCircularIndicator()
+                        }
+                        receiptState.imageError != null -> {
+                          ErrorMessage(errorMessage = receiptState.imageError) {
+                            viewModel.loadImage()
+                          }
+                        }
+                        receiptState.receiptImageURI == null -> {
+                          Image(
+                              modifier = Modifier.align(Alignment.Center).size(100.dp),
+                              imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
+                              contentDescription = "receipt icon")
+                        }
+                        else -> {
+                          AsyncImage(
+                              model = receiptState.receiptImageURI,
+                              modifier = Modifier.align(Alignment.Center),
+                              contentDescription = "receipt image",
+                          )
+                        }
                       }
                       FilledIconButton(
                           modifier =
