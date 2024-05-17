@@ -47,7 +47,19 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           User("10", "seb"))
 
   private val mockNavActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val mockAssocAPI = mockk<AssociationAPI>(relaxUnitFun = true)
+  private val mockAssocAPI =
+      mockk<AssociationAPI>() {
+        every { addAssociation(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { initAssociation(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
+      }
   private val mockUserAPI =
       mockk<UserAPI> {
         every { getAllUsers(any(), any()) } answers
@@ -55,6 +67,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
               val onSuccessCallback = firstArg<(List<User>) -> Unit>()
               onSuccessCallback(bigList)
             }
+        every { updateCurrentUserAssociationCache(any(), any()) } answers {}
       }
 
   val bigView = CreateAssociationViewmodel(mockAssocAPI, mockUserAPI, mockNavActions)
