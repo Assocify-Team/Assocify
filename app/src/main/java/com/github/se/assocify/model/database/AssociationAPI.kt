@@ -130,9 +130,12 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
         filter { SupabaseAssociation::uid eq uid }
       }
 
-      associationCache =
-          associationCache +
-              (uid to associationCache[uid]!!.copy(name = name, description = description))
+      val associationCacheValue = associationCache[uid]
+      if (associationCacheValue != null) {
+        associationCache =
+            associationCache +
+                (uid to associationCacheValue.copy(name = name, description = description))
+      }
       onSuccess()
     }
   }
