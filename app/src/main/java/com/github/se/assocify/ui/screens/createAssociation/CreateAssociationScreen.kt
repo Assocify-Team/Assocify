@@ -92,6 +92,7 @@ fun CreateAssociationScreen(
                     }
                 OutlinedTextField(
                     value = state.name,
+                    singleLine = true,
                     onValueChange = { viewmodel.setName(it) },
                     isError = state.nameError != null,
                     supportingText = { Text(state.nameError ?: "") },
