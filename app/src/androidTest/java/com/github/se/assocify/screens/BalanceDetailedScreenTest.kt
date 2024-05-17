@@ -141,7 +141,7 @@ class BalanceDetailedScreenTest :
             mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
-            mockBalanceAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockBalanceAPI,mockReceiptAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
     composeTestRule.setContent {
       BalanceDetailedScreen(mockNavActions, budgetDetailedViewModel, balanceDetailedViewModel)
     }
