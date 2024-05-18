@@ -78,7 +78,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             .map { it.title }
             .getOrElse(0) { "" })
   }
-  var amountString by remember { mutableStateOf(balance.amount.toString()) }
+  var amountString by remember { mutableStateOf(PriceUtil.fromCents(balance.amount)) }
   var tvaString by remember { mutableStateOf(balance.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(balance.description) }
   var date by remember { mutableStateOf(balance.date) }
