@@ -182,7 +182,7 @@ class BalanceDetailedScreenTest :
   fun testEmptyList() {
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2024").performClick()
+      onNodeWithText("2021").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
       onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
           .assertIsDisplayed()
