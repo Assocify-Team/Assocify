@@ -320,12 +320,18 @@ fun DisplayBalanceItem(
     balanceItem: BalanceItem,
     testTag: String
 ) {
+  val balanceState by balanceDetailedViewModel.uiState.collectAsState()
   ListItem(
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text(
-              PriceUtil.fromCents(balanceItem.amount),
+              text =
+                  if (balanceState.filterActive)
+                      PriceUtil.fromCents(
+                          balanceItem.amount +
+                              (balanceItem.amount * balanceItem.tva.rate / 100f).toInt())
+                  else PriceUtil.fromCents(balanceItem.amount),
               modifier = Modifier.padding(end = 4.dp),
               style = MaterialTheme.typography.bodyMedium)
           /*Icon(

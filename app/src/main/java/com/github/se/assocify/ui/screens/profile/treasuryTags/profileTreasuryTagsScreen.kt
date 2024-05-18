@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.profile.members
+package com.github.se.assocify.ui.screens.profile.treasuryTags
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,12 +17,12 @@ import com.github.se.assocify.ui.composables.BackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileMembersScreen(navActions: NavigationActions) {
+fun ProfileTreasuryTagsScreen(navActions: NavigationActions) {
   Scaffold(
-      modifier = Modifier.testTag("Members Screen"),
+      modifier = Modifier.testTag("TreasuryTags Screen"),
       topBar = {
         CenterAlignedTopAppBar(
-            title = { Text("Members Management") },
+            title = { Text("Treasury Tags Management") },
             navigationIcon = {
               BackButton(
                   contentDescription = "Arrow Back",
@@ -31,10 +31,11 @@ fun ProfileMembersScreen(navActions: NavigationActions) {
             })
       }) {
         Column(
+            modifier = Modifier.fillMaxSize().padding(it),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(it)) {
-              Text(text = "Members Screen : not yet implemented")
-            }
+        ) {
+          Text(modifier = Modifier.padding(it), text = "Treasury Tags Screen : not yet implemented")
+        }
       }
 }
