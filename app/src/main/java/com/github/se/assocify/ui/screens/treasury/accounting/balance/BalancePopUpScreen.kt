@@ -306,7 +306,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                 Button(
                     onClick = {
                       balanceDetailedViewModel.checkAll(
-                          nameString, receiptUid, amountString, assignee)
+                          nameString, receiptUid, amountString, assignee, descriptionString)
                       val newBalanceItem =
                           BalanceItem(
                               balance.uid,

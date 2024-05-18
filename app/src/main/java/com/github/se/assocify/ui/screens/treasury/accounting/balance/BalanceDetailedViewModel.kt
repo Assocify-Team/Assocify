@@ -37,6 +37,8 @@ class BalanceDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
   val uiState: StateFlow<BalanceItemState>
+  private val maxDescriptionLength = 50
+  private val maxNameLength = 20
 
   init {
     loadBalanceDetails()
@@ -225,6 +227,14 @@ class BalanceDetailedViewModel(
    * @param balanceItem the new edited budgetItem
    */
   fun saveEditing(balanceItem: BalanceItem) {
+    if (_uiState.value.errorName ||
+        _uiState.value.errorReceipt ||
+        _uiState.value.errorAmount ||
+        _uiState.value.errorAssignee ||
+        _uiState.value.receiptAlreadyAssigned ||
+        _uiState.value.errorDescription) {
+      return
+    }
     balanceApi.updateBalance(
         CurrentUser.associationUid!!,
         balanceItem,
@@ -268,7 +278,9 @@ class BalanceDetailedViewModel(
     if (_uiState.value.errorName ||
         _uiState.value.errorReceipt ||
         _uiState.value.errorAmount ||
-        _uiState.value.errorAssignee) {
+        _uiState.value.errorAssignee ||
+        _uiState.value.receiptAlreadyAssigned ||
+        _uiState.value.errorDescription) {
       return
     }
     balanceApi.addBalance(
@@ -285,7 +297,7 @@ class BalanceDetailedViewModel(
   }
 
   fun checkName(name: String) {
-    _uiState.value = _uiState.value.copy(errorName = name.isEmpty() || name.length > 50)
+    _uiState.value = _uiState.value.copy(errorName = name.isEmpty() || name.length > maxNameLength)
   }
 
   fun checkReceipt(receiptUid: String) {
@@ -304,11 +316,23 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(errorAssignee = assignee.isEmpty())
   }
 
-  fun checkAll(name: String, receiptUid: String, amount: String, assignee: String) {
+  fun checkDescription(description: String) {
+    _uiState.value =
+        _uiState.value.copy(errorDescription = description.length > maxDescriptionLength)
+  }
+
+  fun checkAll(
+      name: String,
+      receiptUid: String,
+      amount: String,
+      assignee: String,
+      description: String
+  ) {
     checkName(name)
     checkReceipt(receiptUid)
     checkAmount(amount)
     checkAssignee(assignee)
+    checkDescription(description)
   }
 }
 
@@ -346,5 +370,6 @@ data class BalanceItemState(
     val errorReceipt: Boolean = false,
     val errorAmount: Boolean = false,
     val errorAssignee: Boolean = false,
+    val errorDescription: Boolean = false,
     val receiptAlreadyAssigned: Boolean = false
 )
