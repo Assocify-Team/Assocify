@@ -545,6 +545,7 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("receiptDropdown").assertIsDisplayed()
       onNodeWithTag("receiptDropdown").performClick()
       onNodeWithText("r1").performClick()
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editDialogAssignee"))
       onNodeWithTag("editDialogAssignee").performTextClearance()
       onNodeWithTag("editDialogAssignee").performTextInput("François Théron")
       onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
