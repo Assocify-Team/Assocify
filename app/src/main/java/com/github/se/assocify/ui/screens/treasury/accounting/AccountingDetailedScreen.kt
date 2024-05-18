@@ -303,7 +303,9 @@ fun DisplayBudgetItem(
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount)) },
-      supportingContent = { if(budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description) },
+      supportingContent = {
+        if (budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description)
+      },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }

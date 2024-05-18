@@ -151,7 +151,9 @@ class BudgetDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   budgetList =
-                      if(_uiState.value.yearFilter == budgetItem.year) _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem else _uiState.value.budgetList.filter { it.uid != budgetItem.uid },
+                      if (_uiState.value.yearFilter == budgetItem.year)
+                          _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem
+                      else _uiState.value.budgetList.filter { it.uid != budgetItem.uid },
                   editedBudgetItem = null)
         },
         {})
@@ -257,7 +259,9 @@ class BudgetDetailedViewModel(
         CurrentUser.associationUid!!,
         budgetItem,
         {
-         if (budgetItem.year == _uiState.value.yearFilter) _uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
+          if (budgetItem.year == _uiState.value.yearFilter)
+              _uiState.value =
+                  _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
         },
         {})
     _uiState.value = _uiState.value.copy(creating = false)
