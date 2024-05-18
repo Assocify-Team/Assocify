@@ -134,9 +134,11 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { receiptExpanded = !receiptExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
-                        isError = balanceModel.errorReceipt,
+                        isError = balanceModel.errorReceipt || balanceModel.receiptAlreadyAssigned,
                         supportingText = {
                           if (balanceModel.errorReceipt) Text("You have to choose a receipt!")
+                          else if (balanceModel.receiptAlreadyAssigned)
+                              Text("This receipt is already assigned!")
                         },
                         value = receiptName,
                         onValueChange = { balanceDetailedViewModel.checkReceipt(receiptName) },

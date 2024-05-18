@@ -238,7 +238,7 @@ class BalanceDetailedViewModel(
                       _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
                   editedBalanceItem = null)
         },
-        { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
+        { _uiState.value = _uiState.value.copy(receiptAlreadyAssigned = true) })
   }
 
   /** Exit the edit state without keeping the modifications done */
@@ -281,7 +281,7 @@ class BalanceDetailedViewModel(
               _uiState.value.copy(
                   creating = false, balanceList = _uiState.value.balanceList + balanceItem)
         },
-        { _uiState.value = _uiState.value.copy(creating = false) })
+        { _uiState.value = _uiState.value.copy(receiptAlreadyAssigned = true) })
   }
 
   fun checkName(name: String) {
@@ -289,7 +289,8 @@ class BalanceDetailedViewModel(
   }
 
   fun checkReceipt(receiptUid: String) {
-    _uiState.value = _uiState.value.copy(errorReceipt = receiptUid.isEmpty())
+    _uiState.value =
+        _uiState.value.copy(errorReceipt = receiptUid.isEmpty(), receiptAlreadyAssigned = false)
   }
 
   fun checkAmount(amount: String) {
@@ -344,5 +345,6 @@ data class BalanceItemState(
     val errorName: Boolean = false,
     val errorReceipt: Boolean = false,
     val errorAmount: Boolean = false,
-    val errorAssignee: Boolean = false
+    val errorAssignee: Boolean = false,
+    val receiptAlreadyAssigned: Boolean = false
 )
