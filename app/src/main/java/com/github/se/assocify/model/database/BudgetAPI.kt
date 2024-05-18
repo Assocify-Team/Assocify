@@ -110,7 +110,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       }) {
         filter {
           BudgetAPI.SupabaseBudgetItem::associationUID eq associationUID
-          SupabaseBudgetItem::uid eq budgetItem.uid
+          SupabaseBudgetItem::itemUID eq budgetItem.uid
         }
       }
 
@@ -135,7 +135,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.from(collectionName).delete { filter { SupabaseBudgetItem::uid eq budgetItemUID } }
+      db.from(collectionName).delete { filter { SupabaseBudgetItem::itemUID eq budgetItemUID } }
 
       // Update cache
       budgetCache = budgetCache.orEmpty().filter { it.uid != budgetItemUID }
@@ -146,7 +146,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
 
   @Serializable
   data class SupabaseBudgetItem(
-      @SerialName("uid") val uid: String,
+      @SerialName("uid") val itemUID: String,
       @SerialName("association_uid") val associationUID: String,
       @SerialName("name") val name: String,
       @SerialName("description") val description: String,
@@ -157,7 +157,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
   ) {
     fun toBudgetItem(): BudgetItem {
       return BudgetItem(
-          uid = uid,
+          uid = itemUID,
           nameItem = name,
           amount = amount,
           description = description,
@@ -169,7 +169,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
     companion object {
       fun fromBudgetItem(budgetItem: BudgetItem, associationUID: String) =
           SupabaseBudgetItem(
-              uid = budgetItem.uid,
+              itemUID = budgetItem.uid,
               associationUID = associationUID,
               name = budgetItem.nameItem,
               description = budgetItem.description,

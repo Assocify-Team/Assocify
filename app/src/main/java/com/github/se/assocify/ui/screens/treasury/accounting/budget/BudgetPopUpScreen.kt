@@ -75,7 +75,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               nameItem = "",
               amount = 0,
               tva = TVA.TVA_0,
-              description = "",
+              description = "Description",
               subcategoryUID = budgetModel.subCategory!!.uid,
               year = Year.now().value)
       else budgetModel.editedBudgetItem!!
