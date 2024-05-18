@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -89,26 +90,33 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
         modifier = Modifier.padding(16.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
     ) {
-      Column() {
+      LazyColumn() {
         val mainText =
             if (budgetModel.editedBudgetItem == null) "Create Budget Item" else "Edit Budget Item"
-        Text(mainText, fontSize = 20.sp, modifier = Modifier.padding(16.dp))
-        OutlinedTextField(
+        item{
+          Text(mainText, fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+        }
+        item{
+          OutlinedTextField(
             modifier = Modifier.padding(8.dp).testTag("editNameBox"),
             value = nameString,
             onValueChange = { nameString = it },
             label = { Text("Name") },
             supportingText = {})
-        OutlinedTextField(
+        }
+        item{
+          OutlinedTextField(
             modifier = Modifier.padding(8.dp).testTag("editYearBox"),
             value = amountString,
             onValueChange = { amountString = it },
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
-        Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-          var tvaExtended by remember { mutableStateOf(false) }
-          FilterChip(
+        }
+        item{
+          Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            var tvaExtended by remember { mutableStateOf(false) }
+            FilterChip(
               modifier = Modifier.fillMaxWidth().height(60.dp),
               selected = tvaExtended,
               onClick = { tvaExtended = !tvaExtended },
@@ -131,58 +139,64 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                       })
                 }
               }
+         }
         }
-        OutlinedTextField(
+        item{
+          OutlinedTextField(
             modifier = Modifier.padding(8.dp),
             value = descriptionString,
             onValueChange = { descriptionString = it },
             label = { Text("Description") },
             supportingText = {})
-        OutlinedTextField(
+        }
+        item{
+          OutlinedTextField(
             modifier = Modifier.padding(8.dp),
             value = yearString,
             onValueChange = { yearString = it },
             label = { Text("Year") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
             supportingText = {})
-        Row(
+        }
+        item{
+          Row(
             modifier = Modifier.fillMaxWidth().padding(15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-          Button(
+          ) {
+            Button(
               onClick = { budgetViewModel.cancelEditing() },
               modifier = Modifier.padding(15.dp).testTag("editDismissButton"),
-          ) {
-            Text("Dismiss")
-          }
-          Button(
+            ) {
+              Text("Cancel")
+            }
+            Button(
               onClick = {
                 if (budgetModel.editedBudgetItem != null) {
                   budgetViewModel.saveEditing(
-                      BudgetItem(
-                          budget.uid,
-                          nameItem = nameString,
-                          amount = amountString.toInt(),
-                          tva = TVA.floatToTVA(tvaString.toFloat()),
-                          description = descriptionString,
-                          subcategoryUID = budget.subcategoryUID,
-                          year = yearString.toInt()))
+                    BudgetItem(
+                      budget.uid,
+                      nameItem = nameString,
+                      amount = amountString.toInt(),
+                      tva = TVA.floatToTVA(tvaString.toFloat()),
+                      description = descriptionString,
+                      subcategoryUID = budget.subcategoryUID,
+                      year = yearString.toInt()))
                 } else {
-                  Log.e("Error", budget.toString())
                   budgetViewModel.saveCreating(
-                      BudgetItem(
-                          budget.uid,
-                          nameItem = nameString,
-                          amount = amountString.toInt(),
-                          tva = TVA.floatToTVA(tvaString.toFloat()),
-                          description = descriptionString,
-                          subcategoryUID = budget.subcategoryUID,
-                          year = yearString.toInt()))
+                    BudgetItem(
+                      budget.uid,
+                      nameItem = nameString,
+                      amount = amountString.toInt(),
+                      tva = TVA.floatToTVA(tvaString.toFloat()),
+                      description = descriptionString,
+                      subcategoryUID = budget.subcategoryUID,
+                      year = yearString.toInt()))
                 }
               },
               modifier = Modifier.padding(15.dp).testTag("editConfirmButton"),
-          ) {
-            Text("Confirm")
+            ) {
+              Text("Confirm")
+            }
           }
         }
       }
