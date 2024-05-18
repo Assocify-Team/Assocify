@@ -151,7 +151,7 @@ class BudgetDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   budgetList =
-                      _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem,
+                      if(_uiState.value.yearFilter == budgetItem.year) _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem else _uiState.value.budgetList.filter { it.uid != budgetItem.uid },
                   editedBudgetItem = null)
         },
         {})
