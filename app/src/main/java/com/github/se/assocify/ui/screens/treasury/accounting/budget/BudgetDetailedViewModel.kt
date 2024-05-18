@@ -41,6 +41,8 @@ class BudgetDetailedViewModel(
   }
 
   private var loadCounter = 0
+  private val MAX_NAME_LENGTH = 20
+  private val MAX_DESCRIPTION_LENGTH = 50
 
   fun loadBudgetDetails() {
     loadCounter += 2
@@ -252,7 +254,7 @@ class BudgetDetailedViewModel(
    * @param title the string that is checked
    */
   fun setTitle(title: String) {
-    _uiState.value = _uiState.value.copy(titleError = title.isEmpty() || title.length > 20)
+    _uiState.value = _uiState.value.copy(titleError = title.isEmpty() || title.length > MAX_NAME_LENGTH)
   }
 
   /**
@@ -268,7 +270,7 @@ class BudgetDetailedViewModel(
   }
 
   fun setDescription(description: String) {
-    _uiState.value = _uiState.value.copy(descriptionError = description.length > 50)
+    _uiState.value = _uiState.value.copy(descriptionError = description.length > MAX_DESCRIPTION_LENGTH)
   }
 }
 
