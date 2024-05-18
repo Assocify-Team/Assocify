@@ -57,15 +57,15 @@ fun AccountingScreen(
   val accountingState by accountingViewModel.uiState.collectAsState()
   val subCategoryList = accountingState.subCategoryList
 
-    if (accountingState.loading) {
-        CenteredCircularIndicator()
-        return
-    }
+  if (accountingState.loading) {
+    CenteredCircularIndicator()
+    return
+  }
 
-    if (accountingState.error != null) {
-        ErrorMessage(errorMessage = accountingState.error) { accountingViewModel.loadAccounting() }
-        return
-    }
+  if (accountingState.error != null) {
+    ErrorMessage(errorMessage = accountingState.error) { accountingViewModel.loadAccounting() }
+    return
+  }
 
   LazyColumn(
       modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),

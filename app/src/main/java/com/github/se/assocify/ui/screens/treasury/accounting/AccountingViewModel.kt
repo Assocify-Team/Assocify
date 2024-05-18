@@ -50,7 +50,7 @@ class AccountingViewModel(
       _uiState.value = _uiState.value.copy(loading = false, error = error)
     } else if (loadCounter == 0) {
       filterSubCategories()
-        setSubcategoriesAmount()
+      setSubcategoriesAmount()
       _uiState.value = _uiState.value.copy(loading = false, error = null)
     }
   }
@@ -60,7 +60,7 @@ class AccountingViewModel(
     startLoad(4)
     getCategories()
     getSubCategories()
-      getAccountingList()
+    getAccountingList()
   }
 
   /** Function to get the categories from the database */
@@ -111,21 +111,23 @@ class AccountingViewModel(
     }
   }
 
-    /** Function to get the budget and balance items from the database */
+  /** Function to get the budget and balance items from the database */
   private fun getAccountingList() {
     // get the budgetItem List
     budgetAPI.getBudget(
         CurrentUser.associationUid!!,
-        { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList)
-            endLoad()
+        { budgetList ->
+          _uiState.value = _uiState.value.copy(budgetItemsList = budgetList)
+          endLoad()
         },
         { endLoad("Error loading budget") })
 
     // get the balanceItem List
     balanceAPI.getBalance(
         CurrentUser.associationUid!!,
-        { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList)
-            endLoad()
+        { balanceList ->
+          _uiState.value = _uiState.value.copy(balanceItemList = balanceList)
+          endLoad()
         },
         { endLoad("Error loading balance") })
   }
@@ -178,7 +180,7 @@ class AccountingViewModel(
             amountBalanceTTC = updatedAmountBalanceTTC,
             amountBudgetHT = updatedAmountBudgetHT,
             amountBudgetTTC = updatedAmountBudgetTTC)
-    }
+  }
 
   /**
    * Function to update the subcategories list when a category is selected
