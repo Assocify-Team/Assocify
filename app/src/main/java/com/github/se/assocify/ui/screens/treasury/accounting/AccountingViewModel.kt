@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -8,6 +9,8 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.Year
+import java.util.UUID
 
 /**
  * The view model for the budget screen
@@ -138,6 +141,86 @@ class AccountingViewModel(
   fun modifyTVAFilter(tvaActive: Boolean) {
     _uiState.value = _uiState.value.copy(filterActive = tvaActive)
   }
+
+  fun resetNewSubcategoryDialog() {
+    _uiState.value =
+        _uiState.value.copy(
+            newSubcategoryTitle = "",
+            newSubcategoryCategory = null,
+            newSubcategoryYear = Year.now().value.toString(),
+            newSubcategoryTitleError = null,
+            newSubcategoryCategoryError = null)
+  }
+
+  fun showNewSubcategoryDialog() {
+    resetNewSubcategoryDialog()
+    _uiState.value = _uiState.value.copy(showNewSubcategoryDialog = true)
+  }
+
+  fun hideNewSubcategoryDialog() {
+    _uiState.value = _uiState.value.copy(showNewSubcategoryDialog = false)
+    resetNewSubcategoryDialog()
+  }
+
+  fun setNewSubcategoryTitle(title: String) {
+    _uiState.value = _uiState.value.copy(newSubcategoryTitle = title)
+    when {
+      title.isEmpty() -> {
+        _uiState.value = _uiState.value.copy(newSubcategoryTitleError = "Name cannot be empty")
+      }
+      _uiState.value.subCategoryList.any { it.name == title } -> {
+        _uiState.value = _uiState.value.copy(newSubcategoryTitleError = "Name already used")
+      }
+      title.length > 50 -> {
+        _uiState.value =
+            _uiState.value.copy(
+                newSubcategoryTitleError = "Name cannot be longer than 50 characters")
+      }
+      else -> {
+        _uiState.value = _uiState.value.copy(newSubcategoryTitleError = null)
+      }
+    }
+  }
+
+  fun setNewSubcategoryCategory(category: AccountingCategory?) {
+    _uiState.value = _uiState.value.copy(newSubcategoryCategory = category)
+    if (category == null) {
+      _uiState.value = _uiState.value.copy(newSubcategoryCategoryError = "Category cannot be empty")
+    } else {
+      _uiState.value = _uiState.value.copy(newSubcategoryCategoryError = null)
+    }
+  }
+
+  fun setNewSubcategoryYear(year: String) {
+    _uiState.value = _uiState.value.copy(newSubcategoryYear = year)
+  }
+
+  fun createNewSubcategory() {
+
+    setNewSubcategoryCategory(_uiState.value.newSubcategoryCategory)
+    setNewSubcategoryTitle(_uiState.value.newSubcategoryTitle)
+
+    if (_uiState.value.newSubcategoryTitleError != null ||
+        _uiState.value.newSubcategoryCategoryError != null) {
+      return
+    }
+
+    val newSubcategory =
+        AccountingSubCategory(
+            uid = UUID.randomUUID().toString(),
+            name = _uiState.value.newSubcategoryTitle,
+            categoryUID = _uiState.value.newSubcategoryCategory!!.uid,
+            year = _uiState.value.newSubcategoryYear.toInt(),
+            amount = 0)
+    accountingSubCategoryAPI.addSubCategory(
+        CurrentUser.associationUid!!,
+        newSubcategory,
+        {
+          hideNewSubcategoryDialog()
+          loadAccounting()
+        },
+        { Log.e("ACCOUNTING", "New category creation failed") })
+  }
 }
 
 /**
@@ -162,5 +245,11 @@ data class AccountingState(
     val globalSelected: Boolean = true,
     val yearFilter: Int = 2024,
     val filterActive: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val showNewSubcategoryDialog: Boolean = false,
+    val newSubcategoryTitle: String = "",
+    val newSubcategoryCategory: AccountingCategory? = null,
+    val newSubcategoryYear: String = Year.now().value.toString(),
+    val newSubcategoryTitleError: String? = null,
+    val newSubcategoryCategoryError: String? = null,
 )

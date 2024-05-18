@@ -27,9 +27,9 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.accountingComposables.AddSubcategoryDialog
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
-import com.github.se.assocify.ui.screens.treasury.accounting.newcategory.AddCategoryPopUp
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 
@@ -50,9 +50,9 @@ fun TreasuryScreen(
 ) {
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
+  val accountingState by accountingViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
-  var showNewCategoryPopUp = false
   Scaffold(
       modifier = Modifier.testTag("treasuryScreen"),
       topBar = {
@@ -85,8 +85,8 @@ fun TreasuryScreen(
             onClick = {
               when (pagerState.currentPage) {
                 TreasuryPageIndex.Receipts.ordinal -> navActions.navigateTo(Destination.NewReceipt)
-                TreasuryPageIndex.Budget.ordinal -> showNewCategoryPopUp = true
-                TreasuryPageIndex.Balance.ordinal -> showNewCategoryPopUp = true
+                TreasuryPageIndex.Budget.ordinal -> accountingViewModel.showNewSubcategoryDialog()
+                TreasuryPageIndex.Balance.ordinal -> accountingViewModel.showNewSubcategoryDialog()
               }
             }) {
               Icon(Icons.Outlined.Add, "Create")
@@ -103,15 +103,11 @@ fun TreasuryScreen(
             TreasuryPageIndex.Receipts.ordinal -> {}
             TreasuryPageIndex.Budget.ordinal -> {
               AccountingFilterBar(accountingViewModel)
-              if (showNewCategoryPopUp) {
-                AddCategoryPopUp(showNewCategoryPopUp)
-              }
+              AddSubcategoryDialog(accountingViewModel)
             }
             TreasuryPageIndex.Balance.ordinal -> {
               AccountingFilterBar(accountingViewModel)
-              if (showNewCategoryPopUp) {
-                AddCategoryPopUp(showNewCategoryPopUp)
-              }
+              AddSubcategoryDialog(accountingViewModel)
             }
           }
 

@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.assocify.ui.screens.treasury.accounting.newcategory.AddCategoryPopUp
+import com.github.se.assocify.ui.screens.treasury.accounting.accountingComposables.AddSubcategoryDialog
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -24,7 +24,7 @@ class AddCategoryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
 
   @Before
   fun display() {
-    composeTestRule.setContent { AddCategoryPopUp(show = true) }
+    composeTestRule.setContent { AddSubcategoryDialog(show = true) }
   }
 
   @Test
