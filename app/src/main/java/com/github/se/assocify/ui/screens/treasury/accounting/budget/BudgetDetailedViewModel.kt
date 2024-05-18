@@ -146,10 +146,14 @@ class BudgetDetailedViewModel(
     budgetApi.deleteBudgetItem(
         _uiState.value.editedBudgetItem!!.uid,
         {
-          _uiState.value = _uiState.value.copy(
-              editing = false,
-              budgetList = _uiState.value.budgetList.filter { it.uid != _uiState.value.editedBudgetItem!!.uid },
-              editedBudgetItem = null)
+          _uiState.value =
+              _uiState.value.copy(
+                  editing = false,
+                  budgetList =
+                      _uiState.value.budgetList.filter {
+                        it.uid != _uiState.value.editedBudgetItem!!.uid
+                      },
+                  editedBudgetItem = null)
         },
         {})
   }

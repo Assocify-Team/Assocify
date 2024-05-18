@@ -189,7 +189,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { tvaExpanded = !tvaExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
-                        value = tvaString + "%",
+                        value = "$tvaString%",
                         onValueChange = {},
                         label = { Text("Tva") },
                         trailingIcon = {
