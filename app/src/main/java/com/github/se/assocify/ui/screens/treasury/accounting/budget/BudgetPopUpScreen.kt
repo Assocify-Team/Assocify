@@ -118,6 +118,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
             }
             item {
               OutlinedTextField(
+                  singleLine = true,
                   modifier = Modifier.padding(8.dp).testTag("editNameBox"),
                   value = nameString,
                   isError = budgetModel.titleError,
@@ -133,6 +134,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
             }
             item {
               OutlinedTextField(
+                  singleLine = true,
                   modifier = Modifier.padding(8.dp).testTag("editYearBox"),
                   value = amountString,
                   isError = budgetModel.amountError,
@@ -182,6 +184,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
             }
             item {
               OutlinedTextField(
+                  singleLine = true,
                   isError = budgetModel.descriptionError,
                   modifier = Modifier.padding(8.dp),
                   value = descriptionString,
