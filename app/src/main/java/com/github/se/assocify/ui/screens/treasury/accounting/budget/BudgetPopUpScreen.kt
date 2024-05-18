@@ -75,7 +75,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               nameItem = "",
               amount = 0,
               tva = TVA.TVA_0,
-              description = "Description",
+              description = "",
               subcategoryUID = budgetModel.subCategory!!.uid,
               year = Year.now().value)
       else budgetModel.editedBudgetItem!!
@@ -85,195 +85,201 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
   var descriptionString by remember { mutableStateOf(budget.description) }
   var yearString by remember { mutableStateOf(budget.year.toString()) }
 
-  Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
-    Card(
-        modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp).testTag("editDialogBox"),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-      LazyColumn(
-          horizontalAlignment = Alignment.CenterHorizontally,
-          modifier = Modifier.padding(8.dp).testTag("editDialogColumn")) {
-            item {
-              val mainText =
-                  if (budgetModel.editedBudgetItem == null) "Create Budget Item"
-                  else "Edit Budget Item"
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  horizontalArrangement = Arrangement.SpaceBetween,
-                  verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        mainText,
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.testTag("editDialogTitle"))
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Close dialog",
-                        modifier =
-                            Modifier.clickable {
-                                  if (budgetModel.editing) budgetViewModel.cancelEditing()
-                                  else budgetViewModel.cancelCreating()
-                                }
-                                .testTag("editSubCategoryCancelButton"))
-                  }
-            }
-            item {
-              OutlinedTextField(
-                  singleLine = true,
-                  modifier = Modifier.padding(8.dp).testTag("editNameBox"),
-                  value = nameString,
-                  isError = budgetModel.titleError,
-                  onValueChange = {
-                    nameString = it
-                    budgetViewModel.setTitle(it)
-                  },
-                  label = { Text("Name") },
-                  supportingText = {
-                    if (budgetModel.titleError)
-                        Text("You need to input a title before confirming !!")
-                  })
-            }
-            item {
-              OutlinedTextField(
-                  singleLine = true,
-                  modifier = Modifier.padding(8.dp).testTag("editYearBox"),
-                  value = amountString,
-                  isError = budgetModel.amountError,
-                  onValueChange = {
-                    amountString = it
-                    budgetViewModel.setAmount(it)
-                  },
-                  label = { Text("Amount") },
-                  keyboardOptions =
-                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                  supportingText = {
-                    if (budgetModel.amountError) Text("You need to input a correct amount!!")
-                  })
-            }
-            item {
-              var budgetTvaExpanded by remember { mutableStateOf(false) }
-              ExposedDropdownMenuBox(
-                  expanded = budgetTvaExpanded,
-                  onExpandedChange = { budgetTvaExpanded = !budgetTvaExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
-                    OutlinedTextField(
-                        value = "$tvaString%",
-                        onValueChange = {},
-                        label = { Text("Tva") },
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = budgetTvaExpanded)
-                        },
-                        readOnly = true,
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier =
-                            Modifier.menuAnchor().clickable {
-                              budgetTvaExpanded = !budgetTvaExpanded
-                            })
-                    ExposedDropdownMenu(
-                        expanded = budgetTvaExpanded,
-                        onDismissRequest = { budgetTvaExpanded = false }) {
-                          TVA.entries.forEach { tva ->
-                            DropdownMenuItem(
-                                text = { Text(tva.toString()) },
-                                onClick = {
-                                  tvaString = tva.rate.toString()
-                                  budgetTvaExpanded = false
-                                })
-                          }
-                        }
-                  }
-            }
-            item {
-              OutlinedTextField(
-                  singleLine = true,
-                  isError = budgetModel.descriptionError,
-                  modifier = Modifier.padding(8.dp),
-                  value = descriptionString,
-                  onValueChange = {
-                    descriptionString = it
-                    budgetViewModel.setDescription(descriptionString)
-                  },
-                  label = { Text("Description") },
-                  supportingText = {
-                    if (budgetModel.descriptionError) Text("The description is too long!!")
-                  })
-            }
-            item {
-              var yearExpanded by remember { mutableStateOf(false) }
-              ExposedDropdownMenuBox(
-                  expanded = yearExpanded,
-                  onExpandedChange = { yearExpanded = !yearExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
-                    OutlinedTextField(
-                        value = yearString,
-                        onValueChange = {},
-                        label = { Text("Year") },
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = yearExpanded)
-                        },
-                        readOnly = true,
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier = Modifier.menuAnchor().clickable { yearExpanded = !yearExpanded })
-                    ExposedDropdownMenu(
-                        expanded = yearExpanded, onDismissRequest = { yearExpanded = false }) {
-                          DateUtil.getYearList().forEach { year ->
-                            DropdownMenuItem(
-                                text = { Text(year) },
-                                onClick = {
-                                  yearString = year
-                                  yearExpanded = false
-                                })
-                          }
-                        }
-                  }
-            }
-            item {
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  horizontalArrangement =
-                      if (budgetModel.editing) Arrangement.SpaceBetween else Arrangement.End,
-              ) {
-                if (budgetModel.editing) {
-                  Button(
-                      onClick = { budgetViewModel.deleteEditing() },
-                      modifier = Modifier.testTag("deleteButton"),
-                  ) {
-                    Text("Delete")
-                  }
-                }
-                Button(
-                    onClick = {
-                      budgetViewModel.setTitle(nameString)
-                      budgetViewModel.setAmount(amountString)
-                      budgetViewModel.setDescription(descriptionString)
-                      if (budgetModel.editedBudgetItem != null) {
-                        budgetViewModel.saveEditing(
-                            BudgetItem(
-                                budget.uid,
-                                nameItem = nameString,
-                                amount = PriceUtil.toCents(amountString),
-                                tva = TVA.floatToTVA(tvaString.toFloat()),
-                                description = descriptionString,
-                                subcategoryUID = budget.subcategoryUID,
-                                year = yearString.toInt()))
-                      } else {
-                        budgetViewModel.saveCreating(
-                            BudgetItem(
-                                budget.uid,
-                                nameItem = nameString,
-                                amount = PriceUtil.toCents(amountString),
-                                tva = TVA.floatToTVA(tvaString.toFloat()),
-                                description = descriptionString,
-                                subcategoryUID = budget.subcategoryUID,
-                                year = yearString.toInt()))
+  Dialog(
+      onDismissRequest = {
+        if (budgetModel.editing) budgetViewModel.cancelEditing()
+        else budgetViewModel.cancelCreating()
+      }) {
+        Card(
+            modifier =
+                Modifier.padding(vertical = 16.dp, horizontal = 8.dp).testTag("editDialogBox"),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+          LazyColumn(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              modifier = Modifier.padding(8.dp).testTag("editDialogColumn")) {
+                item {
+                  val mainText =
+                      if (budgetModel.editedBudgetItem == null) "Create Budget Item"
+                      else "Edit Budget Item"
+                  Row(
+                      modifier = Modifier.fillMaxWidth().padding(8.dp),
+                      horizontalArrangement = Arrangement.SpaceBetween,
+                      verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            mainText,
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.testTag("editDialogTitle"))
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Close dialog",
+                            modifier =
+                                Modifier.clickable {
+                                      if (budgetModel.editing) budgetViewModel.cancelEditing()
+                                      else budgetViewModel.cancelCreating()
+                                    }
+                                    .testTag("editSubCategoryCancelButton"))
                       }
-                    },
-                    modifier = Modifier.testTag("editConfirmButton"),
-                ) {
-                  Text("Confirm")
+                }
+                item {
+                  OutlinedTextField(
+                      singleLine = true,
+                      modifier = Modifier.padding(8.dp).testTag("editNameBox"),
+                      value = nameString,
+                      isError = budgetModel.titleError,
+                      onValueChange = {
+                        nameString = it
+                        budgetViewModel.setTitle(it)
+                      },
+                      label = { Text("Name") },
+                      supportingText = {
+                        if (budgetModel.titleError)
+                            Text("You need to input a title before confirming !!")
+                      })
+                }
+                item {
+                  OutlinedTextField(
+                      singleLine = true,
+                      modifier = Modifier.padding(8.dp).testTag("editYearBox"),
+                      value = amountString,
+                      isError = budgetModel.amountError,
+                      onValueChange = {
+                        amountString = it
+                        budgetViewModel.setAmount(it)
+                      },
+                      label = { Text("Amount") },
+                      keyboardOptions =
+                          KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                      supportingText = {
+                        if (budgetModel.amountError) Text("You need to input a correct amount!!")
+                      })
+                }
+                item {
+                  var budgetTvaExpanded by remember { mutableStateOf(false) }
+                  ExposedDropdownMenuBox(
+                      expanded = budgetTvaExpanded,
+                      onExpandedChange = { budgetTvaExpanded = !budgetTvaExpanded },
+                      modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                        OutlinedTextField(
+                            value = "$tvaString%",
+                            onValueChange = {},
+                            label = { Text("Tva") },
+                            trailingIcon = {
+                              ExposedDropdownMenuDefaults.TrailingIcon(expanded = budgetTvaExpanded)
+                            },
+                            readOnly = true,
+                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                            modifier =
+                                Modifier.menuAnchor().clickable {
+                                  budgetTvaExpanded = !budgetTvaExpanded
+                                })
+                        ExposedDropdownMenu(
+                            expanded = budgetTvaExpanded,
+                            onDismissRequest = { budgetTvaExpanded = false }) {
+                              TVA.entries.forEach { tva ->
+                                DropdownMenuItem(
+                                    text = { Text(tva.toString()) },
+                                    onClick = {
+                                      tvaString = tva.rate.toString()
+                                      budgetTvaExpanded = false
+                                    })
+                              }
+                            }
+                      }
+                }
+                item {
+                  OutlinedTextField(
+                      singleLine = true,
+                      isError = budgetModel.descriptionError,
+                      modifier = Modifier.padding(8.dp),
+                      value = descriptionString,
+                      onValueChange = {
+                        descriptionString = it
+                        budgetViewModel.setDescription(descriptionString)
+                      },
+                      label = { Text("Description") },
+                      supportingText = {
+                        if (budgetModel.descriptionError) Text("The description is too long!!")
+                      })
+                }
+                item {
+                  var yearExpanded by remember { mutableStateOf(false) }
+                  ExposedDropdownMenuBox(
+                      expanded = yearExpanded,
+                      onExpandedChange = { yearExpanded = !yearExpanded },
+                      modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                        OutlinedTextField(
+                            value = yearString,
+                            onValueChange = {},
+                            label = { Text("Year") },
+                            trailingIcon = {
+                              ExposedDropdownMenuDefaults.TrailingIcon(expanded = yearExpanded)
+                            },
+                            readOnly = true,
+                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                            modifier =
+                                Modifier.menuAnchor().clickable { yearExpanded = !yearExpanded })
+                        ExposedDropdownMenu(
+                            expanded = yearExpanded, onDismissRequest = { yearExpanded = false }) {
+                              DateUtil.getYearList().forEach { year ->
+                                DropdownMenuItem(
+                                    text = { Text(year) },
+                                    onClick = {
+                                      yearString = year
+                                      yearExpanded = false
+                                    })
+                              }
+                            }
+                      }
+                }
+                item {
+                  Row(
+                      modifier = Modifier.fillMaxWidth().padding(8.dp),
+                      horizontalArrangement =
+                          if (budgetModel.editing) Arrangement.SpaceBetween else Arrangement.End,
+                  ) {
+                    if (budgetModel.editing) {
+                      Button(
+                          onClick = { budgetViewModel.deleteEditing() },
+                          modifier = Modifier.testTag("deleteButton"),
+                      ) {
+                        Text("Delete")
+                      }
+                    }
+                    Button(
+                        onClick = {
+                          budgetViewModel.setTitle(nameString)
+                          budgetViewModel.setAmount(amountString)
+                          budgetViewModel.setDescription(descriptionString)
+                          if (budgetModel.editedBudgetItem != null) {
+                            budgetViewModel.saveEditing(
+                                BudgetItem(
+                                    budget.uid,
+                                    nameItem = nameString,
+                                    amount = PriceUtil.toCents(amountString),
+                                    tva = TVA.floatToTVA(tvaString.toFloat()),
+                                    description = descriptionString,
+                                    subcategoryUID = budget.subcategoryUID,
+                                    year = yearString.toInt()))
+                          } else {
+                            budgetViewModel.saveCreating(
+                                BudgetItem(
+                                    budget.uid,
+                                    nameItem = nameString,
+                                    amount = PriceUtil.toCents(amountString),
+                                    tva = TVA.floatToTVA(tvaString.toFloat()),
+                                    description = descriptionString,
+                                    subcategoryUID = budget.subcategoryUID,
+                                    year = yearString.toInt()))
+                          }
+                        },
+                        modifier = Modifier.testTag("editConfirmButton"),
+                    ) {
+                      Text("Confirm")
+                    }
+                  }
                 }
               }
-            }
-          }
-    }
-  }
+        }
+      }
 }

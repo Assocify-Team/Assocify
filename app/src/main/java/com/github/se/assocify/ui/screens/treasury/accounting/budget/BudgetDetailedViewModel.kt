@@ -123,7 +123,13 @@ class BudgetDetailedViewModel(
    * @param budgetItem the item we want to edit
    */
   fun startEditing(budgetItem: BudgetItem) {
-    _uiState.value = _uiState.value.copy(editing = true, editedBudgetItem = budgetItem)
+    _uiState.value =
+        _uiState.value.copy(
+            editing = true,
+            editedBudgetItem = budgetItem,
+            titleError = false,
+            amountError = false,
+            descriptionError = false)
   }
 
   /**
@@ -132,7 +138,9 @@ class BudgetDetailedViewModel(
    * @param budgetItem the new edited budgetItem
    */
   fun saveEditing(budgetItem: BudgetItem) {
-    if (_uiState.value.titleError || _uiState.value.amountError) {
+    if (_uiState.value.titleError ||
+        _uiState.value.amountError ||
+        _uiState.value.descriptionError) {
       return
     }
     budgetApi.updateBudgetItem(
@@ -227,11 +235,16 @@ class BudgetDetailedViewModel(
   }
 
   fun startCreating() {
-    _uiState.value = _uiState.value.copy(creating = true)
+    _uiState.value =
+        _uiState.value.copy(
+            creating = true, titleError = false, amountError = false, descriptionError = false)
   }
 
   fun cancelCreating() {
-    _uiState.value = _uiState.value.copy(creating = false)
+    _uiState.value =
+        _uiState.value.copy(
+            creating = false,
+        )
   }
 
   fun saveCreating(budgetItem: BudgetItem) {
