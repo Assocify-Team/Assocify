@@ -110,13 +110,11 @@ class AccountingViewModel(
     // if the category is global, display all subcategories
     if (categoryName == "Global") {
       _uiState.value = _uiState.value.copy(globalSelected = true)
-      loadAccounting()
     } else {
       _uiState.value = _uiState.value.copy(globalSelected = false)
       _uiState.value =
           _uiState.value.copy(
               selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid)
-      loadAccounting()
     }
     filterSubCategories()
   }
