@@ -2,12 +2,11 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
@@ -127,8 +126,16 @@ class BalanceDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
               onSuccessCallback(subCategoryList)
             }
-        every { updateSubCategory(any(), any(), any()) } answers {}
-        every { deleteSubCategory(any(), any(), any()) } answers {}
+        every { updateSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { deleteSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -150,9 +157,14 @@ class BalanceDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockNavActions,
+            mockBudgetAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
+            mockNavActions,
             mockBalanceAPI,
             mockReceiptAPI,
             mockAccountingSubCategoryAPI,
@@ -286,9 +298,9 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsDisplayed()
-      assert(balanceDetailedViewModel.uiState.value.subCategory.name == "newName")
-      assert(balanceDetailedViewModel.uiState.value.subCategory.year == 2024)
-      assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.name == "newName")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.year == 2024)
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.categoryUID == "1")
     }
   }
 
@@ -311,9 +323,9 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsNotDisplayed()
-      assert(balanceDetailedViewModel.uiState.value.subCategory.name == "Logistics")
-      assert(balanceDetailedViewModel.uiState.value.subCategory.year == 2023)
-      assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.name == "Logistics")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.year == 2023)
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.categoryUID == "2")
     }
   }
 
@@ -324,9 +336,7 @@ class BalanceDetailedScreenTest :
       assert(balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
       onNodeWithTag("editSubCategoryDeleteButton").performClick()
-      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
-      assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
-      assert(balanceDetailedViewModel.uiState.value.balanceList.isEmpty())
+      verify { mockNavActions.back() }
     }
   }
 
@@ -343,63 +353,84 @@ class BalanceDetailedScreenTest :
   }
 
   @Test
-  fun testEditDeleteScreen() {
+  fun testLoadSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.getSubCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
-      onNodeWithTag("statusListTag").performClick()
-      onNodeWithText("Pending").performClick()
-
-      // Assert that only the item "pair of scissors" is displayed
-      onNodeWithText("pair of scissors").assertIsDisplayed()
-      onNodeWithText("François Théron").assertIsDisplayed()
-      onNodeWithText("pair of scissors").performClick()
-      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editDeleteButton"))
-      onNodeWithTag("editDeleteButton").performClick()
-      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+      balanceDetailedViewModel.loadBalanceDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading category")
     }
   }
 
   @Test
-  fun testEditModifyScreen() {
+  fun testLoadBalanceError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockBalanceAPI.getBalance(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
-      onNodeWithTag("statusListTag").performClick()
-      onNodeWithText("Pending").performClick()
-
-      // Assert that only the item "pair of scissors" is displayed
-      onNodeWithText("pair of scissors").assertIsDisplayed()
-      onNodeWithText("François Théron").assertIsDisplayed()
-      onNodeWithText("pair of scissors").performClick()
-      onNodeWithTag("editDialogName").assertIsDisplayed()
-      onNodeWithTag("editDialogName").performTextClearance()
-      onNodeWithTag("editDialogName").performTextInput("money")
-      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
-      onNodeWithTag("editConfirmButton").performClick()
-      onNodeWithText("money").assertIsDisplayed()
-      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+      balanceDetailedViewModel.loadBalanceDetails()
+      onNodeWithTag("errorMessage")
+          .assertIsDisplayed()
+          .assertTextContains("Error loading balance items")
     }
   }
 
   @Test
-  fun testCancelModifyScreen() {
+  fun testLoadCategoriesError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingCategoryAPI.getCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
-      onNodeWithTag("statusListTag").performClick()
-      onNodeWithText("Pending").performClick()
+      balanceDetailedViewModel.loadBalanceDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tags")
+    }
+  }
 
-      // Assert that only the item "pair of scissors" is displayed
-      onNodeWithText("pair of scissors").assertIsDisplayed()
-      onNodeWithText("François Théron").assertIsDisplayed()
-      onNodeWithText("pair of scissors").performClick()
-      onNodeWithTag("editDialogName").assertIsDisplayed()
-      onNodeWithTag("editDialogName").performTextClearance()
-      onNodeWithTag("editDialogName").performTextInput("money")
-      onNodeWithTag("editSubCategoryCancelButton").performClick()
-      onNodeWithText("money").assertIsNotDisplayed()
-      onNodeWithText("pair of scissors").assertIsDisplayed()
+  @Test
+  fun testSaveSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.updateSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategorySaveButton").performClick()
+      onNodeWithText("Failed to update category").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testDeleteSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.deleteSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryDeleteButton").performClick()
+      onNodeWithText("Failed to delete category").assertIsDisplayed()
     }
   }
 }

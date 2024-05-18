@@ -41,6 +41,8 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -125,8 +127,8 @@ fun AccountingDetailedScreen(
               Text(
                   text =
                       when (page) {
-                        AccountingPage.BALANCE -> balanceState.subCategory.name
-                        AccountingPage.BUDGET -> budgetState.subCategory.name
+                        AccountingPage.BALANCE -> balanceState.subCategory!!.name
+                        AccountingPage.BUDGET -> budgetState.subCategory!!.name
                       },
                   style = MaterialTheme.typography.titleLarge)
             },
@@ -143,13 +145,11 @@ fun AccountingDetailedScreen(
                     // Sets the editing state to true
                     when (page) {
                       AccountingPage.BALANCE ->
-                          if (balanceState.subCategory.name !=
-                              "") { // TODO: modify this with loading
+                          if (balanceState.subCategory != null) {
                             balanceDetailedViewModel.startSubCategoryEditingInBalance()
                           }
                       AccountingPage.BUDGET ->
-                          if (budgetState.subCategory.name !=
-                              "") { // TODO: modify this with loading
+                          if (budgetState.subCategory != null) {
                             budgetDetailedViewModel.startSubCategoryEditingInBudget()
                           }
                     }
@@ -170,7 +170,15 @@ fun AccountingDetailedScreen(
               Icon(Icons.Outlined.Add, "Create")
             }
       },
-      content = { innerPadding ->
+      snackbarHost = {
+        SnackbarHost(
+            hostState =
+                when (page) {
+                  AccountingPage.BALANCE -> balanceState.snackbarState
+                  AccountingPage.BUDGET -> budgetState.snackbarState
+                },
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+      }) { innerPadding ->
         // Call the various editing popups
         if (budgetState.editing && page == AccountingPage.BUDGET) {
           DisplayEditBudget(budgetDetailedViewModel)
@@ -235,7 +243,8 @@ fun AccountingDetailedScreen(
                 item { TotalItems(totalAmount) }
               } else {
                 item {
-                  Text("No items for the ${balanceState.subCategory.name} sheet with these filters")
+                  Text(
+                      "No items for the ${balanceState.subCategory!!.name} sheet with these filters")
                 }
               }
             }
@@ -251,7 +260,7 @@ fun AccountingDetailedScreen(
               } else {
                 item {
                   Text(
-                      "No items for the ${balanceState.subCategory.name} sheet with these filters",
+                      "No items for the ${balanceState.subCategory!!.name} sheet with these filters",
                   )
                 }
               }
@@ -260,7 +269,7 @@ fun AccountingDetailedScreen(
 
           item { Spacer(modifier = Modifier.height(80.dp)) }
         }
-      })
+      }
 }
 
 /**
@@ -476,12 +485,12 @@ fun DisplayEditSubCategory(
         AccountingPage.BALANCE -> balanceState.categoryList
         AccountingPage.BUDGET -> budgetState.categoryList
       }
-  var name by remember { mutableStateOf(subCategory.name) }
-  var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
-  var year by remember { mutableStateOf(subCategory.year.toString()) }
+  var name by remember { mutableStateOf(subCategory!!.name) }
+  var categoryUid by remember { mutableStateOf(subCategory!!.categoryUID) }
+  var year by remember { mutableStateOf(subCategory!!.year.toString()) }
   var expanded by remember { mutableStateOf(false) }
   var selectedCategory by remember {
-    mutableStateOf(categoryList.find { it.uid == subCategory.categoryUID }?.name ?: "No tag")
+    mutableStateOf(categoryList.find { it.uid == subCategory!!.categoryUID }?.name ?: "No tag")
   }
   Dialog(
       onDismissRequest = {
@@ -505,7 +514,7 @@ fun DisplayEditSubCategory(
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                  Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
+                  Text("Edit ${subCategory!!.name}", style = MaterialTheme.typography.titleLarge)
                   Icon(
                       Icons.Default.Close,
                       contentDescription = "Close dialog",
@@ -578,7 +587,6 @@ fun DisplayEditSubCategory(
                         AccountingPage.BALANCE -> balanceViewModel.deleteSubCategoryInBalance()
                         AccountingPage.BUDGET -> budgetViewModel.deleteSubCategoryInBudget()
                       }
-                      navigationActions.back()
                     },
                     modifier = Modifier.testTag("editSubCategoryDeleteButton")) {
                       Text("Delete", color = MaterialTheme.colorScheme.error)

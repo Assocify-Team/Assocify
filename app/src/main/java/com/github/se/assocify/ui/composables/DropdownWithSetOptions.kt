@@ -31,6 +31,7 @@ fun DropdownWithSetOptions(
     opened: Boolean,
     onOpenedChange: (Boolean) -> Unit,
     onSelectOption: (DropdownOption) -> Unit,
+    label: String = ""
 ) {
 
   ExposedDropdownMenuBox(
@@ -41,6 +42,7 @@ fun DropdownWithSetOptions(
             enabled = options.size > 1,
             value = selectedOption.name,
             onValueChange = {},
+            label = { Text(label) },
             readOnly = true,
             trailingIcon = {
               if (options.size > 1) ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened)

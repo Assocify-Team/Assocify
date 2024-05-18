@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -11,8 +12,12 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
+import com.github.se.assocify.navigation.NavigationActions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * View model for the balance detailed screen
@@ -23,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @param subCategoryUid the subcategory uid
  */
 class BalanceDetailedViewModel(
+    private var navigationActions: NavigationActions,
     private var balanceApi: BalanceAPI,
     private var receiptAPI: ReceiptAPI,
     private var subCategoryAPI: AccountingSubCategoryAPI,
@@ -33,9 +39,26 @@ class BalanceDetailedViewModel(
   val uiState: StateFlow<BalanceItemState>
 
   init {
-    updateDatabaseValuesInBalance()
-    setSubCategoryInBalance(subCategoryUid)
+    loadBalanceDetails()
     uiState = _uiState
+  }
+
+  private var loadCounter = 0
+
+  fun loadBalanceDetails() {
+    loadCounter += 2
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+    setSubCategoryInBalance(subCategoryUid)
+    updateDatabaseValuesInBalance()
+  }
+
+  private fun endLoad(error: String? = null) {
+    loadCounter--
+    if (error != null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = error)
+    } else if (loadCounter == 0 && _uiState.value.error == null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+    }
   }
 
   /**
@@ -51,12 +74,14 @@ class BalanceDetailedViewModel(
           if (subCategory != null) {
             _uiState.value = _uiState.value.copy(subCategory = subCategory)
           }
+          endLoad()
         },
-        {})
+        { endLoad("Error loading category") })
   }
 
   /** Update the database values */
   private fun updateDatabaseValuesInBalance() {
+    var innerLoadCounter = 2
 
     receiptAPI.getUserReceipts(
         { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
@@ -91,14 +116,18 @@ class BalanceDetailedViewModel(
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(balanceList = statusFilteredBalanceList)
+          if (--innerLoadCounter == 0) endLoad()
         },
-        {})
+        { endLoad("Error loading balance items") })
 
     // Get the categories from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-        {})
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(categoryList = categoryList)
+          if (--innerLoadCounter == 0) endLoad()
+        },
+        { endLoad("Error loading tags") })
   }
 
   /**
@@ -135,8 +164,20 @@ class BalanceDetailedViewModel(
    */
   fun saveSubCategoryEditingInBalance(name: String, categoryUid: String, year: Int) {
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-    subCategoryAPI.updateSubCategory(subCategory, {}, {})
-    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
+    subCategoryAPI.updateSubCategory(
+        subCategory,
+        {
+          _uiState.value = _uiState.value.copy(subCategory = subCategory)
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+        },
+        {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to update category",
+            )
+          }
+        })
   }
 
   /** Cancel the Subcategory editing */
@@ -146,9 +187,18 @@ class BalanceDetailedViewModel(
 
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBalance() {
-    subCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
-    _uiState.value = _uiState.value.copy(balanceList = emptyList())
-    _uiState.value = _uiState.value.copy(subCatEditing = false)
+    if (_uiState.value.subCategory == null) return
+    subCategoryAPI.deleteSubCategory(
+        _uiState.value.subCategory!!,
+        { navigationActions.back() },
+        {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to delete category",
+            )
+          }
+        })
   }
 
   /**
@@ -213,16 +263,21 @@ class BalanceDetailedViewModel(
 /**
  * The state for the balance item
  *
+ * @param loading whether the page is loading
+ * @param error the error message, if any
  * @param balanceList the current list of balance items
  * @param subCategory the current subcategory of the item
  * @param status the current status
  * @param subCatEditing whether the subcategory is being edited
  * @param year the current year
+ * @param snackbarState the snackbar state
  * @param filterActive if the tva filter is active or not
  */
 data class BalanceItemState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val balanceList: List<BalanceItem> = emptyList(),
-    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
+    val subCategory: AccountingSubCategory? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
     val loadingCategory: Boolean = false,
     val status: Status? = null,
@@ -232,5 +287,6 @@ data class BalanceItemState(
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
     val year: Int = 2023,
+    val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false
 )
