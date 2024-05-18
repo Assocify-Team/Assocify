@@ -41,8 +41,8 @@ class BudgetDetailedViewModel(
   }
 
   private var loadCounter = 0
-  private val MAX_NAME_LENGTH = 20
-  private val MAX_DESCRIPTION_LENGTH = 50
+  private val maxNameLength = 20
+  private val maxDescriptionLength = 50
 
   fun loadBudgetDetails() {
     loadCounter += 2
@@ -235,7 +235,9 @@ class BudgetDetailedViewModel(
   }
 
   fun saveCreating(budgetItem: BudgetItem) {
-    if (_uiState.value.titleError || _uiState.value.amountError) {
+    if (_uiState.value.titleError ||
+        _uiState.value.amountError ||
+        _uiState.value.descriptionError) {
       return
     }
     budgetApi.addBudgetItem(
@@ -254,7 +256,8 @@ class BudgetDetailedViewModel(
    * @param title the string that is checked
    */
   fun setTitle(title: String) {
-    _uiState.value = _uiState.value.copy(titleError = title.isEmpty() || title.length > MAX_NAME_LENGTH)
+    _uiState.value =
+        _uiState.value.copy(titleError = title.isEmpty() || title.length > maxNameLength)
   }
 
   /**
@@ -270,7 +273,8 @@ class BudgetDetailedViewModel(
   }
 
   fun setDescription(description: String) {
-    _uiState.value = _uiState.value.copy(descriptionError = description.length > MAX_DESCRIPTION_LENGTH)
+    _uiState.value =
+        _uiState.value.copy(descriptionError = description.length > maxDescriptionLength)
   }
 }
 
