@@ -23,6 +23,7 @@ import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
@@ -51,7 +52,6 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
-  @RelaxedMockK lateinit var mockReceiptAPI: ReceiptAPI
   val subCategoryUid = "subCategoryUid"
   val categoryList =
       listOf(
@@ -101,6 +101,18 @@ class BalanceDetailedScreenTest :
               "Sidonie Bouthors",
               Status.Reimbursed))
 
+  private val userReceipts =
+      listOf<Receipt>(
+          Receipt(
+              "00000000-0000-0000-0000-000000000000",
+              "r1",
+              "a cool receipt",
+              LocalDate.of(2023, 3, 11),
+              28,
+              Status.Pending,
+              null),
+      )
+
   val mockBalanceAPI: BalanceAPI =
       mockk<BalanceAPI>() {
         every { getBalance(any(), any(), any()) } answers
@@ -115,6 +127,11 @@ class BalanceDetailedScreenTest :
               onSuccessCallback()
             }
         every { updateBalance(any(), any(), any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = arg<() -> Unit>(4)
+              onSuccessCallback()
+            }
+        every { addBalance(any(), any(), any(), any(), any(), any()) } answers
             {
               val onSuccessCallback = arg<() -> Unit>(4)
               onSuccessCallback()
@@ -147,6 +164,15 @@ class BalanceDetailedScreenTest :
             {
               val onSuccessCallback = secondArg<(List<AccountingCategory>) -> Unit>()
               onSuccessCallback(categoryList)
+            }
+      }
+
+  val mockReceiptAPI: ReceiptAPI =
+      mockk<ReceiptAPI>() {
+        every { getUserReceipts(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
+              onSuccessCallback(userReceipts)
             }
       }
 
@@ -494,6 +520,37 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryCancelButton").performClick()
       onNodeWithText("money").assertIsNotDisplayed()
       onNodeWithText("pair of scissors").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testCancelCreateScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogName").assertIsDisplayed()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("money")
+      onNodeWithTag("editSubCategoryCancelButton").performClick()
+      onNodeWithText("money").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun testSaveCreateScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogName").assertIsDisplayed()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("lots of money")
+      onNodeWithTag("receiptDropdown").assertIsDisplayed()
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("r1").performClick()
+      onNodeWithTag("editDialogAssignee").performTextClearance()
+      onNodeWithTag("editDialogAssignee").performTextInput("François Théron")
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithTag("editDialogName").assertIsNotDisplayed()
+      onNodeWithText("lots of money").assertIsDisplayed()
     }
   }
 }

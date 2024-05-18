@@ -133,7 +133,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               ExposedDropdownMenuBox(
                   expanded = receiptExpanded,
                   onExpandedChange = { receiptExpanded = !receiptExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                  modifier = Modifier.testTag("receiptDropdown").padding(8.dp)) {
                     OutlinedTextField(
                         isError = balanceModel.errorReceipt || balanceModel.receiptAlreadyAssigned,
                         supportingText = {
@@ -245,7 +245,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               OutlinedTextField(
                   singleLine = true,
                   isError = balanceModel.errorAssignee,
-                  modifier = Modifier.padding(8.dp),
+                  modifier = Modifier.padding(8.dp).testTag("editDialogAssignee"),
                   value = assignee,
                   onValueChange = {
                     assignee = it
