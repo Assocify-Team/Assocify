@@ -38,11 +38,23 @@ import com.github.se.assocify.model.entities.TVA
 import java.time.Year
 import java.util.UUID
 
+
+/**
+ * Displays the popup to edit a budget
+ *
+ * @param budgetViewModel the viewModel of the budget details
+ */
 @Composable
 fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   BudgetPopUpScreen(budgetViewModel)
 }
 
+
+/**
+ * Displays the popup to create a budget
+ *
+ * @param budgetViewModel the viewModel of the budget details
+ */
 @Composable
 fun DisplayCreateBudget(budgetViewModel: BudgetDetailedViewModel) {
   BudgetPopUpScreen(budgetViewModel)
