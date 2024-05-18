@@ -141,6 +141,19 @@ class BudgetDetailedViewModel(
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
   }
 
+  /** Delete the item that is being edited from the list */
+  fun deleteEditing() {
+    budgetApi.deleteBudgetItem(
+        _uiState.value.editedBudgetItem!!.uid,
+        {
+          _uiState.value = _uiState.value.copy(
+              editing = false,
+              budgetList = _uiState.value.budgetList.filter { it.uid != _uiState.value.editedBudgetItem!!.uid },
+              editedBudgetItem = null)
+        },
+        {})
+  }
+
   fun modifyTVAFilter(tvaActive: Boolean) {
     _uiState.value = _uiState.value.copy(filterActive = tvaActive)
   }
