@@ -140,7 +140,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                 item {
                   OutlinedTextField(
                       singleLine = true,
-                      modifier = Modifier.padding(8.dp).testTag("editYearBox"),
+                      modifier = Modifier.padding(8.dp),
                       value = amountString,
                       isError = budgetModel.amountError,
                       onValueChange = {
@@ -207,7 +207,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                   ExposedDropdownMenuBox(
                       expanded = yearExpanded,
                       onExpandedChange = { yearExpanded = !yearExpanded },
-                      modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                      modifier = Modifier.padding(8.dp)) {
                         OutlinedTextField(
                             value = yearString,
                             onValueChange = {},
@@ -218,11 +218,14 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                             readOnly = true,
                             colors = ExposedDropdownMenuDefaults.textFieldColors(),
                             modifier =
-                                Modifier.menuAnchor().clickable { yearExpanded = !yearExpanded })
+                                Modifier.menuAnchor()
+                                    .clickable { yearExpanded = !yearExpanded }
+                                    .testTag("editYearBox"))
                         ExposedDropdownMenu(
                             expanded = yearExpanded, onDismissRequest = { yearExpanded = false }) {
                               DateUtil.getYearList().forEach { year ->
                                 DropdownMenuItem(
+                                    modifier = Modifier.testTag("$year DropdownItem"),
                                     text = { Text(year) },
                                     onClick = {
                                       yearString = year

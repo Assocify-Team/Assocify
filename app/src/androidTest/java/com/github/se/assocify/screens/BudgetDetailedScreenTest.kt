@@ -431,6 +431,8 @@ class BudgetDetailedScreenTest :
 
   @Test
   fun createTest() {
+    val year = 2022
+    val weirdTag = "$year DropdownItem"
     with(composeTestRule) {
       onNodeWithTag("yearListTag").performClick()
       onNodeWithText("2022").performClick()
@@ -438,8 +440,8 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editDialogBox").assertIsDisplayed()
       onNodeWithTag("editNameBox").performTextClearance()
       onNodeWithTag("editNameBox").performTextInput("fees")
-      onNodeWithTag("editYearBox").performTextClearance()
-      onNodeWithTag("editYearBox").performTextInput("2022")
+      onNodeWithTag("editYearBox").performClick()
+      onNodeWithTag(weirdTag).performClick()
       onNodeWithTag("editConfirmButton").performClick()
       onNodeWithText("fees").assertIsDisplayed()
       onNodeWithTag("yearListTag").performClick()
