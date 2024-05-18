@@ -37,6 +37,7 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 import java.time.LocalDate
 import java.util.UUID
 
@@ -69,14 +70,6 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               assignee = "",
               uid = UUID.randomUUID().toString())
   var nameString by remember { mutableStateOf(balance.nameItem) }
-  var subCategoryUid by remember { mutableStateOf(balance.subcategoryUID) }
-  var subCategoryName by remember {
-    mutableStateOf(
-        balanceModel.subCategoryList
-            .filter { it.uid == balance.subcategoryUID }
-            .map { it.name }
-            .getOrElse(0) { "" })
-  }
   var receiptUid by remember { mutableStateOf(balance.receiptUID) }
   var receiptName by remember {
     mutableStateOf(
@@ -132,45 +125,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     if (balanceModel.errorName) Text("The text cannot be empty!")
                   })
             }
-            // The subcategory selector
-            item {
-              var subcategoryExpanded by remember { mutableStateOf(false) }
-              ExposedDropdownMenuBox(
-                  expanded = subcategoryExpanded,
-                  onExpandedChange = { subcategoryExpanded = !subcategoryExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
-                    OutlinedTextField(
-                        isError = balanceModel.errorCategory,
-                        supportingText = {
-                          if (balanceModel.errorCategory) Text("You have to choose a category!")
-                        },
-                        value = subCategoryName,
-                        onValueChange = { balanceDetailedViewModel.checkCategory(subCategoryName) },
-                        label = { Text("SubCategory") },
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = subcategoryExpanded)
-                        },
-                        readOnly = true,
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier =
-                            Modifier.menuAnchor().clickable {
-                              subcategoryExpanded = !subcategoryExpanded
-                            })
-                    ExposedDropdownMenu(
-                        expanded = subcategoryExpanded,
-                        onDismissRequest = { subcategoryExpanded = false }) {
-                          balanceModel.subCategoryList.forEach { subCat ->
-                            DropdownMenuItem(
-                                text = { Text(subCat.name) },
-                                onClick = {
-                                  subCategoryUid = subCat.uid
-                                  subCategoryName = subCat.name
-                                  subcategoryExpanded = false
-                                })
-                          }
-                        }
-                  }
-            }
+
             // The receipt selector
             item {
               var receiptExpanded by remember { mutableStateOf(false) }
@@ -345,14 +300,14 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                 Button(
                     onClick = {
                       balanceDetailedViewModel.checkAll(
-                          nameString, subCategoryUid, receiptUid, amountString, assignee)
+                          nameString, receiptUid, amountString, assignee)
                       val newBalanceItem =
                           BalanceItem(
                               balance.uid,
                               nameString,
-                              subCategoryUid,
+                              balanceModel.subCategory!!.uid,
                               receiptUid,
-                              amountString.toInt(),
+                              PriceUtil.toCents(amountString),
                               TVA.floatToTVA(tvaString.toFloat()),
                               descriptionString,
                               date,

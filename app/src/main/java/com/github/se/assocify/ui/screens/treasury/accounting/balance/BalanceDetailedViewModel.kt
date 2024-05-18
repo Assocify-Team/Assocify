@@ -266,7 +266,6 @@ class BalanceDetailedViewModel(
 
   fun saveCreation(balanceItem: BalanceItem) {
     if (_uiState.value.errorName ||
-        _uiState.value.errorCategory ||
         _uiState.value.errorReceipt ||
         _uiState.value.errorAmount ||
         _uiState.value.errorAssignee) {
@@ -289,10 +288,6 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(errorName = name.isEmpty() || name.length > 50)
   }
 
-  fun checkCategory(categoryUid: String) {
-    _uiState.value = _uiState.value.copy(errorCategory = categoryUid.isEmpty())
-  }
-
   fun checkReceipt(receiptUid: String) {
     _uiState.value = _uiState.value.copy(errorReceipt = receiptUid.isEmpty())
   }
@@ -308,15 +303,8 @@ class BalanceDetailedViewModel(
     _uiState.value = _uiState.value.copy(errorAssignee = assignee.isEmpty())
   }
 
-  fun checkAll(
-      name: String,
-      categoryUid: String,
-      receiptUid: String,
-      amount: String,
-      assignee: String
-  ) {
+  fun checkAll(name: String, receiptUid: String, amount: String, assignee: String) {
     checkName(name)
-    checkCategory(categoryUid)
     checkReceipt(receiptUid)
     checkAmount(amount)
     checkAssignee(assignee)
@@ -354,7 +342,6 @@ data class BalanceItemState(
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val errorName: Boolean = false,
-    val errorCategory: Boolean = false,
     val errorReceipt: Boolean = false,
     val errorAmount: Boolean = false,
     val errorAssignee: Boolean = false
