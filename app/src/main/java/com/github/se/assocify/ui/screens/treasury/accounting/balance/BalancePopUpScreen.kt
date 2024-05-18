@@ -38,9 +38,19 @@ import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.util.DateUtil
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
+  BalancePopUpScreen(balanceDetailedViewModel)
+}
+
+@Composable
+fun DisplayAddBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
+  BalancePopUpScreen(balanceDetailedViewModel)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
   val balance = balanceModel.editedBalanceItem!!
   var nameString by remember { mutableStateOf(balance.nameItem) }
