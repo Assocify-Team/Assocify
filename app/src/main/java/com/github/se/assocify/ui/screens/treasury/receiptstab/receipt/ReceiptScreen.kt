@@ -64,6 +64,7 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 fun ReceiptScreen(viewModel: ReceiptViewModel) {
 
   val receiptState by viewModel.uiState.collectAsState()
+  
   Scaffold(
       modifier = Modifier.testTag("receiptScreen"),
       topBar = {
