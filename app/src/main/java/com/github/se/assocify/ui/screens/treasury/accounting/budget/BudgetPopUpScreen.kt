@@ -133,8 +133,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                       },
                       label = { Text("Name") },
                       supportingText = {
-                        if (budgetModel.titleError)
-                            Text("You need to input a title before confirming !!")
+                        if (budgetModel.titleError) Text(budgetModel.titleErrorString)
                       })
                 }
                 item {

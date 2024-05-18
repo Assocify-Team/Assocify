@@ -41,8 +41,8 @@ class BudgetDetailedViewModel(
   }
 
   private var loadCounter = 0
-  private val maxNameLength = 20
-  private val maxDescriptionLength = 50
+  private val maxNameLength = 50
+  private val maxDescriptionLength = 200
 
   fun loadBudgetDetails() {
     loadCounter += 2
@@ -273,8 +273,16 @@ class BudgetDetailedViewModel(
    * @param title the string that is checked
    */
   fun setTitle(title: String) {
-    _uiState.value =
-        _uiState.value.copy(titleError = title.isEmpty() || title.length > maxNameLength)
+    if (title.length > maxNameLength) {
+      _uiState.value =
+          _uiState.value.copy(
+              titleError = true,
+              titleErrorString = "Title is too long, max length is $maxNameLength")
+    } else if (title.isEmpty()) {
+      _uiState.value = _uiState.value.copy(titleError = true, titleErrorString = "Title is empty")
+    } else {
+      _uiState.value = _uiState.value.copy(titleError = false)
+    }
   }
 
   /**
@@ -323,6 +331,7 @@ data class BudgetItemState(
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val titleError: Boolean = false,
+    val titleErrorString: String = "",
     val amountError: Boolean = false,
     val descriptionError: Boolean = false
 )
