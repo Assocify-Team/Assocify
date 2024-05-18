@@ -113,6 +113,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The name box
             item {
               OutlinedTextField(
+                  singleLine = true,
                   modifier = Modifier.padding(8.dp).testTag("editDialogName"),
                   value = nameString,
                   isError = balanceModel.errorName,
@@ -169,6 +170,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The amount field
             item {
               OutlinedTextField(
+                  singleLine = true,
                   isError = balanceModel.errorAmount,
                   modifier = Modifier.padding(8.dp),
                   value = amountString,
@@ -218,6 +220,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The description field
             item {
               OutlinedTextField(
+                  singleLine = true,
                   modifier = Modifier.padding(8.dp),
                   value = descriptionString,
                   onValueChange = { descriptionString = it },
@@ -240,6 +243,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The assignee field
             item {
               OutlinedTextField(
+                  singleLine = true,
                   isError = balanceModel.errorAssignee,
                   modifier = Modifier.padding(8.dp),
                   value = assignee,
@@ -262,7 +266,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     OutlinedTextField(
                         value = mutableStatus.name,
                         onValueChange = {},
-                        label = { Text("Tag") },
+                        label = { Text("Status") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusExpanded)
                         },
