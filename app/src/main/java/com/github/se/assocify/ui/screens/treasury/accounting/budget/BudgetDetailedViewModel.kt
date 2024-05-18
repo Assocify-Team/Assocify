@@ -252,7 +252,7 @@ class BudgetDetailedViewModel(
    * @param title the string that is checked
    */
   fun setTitle(title: String) {
-    _uiState.value = _uiState.value.copy(titleError = title.isEmpty())
+    _uiState.value = _uiState.value.copy(titleError = title.isEmpty() || title.length > 20)
   }
 
   /**
@@ -264,10 +264,11 @@ class BudgetDetailedViewModel(
     _uiState.value =
         _uiState.value.copy(
             amountError =
-                amount.contains(" ") ||
-                    amount.isEmpty() ||
-                    amount.contains("-") ||
-                    amount.contains(","))
+                amount.isEmpty() || amount.toDoubleOrNull() == null || amount.toDouble() < 0.0)
+  }
+
+  fun setDescription(description: String) {
+    _uiState.value = _uiState.value.copy(descriptionError = description.length > 50)
   }
 }
 
@@ -299,5 +300,6 @@ data class BudgetItemState(
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val titleError: Boolean = false,
-    val amountError: Boolean = false
+    val amountError: Boolean = false,
+    val descriptionError: Boolean = false
 )

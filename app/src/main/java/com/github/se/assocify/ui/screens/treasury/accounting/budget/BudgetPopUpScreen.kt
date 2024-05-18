@@ -84,8 +84,6 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
   var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(budget.description) }
   var yearString by remember { mutableStateOf(budget.year.toString()) }
-  budgetViewModel.setTitle(nameString)
-  budgetViewModel.setAmount(amountString)
 
   Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
     Card(
@@ -184,11 +182,17 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
             }
             item {
               OutlinedTextField(
+                  isError = budgetModel.descriptionError,
                   modifier = Modifier.padding(8.dp),
                   value = descriptionString,
-                  onValueChange = { descriptionString = it },
+                  onValueChange = {
+                    descriptionString = it
+                    budgetViewModel.setDescription(descriptionString)
+                  },
                   label = { Text("Description") },
-                  supportingText = {})
+                  supportingText = {
+                    if (budgetModel.descriptionError) Text("The description is too long!!")
+                  })
             }
             item {
               var yearExpanded by remember { mutableStateOf(false) }
@@ -235,6 +239,9 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                 }
                 Button(
                     onClick = {
+                      budgetViewModel.setTitle(nameString)
+                      budgetViewModel.setAmount(amountString)
+                      budgetViewModel.setDescription(descriptionString)
                       if (budgetModel.editedBudgetItem != null) {
                         budgetViewModel.saveEditing(
                             BudgetItem(
