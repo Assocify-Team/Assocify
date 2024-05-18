@@ -123,7 +123,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   },
                   label = { Text("Name") },
                   supportingText = {
-                    if (balanceModel.errorName) Text("The text cannot be empty!")
+                    if (balanceModel.errorName) Text(balanceModel.errorNameMessage)
                   })
             }
 
@@ -223,9 +223,10 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   singleLine = true,
                   modifier = Modifier.padding(8.dp),
                   value = descriptionString,
-                  onValueChange = { descriptionString = it },
+                  onValueChange = { descriptionString = it
+                                  balanceDetailedViewModel.checkDescription(descriptionString) },
                   label = { Text("Description") },
-                  supportingText = {})
+                  supportingText = {if(balanceModel.errorDescription) Text("The description is too long!!")})
             }
             // The date screen
             item {

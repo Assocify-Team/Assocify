@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
+import co.touchlab.kermit.Message
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
@@ -37,8 +38,8 @@ class BalanceDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
   val uiState: StateFlow<BalanceItemState>
-  private val maxDescriptionLength = 50
-  private val maxNameLength = 20
+  private val maxDescriptionLength = 100
+  private val maxNameLength = 50
 
   init {
     loadBalanceDetails()
@@ -314,7 +315,14 @@ class BalanceDetailedViewModel(
   }
 
   fun checkName(name: String) {
-    _uiState.value = _uiState.value.copy(errorName = name.isEmpty() || name.length > maxNameLength)
+    if(name.length > maxNameLength) {
+      _uiState.value = _uiState.value.copy(errorNameMessage = "Name is too long", errorName = true)
+    } else if (name.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorNameMessage = "Name cannot be empty", errorName = true)
+    }
+    else {
+      _uiState.value = _uiState.value.copy(errorNameMessage = "", errorName = false)
+    }
   }
 
   fun checkReceipt(receiptUid: String) {
@@ -384,6 +392,7 @@ data class BalanceItemState(
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val errorName: Boolean = false,
+    val errorNameMessage: String = "",
     val errorReceipt: Boolean = false,
     val errorAmount: Boolean = false,
     val errorAssignee: Boolean = false,
