@@ -34,9 +34,9 @@ class AccountingViewModel(
   init {
     getCategories()
     getSubCategories()
-      getAccountingList()
+    getAccountingList()
     filterSubCategories()
-      setSubcategoriesAmount()
+    setSubcategoriesAmount()
     uiState = _uiState
   }
 
@@ -54,8 +54,7 @@ class AccountingViewModel(
     // Sets the subcategory list in the state from the database if a category is selected
     accountingSubCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
-        {
-            subCategoryList ->
+        { subCategoryList ->
           _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)
         },
         { Log.d("BudgetViewModel", "Error getting subcategories") })
@@ -85,70 +84,76 @@ class AccountingViewModel(
     }
   }
 
-    private fun getAccountingList(){
-        // get the budgetItem List
-        budgetAPI.getBudget(
-            CurrentUser.associationUid!!,
-            { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList) },
-            { Log.d("BudgetViewModel", "Error getting budget items") })
+  private fun getAccountingList() {
+    // get the budgetItem List
+    budgetAPI.getBudget(
+        CurrentUser.associationUid!!,
+        { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList) },
+        { Log.d("BudgetViewModel", "Error getting budget items") })
 
-        // get the balanceItem List
-        balanceAPI.getBalance(
-            CurrentUser.associationUid!!,
-            { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList) },
-            { Log.d("BudgetViewModel", "Error getting balance items") })
+    // get the balanceItem List
+    balanceAPI.getBalance(
+        CurrentUser.associationUid!!,
+        { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList) },
+        { Log.d("BudgetViewModel", "Error getting balance items") })
+  }
+
+  /** Set the amount of a subcategory */
+  private fun setSubcategoriesAmount() {
+    val updatedAmountBalanceHT = _uiState.value.amountBalanceHT.toMutableMap()
+    val updatedAmountBalanceTTC = _uiState.value.amountBalanceTTC.toMutableMap()
+    val updatedAmountBudgetHT = _uiState.value.amountBudgetHT.toMutableMap()
+    val updatedAmountBudgetTTC = _uiState.value.amountBudgetTTC.toMutableMap()
+
+    // For each subcategory, we calculate their amount given the budget and balance items (with and
+    // without VAT)
+    _uiState.value.allSubCategoryList.forEach { subCategory ->
+
+      // Calculate the amount for the balance screen
+      _uiState.value.balanceItemList
+          .filter { balanceItem -> subCategory.uid == balanceItem.subcategoryUID }
+          .forEach { balanceItem ->
+            // Add to map the balance amount of the subcategory
+            updatedAmountBalanceHT[subCategory.uid] =
+                updatedAmountBalanceHT.getOrPut(subCategory.uid) { 0 } + balanceItem.amount
+
+            // Add to map the balance amount of the subcategory with TVA
+            val amountWithTVA =
+                balanceItem.amount + (balanceItem.amount * balanceItem.tva.rate / 100f).toInt()
+            updatedAmountBalanceTTC[subCategory.uid] =
+                updatedAmountBalanceTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
+          }
+
+      // Calculate the amount for the budget screen
+      _uiState.value.budgetItemsList
+          .filter { budgetItem -> subCategory.uid == budgetItem.subcategoryUID }
+          .forEach { budgetItem ->
+            // Add to map the budget amount of the subcategory
+            updatedAmountBudgetHT[subCategory.uid] =
+                updatedAmountBudgetHT.getOrPut(subCategory.uid) { 0 } + budgetItem.amount
+            Log.d("BudgetViewModel", "amountBudgetHT ${updatedAmountBudgetHT[subCategory.uid]}")
+            // Add to map the budget amount of the subcategory with TVA
+            val amountWithTVA =
+                budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt()
+            updatedAmountBudgetTTC[subCategory.uid] =
+                updatedAmountBudgetTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
+            Log.d("BudgetViewModel", "amountBudgetTTC ${updatedAmountBudgetTTC[subCategory.uid]}")
+          }
     }
 
-    /** Set the amount of a subcategory */
-    private fun setSubcategoriesAmount(){
-        val updatedAmountBalanceHT = _uiState.value.amountBalanceHT.toMutableMap()
-        val updatedAmountBalanceTTC = _uiState.value.amountBalanceTTC.toMutableMap()
-        val updatedAmountBudgetHT = _uiState.value.amountBudgetHT.toMutableMap()
-        val updatedAmountBudgetTTC = _uiState.value.amountBudgetTTC.toMutableMap()
-
-        //For each subcategory, we calculate their amount given the budget and balance items (with and without VAT)
-        _uiState.value.allSubCategoryList.forEach {
-            subCategory ->
-
-            //Calculate the amount for the balance screen
-            _uiState.value.balanceItemList.filter { balanceItem ->
-                subCategory.uid == balanceItem.subcategoryUID
-            }.forEach { balanceItem ->
-                // Add to map the balance amount of the subcategory
-                updatedAmountBalanceHT[subCategory.uid] = updatedAmountBalanceHT.getOrPut(subCategory.uid) { 0 } + balanceItem.amount
-
-                // Add to map the balance amount of the subcategory with TVA
-                val amountWithTVA = balanceItem.amount + (balanceItem.amount * balanceItem.tva.rate / 100f).toInt()
-                updatedAmountBalanceTTC[subCategory.uid] = updatedAmountBalanceTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
-            }
-
-            //Calculate the amount for the budget screen
-            _uiState.value.budgetItemsList.filter { budgetItem ->
-                subCategory.uid == budgetItem.subcategoryUID
-            }.forEach { budgetItem ->
-                // Add to map the budget amount of the subcategory
-                updatedAmountBudgetHT[subCategory.uid] = updatedAmountBudgetHT.getOrPut(subCategory.uid) { 0 } + budgetItem.amount
-                Log.d("BudgetViewModel", "amountBudgetHT ${updatedAmountBudgetHT[subCategory.uid]}")
-                // Add to map the budget amount of the subcategory with TVA
-                val amountWithTVA = budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt()
-                updatedAmountBudgetTTC[subCategory.uid] = updatedAmountBudgetTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
-                Log.d("BudgetViewModel", "amountBudgetTTC ${updatedAmountBudgetTTC[subCategory.uid]}")
-            }
-        }
-
-        // Update the state with the new maps
-        _uiState.value = _uiState.value.copy(
+    // Update the state with the new maps
+    _uiState.value =
+        _uiState.value.copy(
             amountBalanceHT = updatedAmountBalanceHT,
             amountBalanceTTC = updatedAmountBalanceTTC,
             amountBudgetHT = updatedAmountBudgetHT,
-            amountBudgetTTC = updatedAmountBudgetTTC
-        )
+            amountBudgetTTC = updatedAmountBudgetTTC)
 
-        Log.d("BudgetViewModel", "amountBalanceHT ${_uiState.value.amountBalanceHT}")
-        Log.d("BudgetViewModel", "amountBalanceTTC ${_uiState.value.amountBalanceTTC}")
-        Log.d("BudgetViewModel", "amountBudgetHT ${_uiState.value.amountBudgetHT}")
-        Log.d("BudgetViewModel", "amountBudgetTTC ${_uiState.value.amountBudgetTTC}")
-    }
+    Log.d("BudgetViewModel", "amountBalanceHT ${_uiState.value.amountBalanceHT}")
+    Log.d("BudgetViewModel", "amountBalanceTTC ${_uiState.value.amountBalanceTTC}")
+    Log.d("BudgetViewModel", "amountBudgetHT ${_uiState.value.amountBudgetHT}")
+    Log.d("BudgetViewModel", "amountBudgetTTC ${_uiState.value.amountBudgetTTC}")
+  }
 
   /**
    * Function to update the subcategories list when a category is selected
@@ -184,11 +189,11 @@ class AccountingViewModel(
     filterSubCategories()
   }
 
-    /**
-     * Function to update the tva filter
-     *
-     * @param tvaActive: The state of the tva filter
-     */
+  /**
+   * Function to update the tva filter
+   *
+   * @param tvaActive: The state of the tva filter
+   */
   fun activeTVA(tvaActive: Boolean) {
     _uiState.value = _uiState.value.copy(tvaFilterActive = tvaActive)
   }

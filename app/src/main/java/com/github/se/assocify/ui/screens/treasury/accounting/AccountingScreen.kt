@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
-import android.util.MutableInt
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +16,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,9 +55,7 @@ fun AccountingScreen(
   val accountingState by accountingViewModel.uiState.collectAsState()
   val subCategoryList = accountingState.subCategoryList
   LazyColumn(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("AccountingScreen"),
+      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
   ) {
@@ -70,18 +66,34 @@ fun AccountingScreen(
         HorizontalDivider(Modifier.fillMaxWidth())
       }
       item {
-          val totalAmount =
-              when(page) {
-                    AccountingPage.BUDGET -> {
-                        if(accountingState.tvaFilterActive) accountingState.amountBudgetTTC.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
-                        else accountingState.amountBudgetHT.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
-                    }
-                    AccountingPage.BALANCE -> {
-                        if(accountingState.tvaFilterActive) accountingState.amountBalanceTTC.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
-                        else accountingState.amountBalanceHT.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
-                    }
+        val totalAmount =
+            when (page) {
+              AccountingPage.BUDGET -> {
+                if (accountingState.tvaFilterActive)
+                    accountingState.amountBudgetTTC
+                        .filter { it.key in subCategoryList.map { it.uid } }
+                        .values
+                        .sum()
+                else
+                    accountingState.amountBudgetHT
+                        .filter { it.key in subCategoryList.map { it.uid } }
+                        .values
+                        .sum()
               }
-              TotalLine(totalAmount = totalAmount)
+              AccountingPage.BALANCE -> {
+                if (accountingState.tvaFilterActive)
+                    accountingState.amountBalanceTTC
+                        .filter { it.key in subCategoryList.map { it.uid } }
+                        .values
+                        .sum()
+                else
+                    accountingState.amountBalanceHT
+                        .filter { it.key in subCategoryList.map { it.uid } }
+                        .values
+                        .sum()
+              }
+            }
+        TotalLine(totalAmount = totalAmount)
       }
     } else {
       item {
@@ -116,10 +128,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   var selectedTVA by remember { mutableStateOf(tvaList.first()) }
 
   // Row of dropdown filters
-  Row(
-      Modifier
-          .testTag("filterRow")
-          .horizontalScroll(rememberScrollState())) {
+  Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
     DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") {
       selectedYear = it
       accountingViewModel.onYearFilter(selectedYear.toInt())
@@ -130,8 +139,8 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
     }
 
     DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-        selectedTVA = it
-        accountingViewModel.activeTVA(selectedTVA == "TTC")
+      selectedTVA = it
+      accountingViewModel.activeTVA(selectedTVA == "TTC")
     }
   }
 }
@@ -144,9 +153,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 @Composable
 fun TotalLine(totalAmount: Int) {
   ListItem(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("totalLine"),
+      modifier = Modifier.fillMaxWidth().testTag("totalLine"),
       headlineContent = {
         Text(
             text = "Total",
@@ -177,15 +184,17 @@ fun DisplayLine(
     navigationActions: NavigationActions,
     accountingState: AccountingState
 ) {
-    val amount =
-        when(page){
-            AccountingPage.BUDGET ->
-                if(accountingState.tvaFilterActive) accountingState.amountBudgetTTC[subCategory.uid] ?: 0
-                else accountingState.amountBudgetHT[subCategory.uid] ?: 0
-            AccountingPage.BALANCE ->
-                if(accountingState.tvaFilterActive) accountingState.amountBalanceTTC[subCategory.uid] ?: 0
-                else accountingState.amountBalanceHT[subCategory.uid] ?: 0
-        }
+  val amount =
+      when (page) {
+        AccountingPage.BUDGET ->
+            if (accountingState.tvaFilterActive)
+                accountingState.amountBudgetTTC[subCategory.uid] ?: 0
+            else accountingState.amountBudgetHT[subCategory.uid] ?: 0
+        AccountingPage.BALANCE ->
+            if (accountingState.tvaFilterActive)
+                accountingState.amountBalanceTTC[subCategory.uid] ?: 0
+            else accountingState.amountBalanceHT[subCategory.uid] ?: 0
+      }
 
   ListItem(
       headlineContent = { Text(subCategory.name) },
@@ -193,22 +202,13 @@ fun DisplayLine(
         Text(PriceUtil.fromCents(amount), style = MaterialTheme.typography.bodyMedium)
       },
       modifier =
-      Modifier
-          .clickable {
-              when (page) {
-                  AccountingPage.BUDGET -> navigationActions.navigateTo(
-                      Destination.BudgetDetailed(
-                          subCategory.uid
-                      )
-                  )
-
-                  AccountingPage.BALANCE -> navigationActions.navigateTo(
-                      Destination.BalanceDetailed(
-                          subCategory.uid
-                      )
-                  )
+          Modifier.clickable {
+                when (page) {
+                  AccountingPage.BUDGET ->
+                      navigationActions.navigateTo(Destination.BudgetDetailed(subCategory.uid))
+                  AccountingPage.BALANCE ->
+                      navigationActions.navigateTo(Destination.BalanceDetailed(subCategory.uid))
+                }
               }
-          }
-          .testTag(testTag)
-  )
+              .testTag(testTag))
 }

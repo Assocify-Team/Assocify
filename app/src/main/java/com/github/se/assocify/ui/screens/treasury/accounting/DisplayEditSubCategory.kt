@@ -57,62 +57,61 @@ fun DisplayEditSubCategory(
     balanceState: BalanceItemState,
     budgetState: BudgetItemState
 ) {
-    val subCategory =
-        when (page) {
-            AccountingPage.BALANCE -> balanceState.subCategory
-            AccountingPage.BUDGET -> budgetState.subCategory
-        }
+  val subCategory =
+      when (page) {
+        AccountingPage.BALANCE -> balanceState.subCategory
+        AccountingPage.BUDGET -> budgetState.subCategory
+      }
 
-    val categoryList =
-        when (page) {
-            AccountingPage.BALANCE -> balanceState.categoryList
-            AccountingPage.BUDGET -> budgetState.categoryList
-        }
+  val categoryList =
+      when (page) {
+        AccountingPage.BALANCE -> balanceState.categoryList
+        AccountingPage.BUDGET -> budgetState.categoryList
+      }
 
-    var name by remember { mutableStateOf(subCategory.name) }
-    var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
-    var year by remember { mutableStateOf(subCategory.year.toString()) }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember {
-        mutableStateOf(categoryList.find { it.uid == subCategory.categoryUID }?.name ?: "No tag")
-    }
-    Dialog(
-        onDismissRequest = {
-            when (page) {
-                AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditingInBalance()
-                AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditingInBudget()
-            }
-        },
-        properties = DialogProperties()
-    ) {
+  var name by remember { mutableStateOf(subCategory.name) }
+  var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
+  var year by remember { mutableStateOf(subCategory.year.toString()) }
+  var expanded by remember { mutableStateOf(false) }
+  var selectedCategory by remember {
+    mutableStateOf(categoryList.find { it.uid == subCategory.categoryUID }?.name ?: "No tag")
+  }
+  Dialog(
+      onDismissRequest = {
+        when (page) {
+          AccountingPage.BALANCE -> balanceViewModel.cancelSubCategoryEditingInBalance()
+          AccountingPage.BUDGET -> budgetViewModel.cancelSubCategoryEditingInBudget()
+        }
+      },
+      properties = DialogProperties()) {
         Card(
             modifier =
-            Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
-                .testTag("editSubCategoryDialog"),
+                Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
+                    .testTag("editSubCategoryDialog"),
             shape = RoundedCornerShape(16.dp),
         ) {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally) {
+          Column(
+              modifier = Modifier.verticalScroll(rememberScrollState()).padding(8.dp),
+              horizontalAlignment = Alignment.CenterHorizontally) {
                 // Title
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Close dialog",
-                        modifier =
-                        Modifier.clickable {
-                            when (page) {
-                                AccountingPage.BALANCE ->
-                                    balanceViewModel.cancelSubCategoryEditingInBalance()
-                                AccountingPage.BUDGET ->
-                                    budgetViewModel.cancelSubCategoryEditingInBudget()
-                            }
-                        }
-                            .testTag("editSubCategoryCancelButton"))
+                  Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
+                  Icon(
+                      Icons.Default.Close,
+                      contentDescription = "Close dialog",
+                      modifier =
+                          Modifier.clickable {
+                                when (page) {
+                                  AccountingPage.BALANCE ->
+                                      balanceViewModel.cancelSubCategoryEditingInBalance()
+                                  AccountingPage.BUDGET ->
+                                      budgetViewModel.cancelSubCategoryEditingInBudget()
+                                }
+                              }
+                              .testTag("editSubCategoryCancelButton"))
                 }
 
                 // Edit fields
@@ -135,66 +134,66 @@ fun DisplayEditSubCategory(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
                     modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
-                    OutlinedTextField(
-                        value = selectedCategory,
-                        singleLine = true,
-                        onValueChange = {},
-                        label = { Text("Tag") },
-                        trailingIcon = {
+                      OutlinedTextField(
+                          value = selectedCategory,
+                          singleLine = true,
+                          onValueChange = {},
+                          label = { Text("Tag") },
+                          trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                        },
-                        readOnly = true,
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier = Modifier.menuAnchor().clickable { expanded = !expanded })
-                    ExposedDropdownMenu(
-                        expanded = expanded, onDismissRequest = { expanded = false }) {
-                        categoryList.forEach { category ->
-                            DropdownMenuItem(
-                                text = { Text(category.name) },
-                                onClick = {
+                          },
+                          readOnly = true,
+                          colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                          modifier = Modifier.menuAnchor().clickable { expanded = !expanded })
+                      ExposedDropdownMenu(
+                          expanded = expanded, onDismissRequest = { expanded = false }) {
+                            categoryList.forEach { category ->
+                              DropdownMenuItem(
+                                  text = { Text(category.name) },
+                                  onClick = {
                                     categoryUid = category.uid
                                     selectedCategory = category.name
                                     expanded = false
-                                })
-                        }
+                                  })
+                            }
+                          }
                     }
-                }
-            }
+              }
 
-            // Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                horizontalArrangement = Arrangement.Absolute.Right) {
+          // Buttons
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(8.dp),
+              horizontalArrangement = Arrangement.Absolute.Right) {
                 // Delete button
                 TextButton(
                     onClick = {
-                        when (page) {
-                            AccountingPage.BALANCE -> balanceViewModel.deleteSubCategoryInBalance()
-                            AccountingPage.BUDGET -> budgetViewModel.deleteSubCategoryInBudget()
-                        }
-                        navigationActions.back()
+                      when (page) {
+                        AccountingPage.BALANCE -> balanceViewModel.deleteSubCategoryInBalance()
+                        AccountingPage.BUDGET -> budgetViewModel.deleteSubCategoryInBudget()
+                      }
+                      navigationActions.back()
                     },
                     modifier = Modifier.testTag("editSubCategoryDeleteButton")) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
-                }
+                      Text("Delete", color = MaterialTheme.colorScheme.error)
+                    }
 
                 // Save button
                 TextButton(
                     onClick = {
-                        when (page) {
-                            AccountingPage.BALANCE ->
-                                balanceViewModel.saveSubCategoryEditingInBalance(
-                                    name, categoryUid, year.toInt())
-                            AccountingPage.BUDGET ->
-                                budgetViewModel.saveSubCategoryEditingInBudget(
-                                    name, categoryUid, year.toInt())
-                        }
+                      when (page) {
+                        AccountingPage.BALANCE ->
+                            balanceViewModel.saveSubCategoryEditingInBalance(
+                                name, categoryUid, year.toInt())
+                        AccountingPage.BUDGET ->
+                            budgetViewModel.saveSubCategoryEditingInBudget(
+                                name, categoryUid, year.toInt())
+                      }
                     },
                     modifier = Modifier.testTag("editSubCategorySaveButton"),
                 ) {
-                    Text("Save")
+                  Text("Save")
                 }
-            }
+              }
         }
-    }
+      }
 }
