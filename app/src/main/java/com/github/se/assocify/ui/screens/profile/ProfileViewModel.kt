@@ -69,6 +69,7 @@ class ProfileViewModel(
       loadCounter = 0
     } else if (--loadCounter == 0) {
       _uiState.value = _uiState.value.copy(loading = false, error = null)
+      loadCounter = 0
     }
   }
 

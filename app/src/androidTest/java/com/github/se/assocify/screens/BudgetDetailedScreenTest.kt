@@ -2,6 +2,7 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -96,8 +97,16 @@ class BudgetDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
               onSuccessCallback(subCategoryList)
             }
-        every { updateSubCategory(any(), any(), any()) } answers {}
-        every { deleteSubCategory(any(), any(), any()) } answers {}
+        every { updateSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { deleteSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -119,9 +128,14 @@ class BudgetDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockNavActions,
+            mockBudgetAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
+            mockNavActions,
             mockBalanceAPI,
             mockReceiptAPI,
             mockAccountingSubCategoryAPI,
@@ -274,8 +288,8 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsDisplayed()
-      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "newName")
-      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2024)
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.name == "newName")
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.year == 2024)
     }
   }
 
@@ -298,9 +312,9 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsNotDisplayed()
-      assert(budgetDetailedViewModel.uiState.value.subCategory.name == "Logistics")
-      assert(budgetDetailedViewModel.uiState.value.subCategory.year == 2023)
-      assert(budgetDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.name == "Logistics")
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.year == 2023)
+      assert(budgetDetailedViewModel.uiState.value.subCategory!!.categoryUID == "2")
     }
   }
 
@@ -311,9 +325,7 @@ class BudgetDetailedScreenTest :
       assert(budgetDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
       onNodeWithTag("editSubCategoryDeleteButton").performClick()
-      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
-      assert(!budgetDetailedViewModel.uiState.value.subCatEditing)
-      assert(budgetDetailedViewModel.uiState.value.budgetList.isEmpty())
+      verify { mockNavActions.back() }
     }
   }
 
@@ -326,6 +338,88 @@ class BudgetDetailedScreenTest :
       onNodeWithText("12.00").assertIsDisplayed()
       onNodeWithText("TTC").performClick()
       onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testLoadSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.getSubCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      budgetDetailedViewModel.loadBudgetDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading category")
+    }
+  }
+
+  @Test
+  fun testLoadBudgetError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockBudgetAPI.getBudget(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      budgetDetailedViewModel.loadBudgetDetails()
+      onNodeWithTag("errorMessage")
+          .assertIsDisplayed()
+          .assertTextContains("Error loading budget items")
+    }
+  }
+
+  @Test
+  fun testLoadCategoriesError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingCategoryAPI.getCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      budgetDetailedViewModel.loadBudgetDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tags")
+    }
+  }
+
+  @Test
+  fun testSaveSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.updateSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategorySaveButton").performClick()
+      onNodeWithText("Failed to update category").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testDeleteSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.deleteSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryDeleteButton").performClick()
+      onNodeWithText("Failed to delete category").assertIsDisplayed()
     }
   }
 

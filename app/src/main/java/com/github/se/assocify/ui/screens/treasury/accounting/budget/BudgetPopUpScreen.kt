@@ -38,7 +38,6 @@ import com.github.se.assocify.model.entities.TVA
 import java.time.Year
 import java.util.UUID
 
-
 /**
  * Displays the popup to edit a budget
  *
@@ -48,7 +47,6 @@ import java.util.UUID
 fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
   BudgetPopUpScreen(budgetViewModel)
 }
-
 
 /**
  * Displays the popup to create a budget
@@ -76,7 +74,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               amount = 0,
               tva = TVA.TVA_0,
               description = "",
-              subcategoryUID = budgetModel.subCategory.uid,
+              subcategoryUID = budgetModel.subCategory!!.uid,
               year = Year.now().value)
       else budgetModel.editedBudgetItem!!
   var nameString by remember { mutableStateOf(budget.nameItem) }
