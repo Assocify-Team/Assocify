@@ -254,7 +254,10 @@ class BalanceDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   balanceList =
-                      _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
+                      if (_uiState.value.year == balanceItem.date.year)
+                          _uiState.value.balanceList.filter { it.uid != balanceItem.uid } +
+                              balanceItem
+                      else _uiState.value.balanceList.filter { it.uid != balanceItem.uid },
                   editedBalanceItem = null)
         },
         { _uiState.value = _uiState.value.copy(receiptAlreadyAssigned = true) })
@@ -308,7 +311,11 @@ class BalanceDetailedViewModel(
         {
           _uiState.value =
               _uiState.value.copy(
-                  creating = false, balanceList = _uiState.value.balanceList + balanceItem)
+                  creating = false,
+                  balanceList =
+                      if (_uiState.value.year == balanceItem.date.year)
+                          _uiState.value.balanceList + balanceItem
+                      else _uiState.value.balanceList)
         },
         { _uiState.value = _uiState.value.copy(receiptAlreadyAssigned = true) })
   }
