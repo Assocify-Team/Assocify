@@ -80,7 +80,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               year = Year.now().value)
       else budgetModel.editedBudgetItem!!
   var nameString by remember { mutableStateOf(budget.nameItem) }
-  var amountString by remember { mutableStateOf(budget.amount.toString()) }
+  var amountString by remember { mutableStateOf(PriceUtil.fromCents(budget.amount)) }
   var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(budget.description) }
   var yearString by remember { mutableStateOf(budget.year.toString()) }
