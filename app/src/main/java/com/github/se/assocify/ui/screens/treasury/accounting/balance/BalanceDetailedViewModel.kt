@@ -242,8 +242,9 @@ class BalanceDetailedViewModel(
   }
 
   /** Exit the edit state without keeping the modifications done */
-  fun cancelEditing() {
-    _uiState.value = _uiState.value.copy(editing = false, editedBalanceItem = null)
+  fun cancelPopUp() {
+    _uiState.value =
+        _uiState.value.copy(editing = false, editedBalanceItem = null, creating = false)
   }
 
   fun deleteBalanceItem(balanceItemUid: String) {
@@ -257,6 +258,24 @@ class BalanceDetailedViewModel(
                   editing = false)
         },
         { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
+  }
+
+  fun startCreation() {
+    _uiState.value = _uiState.value.copy(creating = true)
+  }
+
+  fun saveCreation(balanceItem: BalanceItem) {
+    balanceApi.addBalance(
+        CurrentUser.associationUid!!,
+        balanceItem.subcategoryUID,
+        balanceItem.receiptUID,
+        balanceItem,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  creating = false, balanceList = _uiState.value.balanceList + balanceItem)
+        },
+        { _uiState.value = _uiState.value.copy(creating = false) })
   }
 }
 
@@ -284,6 +303,7 @@ data class BalanceItemState(
     val receiptList: List<Receipt> = emptyList(),
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val editing: Boolean = false,
+    val creating: Boolean = false,
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
     val year: Int = 2023,

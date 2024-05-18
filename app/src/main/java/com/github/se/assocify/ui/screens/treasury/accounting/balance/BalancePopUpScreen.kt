@@ -44,7 +44,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
 }
 
 @Composable
-fun DisplayAddBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
+fun DisplayCreateBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
   BalancePopUpScreen(balanceDetailedViewModel)
 }
 
@@ -76,7 +76,8 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
   var date by remember { mutableStateOf(balance.date) }
   var assignee by remember { mutableStateOf((balance.assignee)) }
   var mutableStatus by remember { mutableStateOf(balance.status) }
-  Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
+  val titleText = if (balanceModel.editing) "Edit Balance Detail" else "Create Balance Detail"
+  Dialog(onDismissRequest = { balanceDetailedViewModel.cancelPopUp() }) {
     Card(
         modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
@@ -90,14 +91,14 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   horizontalArrangement = Arrangement.SpaceBetween,
                   verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "Edit Balance Detail",
+                        titleText,
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.testTag("editDialogTitle"))
                     Icon(
                         Icons.Default.Close,
                         contentDescription = "Close dialog",
                         modifier =
-                            Modifier.clickable { balanceDetailedViewModel.cancelEditing() }
+                            Modifier.clickable { balanceDetailedViewModel.cancelPopUp() }
                                 .testTag("editSubCategoryCancelButton"))
                   }
             }
@@ -289,17 +290,20 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             item {
               Row(
                   modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  horizontalArrangement = Arrangement.SpaceBetween,
+                  horizontalArrangement =
+                      if (balanceModel.editing) Arrangement.SpaceBetween else Arrangement.End,
               ) {
-                Button(
-                    onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
-                    modifier = Modifier.testTag("editDeleteButton"),
-                ) {
-                  Text("Delete")
+                if (balanceModel.editing) {
+                  Button(
+                      onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
+                      modifier = Modifier.testTag("editDeleteButton"),
+                  ) {
+                    Text("Delete")
+                  }
                 }
                 Button(
                     onClick = {
-                      balanceDetailedViewModel.saveEditing(
+                      val newBalanceItem =
                           BalanceItem(
                               balance.uid,
                               nameString,
@@ -310,7 +314,12 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                               descriptionString,
                               date,
                               assignee,
-                              mutableStatus))
+                              mutableStatus)
+                      if (balanceModel.editing) {
+                        balanceDetailedViewModel.saveCreation(newBalanceItem)
+                      } else {
+                        balanceDetailedViewModel.saveEditing(newBalanceItem)
+                      }
                     },
                     modifier = Modifier.testTag("editConfirmButton"),
                 ) {

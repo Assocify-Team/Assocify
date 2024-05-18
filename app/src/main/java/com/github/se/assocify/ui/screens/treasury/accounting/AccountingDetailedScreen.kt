@@ -69,6 +69,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceItemState
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayCreateBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEditBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetItemState
@@ -94,11 +95,6 @@ fun AccountingDetailedScreen(
 
   val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
-  val subCategory =
-      when (page) {
-        AccountingPage.BALANCE -> balanceState.subCategory
-        AccountingPage.BUDGET -> budgetState.subCategory
-      }
 
   val yearList = DateUtil.getYearList()
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
@@ -166,7 +162,7 @@ fun AccountingDetailedScreen(
             modifier = Modifier.testTag("createNewItem"),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
-            onClick = { /*TODO: create new item*/}) {
+            onClick = { balanceDetailedViewModel.startCreation() }) {
               Icon(Icons.Outlined.Add, "Create")
             }
       },
@@ -185,14 +181,11 @@ fun AccountingDetailedScreen(
         } else if ((budgetState.subCatEditing && page == AccountingPage.BUDGET) ||
             (balanceState.subCatEditing && page == AccountingPage.BALANCE)) {
           DisplayEditSubCategory(
-              page,
-              budgetDetailedViewModel,
-              balanceDetailedViewModel,
-              navigationActions,
-              balanceState,
-              budgetState)
+              page, budgetDetailedViewModel, balanceDetailedViewModel, balanceState, budgetState)
         } else if (balanceState.editing && page == AccountingPage.BALANCE) {
           DisplayEditBalance(balanceDetailedViewModel)
+        } else if (balanceState.creating && page == AccountingPage.BALANCE) {
+          DisplayCreateBalance(balanceDetailedViewModel)
         }
 
         LazyColumn(
@@ -335,9 +328,6 @@ fun DisplayBalanceItem(
               PriceUtil.fromCents(balanceItem.amount),
               modifier = Modifier.padding(end = 4.dp),
               style = MaterialTheme.typography.bodyMedium)
-          /*Icon(
-          balanceItem.receipt!!.status.getIcon(),
-          contentDescription = "Create") // TODO: add logo depending on the phase*/
         }
       },
       supportingContent = { Text(balanceItem.assignee) },
@@ -470,7 +460,6 @@ fun DisplayEditSubCategory(
     page: AccountingPage,
     budgetViewModel: BudgetDetailedViewModel,
     balanceViewModel: BalanceDetailedViewModel,
-    navigationActions: NavigationActions,
     balanceState: BalanceItemState,
     budgetState: BudgetItemState
 ) {
