@@ -57,9 +57,10 @@ class BalanceDetailedViewModel(
 
   /** Update the database values */
   private fun updateDatabaseValuesInBalance() {
-
-    receiptAPI.getUserReceipts(
-        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
+      receiptAPI.getAllReceipts(
+          { receiptList ->
+              _uiState.value = _uiState.value.copy(receiptList = receiptList) },
+          {})
 
     subCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
@@ -208,6 +209,7 @@ class BalanceDetailedViewModel(
         },
         { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
   }
+
 }
 
 /**
