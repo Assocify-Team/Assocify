@@ -13,6 +13,7 @@ import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
+import java.time.Year
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -394,7 +395,7 @@ data class BalanceItemState(
     val creating: Boolean = false,
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = 2023,
+    val year: Int = Year.now().value,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val errorName: Boolean = false,
