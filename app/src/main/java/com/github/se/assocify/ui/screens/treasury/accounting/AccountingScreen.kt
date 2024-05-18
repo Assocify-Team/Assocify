@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 
@@ -54,6 +56,17 @@ fun AccountingScreen(
 ) {
   val accountingState by accountingViewModel.uiState.collectAsState()
   val subCategoryList = accountingState.subCategoryList
+
+    if (accountingState.loading) {
+        CenteredCircularIndicator()
+        return
+    }
+
+    if (accountingState.error != null) {
+        ErrorMessage(errorMessage = accountingState.error) { accountingViewModel.loadAccounting() }
+        return
+    }
+
   LazyColumn(
       modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,

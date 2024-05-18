@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -19,6 +18,8 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param accountingCategoryAPI the accounting category api
  * @param accountingSubCategoryAPI the accounting subcategory api
+ * @param balanceAPI the balance api
+ * @param budgetAPI the budget api
  */
 class AccountingViewModel(
     private var accountingCategoryAPI: AccountingCategoryAPI,
@@ -32,12 +33,34 @@ class AccountingViewModel(
 
   /** Initialize the view model */
   init {
+    loadAccounting()
+    uiState = _uiState
+  }
+
+  private var loadCounter = 0
+
+  private fun startLoad(count: Int) {
+    loadCounter = count
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+  }
+
+  private fun endLoad(error: String? = null) {
+    loadCounter--
+    if (error != null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = error)
+    } else if (loadCounter == 0) {
+      filterSubCategories()
+        setSubcategoriesAmount()
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+    }
+  }
+
+  /** Function to load categories and subcategories */
+  fun loadAccounting() {
+    startLoad(4)
     getCategories()
     getSubCategories()
-    getAccountingList()
-    filterSubCategories()
-    setSubcategoriesAmount()
-    uiState = _uiState
+      getAccountingList()
   }
 
   /** Function to get the categories from the database */
@@ -45,8 +68,11 @@ class AccountingViewModel(
     // Sets the category list in the state from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-        {})
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(categoryList = categoryList)
+          endLoad()
+        },
+        { endLoad("Error loading tags") })
   }
 
   /** Function to get the subcategories from the database */
@@ -56,8 +82,9 @@ class AccountingViewModel(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)
+          endLoad()
         },
-        { Log.d("BudgetViewModel", "Error getting subcategories") })
+        { endLoad("Error loading categories") })
   }
 
   /** Function to filter the subCategoryList */
@@ -84,18 +111,23 @@ class AccountingViewModel(
     }
   }
 
+    /** Function to get the budget and balance items from the database */
   private fun getAccountingList() {
     // get the budgetItem List
     budgetAPI.getBudget(
         CurrentUser.associationUid!!,
-        { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList) },
-        { Log.d("BudgetViewModel", "Error getting budget items") })
+        { budgetList -> _uiState.value = _uiState.value.copy(budgetItemsList = budgetList)
+            endLoad()
+        },
+        { endLoad("Error loading budget") })
 
     // get the balanceItem List
     balanceAPI.getBalance(
         CurrentUser.associationUid!!,
-        { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList) },
-        { Log.d("BudgetViewModel", "Error getting balance items") })
+        { balanceList -> _uiState.value = _uiState.value.copy(balanceItemList = balanceList)
+            endLoad()
+        },
+        { endLoad("Error loading balance") })
   }
 
   /** Set the amount of a subcategory */
@@ -131,13 +163,11 @@ class AccountingViewModel(
             // Add to map the budget amount of the subcategory
             updatedAmountBudgetHT[subCategory.uid] =
                 updatedAmountBudgetHT.getOrPut(subCategory.uid) { 0 } + budgetItem.amount
-            Log.d("BudgetViewModel", "amountBudgetHT ${updatedAmountBudgetHT[subCategory.uid]}")
             // Add to map the budget amount of the subcategory with TVA
             val amountWithTVA =
                 budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt()
             updatedAmountBudgetTTC[subCategory.uid] =
                 updatedAmountBudgetTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
-            Log.d("BudgetViewModel", "amountBudgetTTC ${updatedAmountBudgetTTC[subCategory.uid]}")
           }
     }
 
@@ -148,12 +178,7 @@ class AccountingViewModel(
             amountBalanceTTC = updatedAmountBalanceTTC,
             amountBudgetHT = updatedAmountBudgetHT,
             amountBudgetTTC = updatedAmountBudgetTTC)
-
-    Log.d("BudgetViewModel", "amountBalanceHT ${_uiState.value.amountBalanceHT}")
-    Log.d("BudgetViewModel", "amountBalanceTTC ${_uiState.value.amountBalanceTTC}")
-    Log.d("BudgetViewModel", "amountBudgetHT ${_uiState.value.amountBudgetHT}")
-    Log.d("BudgetViewModel", "amountBudgetTTC ${_uiState.value.amountBudgetTTC}")
-  }
+    }
 
   /**
    * Function to update the subcategories list when a category is selected
@@ -164,11 +189,13 @@ class AccountingViewModel(
     // if the category is global, display all subcategories
     if (categoryName == "Global") {
       _uiState.value = _uiState.value.copy(globalSelected = true)
+      loadAccounting()
     } else {
       _uiState.value = _uiState.value.copy(globalSelected = false)
       _uiState.value =
           _uiState.value.copy(
               selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid)
+      loadAccounting()
     }
     filterSubCategories()
   }
@@ -214,6 +241,8 @@ class AccountingViewModel(
  * @param searchQuery: The search query
  */
 data class AccountingState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
     val selectedCatUid: String = "",
     val subCategoryList: List<AccountingSubCategory> = emptyList(),

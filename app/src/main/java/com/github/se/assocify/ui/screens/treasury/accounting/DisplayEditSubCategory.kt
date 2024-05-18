@@ -69,13 +69,13 @@ fun DisplayEditSubCategory(
         AccountingPage.BUDGET -> budgetState.categoryList
       }
 
-  var name by remember { mutableStateOf(subCategory.name) }
-  var categoryUid by remember { mutableStateOf(subCategory.categoryUID) }
-  var year by remember { mutableStateOf(subCategory.year.toString()) }
-  var expanded by remember { mutableStateOf(false) }
-  var selectedCategory by remember {
-    mutableStateOf(categoryList.find { it.uid == subCategory.categoryUID }?.name ?: "No tag")
-  }
+    var name by remember { mutableStateOf(subCategory!!.name) }
+    var categoryUid by remember { mutableStateOf(subCategory!!.categoryUID) }
+    var year by remember { mutableStateOf(subCategory!!.year.toString()) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCategory by remember {
+        mutableStateOf(categoryList.find { it.uid == subCategory!!.categoryUID }?.name ?: "No tag")
+    }
   Dialog(
       onDismissRequest = {
         when (page) {
@@ -98,7 +98,7 @@ fun DisplayEditSubCategory(
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                  Text("Edit ${subCategory.name}", style = MaterialTheme.typography.titleLarge)
+                  Text("Edit ${subCategory!!.name}", style = MaterialTheme.typography.titleLarge)
                   Icon(
                       Icons.Default.Close,
                       contentDescription = "Close dialog",
