@@ -26,19 +26,21 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AddSubcategoryDialogTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class AddSubcategoryDialogTest :
+    TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
   @get:Rule val mockkRule = MockKRule(this)
 
-  val categories = listOf(
-    AccountingCategory("1", "Pole"),
-    AccountingCategory("2", "Events"),
-    AccountingCategory("3", "Commission")
-  )
+  val categories =
+      listOf(
+          AccountingCategory("1", "Pole"),
+          AccountingCategory("2", "Events"),
+          AccountingCategory("3", "Commission"))
 
-  val subCategories = listOf(
-    AccountingSubCategory("1", "1", "Pole 1", 0, 2021),
-  )
+  val subCategories =
+      listOf(
+          AccountingSubCategory("1", "1", "Pole 1", 0, 2021),
+      )
 
   val accountingCategoryAPI = mockk<AccountingCategoryAPI>()
   val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>()
@@ -48,19 +50,22 @@ class AddSubcategoryDialogTest : TestCase(kaspressoBuilder = Kaspresso.Builder.w
   fun setup() {
     CurrentUser.userUid = "userUid"
     CurrentUser.associationUid = "associationUid"
-    every { accountingCategoryAPI.getCategories(any(), any(), any()) } answers {
-      secondArg<(List<AccountingCategory>) -> Unit>().invoke(categories)
-    }
-    every { accountingSubCategoryAPI.getSubCategories(any(), any(), any()) } answers {
-      secondArg<(List<AccountingSubCategory>) -> Unit>().invoke(subCategories)
-    }
-    every { accountingSubCategoryAPI.addSubCategory(any(), any(), any(), any()) } answers {
-      thirdArg<() -> Unit>().invoke()
-    }
-    viewModel = AccountingViewModel(
-      accountingCategoryAPI = accountingCategoryAPI,
-      accountingSubCategoryAPI = accountingSubCategoryAPI
-    )
+    every { accountingCategoryAPI.getCategories(any(), any(), any()) } answers
+        {
+          secondArg<(List<AccountingCategory>) -> Unit>().invoke(categories)
+        }
+    every { accountingSubCategoryAPI.getSubCategories(any(), any(), any()) } answers
+        {
+          secondArg<(List<AccountingSubCategory>) -> Unit>().invoke(subCategories)
+        }
+    every { accountingSubCategoryAPI.addSubCategory(any(), any(), any(), any()) } answers
+        {
+          thirdArg<() -> Unit>().invoke()
+        }
+    viewModel =
+        AccountingViewModel(
+            accountingCategoryAPI = accountingCategoryAPI,
+            accountingSubCategoryAPI = accountingSubCategoryAPI)
     composeTestRule.setContent { AddSubcategoryDialog(viewModel) }
     viewModel.showNewSubcategoryDialog()
   }
