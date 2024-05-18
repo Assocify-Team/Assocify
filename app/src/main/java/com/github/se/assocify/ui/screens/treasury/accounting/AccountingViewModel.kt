@@ -54,7 +54,8 @@ class AccountingViewModel(
     // Sets the subcategory list in the state from the database if a category is selected
     accountingSubCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
-        { subCategoryList ->
+        {
+            subCategoryList ->
           _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)
         },
         { Log.d("BudgetViewModel", "Error getting subcategories") })
@@ -111,7 +112,7 @@ class AccountingViewModel(
 
             //Calculate the amount for the balance screen
             _uiState.value.balanceItemList.filter { balanceItem ->
-                subCategory.uid == balanceItem.uid
+                subCategory.uid == balanceItem.subcategoryUID
             }.forEach { balanceItem ->
                 // Add to map the balance amount of the subcategory
                 updatedAmountBalanceHT[subCategory.uid] = updatedAmountBalanceHT.getOrPut(subCategory.uid) { 0 } + balanceItem.amount
@@ -123,14 +124,15 @@ class AccountingViewModel(
 
             //Calculate the amount for the budget screen
             _uiState.value.budgetItemsList.filter { budgetItem ->
-                subCategory.uid == budgetItem.uid
+                subCategory.uid == budgetItem.subcategoryUID
             }.forEach { budgetItem ->
                 // Add to map the budget amount of the subcategory
                 updatedAmountBudgetHT[subCategory.uid] = updatedAmountBudgetHT.getOrPut(subCategory.uid) { 0 } + budgetItem.amount
-
+                Log.d("BudgetViewModel", "amountBudgetHT ${updatedAmountBudgetHT[subCategory.uid]}")
                 // Add to map the budget amount of the subcategory with TVA
                 val amountWithTVA = budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt()
                 updatedAmountBudgetTTC[subCategory.uid] = updatedAmountBudgetTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
+                Log.d("BudgetViewModel", "amountBudgetTTC ${updatedAmountBudgetTTC[subCategory.uid]}")
             }
         }
 
@@ -141,6 +143,11 @@ class AccountingViewModel(
             amountBudgetHT = updatedAmountBudgetHT,
             amountBudgetTTC = updatedAmountBudgetTTC
         )
+
+        Log.d("BudgetViewModel", "amountBalanceHT ${_uiState.value.amountBalanceHT}")
+        Log.d("BudgetViewModel", "amountBalanceTTC ${_uiState.value.amountBalanceTTC}")
+        Log.d("BudgetViewModel", "amountBudgetHT ${_uiState.value.amountBudgetHT}")
+        Log.d("BudgetViewModel", "amountBudgetTTC ${_uiState.value.amountBudgetTTC}")
     }
 
   /**
@@ -177,7 +184,12 @@ class AccountingViewModel(
     filterSubCategories()
   }
 
-  fun modifyTVAFilter(tvaActive: Boolean) {
+    /**
+     * Function to update the tva filter
+     *
+     * @param tvaActive: The state of the tva filter
+     */
+  fun activeTVA(tvaActive: Boolean) {
     _uiState.value = _uiState.value.copy(tvaFilterActive = tvaActive)
   }
 }
@@ -187,7 +199,7 @@ class AccountingViewModel(
  *
  * @param categoryList: The list of accounting categories
  * @param selectedCatUid: The selected category unique identifier
- * @param subCategoryList: The list of accounting subcategories
+ * @param subCategoryList: The list of accounting subcategories filtered
  * @param budgetItemsList: The list of budget items
  * @param balanceItemList: The list of balance items
  * @param allSubCategoryList: The list of all accounting subcategories

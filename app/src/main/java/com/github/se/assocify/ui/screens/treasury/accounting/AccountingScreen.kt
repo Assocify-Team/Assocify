@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting
 
+import android.util.MutableInt
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,7 +56,6 @@ fun AccountingScreen(
 ) {
   val accountingState by accountingViewModel.uiState.collectAsState()
   val subCategoryList = accountingState.subCategoryList
-
   LazyColumn(
       modifier = Modifier
           .fillMaxWidth()
@@ -65,16 +66,22 @@ fun AccountingScreen(
     // display the subcategory if list is not empty
     if (subCategoryList.isNotEmpty()) {
       items(subCategoryList) {
-        DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingViewModel, accountingState)
+        DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingState)
         HorizontalDivider(Modifier.fillMaxWidth())
       }
       item {
-        TotalLine(
-            totalAmount =
-                subCategoryList.sumOf {
-                  if (!accountingState.tvaFilterActive) it.amount
-                  else it.amount + it.amount /*TODO: have to find the TVA*/
-                })
+          val totalAmount =
+              when(page) {
+                    AccountingPage.BUDGET -> {
+                        if(accountingState.tvaFilterActive) accountingState.amountBudgetTTC.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
+                        else accountingState.amountBudgetHT.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
+                    }
+                    AccountingPage.BALANCE -> {
+                        if(accountingState.tvaFilterActive) accountingState.amountBalanceTTC.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
+                        else accountingState.amountBalanceHT.filter { it.key in subCategoryList.map { it.uid } }.values.sum()
+                    }
+              }
+              TotalLine(totalAmount = totalAmount)
       }
     } else {
       item {
@@ -100,7 +107,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 
   // filter bar lists
   val yearList = DateUtil.getYearList().reversed()
-  val tvaList: List<String> = listOf("TTC", "HT")
+  val tvaList: List<String> = listOf("HT", "TTC")
   val categoryList = listOf("Global") + model.categoryList.map { it.name }
 
   // selected filters
@@ -121,8 +128,11 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
       selectedCategory = it
       accountingViewModel.onSelectedCategory(selectedCategory)
     }
-    // TODO: change amount given TVA
-    DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { selectedTVA = it }
+
+    DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+        selectedTVA = it
+        accountingViewModel.activeTVA(selectedTVA == "TTC")
+    }
   }
 }
 
@@ -153,23 +163,32 @@ fun TotalLine(totalAmount: Int) {
 /**
  * A line displaying a budget category and its amount
  *
- * @param category: The budget category
+ * @param subCategory: The budget category
  * @param testTag: The test tag of the line
  * @param page: The page to which the line belongs
  * @param navigationActions: The navigation actions to navigate to the detailed screen
+ * @param accountingState: The state of the accounting screen
  */
 @Composable
 fun DisplayLine(
-    category: AccountingSubCategory,
+    subCategory: AccountingSubCategory,
     testTag: String,
     page: AccountingPage,
     navigationActions: NavigationActions,
-    accountingViewModel: AccountingViewModel,
     accountingState: AccountingState
 ) {
-    val amount = 0 //TODO: get right amount
+    val amount =
+        when(page){
+            AccountingPage.BUDGET ->
+                if(accountingState.tvaFilterActive) accountingState.amountBudgetTTC[subCategory.uid] ?: 0
+                else accountingState.amountBudgetHT[subCategory.uid] ?: 0
+            AccountingPage.BALANCE ->
+                if(accountingState.tvaFilterActive) accountingState.amountBalanceTTC[subCategory.uid] ?: 0
+                else accountingState.amountBalanceHT[subCategory.uid] ?: 0
+        }
+
   ListItem(
-      headlineContent = { Text(category.name) },
+      headlineContent = { Text(subCategory.name) },
       trailingContent = {
         Text(PriceUtil.fromCents(amount), style = MaterialTheme.typography.bodyMedium)
       },
@@ -179,13 +198,13 @@ fun DisplayLine(
               when (page) {
                   AccountingPage.BUDGET -> navigationActions.navigateTo(
                       Destination.BudgetDetailed(
-                          category.uid
+                          subCategory.uid
                       )
                   )
 
                   AccountingPage.BALANCE -> navigationActions.navigateTo(
                       Destination.BalanceDetailed(
-                          category.uid
+                          subCategory.uid
                       )
                   )
               }
