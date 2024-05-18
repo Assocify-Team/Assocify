@@ -218,7 +218,16 @@ class BalanceDetailedViewModel(
    * @param balanceItem the item we want to edit
    */
   fun startEditing(balanceItem: BalanceItem) {
-    _uiState.value = _uiState.value.copy(editing = true, editedBalanceItem = balanceItem)
+    _uiState.value =
+        _uiState.value.copy(
+            editing = true,
+            editedBalanceItem = balanceItem,
+            errorName = false,
+            errorReceipt = false,
+            errorAmount = false,
+            errorAssignee = false,
+            errorDescription = false,
+            receiptAlreadyAssigned = false)
   }
 
   /**
@@ -271,7 +280,15 @@ class BalanceDetailedViewModel(
   }
 
   fun startCreation() {
-    _uiState.value = _uiState.value.copy(creating = true)
+    _uiState.value =
+        _uiState.value.copy(
+            creating = true,
+            errorName = false,
+            errorReceipt = false,
+            errorAmount = false,
+            errorAssignee = false,
+            errorDescription = false,
+            receiptAlreadyAssigned = false)
   }
 
   fun saveCreation(balanceItem: BalanceItem) {
