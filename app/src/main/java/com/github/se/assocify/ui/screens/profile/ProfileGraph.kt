@@ -24,10 +24,7 @@ fun NavGraphBuilder.profileGraph(
     ProfileScreen(navigationActions, profileViewModel)
   }
 
-  //  profileNotificationsGraph(navigationActions)
-  //  profileSecurityPrivacyGraph(navigationActions)
   profilePreferencesGraph(navigationActions)
-  //  profileRolesGraph(navigationActions)
   profileMembersGraph(navigationActions)
   profileTreasuryTagsGraph(navigationActions)
   profileEventsGraph(navigationActions)

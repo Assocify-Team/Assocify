@@ -285,23 +285,17 @@ data class ProfileUIState(
  * icon corresponding to the setting.
  */
 enum class MySettings {
-  Preferences /*,
-  Privacy,
-  Notifications*/;
+  Preferences;
 
   fun getIcon(): ImageVector {
     return when (this) {
       Preferences -> Icons.Default.LightMode
-    /*Privacy -> Icons.Default.Lock
-    Notifications -> Icons.Default.Notifications*/
     }
   }
 
   fun getDestination(): Destination {
     return when (this) {
       Preferences -> Destination.ProfilePreferences
-    /*Privacy -> Destination.ProfileSecurityPrivacy
-    Notifications -> Destination.ProfileNotifications*/
     }
   }
 }
@@ -312,14 +306,12 @@ enum class MySettings {
  */
 enum class AssociationSettings {
   Members,
-  //  Roles;
   TreasuryTags,
   Events;
 
   fun getIcon(): ImageVector {
     return when (this) {
       Members -> Icons.Default.People
-      //      Roles -> Icons.Default.ManageAccounts
       TreasuryTags -> Icons.Default.Savings
       Events -> Icons.Default.Event
     }
@@ -336,7 +328,6 @@ enum class AssociationSettings {
   fun getDestination(): Destination {
     return when (this) {
       Members -> Destination.ProfileMembers
-      //      Roles -> Destination.ProfileRoles
       TreasuryTags -> Destination.ProfileTreasuryTags
       Events -> Destination.ProfileEvents
     }
