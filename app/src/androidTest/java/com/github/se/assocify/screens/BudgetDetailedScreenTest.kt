@@ -447,4 +447,16 @@ class BudgetDetailedScreenTest :
       onNodeWithText("fees").assertIsNotDisplayed()
     }
   }
+
+  @Test
+  fun deleteTest() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("deleteButton").performClick()
+      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+    }
+  }
 }
