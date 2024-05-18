@@ -84,13 +84,8 @@ fun AccountingDetailedScreen(
 
   val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
-  val subCategory =
-      when (page) {
-        AccountingPage.BALANCE -> balanceState.subCategory
-        AccountingPage.BUDGET -> budgetState.subCategory
-      }
 
-  val yearList = DateUtil.getYearList()
+  val yearList = DateUtil.getYearList().reversed()
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("HT", "TTC")
 

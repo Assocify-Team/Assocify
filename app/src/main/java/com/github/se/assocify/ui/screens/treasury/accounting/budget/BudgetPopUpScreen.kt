@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
+import com.github.se.assocify.ui.util.DateUtil
 import java.time.Year
 import java.util.UUID
 
@@ -79,10 +80,11 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
       else budgetModel.editedBudgetItem!!
   var nameString by remember { mutableStateOf(budget.nameItem) }
   var amountString by remember { mutableStateOf(budget.amount.toString()) }
-  var tvaTypeString by remember { mutableStateOf(budget.tva.toString()) }
   var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(budget.description) }
   var yearString by remember { mutableStateOf(budget.year.toString()) }
+  budgetViewModel.setTitle(nameString)
+  budgetViewModel.setAmount(amountString)
 
   Dialog(onDismissRequest = { budgetViewModel.cancelEditing() }) {
     Card(
@@ -119,19 +121,32 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               OutlinedTextField(
                   modifier = Modifier.padding(8.dp).testTag("editNameBox"),
                   value = nameString,
-                  onValueChange = { nameString = it },
+                  isError = budgetModel.titleError,
+                  onValueChange = {
+                    nameString = it
+                    budgetViewModel.setTitle(it)
+                  },
                   label = { Text("Name") },
-                  supportingText = {})
+                  supportingText = {
+                    if (budgetModel.titleError)
+                        Text("You need to input a title before confirming !!")
+                  })
             }
             item {
               OutlinedTextField(
                   modifier = Modifier.padding(8.dp).testTag("editYearBox"),
                   value = amountString,
-                  onValueChange = { amountString = it },
+                  isError = budgetModel.amountError,
+                  onValueChange = {
+                    amountString = it
+                    budgetViewModel.setAmount(it)
+                  },
                   label = { Text("Amount") },
                   keyboardOptions =
-                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  supportingText = {})
+                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                  supportingText = {
+                    if (budgetModel.amountError) Text("You need to input a correct amount!!")
+                  })
             }
             item {
               var tvaExpanded by remember { mutableStateOf(false) }
@@ -171,14 +186,33 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                   supportingText = {})
             }
             item {
-              OutlinedTextField(
-                  modifier = Modifier.padding(8.dp),
-                  value = yearString,
-                  onValueChange = { yearString = it },
-                  label = { Text("Year") },
-                  keyboardOptions =
-                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  supportingText = {})
+              var yearExpanded by remember { mutableStateOf(false) }
+              ExposedDropdownMenuBox(
+                  expanded = yearExpanded,
+                  onExpandedChange = { yearExpanded = !yearExpanded },
+                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                    OutlinedTextField(
+                        value = "$yearString%",
+                        onValueChange = {},
+                        label = { Text("Year") },
+                        trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = yearExpanded)
+                        },
+                        readOnly = true,
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        modifier = Modifier.menuAnchor().clickable { yearExpanded = !yearExpanded })
+                    ExposedDropdownMenu(
+                        expanded = yearExpanded, onDismissRequest = { yearExpanded = false }) {
+                          DateUtil.getYearList().forEach { year ->
+                            DropdownMenuItem(
+                                text = { Text(year) },
+                                onClick = {
+                                  tvaString = year
+                                  yearExpanded = false
+                                })
+                          }
+                        }
+                  }
             }
             item {
               Row(

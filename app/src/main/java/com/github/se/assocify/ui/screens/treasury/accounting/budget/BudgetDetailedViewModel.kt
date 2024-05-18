@@ -10,6 +10,7 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.navigation.NavigationActions
+import java.time.Year
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -129,6 +130,9 @@ class BudgetDetailedViewModel(
    * @param budgetItem the new edited budgetItem
    */
   fun saveEditing(budgetItem: BudgetItem) {
+    if (_uiState.value.titleError || _uiState.value.amountError) {
+      return
+    }
     _uiState.value =
         _uiState.value.copy(
             editing = false,
@@ -222,6 +226,9 @@ class BudgetDetailedViewModel(
   }
 
   fun saveCreating(budgetItem: BudgetItem) {
+    if (_uiState.value.titleError || _uiState.value.amountError) {
+      return
+    }
     budgetApi.addBudgetItem(
         CurrentUser.associationUid!!,
         budgetItem,
@@ -230,6 +237,31 @@ class BudgetDetailedViewModel(
         },
         {})
     _uiState.value = _uiState.value.copy(creating = false)
+  }
+
+  /**
+   * Checks if the format of title is good and changes the error depending on it
+   *
+   * @param title the string that is checked
+   */
+  fun setTitle(title: String) {
+    _uiState.value = _uiState.value.copy(titleError = title.isEmpty())
+  }
+
+  /**
+   * Checks if the format of amount is good and changes the error depending on it
+   *
+   * @param amount the string that is checked
+   */
+  fun setAmount(amount: String) {
+    _uiState.value =
+        _uiState.value.copy(
+            amountError =
+                amount.contains(" ") ||
+                    amount.isEmpty() ||
+                    amount.contains("-") ||
+                    amount.contains(".") ||
+                    amount.contains(","))
   }
 }
 
@@ -253,11 +285,13 @@ data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
     val subCategory: AccountingSubCategory? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
-    val yearFilter: Int = 2023,
+    val yearFilter: Int = Year.now().value,
     val editing: Boolean = false,
     val creating: Boolean = false,
     val subCatEditing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
-    val filterActive: Boolean = false
+    val filterActive: Boolean = false,
+    val titleError: Boolean = false,
+    val amountError: Boolean = false
 )
