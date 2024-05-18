@@ -183,29 +183,33 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
 
             // The TVA box
             item {
-              var tvaExpanded by remember { mutableStateOf(false) }
+              var balanceTvaExpanded by remember { mutableStateOf(false) }
               ExposedDropdownMenuBox(
-                  expanded = tvaExpanded,
-                  onExpandedChange = { tvaExpanded = !tvaExpanded },
+                  expanded = balanceTvaExpanded,
+                  onExpandedChange = { balanceTvaExpanded = !balanceTvaExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
                         value = "$tvaString%",
                         onValueChange = {},
                         label = { Text("Tva") },
                         trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = tvaExpanded)
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = balanceTvaExpanded)
                         },
                         readOnly = true,
                         colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier = Modifier.menuAnchor().clickable { tvaExpanded = !tvaExpanded })
+                        modifier =
+                            Modifier.menuAnchor().clickable {
+                              balanceTvaExpanded = !balanceTvaExpanded
+                            })
                     ExposedDropdownMenu(
-                        expanded = tvaExpanded, onDismissRequest = { tvaExpanded = false }) {
+                        expanded = balanceTvaExpanded,
+                        onDismissRequest = { balanceTvaExpanded = false }) {
                           TVA.entries.forEach { tva ->
                             DropdownMenuItem(
                                 text = { Text(tva.toString()) },
                                 onClick = {
                                   tvaString = tva.rate.toString()
-                                  tvaExpanded = false
+                                  balanceTvaExpanded = false
                                 })
                           }
                         }

@@ -149,29 +149,33 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                   })
             }
             item {
-              var tvaExpanded by remember { mutableStateOf(false) }
+              var budgetTvaExpanded by remember { mutableStateOf(false) }
               ExposedDropdownMenuBox(
-                  expanded = tvaExpanded,
-                  onExpandedChange = { tvaExpanded = !tvaExpanded },
+                  expanded = budgetTvaExpanded,
+                  onExpandedChange = { budgetTvaExpanded = !budgetTvaExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
                         value = "$tvaString%",
                         onValueChange = {},
                         label = { Text("Tva") },
                         trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = tvaExpanded)
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = budgetTvaExpanded)
                         },
                         readOnly = true,
                         colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier = Modifier.menuAnchor().clickable { tvaExpanded = !tvaExpanded })
+                        modifier =
+                            Modifier.menuAnchor().clickable {
+                              budgetTvaExpanded = !budgetTvaExpanded
+                            })
                     ExposedDropdownMenu(
-                        expanded = tvaExpanded, onDismissRequest = { tvaExpanded = false }) {
+                        expanded = budgetTvaExpanded,
+                        onDismissRequest = { budgetTvaExpanded = false }) {
                           TVA.entries.forEach { tva ->
                             DropdownMenuItem(
                                 text = { Text(tva.toString()) },
                                 onClick = {
                                   tvaString = tva.rate.toString()
-                                  tvaExpanded = false
+                                  budgetTvaExpanded = false
                                 })
                           }
                         }
