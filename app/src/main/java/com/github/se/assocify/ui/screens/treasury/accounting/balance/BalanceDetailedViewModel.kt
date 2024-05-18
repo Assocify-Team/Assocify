@@ -2,7 +2,6 @@ package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
-import co.touchlab.kermit.Message
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
@@ -315,12 +314,12 @@ class BalanceDetailedViewModel(
   }
 
   fun checkName(name: String) {
-    if(name.length > maxNameLength) {
+    if (name.length > maxNameLength) {
       _uiState.value = _uiState.value.copy(errorNameMessage = "Name is too long", errorName = true)
     } else if (name.isEmpty()) {
-      _uiState.value = _uiState.value.copy(errorNameMessage = "Name cannot be empty", errorName = true)
-    }
-    else {
+      _uiState.value =
+          _uiState.value.copy(errorNameMessage = "Name cannot be empty", errorName = true)
+    } else {
       _uiState.value = _uiState.value.copy(errorNameMessage = "", errorName = false)
     }
   }
