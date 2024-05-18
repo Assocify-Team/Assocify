@@ -17,7 +17,7 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       associationUID: String,
       onSuccess: (List<BalanceItem>) -> Unit,
       onFailure: (Exception) -> Unit
-  ): List<BalanceItem> {
+  ) {
 
     tryAsync(onFailure) {
       val response =
@@ -26,8 +26,6 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
               .decodeList<SupabaseBalanceItem>()
       onSuccess(response.map { it.toBalanceItem() })
     }
-
-    return listOf()
   }
 
   fun addBalance(
