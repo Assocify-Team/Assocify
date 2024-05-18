@@ -133,11 +133,18 @@ class BudgetDetailedViewModel(
     if (_uiState.value.titleError || _uiState.value.amountError) {
       return
     }
-    _uiState.value =
-        _uiState.value.copy(
-            editing = false,
-            budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem,
-            editedBudgetItem = null)
+    budgetApi.updateBudgetItem(
+        CurrentUser.associationUid!!,
+        budgetItem,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  editing = false,
+                  budgetList =
+                      _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem,
+                  editedBudgetItem = null)
+        },
+        {})
   }
 
   /** Exit the edit state without keeping the modifications done */

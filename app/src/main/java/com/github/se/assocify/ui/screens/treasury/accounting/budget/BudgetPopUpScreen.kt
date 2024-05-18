@@ -192,7 +192,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                   onExpandedChange = { yearExpanded = !yearExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
-                        value = "$yearString%",
+                        value = yearString,
                         onValueChange = {},
                         label = { Text("Year") },
                         trailingIcon = {
@@ -207,7 +207,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                             DropdownMenuItem(
                                 text = { Text(year) },
                                 onClick = {
-                                  tvaString = year
+                                  yearString = year
                                   yearExpanded = false
                                 })
                           }
