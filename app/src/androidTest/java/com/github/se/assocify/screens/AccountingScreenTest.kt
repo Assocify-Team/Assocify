@@ -106,8 +106,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
           BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", "2", 2023),
           BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", "3", 2023))
 
-
-    //mocked APIs
+  // mocked APIs
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
         every { getCategories(any(), any(), any()) } answers
