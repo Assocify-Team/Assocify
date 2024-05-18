@@ -257,7 +257,7 @@ class BudgetDetailedViewModel(
         CurrentUser.associationUid!!,
         budgetItem,
         {
-          _uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
+         if (budgetItem.year == _uiState.value.yearFilter) _uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
         },
         {})
     _uiState.value = _uiState.value.copy(creating = false)
