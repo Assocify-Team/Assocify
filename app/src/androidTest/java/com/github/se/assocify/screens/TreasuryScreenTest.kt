@@ -77,7 +77,6 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             {
               val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
               onSuccessCallback(emptyList())
-              emptyList()
             }
       }
 
