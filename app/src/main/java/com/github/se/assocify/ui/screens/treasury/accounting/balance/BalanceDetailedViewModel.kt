@@ -288,6 +288,39 @@ class BalanceDetailedViewModel(
   fun checkName(name: String) {
     _uiState.value = _uiState.value.copy(errorName = name.isEmpty() || name.length > 50)
   }
+
+  fun checkCategory(categoryUid: String) {
+    _uiState.value = _uiState.value.copy(errorCategory = categoryUid.isEmpty())
+  }
+
+  fun checkReceipt(receiptUid: String) {
+    _uiState.value = _uiState.value.copy(errorReceipt = receiptUid.isEmpty())
+  }
+
+  fun checkAmount(amount: String) {
+    _uiState.value =
+        _uiState.value.copy(
+            errorAmount =
+                amount.isEmpty() || amount.toDoubleOrNull() == null || amount.toDouble() < 0)
+  }
+
+  fun checkAssignee(assignee: String) {
+    _uiState.value = _uiState.value.copy(errorAssignee = assignee.isEmpty())
+  }
+
+  fun checkAll(
+      name: String,
+      categoryUid: String,
+      receiptUid: String,
+      amount: String,
+      assignee: String
+  ) {
+    checkName(name)
+    checkCategory(categoryUid)
+    checkReceipt(receiptUid)
+    checkAmount(amount)
+    checkAssignee(assignee)
+  }
 }
 
 /**

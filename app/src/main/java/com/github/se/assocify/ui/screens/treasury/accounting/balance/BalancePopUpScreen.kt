@@ -122,9 +122,15 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               OutlinedTextField(
                   modifier = Modifier.padding(8.dp).testTag("editDialogName"),
                   value = nameString,
-                  onValueChange = { nameString = it },
+                  isError = balanceModel.errorName,
+                  onValueChange = {
+                    nameString = it
+                    balanceDetailedViewModel.checkName(nameString)
+                  },
                   label = { Text("Name") },
-                  supportingText = {})
+                  supportingText = {
+                    if (balanceModel.errorName) Text("The text cannot be empty!")
+                  })
             }
             // The subcategory selector
             item {
@@ -134,8 +140,12 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { subcategoryExpanded = !subcategoryExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
+                        isError = balanceModel.errorCategory,
+                        supportingText = {
+                          if (balanceModel.errorCategory) Text("You have to choose a category!")
+                        },
                         value = subCategoryName,
-                        onValueChange = {},
+                        onValueChange = { balanceDetailedViewModel.checkCategory(subCategoryName) },
                         label = { Text("SubCategory") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = subcategoryExpanded)
@@ -169,8 +179,12 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { receiptExpanded = !receiptExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
+                        isError = balanceModel.errorReceipt,
+                        supportingText = {
+                          if (balanceModel.errorReceipt) Text("You have to choose a receipt!")
+                        },
                         value = receiptName,
-                        onValueChange = {},
+                        onValueChange = { balanceDetailedViewModel.checkReceipt(receiptName) },
                         label = { Text("Receipt") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = receiptExpanded)
@@ -198,13 +212,19 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The amount field
             item {
               OutlinedTextField(
+                  isError = balanceModel.errorAmount,
                   modifier = Modifier.padding(8.dp),
                   value = amountString,
-                  onValueChange = { amountString = it },
+                  onValueChange = {
+                    amountString = it
+                    balanceDetailedViewModel.checkAmount(amountString)
+                  },
                   label = { Text("Amount") },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  supportingText = {})
+                  supportingText = {
+                    if (balanceModel.errorAmount) Text("The amount must be a valid number!")
+                  })
             }
 
             // The TVA box
@@ -215,7 +235,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { tvaExpanded = !tvaExpanded },
                   modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
                     OutlinedTextField(
-                        value = tvaString + "%",
+                        value = "$tvaString%",
                         onValueChange = {},
                         label = { Text("Tva") },
                         trailingIcon = {
@@ -263,11 +283,17 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The assignee field
             item {
               OutlinedTextField(
+                  isError = balanceModel.errorAssignee,
                   modifier = Modifier.padding(8.dp),
                   value = assignee,
-                  onValueChange = { assignee = it },
+                  onValueChange = {
+                    assignee = it
+                    balanceDetailedViewModel.checkAssignee(assignee)
+                  },
                   label = { Text("Assignee") },
-                  supportingText = {})
+                  supportingText = {
+                    if (balanceModel.errorAssignee) Text("You have to enter a valid assignee!")
+                  })
             }
             // The status picker
             item {
@@ -318,6 +344,8 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                 }
                 Button(
                     onClick = {
+                      balanceDetailedViewModel.checkAll(
+                          nameString, subCategoryUid, receiptUid, amountString, assignee)
                       val newBalanceItem =
                           BalanceItem(
                               balance.uid,
