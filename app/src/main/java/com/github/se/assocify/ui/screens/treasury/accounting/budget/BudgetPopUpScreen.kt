@@ -239,7 +239,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                             BudgetItem(
                                 budget.uid,
                                 nameItem = nameString,
-                                amount = amountString.toInt(),
+                                amount = (amountString.toFloat() * 100).toInt(),
                                 tva = TVA.floatToTVA(tvaString.toFloat()),
                                 description = descriptionString,
                                 subcategoryUID = budget.subcategoryUID,
@@ -249,7 +249,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                             BudgetItem(
                                 budget.uid,
                                 nameItem = nameString,
-                                amount = amountString.toInt(),
+                                amount = (amountString.toFloat() * 100).toInt(),
                                 tva = TVA.floatToTVA(tvaString.toFloat()),
                                 description = descriptionString,
                                 subcategoryUID = budget.subcategoryUID,

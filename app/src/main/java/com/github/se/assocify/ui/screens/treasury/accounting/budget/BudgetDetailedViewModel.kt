@@ -267,7 +267,6 @@ class BudgetDetailedViewModel(
                 amount.contains(" ") ||
                     amount.isEmpty() ||
                     amount.contains("-") ||
-                    amount.contains(".") ||
                     amount.contains(","))
   }
 }
