@@ -37,6 +37,8 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.util.DateUtil
+import java.time.LocalDate
+import java.util.UUID
 
 @Composable
 fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
@@ -52,7 +54,20 @@ fun DisplayCreateBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
 @Composable
 fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
-  val balance = balanceModel.editedBalanceItem!!
+  val balance =
+      if (balanceModel.editedBalanceItem != null) balanceModel.editedBalanceItem!!
+      else
+          BalanceItem(
+              amount = 0,
+              tva = TVA.TVA_0,
+              status = Status.Pending,
+              date = LocalDate.now(),
+              nameItem = "",
+              subcategoryUID = "",
+              receiptUID = "",
+              description = "",
+              assignee = "",
+              uid = UUID.randomUUID().toString())
   var nameString by remember { mutableStateOf(balance.nameItem) }
   var subCategoryUid by remember { mutableStateOf(balance.subcategoryUID) }
   var subCategoryName by remember {
@@ -315,7 +330,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                               date,
                               assignee,
                               mutableStatus)
-                      if (balanceModel.editing) {
+                      if (balanceModel.creating) {
                         balanceDetailedViewModel.saveCreation(newBalanceItem)
                       } else {
                         balanceDetailedViewModel.saveEditing(newBalanceItem)
