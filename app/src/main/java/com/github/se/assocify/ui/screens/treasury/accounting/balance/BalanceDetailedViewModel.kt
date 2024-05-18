@@ -265,6 +265,13 @@ class BalanceDetailedViewModel(
   }
 
   fun saveCreation(balanceItem: BalanceItem) {
+    if (_uiState.value.errorName ||
+        _uiState.value.errorCategory ||
+        _uiState.value.errorReceipt ||
+        _uiState.value.errorAmount ||
+        _uiState.value.errorAssignee) {
+      return
+    }
     balanceApi.addBalance(
         CurrentUser.associationUid!!,
         balanceItem.subcategoryUID,
@@ -276,6 +283,10 @@ class BalanceDetailedViewModel(
                   creating = false, balanceList = _uiState.value.balanceList + balanceItem)
         },
         { _uiState.value = _uiState.value.copy(creating = false) })
+  }
+
+  fun checkName(name: String) {
+    _uiState.value = _uiState.value.copy(errorName = name.isEmpty() || name.length > 50)
   }
 }
 
@@ -308,5 +319,10 @@ data class BalanceItemState(
     val subCatEditing: Boolean = false,
     val year: Int = 2023,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
-    val filterActive: Boolean = false
+    val filterActive: Boolean = false,
+    val errorName: Boolean = false,
+    val errorCategory: Boolean = false,
+    val errorReceipt: Boolean = false,
+    val errorAmount: Boolean = false,
+    val errorAssignee: Boolean = false
 )
