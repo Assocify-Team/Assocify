@@ -223,7 +223,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                 if (budgetModel.editing) {
                   Button(
                       onClick = { budgetViewModel.deleteEditing() },
-                      modifier = Modifier.testTag("editDismissButton"),
+                      modifier = Modifier,
                   ) {
                     Text("Delete")
                   }
