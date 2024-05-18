@@ -35,6 +35,7 @@ import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 import java.time.Year
 import java.util.UUID
 
@@ -239,7 +240,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                             BudgetItem(
                                 budget.uid,
                                 nameItem = nameString,
-                                amount = (amountString.toFloat() * 100).toInt(),
+                                amount = PriceUtil.toCents(amountString),
                                 tva = TVA.floatToTVA(tvaString.toFloat()),
                                 description = descriptionString,
                                 subcategoryUID = budget.subcategoryUID,
@@ -249,7 +250,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                             BudgetItem(
                                 budget.uid,
                                 nameItem = nameString,
-                                amount = (amountString.toFloat() * 100).toInt(),
+                                amount = PriceUtil.toCents(amountString),
                                 tva = TVA.floatToTVA(tvaString.toFloat()),
                                 description = descriptionString,
                                 subcategoryUID = budget.subcategoryUID,
