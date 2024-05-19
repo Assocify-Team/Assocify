@@ -42,7 +42,6 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceItemState
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayCreateBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEditBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel

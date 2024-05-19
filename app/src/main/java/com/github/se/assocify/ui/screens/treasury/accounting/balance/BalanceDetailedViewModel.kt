@@ -13,7 +13,6 @@ import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
-import java.time.Year
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -238,10 +237,7 @@ class BalanceDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   balanceList =
-                      if (_uiState.value.year == balanceItem.date.year)
-                          _uiState.value.balanceList.filter { it.uid != balanceItem.uid } +
-                              balanceItem
-                      else _uiState.value.balanceList.filter { it.uid != balanceItem.uid },
+                      _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
                   editedBalanceItem = null)
         },
         { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
@@ -293,11 +289,7 @@ class BalanceDetailedViewModel(
         {
           _uiState.value =
               _uiState.value.copy(
-                  creating = false,
-                  balanceList =
-                      if (_uiState.value.year == balanceItem.date.year)
-                          _uiState.value.balanceList + balanceItem
-                      else _uiState.value.balanceList)
+                  creating = false, balanceList = _uiState.value.balanceList + balanceItem)
         },
         { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
   }
@@ -391,7 +383,6 @@ data class BalanceItemState(
     val creating: Boolean = false,
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = Year.now().value,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val errorName: String? = "",

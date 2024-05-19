@@ -209,8 +209,6 @@ class BalanceDetailedScreenTest :
   fun testDisplay() {
     // Test the accounting screen
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithTag("AccountingDetailedScreen").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
       onNodeWithTag("totalItems").assertIsDisplayed()
@@ -235,8 +233,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
       onNodeWithText("pair of scissors").assertIsDisplayed()
@@ -254,8 +250,6 @@ class BalanceDetailedScreenTest :
   fun testTotalAmount() {
     // Test the accounting screen
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithTag("totalItems").assertIsDisplayed()
       var total = 0
       balanceItems.forEach { total += it.amount }
@@ -470,8 +464,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testEditDeleteScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -488,8 +480,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testEditModifyScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -510,8 +500,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testCancelModifyScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
