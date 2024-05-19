@@ -236,11 +236,11 @@ class BalanceDetailedViewModel(
    * @param balanceItem the new edited budgetItem
    */
   fun saveEditing(balanceItem: BalanceItem) {
-    if (_uiState.value.errorName == null ||
-        _uiState.value.errorReceipt == null ||
-        _uiState.value.errorAmount == null ||
-        _uiState.value.errorAssignee == null ||
-        _uiState.value.errorDescription == null) {
+    if (_uiState.value.errorName != null ||
+        _uiState.value.errorReceipt != null ||
+        _uiState.value.errorAmount != null ||
+        _uiState.value.errorAssignee != null ||
+        _uiState.value.errorDescription != null) {
       return
     }
     balanceApi.updateBalance(
@@ -293,11 +293,11 @@ class BalanceDetailedViewModel(
   }
 
   fun saveCreation(balanceItem: BalanceItem) {
-    if (_uiState.value.errorName == null ||
-        _uiState.value.errorReceipt == null ||
-        _uiState.value.errorAmount == null ||
-        _uiState.value.errorAssignee == null ||
-        _uiState.value.errorDescription == null) {
+    if (_uiState.value.errorName != null ||
+        _uiState.value.errorReceipt != null ||
+        _uiState.value.errorAmount != null ||
+        _uiState.value.errorAssignee != null ||
+        _uiState.value.errorDescription != null) {
       return
     }
     balanceApi.addBalance(
