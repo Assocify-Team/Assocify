@@ -294,7 +294,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               ) {
                 if (balanceModel.editing) {
                   TextButton(
-                      content = { Text("Delete",color = MaterialTheme.colorScheme.error) },
+                      content = { Text("Delete", color = MaterialTheme.colorScheme.error) },
                       onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
                       modifier = Modifier.testTag("editDeleteButton"),
                   )
