@@ -1,6 +1,5 @@
 package com.github.se.assocify.screens
 
-import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
@@ -193,15 +192,14 @@ class BalanceDetailedScreenTest :
   /** Tests message shown when empty list */
   @Test
   fun testEmptyList() {
-      with(composeTestRule) {
-          onNodeWithTag("statusListTag").performClick()
-          onNodeWithText("Approved").performClick()
-          onNodeWithTag("totalItems").assertIsNotDisplayed()
-          onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
-              .assertIsDisplayed()
-      }
+    with(composeTestRule) {
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("Approved").performClick()
+      onNodeWithTag("totalItems").assertIsNotDisplayed()
+      onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
+          .assertIsDisplayed()
     }
-
+  }
 
   /** Tests if the items of 2023 are displayed (the default) */
   @Test
@@ -215,7 +213,7 @@ class BalanceDetailedScreenTest :
     }
 
     assert(
-        balanceItems.filter {it.subcategoryUID == subCategoryUid } ==
+        balanceItems.filter { it.subcategoryUID == subCategoryUid } ==
             balanceDetailedViewModel.uiState.value.balanceList)
   }
 
@@ -259,8 +257,9 @@ class BalanceDetailedScreenTest :
       onNodeWithText("All Status").performClick()
 
       // Assert that all items of 2022 are displayed
-        assert(balanceItems.filter { it.subcategoryUID == subCategoryUid } ==
-                balanceDetailedViewModel.uiState.value.balanceList)
+      assert(
+          balanceItems.filter { it.subcategoryUID == subCategoryUid } ==
+              balanceDetailedViewModel.uiState.value.balanceList)
       assert(null == balanceDetailedViewModel.uiState.value.status)
     }
   }
@@ -336,19 +335,21 @@ class BalanceDetailedScreenTest :
     }
   }
 
-    @Test
-    fun tvaFilterWorks() {
-        with(composeTestRule) {
-            onNodeWithTag("tvaListTag").performClick()
-            onNodeWithText("TTC").performClick()
-            val totalAmountTTC = PriceUtil.fromCents(balanceItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
-            onNodeWithText(totalAmountTTC).assertIsDisplayed()
-            onNodeWithTag("tvaListTag").performClick()
-            onNodeWithText("HT").performClick()
-            val totalAmount = PriceUtil.fromCents(balanceItems.sumOf { it.amount })
-            onNodeWithText(totalAmount).assertIsDisplayed()
-        }
+  @Test
+  fun tvaFilterWorks() {
+    with(composeTestRule) {
+      onNodeWithTag("tvaListTag").performClick()
+      onNodeWithText("TTC").performClick()
+      val totalAmountTTC =
+          PriceUtil.fromCents(
+              balanceItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
+      onNodeWithText(totalAmountTTC).assertIsDisplayed()
+      onNodeWithTag("tvaListTag").performClick()
+      onNodeWithText("HT").performClick()
+      val totalAmount = PriceUtil.fromCents(balanceItems.sumOf { it.amount })
+      onNodeWithText(totalAmount).assertIsDisplayed()
     }
+  }
 
   @Test
   fun testLoadSubCategoryError() {

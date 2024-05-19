@@ -275,10 +275,11 @@ class BudgetDetailedViewModel(
   fun setAmount(amount: String) {
     _uiState.value =
         _uiState.value.copy(
-            amountError = amount.isEmpty() || amount.toDoubleOrNull() == null
-                    || amount.toDouble() < 0.0 || isTooLarge(amount)
-        )
-
+            amountError =
+                amount.isEmpty() ||
+                    amount.toDoubleOrNull() == null ||
+                    amount.toDouble() < 0.0 ||
+                    isTooLarge(amount))
   }
 
   fun setDescription(description: String) {

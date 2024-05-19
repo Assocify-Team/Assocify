@@ -253,7 +253,13 @@ class BalanceDetailedViewModel(
  * @param error the error message, if any
  * @param balanceList the current list of balance items
  * @param subCategory the current subcategory of the item
- * @param status the current status
+ * @param categoryList the list of categories
+ * @param loadingCategory whether the categories are loading
+ * @param status the current status filter
+ * @param receiptList the list of receipts
+ * @param subCategoryList the list of subcategories
+ * @param editing whether the item is being edited
+ * @param editedBalanceItem the item being edited
  * @param subCatEditing whether the subcategory is being edited
  * @param snackbarState the snackbar state
  * @param filterActive if the tva filter is active or not

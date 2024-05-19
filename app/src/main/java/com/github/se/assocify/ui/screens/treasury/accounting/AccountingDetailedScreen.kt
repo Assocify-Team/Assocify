@@ -2,7 +2,6 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -272,7 +271,9 @@ fun DisplayBudgetItem(
 ) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
-      trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount), style = MaterialTheme.typography.bodyMedium) },
+      trailingContent = {
+        Text(PriceUtil.fromCents(budgetItem.amount), style = MaterialTheme.typography.bodyMedium)
+      },
       supportingContent = {
         if (budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description)
       },

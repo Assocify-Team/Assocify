@@ -1,6 +1,5 @@
 package com.github.se.assocify.screens
 
-import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -56,7 +55,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   val subCategoryList =
       listOf(
-          AccountingSubCategory("4", "2", "Administration", 0, 2023),
+          AccountingSubCategory("4", "2", "Administration", 0, 2022),
           AccountingSubCategory("5", "2", "Presidency", 0, 2023),
           AccountingSubCategory("6", "2", "Communication", 0, 2023),
           AccountingSubCategory("7", "1", "Champachelor", 0, 2022),
@@ -103,10 +102,10 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   val budgetItems =
       listOf(
           BudgetItem(
-              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", "1", 2022),
-          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", "2", 2023),
-          BudgetItem("2", "sweaters 2", 1000, TVA.TVA_2, "order for 10 sweaters", "4", 2023),
-          BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", "3", 2023))
+              "1", "pair of scissors", 5, TVA.TVA_8, "scissors for paper cutting", "4", 2022),
+          BudgetItem("2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", "5", 2023),
+          BudgetItem("3", "sweaters 2", 1000, TVA.TVA_2, "order for 10 sweaters", "6", 2023),
+          BudgetItem("4", "chairs", 200, TVA.TVA_8, "order for 200 chairs", "3", 2023))
 
   // mocked APIs
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -226,32 +225,41 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithText("2023").performClick()
       onNodeWithTag("categoryFilterChip").performClick()
       onNodeWithText("Pole").performClick()
+
+      // Test HT
       assert(accountingViewModel.uiState.value.yearFilter == 2023)
       assert(
           accountingViewModel.uiState.value.subCategoryList ==
               subCategoryList.filter { it.year == 2023 && it.categoryUID == "2" })
+      val filteredSubCategoryList =
+          subCategoryList.filter { it.categoryUID == "2" && it.year == 2023 }.groupBy { it.uid }
       val mockedTotalAmountHT =
-          budgetItems.filter { it.year == 2023 && it.subcategoryUID == "2" }.map { it.amount }.sum()
-      Log.d("mockedTotalAmountHT", mockedTotalAmountHT.toString())
-      // Log.d()
+          budgetItems
+              .filter { it.year == 2023 && it.subcategoryUID in filteredSubCategoryList }
+              .map { it.amount }
+              .sum()
       val viewModelTotalAmountHT =
-          accountingViewModel.uiState.value.amountBudgetHT.filter { it.key in "2" }.values.sum()
-      Log.d("viewModelTotalAmountHT", viewModelTotalAmountHT.toString())
+          accountingViewModel.uiState.value.amountBudgetHT
+              .filter { it.key in filteredSubCategoryList }
+              .values
+              .sum()
       assert(viewModelTotalAmountHT == mockedTotalAmountHT)
 
+      // Test TTC
       onNodeWithTag("tvaListTag").performClick()
       onNodeWithText("TTC").performClick()
       assert(accountingViewModel.uiState.value.tvaFilterActive)
       val mockedTotalAmountTTC =
-          budgetItems.filter { it.year == 2023 }.map { it.amount * it.tva.rate / 100f }.sum()
+          budgetItems
+              .filter { it.year == 2023 && it.subcategoryUID in filteredSubCategoryList }
+              .map { (it.amount + it.amount * it.tva.rate / 100f).toInt() }
+              .sum()
       val viewModelTotalAmountTTC =
           accountingViewModel.uiState.value.amountBudgetTTC
-              .filter { it.key in subCategoryList.map { it.uid } }
+              .filter { it.key in filteredSubCategoryList }
               .values
               .sum()
-              .toFloat()
       assert(viewModelTotalAmountTTC == mockedTotalAmountTTC)
-
       onNodeWithTag("tvaListTag").performClick()
       onNodeWithText("HT").performClick()
       assert(!accountingViewModel.uiState.value.tvaFilterActive)

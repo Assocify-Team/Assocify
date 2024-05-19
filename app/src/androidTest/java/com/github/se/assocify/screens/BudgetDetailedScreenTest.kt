@@ -1,6 +1,5 @@
 package com.github.se.assocify.screens
 
-import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
@@ -189,7 +188,6 @@ class BudgetDetailedScreenTest :
     }
   }
 
-
   /** Tests if the total amount correspond to the sum of the items */
   @Test
   fun testTotalAmount() {
@@ -303,13 +301,15 @@ class BudgetDetailedScreenTest :
   @Test
   fun tvaFilterWorks() {
     with(composeTestRule) {
-        onNodeWithTag("tvaListTag").performClick()
-        onNodeWithText("TTC").performClick()
-        val totalAmountTTC = PriceUtil.fromCents(budgetItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
-        onNodeWithText(totalAmountTTC).assertIsDisplayed()
-        onNodeWithTag("tvaListTag").performClick()
+      onNodeWithTag("tvaListTag").performClick()
+      onNodeWithText("TTC").performClick()
+      val totalAmountTTC =
+          PriceUtil.fromCents(
+              budgetItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
+      onNodeWithText(totalAmountTTC).assertIsDisplayed()
+      onNodeWithTag("tvaListTag").performClick()
       onNodeWithText("HT").performClick()
-        val totalAmount = PriceUtil.fromCents(budgetItems.sumOf { it.amount })
+      val totalAmount = PriceUtil.fromCents(budgetItems.sumOf { it.amount })
       onNodeWithText(totalAmount).assertIsDisplayed()
     }
   }
