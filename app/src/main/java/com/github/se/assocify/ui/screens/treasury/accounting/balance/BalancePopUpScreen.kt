@@ -237,7 +237,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                       balanceDetailedViewModel.checkDate(date)
                     }
                   },
-                  modifier = Modifier.padding(8.dp),
+                  modifier = Modifier.padding(8.dp).testTag("editDialogDate"),
                   isError = balanceModel.errorDate != null,
                   supportingText = { Text(balanceModel.errorDate ?: "") })
             }

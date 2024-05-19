@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -541,6 +542,10 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editDialogAssignee"))
       onNodeWithTag("editDialogAssignee").performTextClearance()
       onNodeWithTag("editDialogAssignee").performTextInput("François Théron")
+      onNodeWithTag("editDialogDate").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012023")
+      onNodeWithText("OK").performClick()
       onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
       onNodeWithTag("editConfirmButton").performClick()
       onNodeWithTag("editDialogName").assertIsNotDisplayed()
