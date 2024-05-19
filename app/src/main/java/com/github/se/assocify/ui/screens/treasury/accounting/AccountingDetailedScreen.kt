@@ -272,6 +272,7 @@ fun DisplayBudgetItem(
     budgetItem: BudgetItem,
     testTag: String
 ) {
+  val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = {
@@ -281,7 +282,13 @@ fun DisplayBudgetItem(
         if (budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description)
       },
       modifier =
-          Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
+          Modifier.clickable {
+            when (budgetState.editing) {
+              true -> budgetDetailedViewModel.startEditing(budgetItem)
+              false -> budgetDetailedViewModel.startCreating()
+            }
+            budgetDetailedViewModel.startEditing(budgetItem)
+          }.testTag(testTag))
 }
 
 /**
