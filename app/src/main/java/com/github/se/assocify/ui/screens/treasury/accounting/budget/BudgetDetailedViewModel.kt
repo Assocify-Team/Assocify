@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
@@ -10,6 +11,7 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.PriceUtil.isTooLarge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -274,8 +276,10 @@ class BudgetDetailedViewModel(
   fun setAmount(amount: String) {
     _uiState.value =
         _uiState.value.copy(
-            amountError =
-                amount.isEmpty() || amount.toDoubleOrNull() == null || amount.toDouble() < 0.0)
+            amountError = amount.isEmpty() || amount.toDoubleOrNull() == null
+                    || amount.toDouble() < 0.0 || isTooLarge(amount)
+        )
+
   }
 
   fun setDescription(description: String) {

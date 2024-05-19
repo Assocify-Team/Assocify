@@ -145,7 +145,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                         amountString = it
                         budgetViewModel.setAmount(it)
                       },
-                      label = { Text("Amount") },
+                      label = { Text("Amount HT") },
                       keyboardOptions =
                           KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                       supportingText = {

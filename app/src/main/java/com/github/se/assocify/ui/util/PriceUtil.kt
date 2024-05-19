@@ -10,9 +10,6 @@ object PriceUtil {
    */
   const val VALID_CHARS = """^[0-9.]+$"""
 
-  /** Maximum amount that can be displayed. */
-  const val MAX_AMOUNT = Int.MAX_VALUE - (Int.MAX_VALUE * 8.1 / 100f)
-
   /**
    * Formats the given price to a string with two decimal places.
    *
