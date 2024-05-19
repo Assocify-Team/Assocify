@@ -306,21 +306,34 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     onClick = {
                       balanceDetailedViewModel.checkAll(
                           nameString, receiptUid, amountString, assignee, descriptionString, date)
-                      val newBalanceItem =
-                          BalanceItem(
-                              balance.uid,
-                              nameString,
-                              balanceModel.subCategory!!.uid,
-                              receiptUid,
-                              PriceUtil.toCents(amountString),
-                              TVA.floatToTVA(tvaString.toFloat()),
-                              descriptionString,
-                              date,
-                              assignee,
-                              mutableStatus)
-                      if (balanceModel.creating) {
+
+                      if (balanceModel.creating && amountString.toDoubleOrNull() != null) {
+                        val newBalanceItem =
+                            BalanceItem(
+                                balance.uid,
+                                nameString,
+                                balanceModel.subCategory!!.uid,
+                                receiptUid,
+                                PriceUtil.toCents(amountString),
+                                TVA.floatToTVA(tvaString.toFloat()),
+                                descriptionString,
+                                date,
+                                assignee,
+                                mutableStatus)
                         balanceDetailedViewModel.saveCreation(newBalanceItem)
-                      } else {
+                      } else if (amountString.toDoubleOrNull() != null) {
+                        val newBalanceItem =
+                            BalanceItem(
+                                balance.uid,
+                                nameString,
+                                balanceModel.subCategory!!.uid,
+                                receiptUid,
+                                PriceUtil.toCents(amountString),
+                                TVA.floatToTVA(tvaString.toFloat()),
+                                descriptionString,
+                                date,
+                                assignee,
+                                mutableStatus)
                         balanceDetailedViewModel.saveEditing(newBalanceItem)
                       }
                     },

@@ -217,7 +217,8 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                           budgetViewModel.setTitle(nameString)
                           budgetViewModel.setAmount(amountString)
                           budgetViewModel.setDescription(descriptionString)
-                          if (budgetModel.editedBudgetItem != null) {
+                          if (budgetModel.editedBudgetItem != null &&
+                              amountString.toDoubleOrNull() != null) {
                             budgetViewModel.saveEditing(
                                 BudgetItem(
                                     budget.uid,
@@ -227,7 +228,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                                     description = descriptionString,
                                     subcategoryUID = budget.subcategoryUID,
                                     year = budgetModel.subCategory!!.year))
-                          } else {
+                          } else if (amountString.toDoubleOrNull() != null) {
                             budgetViewModel.saveCreating(
                                 BudgetItem(
                                     budget.uid,
