@@ -86,10 +86,14 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.from(collectionName)
-          .update(
-              SupabaseBalanceItem.fromBalanceItem(
-                  balanceItem, associationUID, receiptUID, categoryUID))
+      db.from(collectionName).update(
+          SupabaseBalanceItem.fromBalanceItem(
+              balanceItem, associationUID, receiptUID, categoryUID)) {
+            filter {
+              BalanceAPI.SupabaseBalanceItem::associationUID eq associationUID
+              SupabaseBalanceItem::uid eq balanceItem.uid
+            }
+          }
       if (balanceCacheAssociationUID == associationUID) {
         balanceCache = balanceCache?.map { if (it.uid == balanceItem.uid) balanceItem else it }
       }

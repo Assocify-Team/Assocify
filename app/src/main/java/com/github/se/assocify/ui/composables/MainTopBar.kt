@@ -14,6 +14,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,7 +47,7 @@ fun MainTopBar(
   // Search bar state
   var searchBarVisible by remember { mutableStateOf(false) }
   // Page state
-  var currentPage by remember { mutableStateOf(page) }
+  var currentPage by remember { mutableIntStateOf(page) }
 
   if (currentPage != page) {
     currentPage = page

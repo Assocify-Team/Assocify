@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,9 +42,9 @@ import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.util.DateTimeUtil
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import kotlin.math.max
 
 /** A screen that displays the schedule of a staffer of an event. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventScheduleScreen(
     viewModel: EventScheduleViewModel,
@@ -107,7 +106,7 @@ fun ScheduleContent(
           val startOffset = hourHeight * (startHour + startMinute / 60f)
 
           // duration determines the duration of the task (in hours), with a minimum of 30 minutes
-          val duration = Math.max((task.duration.toDouble() / 60), 0.5)
+          val duration = max((task.duration.toDouble() / 60), 0.5)
 
           // the number of lines to display in the task (2 if the duration is >= 1h)
           val lines = if (duration > 1) 2 else 1

@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.testTag
  * @param opened: The state of the dropdown
  * @param onOpenedChange: The callback when the dropdown is opened or closed
  * @param onSelectOption: The callback when an option is selected
- * @param leadIcon: The leading icon of the dropdown : default is null
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

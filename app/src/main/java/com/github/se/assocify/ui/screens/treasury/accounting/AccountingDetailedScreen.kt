@@ -42,6 +42,8 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceItemState
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayCreateBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEditBalance
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.DisplayCreateBudget
@@ -135,7 +137,7 @@ fun AccountingDetailedScreen(
             onClick = {
               when (page) {
                 AccountingPage.BUDGET -> budgetDetailedViewModel.startCreating()
-                AccountingPage.BALANCE -> /*TODO: implement the balance popup*/ TODO()
+                AccountingPage.BALANCE -> balanceDetailedViewModel.startCreation()
               }
             }) {
               Icon(Icons.Outlined.Add, "Create")
@@ -166,6 +168,8 @@ fun AccountingDetailedScreen(
           DisplayEditBalance(balanceDetailedViewModel)
         } else if (budgetState.creating && page == AccountingPage.BUDGET) {
           DisplayCreateBudget(budgetViewModel = budgetDetailedViewModel)
+        } else if (balanceState.creating && page == AccountingPage.BALANCE) {
+          DisplayCreateBalance(balanceDetailedViewModel)
         }
 
         LazyColumn(
@@ -308,9 +312,6 @@ fun DisplayBalanceItem(
                   else PriceUtil.fromCents(balanceItem.amount),
               modifier = Modifier.padding(end = 4.dp),
               style = MaterialTheme.typography.bodyMedium)
-          /*Icon(
-          balanceItem.receipt!!.status.getIcon(),
-          contentDescription = "Create") // TODO: add logo depending on the phase*/
         }
       },
       supportingContent = { Text(balanceItem.assignee) },

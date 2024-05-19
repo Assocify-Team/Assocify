@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -67,7 +66,6 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
  * @param navActions: NavigationActions object that contains the navigation actions.
  * @param viewmodel: ProfileViewModel object that contains the logic of the profile screen.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
   val state by viewmodel.uiState.collectAsState()
