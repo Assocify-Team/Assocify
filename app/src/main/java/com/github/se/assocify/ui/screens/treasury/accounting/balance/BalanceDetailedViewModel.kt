@@ -13,6 +13,7 @@ import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
+import java.time.Year
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,8 @@ class BalanceDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
   val uiState: StateFlow<BalanceItemState>
+  private val maxDescriptionLength = 100
+  private val maxNameLength = 50
 
   init {
     loadBalanceDetails()
@@ -215,7 +218,15 @@ class BalanceDetailedViewModel(
    * @param balanceItem the item we want to edit
    */
   fun startEditing(balanceItem: BalanceItem) {
-    _uiState.value = _uiState.value.copy(editing = true, editedBalanceItem = balanceItem)
+    _uiState.value =
+        _uiState.value.copy(
+            editing = true,
+            editedBalanceItem = balanceItem,
+            errorName = null,
+            errorReceipt = null,
+            errorAmount = null,
+            errorAssignee = null,
+            errorDescription = null)
   }
 
   /**
@@ -224,6 +235,13 @@ class BalanceDetailedViewModel(
    * @param balanceItem the new edited budgetItem
    */
   fun saveEditing(balanceItem: BalanceItem) {
+    if (_uiState.value.errorName != null ||
+        _uiState.value.errorReceipt != null ||
+        _uiState.value.errorAmount != null ||
+        _uiState.value.errorAssignee != null ||
+        _uiState.value.errorDescription != null) {
+      return
+    }
     balanceApi.updateBalance(
         CurrentUser.associationUid!!,
         balanceItem,
@@ -234,15 +252,19 @@ class BalanceDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   balanceList =
-                      _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
+                      if (_uiState.value.year == balanceItem.date.year)
+                          _uiState.value.balanceList.filter { it.uid != balanceItem.uid } +
+                              balanceItem
+                      else _uiState.value.balanceList.filter { it.uid != balanceItem.uid },
                   editedBalanceItem = null)
         },
-        { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
+        { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
   }
 
   /** Exit the edit state without keeping the modifications done */
-  fun cancelEditing() {
-    _uiState.value = _uiState.value.copy(editing = false, editedBalanceItem = null)
+  fun cancelPopUp() {
+    _uiState.value =
+        _uiState.value.copy(editing = false, editedBalanceItem = null, creating = false)
   }
 
   fun deleteBalanceItem(balanceItemUid: String) {
@@ -256,6 +278,98 @@ class BalanceDetailedViewModel(
                   editing = false)
         },
         { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
+  }
+
+  fun startCreation() {
+    _uiState.value =
+        _uiState.value.copy(
+            creating = true,
+            errorName = null,
+            errorReceipt = null,
+            errorAmount = null,
+            errorAssignee = null,
+            errorDescription = null)
+  }
+
+  fun saveCreation(balanceItem: BalanceItem) {
+    if (_uiState.value.errorName != null ||
+        _uiState.value.errorReceipt != null ||
+        _uiState.value.errorAmount != null ||
+        _uiState.value.errorAssignee != null ||
+        _uiState.value.errorDescription != null) {
+      return
+    }
+    balanceApi.addBalance(
+        CurrentUser.associationUid!!,
+        balanceItem.subcategoryUID,
+        balanceItem.receiptUID,
+        balanceItem,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  creating = false,
+                  balanceList =
+                      if (_uiState.value.year == balanceItem.date.year)
+                          _uiState.value.balanceList + balanceItem
+                      else _uiState.value.balanceList)
+        },
+        { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
+  }
+
+  fun checkName(name: String) {
+    if (name.length > maxNameLength) {
+      _uiState.value = _uiState.value.copy(errorName = "Name is too long")
+    } else if (name.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorName = "Name cannot be empty")
+    } else {
+      _uiState.value = _uiState.value.copy(errorName = null)
+    }
+  }
+
+  fun checkReceipt(receiptUid: String) {
+    if (receiptUid.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorReceipt = "The receipt cannot be empty!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorReceipt = null)
+    }
+  }
+
+  fun checkAmount(amount: String) {
+    if (amount.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
+    } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorAmount = null)
+    }
+  }
+
+  fun checkAssignee(assignee: String) {
+    if (assignee.isEmpty())
+        _uiState.value = _uiState.value.copy(errorAssignee = "Cannot have an empty assignee!")
+    else _uiState.value = _uiState.value.copy(errorAssignee = null)
+  }
+
+  fun checkDescription(description: String) {
+    if (description.length > maxDescriptionLength) {
+      _uiState.value = _uiState.value.copy(errorDescription = "Description is too long")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDescription = null)
+    }
+  }
+
+  fun checkAll(
+      name: String,
+      receiptUid: String,
+      amount: String,
+      assignee: String,
+      description: String
+  ) {
+    checkName(name)
+    checkReceipt(receiptUid)
+    checkAmount(amount)
+    checkAssignee(assignee)
+    checkDescription(description)
   }
 }
 
@@ -283,9 +397,15 @@ data class BalanceItemState(
     val receiptList: List<Receipt> = emptyList(),
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val editing: Boolean = false,
+    val creating: Boolean = false,
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = 2023,
+    val year: Int = Year.now().value,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
-    val filterActive: Boolean = false
+    val filterActive: Boolean = false,
+    val errorName: String? = "",
+    val errorReceipt: String? = "",
+    val errorAmount: String? = "",
+    val errorAssignee: String? = "",
+    val errorDescription: String? = ""
 )

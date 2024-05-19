@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,21 +37,39 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
+import java.time.LocalDate
+import java.util.UUID
+
+@Composable
+fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
+  BalancePopUpScreen(balanceDetailedViewModel)
+}
+
+@Composable
+fun DisplayCreateBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
+  BalancePopUpScreen(balanceDetailedViewModel)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
+fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
   val balanceModel by balanceDetailedViewModel.uiState.collectAsState()
-  val balance = balanceModel.editedBalanceItem!!
+  val balance =
+      if (balanceModel.editedBalanceItem != null) balanceModel.editedBalanceItem!!
+      else
+          BalanceItem(
+              amount = 0,
+              tva = TVA.TVA_0,
+              status = Status.Pending,
+              date = LocalDate.now(),
+              nameItem = "",
+              subcategoryUID = "",
+              receiptUID = "",
+              description = "",
+              assignee = "",
+              uid = UUID.randomUUID().toString())
   var nameString by remember { mutableStateOf(balance.nameItem) }
-  var subCategoryUid by remember { mutableStateOf(balance.subcategoryUID) }
-  var subCategoryName by remember {
-    mutableStateOf(
-        balanceModel.subCategoryList
-            .filter { it.uid == balance.subcategoryUID }
-            .map { it.name }
-            .getOrElse(0) { "" })
-  }
   var receiptUid by remember { mutableStateOf(balance.receiptUID) }
   var receiptName by remember {
     mutableStateOf(
@@ -60,13 +78,14 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             .map { it.title }
             .getOrElse(0) { "" })
   }
-  var amountString by remember { mutableStateOf(balance.amount.toString()) }
+  var amountString by remember { mutableStateOf(PriceUtil.fromCents(balance.amount)) }
   var tvaString by remember { mutableStateOf(balance.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(balance.description) }
   var date by remember { mutableStateOf(balance.date) }
   var assignee by remember { mutableStateOf((balance.assignee)) }
   var mutableStatus by remember { mutableStateOf(balance.status) }
-  Dialog(onDismissRequest = { balanceDetailedViewModel.cancelEditing() }) {
+  val titleText = if (balanceModel.editing) "Edit Balance Item" else "Create Balance Item"
+  Dialog(onDismissRequest = { balanceDetailedViewModel.cancelPopUp() }) {
     Card(
         modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp).testTag("editDialogBox"),
         shape = RoundedCornerShape(16.dp),
@@ -80,71 +99,44 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   horizontalArrangement = Arrangement.SpaceBetween,
                   verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "Edit Balance Detail",
+                        titleText,
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.testTag("editDialogTitle"))
                     Icon(
                         Icons.Default.Close,
                         contentDescription = "Close dialog",
                         modifier =
-                            Modifier.clickable { balanceDetailedViewModel.cancelEditing() }
+                            Modifier.clickable { balanceDetailedViewModel.cancelPopUp() }
                                 .testTag("editSubCategoryCancelButton"))
                   }
             }
             // The name box
             item {
               OutlinedTextField(
+                  singleLine = true,
                   modifier = Modifier.padding(8.dp).testTag("editDialogName"),
                   value = nameString,
-                  onValueChange = { nameString = it },
+                  isError = balanceModel.errorName != null,
+                  onValueChange = {
+                    nameString = it
+                    balanceDetailedViewModel.checkName(nameString)
+                  },
                   label = { Text("Name") },
-                  supportingText = {})
+                  supportingText = { Text(balanceModel.errorName ?: "") })
             }
-            // The subcategory selector
-            item {
-              var subcategoryExpanded by remember { mutableStateOf(false) }
-              ExposedDropdownMenuBox(
-                  expanded = subcategoryExpanded,
-                  onExpandedChange = { subcategoryExpanded = !subcategoryExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
-                    OutlinedTextField(
-                        value = subCategoryName,
-                        onValueChange = {},
-                        label = { Text("SubCategory") },
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = subcategoryExpanded)
-                        },
-                        readOnly = true,
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier =
-                            Modifier.menuAnchor().clickable {
-                              subcategoryExpanded = !subcategoryExpanded
-                            })
-                    ExposedDropdownMenu(
-                        expanded = subcategoryExpanded,
-                        onDismissRequest = { subcategoryExpanded = false }) {
-                          balanceModel.subCategoryList.forEach { subCat ->
-                            DropdownMenuItem(
-                                text = { Text(subCat.name) },
-                                onClick = {
-                                  subCategoryUid = subCat.uid
-                                  subCategoryName = subCat.name
-                                  subcategoryExpanded = false
-                                })
-                          }
-                        }
-                  }
-            }
+
             // The receipt selector
             item {
               var receiptExpanded by remember { mutableStateOf(false) }
               ExposedDropdownMenuBox(
                   expanded = receiptExpanded,
                   onExpandedChange = { receiptExpanded = !receiptExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                  modifier = Modifier.testTag("receiptDropdown").padding(8.dp)) {
                     OutlinedTextField(
+                        isError = balanceModel.errorReceipt != null,
+                        supportingText = { Text(balanceModel.errorReceipt ?: "") },
                         value = receiptName,
-                        onValueChange = {},
+                        onValueChange = { balanceDetailedViewModel.checkReceipt(receiptName) },
                         label = { Text("Receipt") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = receiptExpanded)
@@ -172,13 +164,18 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The amount field
             item {
               OutlinedTextField(
+                  singleLine = true,
+                  isError = balanceModel.errorAmount != null,
                   modifier = Modifier.padding(8.dp),
                   value = amountString,
-                  onValueChange = { amountString = it },
+                  onValueChange = {
+                    amountString = it
+                    balanceDetailedViewModel.checkAmount(amountString)
+                  },
                   label = { Text("Amount") },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  supportingText = {})
+                  supportingText = { Text(balanceModel.errorAmount ?: "") })
             }
 
             // The TVA box
@@ -219,11 +216,16 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The description field
             item {
               OutlinedTextField(
+                  isError = balanceModel.errorDescription != null,
+                  singleLine = true,
                   modifier = Modifier.padding(8.dp),
                   value = descriptionString,
-                  onValueChange = { descriptionString = it },
+                  onValueChange = {
+                    descriptionString = it
+                    balanceDetailedViewModel.checkDescription(descriptionString)
+                  },
                   label = { Text("Description") },
-                  supportingText = {})
+                  supportingText = { Text(text = balanceModel.errorDescription ?: "") })
             }
             // The date screen
             item {
@@ -241,11 +243,16 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The assignee field
             item {
               OutlinedTextField(
-                  modifier = Modifier.padding(8.dp),
+                  singleLine = true,
+                  isError = balanceModel.errorAssignee != null,
+                  modifier = Modifier.padding(8.dp).testTag("editDialogAssignee"),
                   value = assignee,
-                  onValueChange = { assignee = it },
+                  onValueChange = {
+                    assignee = it
+                    balanceDetailedViewModel.checkAssignee(assignee)
+                  },
                   label = { Text("Assignee") },
-                  supportingText = {})
+                  supportingText = { Text(balanceModel.errorAssignee ?: "") })
             }
             // The status picker
             item {
@@ -257,7 +264,7 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     OutlinedTextField(
                         value = mutableStatus.name,
                         onValueChange = {},
-                        label = { Text("Tag") },
+                        label = { Text("Status") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusExpanded)
                         },
@@ -283,33 +290,40 @@ fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
             item {
               Row(
                   modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  horizontalArrangement = Arrangement.SpaceBetween,
+                  horizontalArrangement = Arrangement.End,
               ) {
-                Button(
-                    onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
-                    modifier = Modifier.testTag("editDeleteButton"),
-                ) {
-                  Text("Delete")
+                if (balanceModel.editing) {
+                  TextButton(
+                      content = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                      onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
+                      modifier = Modifier.testTag("editDeleteButton"),
+                  )
                 }
-                Button(
+                TextButton(
+                    content = { Text("Confirm") },
                     onClick = {
-                      balanceDetailedViewModel.saveEditing(
+                      balanceDetailedViewModel.checkAll(
+                          nameString, receiptUid, amountString, assignee, descriptionString)
+                      val newBalanceItem =
                           BalanceItem(
                               balance.uid,
                               nameString,
-                              subCategoryUid,
+                              balanceModel.subCategory!!.uid,
                               receiptUid,
-                              amountString.toInt(),
+                              PriceUtil.toCents(amountString),
                               TVA.floatToTVA(tvaString.toFloat()),
                               descriptionString,
                               date,
                               assignee,
-                              mutableStatus))
+                              mutableStatus)
+                      if (balanceModel.creating) {
+                        balanceDetailedViewModel.saveCreation(newBalanceItem)
+                      } else {
+                        balanceDetailedViewModel.saveEditing(newBalanceItem)
+                      }
                     },
                     modifier = Modifier.testTag("editConfirmButton"),
-                ) {
-                  Text("Confirm")
-                }
+                )
               }
             }
           }
