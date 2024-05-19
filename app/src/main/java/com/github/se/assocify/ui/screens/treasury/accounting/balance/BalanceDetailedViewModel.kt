@@ -14,6 +14,7 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.PriceUtil
+import io.ktor.client.utils.EmptyContent.status
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -241,7 +242,11 @@ class BalanceDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   balanceList =
-                      _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
+                      if (_uiState.value.status == null ||
+                          balanceItem.status == _uiState.value.status)
+                          _uiState.value.balanceList.filter { it.uid != balanceItem.uid } +
+                              balanceItem
+                      else _uiState.value.balanceList.filter { it.uid != balanceItem.uid },
                   editedBalanceItem = null)
         },
         { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
@@ -295,7 +300,13 @@ class BalanceDetailedViewModel(
         {
           _uiState.value =
               _uiState.value.copy(
-                  creating = false, balanceList = _uiState.value.balanceList + balanceItem)
+                  creating = false,
+                  balanceList =
+                      if (_uiState.value.status == null ||
+                          balanceItem.status == _uiState.value.status)
+                          _uiState.value.balanceList + balanceItem
+                      else _uiState.value.balanceList,
+                  editedBalanceItem = null)
         },
         { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
   }
