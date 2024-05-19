@@ -60,10 +60,7 @@ class EventMapViewModel(private val taskAPI: TaskAPI) {
     fetchMarkers()
   }
 
-  /**
-   * Fetch the markers from the tasks
-   *
-   */
+  /** Fetch the markers from the tasks */
   private fun fetchMarkers() {
     val tasks = _uiState.value.currentEventTasks
     for (task in tasks) {
