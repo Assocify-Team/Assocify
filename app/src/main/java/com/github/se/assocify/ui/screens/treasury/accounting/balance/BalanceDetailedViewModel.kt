@@ -318,8 +318,8 @@ class BalanceDetailedViewModel(
       _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
     } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
       _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
-    } else if(PriceUtil.isTooLarge(amount)) {
-        _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
+    } else if (PriceUtil.isTooLarge(amount)) {
+      _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
     } else {
       _uiState.value = _uiState.value.copy(errorAmount = null)
     }

@@ -272,15 +272,16 @@ fun DisplayBudgetItem(
     budgetItem: BudgetItem,
     testTag: String
 ) {
-    val budgetState by budgetDetailedViewModel.uiState.collectAsState()
+  val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = {
-        Text(if (budgetState.filterActive)
-            PriceUtil.fromCents(
-                budgetItem.amount +
-                        (budgetItem.amount * budgetItem.tva.rate / 100f).toInt())
-        else PriceUtil.fromCents(budgetItem.amount), style = MaterialTheme.typography.bodyMedium)
+        Text(
+            if (budgetState.filterActive)
+                PriceUtil.fromCents(
+                    budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt())
+            else PriceUtil.fromCents(budgetItem.amount),
+            style = MaterialTheme.typography.bodyMedium)
       },
       supportingContent = {
         if (budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description)
