@@ -98,8 +98,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               modifier = Modifier.padding(8.dp).testTag("editDialogColumn")) {
                 item {
                   val mainText =
-                      if (budgetModel.editedBudgetItem == null) "Create Budget Item"
-                      else "Edit Budget Item"
+                      if (budgetModel.creating) "Create Budget Item" else "Edit Budget Item"
                   Row(
                       modifier = Modifier.fillMaxWidth().padding(8.dp),
                       horizontalArrangement = Arrangement.SpaceBetween,
@@ -217,8 +216,8 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                           budgetViewModel.setTitle(nameString)
                           budgetViewModel.setAmount(amountString)
                           budgetViewModel.setDescription(descriptionString)
-                          if (budgetModel.editedBudgetItem != null) {
-                            budgetViewModel.saveEditing(
+                          if (budgetModel.creating && amountString.toDoubleOrNull() != null) {
+                            budgetViewModel.saveCreating(
                                 BudgetItem(
                                     budget.uid,
                                     nameItem = nameString,
@@ -227,8 +226,8 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                                     description = descriptionString,
                                     subcategoryUID = budget.subcategoryUID,
                                     year = budgetModel.subCategory!!.year))
-                          } else {
-                            budgetViewModel.saveCreating(
+                          } else if (amountString.toDoubleOrNull() != null) {
+                            budgetViewModel.saveEditing(
                                 BudgetItem(
                                     budget.uid,
                                     nameItem = nameString,
