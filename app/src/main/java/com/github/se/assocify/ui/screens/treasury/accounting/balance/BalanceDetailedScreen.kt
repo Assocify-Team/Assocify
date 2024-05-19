@@ -41,13 +41,13 @@ fun BalanceDetailedScreen(
     return
   }
 
-    val subCategory = balanceState.subCategory
-    val snackbarState = balanceState.snackbarState
+  val subCategory = balanceState.subCategory
+  val snackbarState = balanceState.snackbarState
   AccountingDetailedScreen(
       page = AccountingPage.BALANCE,
       navigationActions = navigationActions,
-        subCategory = subCategory,
-        snackbarState = snackbarState,
+      subCategory = subCategory,
+      snackbarState = snackbarState,
       budgetDetailedViewModel = budgetDetailedViewModel,
       balanceDetailedViewModel = balanceDetailedViewModel)
 }

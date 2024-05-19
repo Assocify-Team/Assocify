@@ -95,9 +95,7 @@ fun AccountingDetailedScreen(
       topBar = {
         CenterAlignedTopAppBar(
             title = {
-              Text(
-                  text = subCategory!!.name,
-                  style = MaterialTheme.typography.titleLarge)
+              Text(text = subCategory!!.name, style = MaterialTheme.typography.titleLarge)
             },
             navigationIcon = {
               IconButton(
@@ -110,10 +108,12 @@ fun AccountingDetailedScreen(
               IconButton(
                   onClick = {
                     // Sets the editing state to true
-                    if(subCategory != null){
+                    if (subCategory != null) {
                       when (page) {
-                        AccountingPage.BUDGET -> budgetDetailedViewModel.startSubCategoryEditingInBudget()
-                        AccountingPage.BALANCE -> balanceDetailedViewModel.startSubCategoryEditingInBalance()
+                        AccountingPage.BUDGET ->
+                            budgetDetailedViewModel.startSubCategoryEditingInBudget()
+                        AccountingPage.BALANCE ->
+                            balanceDetailedViewModel.startSubCategoryEditingInBalance()
                       }
                     }
                   },
@@ -233,22 +233,21 @@ fun DisplayFilters(
     statusList: List<String>,
     tvaList: List<String>
 ) {
-    Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
-        // Status filter for balance Items
-        if (page == AccountingPage.BALANCE) {
-            DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
-                balanceDetailedViewModel.onStatusFilter(
-                    it.takeIf { it != "All Status" }?.let { Status.valueOf(it) }
-                )
-            }
-        }
-
-        // Tva filter
-        DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-            balanceDetailedViewModel.modifyTVAFilter(it == "TTC")
-            budgetDetailedViewModel.modifyTVAFilter(it == "TTC")
-        }
+  Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+    // Status filter for balance Items
+    if (page == AccountingPage.BALANCE) {
+      DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
+        balanceDetailedViewModel.onStatusFilter(
+            it.takeIf { it != "All Status" }?.let { Status.valueOf(it) })
+      }
     }
+
+    // Tva filter
+    DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+      balanceDetailedViewModel.modifyTVAFilter(it == "TTC")
+      budgetDetailedViewModel.modifyTVAFilter(it == "TTC")
+    }
+  }
 }
 
 /**
