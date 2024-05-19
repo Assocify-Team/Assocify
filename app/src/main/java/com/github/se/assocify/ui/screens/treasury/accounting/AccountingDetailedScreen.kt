@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
@@ -62,6 +64,8 @@ import com.github.se.assocify.ui.util.PriceUtil
 fun AccountingDetailedScreen(
     page: AccountingPage,
     navigationActions: NavigationActions,
+    subCategory: AccountingSubCategory?,
+    snackbarState: SnackbarHostState,
     budgetDetailedViewModel: BudgetDetailedViewModel,
     balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
@@ -92,11 +96,7 @@ fun AccountingDetailedScreen(
         CenterAlignedTopAppBar(
             title = {
               Text(
-                  text =
-                      when (page) {
-                        AccountingPage.BALANCE -> balanceState.subCategory!!.name
-                        AccountingPage.BUDGET -> budgetState.subCategory!!.name
-                      },
+                  text = subCategory!!.name,
                   style = MaterialTheme.typography.titleLarge)
             },
             navigationIcon = {
@@ -110,15 +110,11 @@ fun AccountingDetailedScreen(
               IconButton(
                   onClick = {
                     // Sets the editing state to true
-                    when (page) {
-                      AccountingPage.BALANCE ->
-                          if (balanceState.subCategory != null) {
-                            balanceDetailedViewModel.startSubCategoryEditingInBalance()
-                          }
-                      AccountingPage.BUDGET ->
-                          if (budgetState.subCategory != null) {
-                            budgetDetailedViewModel.startSubCategoryEditingInBudget()
-                          }
+                    if(subCategory != null){
+                      when (page) {
+                        AccountingPage.BUDGET -> budgetDetailedViewModel.startSubCategoryEditingInBudget()
+                        AccountingPage.BALANCE -> balanceDetailedViewModel.startSubCategoryEditingInBalance()
+                      }
                     }
                   },
                   modifier = Modifier.testTag("editSubCat")) {
@@ -144,11 +140,7 @@ fun AccountingDetailedScreen(
       },
       snackbarHost = {
         SnackbarHost(
-            hostState =
-                when (page) {
-                  AccountingPage.BALANCE -> balanceState.snackbarState
-                  AccountingPage.BUDGET -> budgetState.snackbarState
-                },
+            hostState = snackbarState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { innerPadding ->
         // Call the various editing popups
@@ -180,11 +172,7 @@ fun AccountingDetailedScreen(
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                   balanceDetailedViewModel.onStatusFilter(
-                      if (it == "All Status") {
-                        null
-                      } else {
-                        Status.valueOf(it)
-                      })
+                      it.takeIf { it != "All Status" }?.let { Status.valueOf(it) })
                 }
               }
 
@@ -235,6 +223,32 @@ fun AccountingDetailedScreen(
           item { Spacer(modifier = Modifier.height(80.dp)) }
         }
       }
+}
+
+@Composable
+fun DisplayFilters(
+    page: AccountingPage,
+    balanceDetailedViewModel: BalanceDetailedViewModel,
+    budgetDetailedViewModel: BudgetDetailedViewModel,
+    statusList: List<String>,
+    tvaList: List<String>
+) {
+    Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
+        // Status filter for balance Items
+        if (page == AccountingPage.BALANCE) {
+            DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
+                balanceDetailedViewModel.onStatusFilter(
+                    it.takeIf { it != "All Status" }?.let { Status.valueOf(it) }
+                )
+            }
+        }
+
+        // Tva filter
+        DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+            balanceDetailedViewModel.modifyTVAFilter(it == "TTC")
+            budgetDetailedViewModel.modifyTVAFilter(it == "TTC")
+        }
+    }
 }
 
 /**

@@ -3,6 +3,8 @@ package com.github.se.assocify.ui.screens.treasury.accounting.budget
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.ErrorMessagePage
@@ -40,6 +42,9 @@ fun BudgetDetailedScreen(
     return
   }
 
+    val subCategory = budgetState.subCategory
+    val snackbarState = budgetState.snackbarState
+
   AccountingDetailedScreen(
-      AccountingPage.BUDGET, navigationActions, budgetDetailedViewModel, balanceDetailedViewModel)
+      AccountingPage.BUDGET, navigationActions, subCategory, snackbarState, budgetDetailedViewModel, balanceDetailedViewModel)
 }
