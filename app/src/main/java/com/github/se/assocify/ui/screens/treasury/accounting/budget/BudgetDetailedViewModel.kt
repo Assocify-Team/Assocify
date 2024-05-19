@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.budget
 
-import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser

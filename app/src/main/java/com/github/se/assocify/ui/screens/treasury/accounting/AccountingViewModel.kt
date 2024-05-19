@@ -231,7 +231,7 @@ class AccountingViewModel(
         _uiState.value.copy(
             newSubcategoryTitle = "",
             newSubcategoryCategory = null,
-            newSubcategoryYear = Year.now().value.toString(),
+            newSubcategoryYear = _uiState.value.yearFilter.toString(),
             newSubcategoryTitleError = null,
             newSubcategoryCategoryError = null)
   }

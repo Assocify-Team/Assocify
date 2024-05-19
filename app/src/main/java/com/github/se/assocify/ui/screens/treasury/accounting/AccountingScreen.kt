@@ -142,7 +142,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 
   // Row of dropdown filters
   Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
-    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") {
+    DropdownFilterChip(model.yearFilter.toString(), yearList, "yearFilterChip") {
       selectedYear = it
       accountingViewModel.onYearFilter(selectedYear.toInt())
     }

@@ -47,7 +47,6 @@ import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEdit
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.DisplayCreateBudget
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.DisplayEditBudget
-import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 
 /**
@@ -275,7 +274,7 @@ fun DisplayBudgetItem(
 ) {
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
-      trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount)) },
+      trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount), style = MaterialTheme.typography.bodyMedium) },
       supportingContent = {
         if (budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description)
       },
@@ -286,6 +285,7 @@ fun DisplayBudgetItem(
 /**
  * Display the budget Item in a list
  *
+ * @param balanceDetailedViewModel: The view model of the balance details
  * @param balanceItem: The budget item to display
  * @param testTag: The test tag of the item
  */
