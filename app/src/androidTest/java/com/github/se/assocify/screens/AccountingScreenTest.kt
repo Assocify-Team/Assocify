@@ -236,7 +236,7 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
                 .map { it.amount }
                 .sum()
             Log.d("mockedTotalAmountHT", mockedTotalAmountHT.toString())
-            Log.d()
+           // Log.d()
             val viewModelTotalAmountHT = accountingViewModel.uiState.value.amountBudgetHT.filter { it.key in "2" }.values.sum()
             Log.d("viewModelTotalAmountHT", viewModelTotalAmountHT.toString())
             assert(viewModelTotalAmountHT == mockedTotalAmountHT)

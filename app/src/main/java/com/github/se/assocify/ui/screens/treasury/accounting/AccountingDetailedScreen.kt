@@ -189,12 +189,6 @@ fun AccountingDetailedScreen(
         ) {
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
-              // Year filter
-              DropdownFilterChip(yearList.first(), yearList, "yearListTag") {
-                balanceDetailedViewModel.onYearFilter(it.toInt())
-                budgetDetailedViewModel.onYearFilter(it.toInt())
-              }
-
               // Status filter for balance Items
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
