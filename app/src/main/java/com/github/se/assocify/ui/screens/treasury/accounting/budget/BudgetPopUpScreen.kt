@@ -216,7 +216,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                           budgetViewModel.setTitle(nameString)
                           budgetViewModel.setAmount(amountString)
                           budgetViewModel.setDescription(descriptionString)
-                          if (budgetModel.editedBudgetItem != null &&
+                          if (budgetModel.creating &&
                               amountString.toDoubleOrNull() != null) {
                             budgetViewModel.saveEditing(
                                 BudgetItem(

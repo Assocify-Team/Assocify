@@ -138,6 +138,7 @@ class BudgetDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   creating = false,
+                  editedBudgetItem = null,
                   budgetList =
                       _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem)
         },
