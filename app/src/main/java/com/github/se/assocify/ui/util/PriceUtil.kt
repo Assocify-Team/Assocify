@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.util
 
-import com.github.se.assocify.model.entities.TVA
 import java.util.Locale
 
 /** Utility class for price related operations. */
@@ -11,9 +10,7 @@ object PriceUtil {
    */
   const val VALID_CHARS = """^[0-9.]+$"""
 
-  /**
-   * Maximum amount that can be displayed.
-   */
+  /** Maximum amount that can be displayed. */
   const val MAX_AMOUNT = Int.MAX_VALUE - (Int.MAX_VALUE * 8.1 / 100f)
 
   /**

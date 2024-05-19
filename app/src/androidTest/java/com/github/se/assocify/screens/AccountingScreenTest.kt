@@ -218,43 +218,43 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     }
   }
 
-    /** Tests if total amount is correctly calculated with or without VAT*/
-    @Test
-    fun testTvaFilterAndTotalAmount(){
-        with(composeTestRule){
-            onNodeWithTag("yearFilterChip").performClick()
-            onNodeWithText("2023").performClick()
-            onNodeWithTag("categoryFilterChip").performClick()
-            onNodeWithText("Pole").performClick()
-            assert(accountingViewModel.uiState.value.yearFilter == 2023)
-            assert(
-                accountingViewModel.uiState.value.subCategoryList ==
-                        subCategoryList.filter { it.year == 2023 && it.categoryUID == "2"})
-            val mockedTotalAmountHT =
-                budgetItems
-                .filter { it.year == 2023 && it.subcategoryUID == "2" }
-                .map { it.amount }
-                .sum()
-            Log.d("mockedTotalAmountHT", mockedTotalAmountHT.toString())
-           // Log.d()
-            val viewModelTotalAmountHT = accountingViewModel.uiState.value.amountBudgetHT.filter { it.key in "2" }.values.sum()
-            Log.d("viewModelTotalAmountHT", viewModelTotalAmountHT.toString())
-            assert(viewModelTotalAmountHT == mockedTotalAmountHT)
+  /** Tests if total amount is correctly calculated with or without VAT */
+  @Test
+  fun testTvaFilterAndTotalAmount() {
+    with(composeTestRule) {
+      onNodeWithTag("yearFilterChip").performClick()
+      onNodeWithText("2023").performClick()
+      onNodeWithTag("categoryFilterChip").performClick()
+      onNodeWithText("Pole").performClick()
+      assert(accountingViewModel.uiState.value.yearFilter == 2023)
+      assert(
+          accountingViewModel.uiState.value.subCategoryList ==
+              subCategoryList.filter { it.year == 2023 && it.categoryUID == "2" })
+      val mockedTotalAmountHT =
+          budgetItems.filter { it.year == 2023 && it.subcategoryUID == "2" }.map { it.amount }.sum()
+      Log.d("mockedTotalAmountHT", mockedTotalAmountHT.toString())
+      // Log.d()
+      val viewModelTotalAmountHT =
+          accountingViewModel.uiState.value.amountBudgetHT.filter { it.key in "2" }.values.sum()
+      Log.d("viewModelTotalAmountHT", viewModelTotalAmountHT.toString())
+      assert(viewModelTotalAmountHT == mockedTotalAmountHT)
 
-            onNodeWithTag("tvaListTag").performClick()
-            onNodeWithText("TTC").performClick()
-            assert(accountingViewModel.uiState.value.tvaFilterActive)
-            val mockedTotalAmountTTC = budgetItems
-                .filter { it.year == 2023 }
-                .map { it.amount * it.tva.rate / 100f }
-                .sum()
-            val viewModelTotalAmountTTC = accountingViewModel.uiState.value.amountBudgetTTC.filter { it.key in subCategoryList.map { it.uid } }.values.sum().toFloat()
-            assert(viewModelTotalAmountTTC == mockedTotalAmountTTC)
+      onNodeWithTag("tvaListTag").performClick()
+      onNodeWithText("TTC").performClick()
+      assert(accountingViewModel.uiState.value.tvaFilterActive)
+      val mockedTotalAmountTTC =
+          budgetItems.filter { it.year == 2023 }.map { it.amount * it.tva.rate / 100f }.sum()
+      val viewModelTotalAmountTTC =
+          accountingViewModel.uiState.value.amountBudgetTTC
+              .filter { it.key in subCategoryList.map { it.uid } }
+              .values
+              .sum()
+              .toFloat()
+      assert(viewModelTotalAmountTTC == mockedTotalAmountTTC)
 
-            onNodeWithTag("tvaListTag").performClick()
-            onNodeWithText("HT").performClick()
-            assert(!accountingViewModel.uiState.value.tvaFilterActive)
-
-        }
+      onNodeWithTag("tvaListTag").performClick()
+      onNodeWithText("HT").performClick()
+      assert(!accountingViewModel.uiState.value.tvaFilterActive)
     }
+  }
 }

@@ -96,13 +96,9 @@ class BalanceDetailedViewModel(
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
-          // Filter the balanceList to only include items with the matching subCategoryUid, year and
-          // status
+          // Filter the balanceList to only include items with the matching subCategoryUid
           val filteredBalanceList =
-              balanceList.filter { balanceItem ->
-                balanceItem.date.year == _uiState.value.year &&
-                    balanceItem.subcategoryUID == subCategoryUid
-              }
+              balanceList.filter { balanceItem -> balanceItem.subcategoryUID == subCategoryUid }
 
           // if status is not null, filter the list by status
           val statusFilteredBalanceList =
@@ -128,16 +124,6 @@ class BalanceDetailedViewModel(
           if (--innerLoadCounter == 0) endLoad()
         },
         { endLoad("Error loading tags") })
-  }
-
-  /**
-   * Handle the year filter
-   *
-   * @param year the year to filter by
-   */
-  fun onYearFilter(year: Int) {
-    _uiState.value = _uiState.value.copy(year = year)
-    updateDatabaseValuesInBalance()
   }
 
   /**
@@ -269,7 +255,6 @@ class BalanceDetailedViewModel(
  * @param subCategory the current subcategory of the item
  * @param status the current status
  * @param subCatEditing whether the subcategory is being edited
- * @param year the current year
  * @param snackbarState the snackbar state
  * @param filterActive if the tva filter is active or not
  */
@@ -286,7 +271,6 @@ data class BalanceItemState(
     val editing: Boolean = false,
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = 2023,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false
 )

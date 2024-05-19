@@ -48,8 +48,8 @@ class AddSubcategoryDialogTest :
 
   val accountingCategoryAPI = mockk<AccountingCategoryAPI>()
   val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>()
-    val balanceAPI = mockk<BalanceAPI>()
-    val budgetAPI = mockk<BudgetAPI>()
+  val balanceAPI = mockk<BalanceAPI>()
+  val budgetAPI = mockk<BudgetAPI>()
   lateinit var viewModel: AccountingViewModel
 
   @Before
@@ -68,23 +68,22 @@ class AddSubcategoryDialogTest :
         {
           thirdArg<() -> Unit>().invoke()
         }
-      every { balanceAPI.getBalance(any(), any(), any()) } answers
+    every { balanceAPI.getBalance(any(), any(), any()) } answers
         {
-            val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
-            onSuccessCallback(emptyList())
+          val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
+          onSuccessCallback(emptyList())
         }
-      every { budgetAPI.getBudget(any(), any(), any()) } answers
-              {
-                  val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
-                  onSuccessCallback(emptyList())
-              }
+    every { budgetAPI.getBudget(any(), any(), any()) } answers
+        {
+          val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
+          onSuccessCallback(emptyList())
+        }
     viewModel =
         AccountingViewModel(
             accountingCategoryAPI = accountingCategoryAPI,
             accountingSubCategoryAPI = accountingSubCategoryAPI,
             balanceAPI = balanceAPI,
-            budgetAPI = budgetAPI
-        )
+            budgetAPI = budgetAPI)
     composeTestRule.setContent { AddSubcategoryDialog(viewModel) }
     viewModel.showNewSubcategoryDialog()
   }

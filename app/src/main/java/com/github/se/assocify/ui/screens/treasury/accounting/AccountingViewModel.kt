@@ -137,51 +137,50 @@ class AccountingViewModel(
 
   /** Set the amount of a subcategory */
   private fun setSubcategoriesAmount() {
-      val updatedAmountBalanceHT = _uiState.value.amountBalanceHT.toMutableMap()
-      val updatedAmountBalanceTTC = _uiState.value.amountBalanceTTC.toMutableMap()
-      val updatedAmountBudgetHT = _uiState.value.amountBudgetHT.toMutableMap()
-      val updatedAmountBudgetTTC = _uiState.value.amountBudgetTTC.toMutableMap()
+    val updatedAmountBalanceHT = _uiState.value.amountBalanceHT.toMutableMap()
+    val updatedAmountBalanceTTC = _uiState.value.amountBalanceTTC.toMutableMap()
+    val updatedAmountBudgetHT = _uiState.value.amountBudgetHT.toMutableMap()
+    val updatedAmountBudgetTTC = _uiState.value.amountBudgetTTC.toMutableMap()
 
-      val balanceItemsBySubCategory = _uiState.value.balanceItemList.groupBy { it.subcategoryUID }
-      val budgetItemsBySubCategory = _uiState.value.budgetItemsList.groupBy { it.subcategoryUID }
+    val balanceItemsBySubCategory = _uiState.value.balanceItemList.groupBy { it.subcategoryUID }
+    val budgetItemsBySubCategory = _uiState.value.budgetItemsList.groupBy { it.subcategoryUID }
 
-      _uiState.value.allSubCategoryList.forEach { subCategory ->
-          val balanceItems = balanceItemsBySubCategory[subCategory.uid].orEmpty()
-          val budgetItems = budgetItemsBySubCategory[subCategory.uid].orEmpty()
+    _uiState.value.allSubCategoryList.forEach { subCategory ->
+      val balanceItems = balanceItemsBySubCategory[subCategory.uid].orEmpty()
+      val budgetItems = budgetItemsBySubCategory[subCategory.uid].orEmpty()
 
-          balanceItems.forEach { balanceItem ->
-              // Add to map the balance amount of the subcategory
-              updatedAmountBalanceHT[subCategory.uid] =
-                  updatedAmountBalanceHT.getOrPut(subCategory.uid) { 0 } + balanceItem.amount
+      balanceItems.forEach { balanceItem ->
+        // Add to map the balance amount of the subcategory
+        updatedAmountBalanceHT[subCategory.uid] =
+            updatedAmountBalanceHT.getOrPut(subCategory.uid) { 0 } + balanceItem.amount
 
-              // Add to map the balance amount of the subcategory with TVA
-              val amountWithTVA =
-                  balanceItem.amount + (balanceItem.amount * balanceItem.tva.rate / 100f).toInt()
-              updatedAmountBalanceTTC[subCategory.uid] =
-                  updatedAmountBalanceTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
-          }
-
-          budgetItems.forEach { budgetItem ->
-              // Add to map the budget amount of the subcategory
-              updatedAmountBudgetHT[subCategory.uid] =
-                  updatedAmountBudgetHT.getOrPut(subCategory.uid) { 0 } + budgetItem.amount
-
-              // Add to map the budget amount of the subcategory with TVA
-              val amountWithTVA =
-                  budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt()
-              updatedAmountBudgetTTC[subCategory.uid] =
-                  updatedAmountBudgetTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
-          }
-
-          // Update the state with the new maps
-          _uiState.value =
-              _uiState.value.copy(
-                  amountBalanceHT = updatedAmountBalanceHT,
-                  amountBalanceTTC = updatedAmountBalanceTTC,
-                  amountBudgetHT = updatedAmountBudgetHT,
-                  amountBudgetTTC = updatedAmountBudgetTTC
-              )
+        // Add to map the balance amount of the subcategory with TVA
+        val amountWithTVA =
+            balanceItem.amount + (balanceItem.amount * balanceItem.tva.rate / 100f).toInt()
+        updatedAmountBalanceTTC[subCategory.uid] =
+            updatedAmountBalanceTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
       }
+
+      budgetItems.forEach { budgetItem ->
+        // Add to map the budget amount of the subcategory
+        updatedAmountBudgetHT[subCategory.uid] =
+            updatedAmountBudgetHT.getOrPut(subCategory.uid) { 0 } + budgetItem.amount
+
+        // Add to map the budget amount of the subcategory with TVA
+        val amountWithTVA =
+            budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt()
+        updatedAmountBudgetTTC[subCategory.uid] =
+            updatedAmountBudgetTTC.getOrPut(subCategory.uid) { 0 } + amountWithTVA
+      }
+
+      // Update the state with the new maps
+      _uiState.value =
+          _uiState.value.copy(
+              amountBalanceHT = updatedAmountBalanceHT,
+              amountBalanceTTC = updatedAmountBalanceTTC,
+              amountBudgetHT = updatedAmountBudgetHT,
+              amountBudgetTTC = updatedAmountBudgetTTC)
+    }
   }
 
   /**
