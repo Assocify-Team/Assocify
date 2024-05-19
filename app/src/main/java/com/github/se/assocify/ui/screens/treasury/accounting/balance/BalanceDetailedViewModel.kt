@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 /**
  * View model for the balance detailed screen
@@ -212,7 +213,9 @@ class BalanceDetailedViewModel(
             errorReceipt = null,
             errorAmount = null,
             errorAssignee = null,
-            errorDescription = null)
+            errorDescription = null,
+            errorDate = null
+        )
   }
 
   /**
@@ -225,7 +228,9 @@ class BalanceDetailedViewModel(
         _uiState.value.errorReceipt != null ||
         _uiState.value.errorAmount != null ||
         _uiState.value.errorAssignee != null ||
-        _uiState.value.errorDescription != null) {
+        _uiState.value.errorDescription != null ||
+        _uiState.value.errorDate != null
+        ) {
       return
     }
     balanceApi.updateBalance(
@@ -271,7 +276,9 @@ class BalanceDetailedViewModel(
             errorReceipt = null,
             errorAmount = null,
             errorAssignee = null,
-            errorDescription = null)
+            errorDescription = null,
+            errorDate = null
+        )
   }
 
   fun saveCreation(balanceItem: BalanceItem) {
@@ -279,7 +286,9 @@ class BalanceDetailedViewModel(
         _uiState.value.errorReceipt != null ||
         _uiState.value.errorAmount != null ||
         _uiState.value.errorAssignee != null ||
-        _uiState.value.errorDescription != null) {
+        _uiState.value.errorDescription != null ||
+        _uiState.value.errorDate != null
+        ) {
       return
     }
     balanceApi.addBalance(
@@ -339,18 +348,28 @@ class BalanceDetailedViewModel(
     }
   }
 
+    fun checkDate(date: LocalDate) {
+        if (date.year != _uiState.value.subCategory!!.year) {
+            _uiState.value = _uiState.value.copy(errorDate = "The year doesn't match ${_uiState.value.subCategory!!.name}'s year: ${_uiState.value.subCategory!!.year}")
+        } else {
+            _uiState.value = _uiState.value.copy(errorDate = null)
+        }
+    }
+
   fun checkAll(
       name: String,
       receiptUid: String,
       amount: String,
       assignee: String,
-      description: String
+      description: String,
+      date: LocalDate
   ) {
     checkName(name)
     checkReceipt(receiptUid)
     checkAmount(amount)
     checkAssignee(assignee)
     checkDescription(description)
+      checkDate(date)
   }
 }
 
@@ -392,5 +411,6 @@ data class BalanceItemState(
     val errorReceipt: String? = "",
     val errorAmount: String? = "",
     val errorAssignee: String? = "",
-    val errorDescription: String? = ""
+    val errorDescription: String? = "",
+    val errorDate: String? = ""
 )
