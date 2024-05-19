@@ -129,7 +129,6 @@ class EventScreenViewModel(
  * @param selectedEvents the list of selected events
  * @param currentTab the current tab
  * @param error whether an error occurred
- * @param errorText the error message
  */
 data class EventScreenState(
     val loading: Boolean = false,

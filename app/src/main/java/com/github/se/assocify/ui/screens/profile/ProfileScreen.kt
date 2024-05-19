@@ -67,7 +67,6 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
  * @param navActions: NavigationActions object that contains the navigation actions.
  * @param viewmodel: ProfileViewModel object that contains the logic of the profile screen.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
   val state by viewmodel.uiState.collectAsState()

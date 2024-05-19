@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
  * View model for the balance detailed screen
  *
  * @param balanceApi the balance api
- * @param accountingSubCategoryAPI the accounting subcategory api
  * @param accountingCategoryAPI the accounting category api
  * @param subCategoryUid the subcategory uid
  */

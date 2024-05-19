@@ -117,11 +117,9 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel) {
         Text(
             modifier = Modifier.testTag("receiptDescriptionText"),
             text =
-                if (receipt.description.isEmpty()) {
-                  "-"
-                } else {
-                  receipt.description
-                },
+            receipt.description.ifEmpty {
+                "-"
+            },
             maxLines = 1,
         )
       },

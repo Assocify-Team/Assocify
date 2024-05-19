@@ -48,8 +48,6 @@ gen-external-apklibs
 # Compiled class file
 *.class
 
-# Log file
-*.log
 
 # BlueJ files
 *.ctxt

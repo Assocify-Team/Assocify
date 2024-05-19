@@ -45,7 +45,6 @@ sealed class Destination(
   data class BalanceDetailed(val subCategoryUid: String) :
       Destination("treasury/balance/$subCategoryUid")
 
-  data object NewBalanceCategory : Destination("treasury/balance/newCategory")
 
   data object NewTask : Destination("event/task")
 
