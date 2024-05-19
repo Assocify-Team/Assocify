@@ -98,8 +98,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
               modifier = Modifier.padding(8.dp).testTag("editDialogColumn")) {
                 item {
                   val mainText =
-                      if (budgetModel.editedBudgetItem == null) "Create Budget Item"
-                      else "Edit Budget Item"
+                      if (budgetModel.creating) "Create Budget Item" else "Edit Budget Item"
                   Row(
                       modifier = Modifier.fillMaxWidth().padding(8.dp),
                       horizontalArrangement = Arrangement.SpaceBetween,

@@ -137,6 +137,7 @@ class BudgetDetailedViewModel(
           _uiState.value =
               _uiState.value.copy(
                   editing = false,
+                  creating = false,
                   budgetList =
                       _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem)
         },
@@ -145,7 +146,7 @@ class BudgetDetailedViewModel(
 
   /** Exit the edit state without keeping the modifications done */
   fun cancelEditing() {
-    _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
+    _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null, creating = false)
   }
 
   /** Delete the item that is being edited from the list */
@@ -223,14 +224,15 @@ class BudgetDetailedViewModel(
   fun startCreating() {
     _uiState.value =
         _uiState.value.copy(
-            creating = true, titleError = false, amountError = false, descriptionError = false)
+            creating = true,
+            titleError = false,
+            amountError = false,
+            descriptionError = false,
+            editing = false)
   }
 
   fun cancelCreating() {
-    _uiState.value =
-        _uiState.value.copy(
-            creating = false,
-        )
+    _uiState.value = _uiState.value.copy(creating = false, editing = false)
   }
 
   fun saveCreating(budgetItem: BudgetItem) {
@@ -243,10 +245,11 @@ class BudgetDetailedViewModel(
         CurrentUser.associationUid!!,
         budgetItem,
         {
-          _uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
+          _uiState.value =
+              _uiState.value.copy(
+                  budgetList = _uiState.value.budgetList + budgetItem, creating = false)
         },
         {})
-    _uiState.value = _uiState.value.copy(creating = false)
   }
 
   /**
