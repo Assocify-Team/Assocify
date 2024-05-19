@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -84,7 +84,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
   var date by remember { mutableStateOf(balance.date) }
   var assignee by remember { mutableStateOf((balance.assignee)) }
   var mutableStatus by remember { mutableStateOf(balance.status) }
-  val titleText = if (balanceModel.editing) "Edit Balance Detail" else "Create Balance Detail"
+  val titleText = if (balanceModel.editing) "Edit Balance Item" else "Create Balance Item"
   Dialog(onDismissRequest = { balanceDetailedViewModel.cancelPopUp() }) {
     Card(
         modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp).testTag("editDialogBox"),
@@ -301,18 +301,17 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             item {
               Row(
                   modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  horizontalArrangement =
-                      if (balanceModel.editing) Arrangement.SpaceBetween else Arrangement.End,
+                  horizontalArrangement = Arrangement.End,
               ) {
                 if (balanceModel.editing) {
-                  Button(
+                  TextButton(
+                      content = { Text("Delete") },
                       onClick = { balanceDetailedViewModel.deleteBalanceItem(balance.uid) },
                       modifier = Modifier.testTag("editDeleteButton"),
-                  ) {
-                    Text("Delete")
-                  }
+                  )
                 }
-                Button(
+                TextButton(
+                    content = { Text("Confirm") },
                     onClick = {
                       balanceDetailedViewModel.checkAll(
                           nameString, receiptUid, amountString, assignee, descriptionString)
@@ -335,9 +334,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                       }
                     },
                     modifier = Modifier.testTag("editConfirmButton"),
-                ) {
-                  Text("Confirm")
-                }
+                )
               }
             }
           }
