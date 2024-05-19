@@ -202,39 +202,6 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                       })
                 }
                 item {
-                  var yearExpanded by remember { mutableStateOf(false) }
-                  ExposedDropdownMenuBox(
-                      expanded = yearExpanded,
-                      onExpandedChange = { yearExpanded = !yearExpanded },
-                      modifier = Modifier.padding(8.dp)) {
-                        OutlinedTextField(
-                            value = yearString,
-                            onValueChange = {},
-                            label = { Text("Year") },
-                            trailingIcon = {
-                              ExposedDropdownMenuDefaults.TrailingIcon(expanded = yearExpanded)
-                            },
-                            readOnly = true,
-                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                            modifier =
-                                Modifier.menuAnchor()
-                                    .clickable { yearExpanded = !yearExpanded }
-                                    .testTag("editYearBox"))
-                        ExposedDropdownMenu(
-                            expanded = yearExpanded, onDismissRequest = { yearExpanded = false }) {
-                              DateUtil.getYearList().forEach { year ->
-                                DropdownMenuItem(
-                                    modifier = Modifier.testTag("$year DropdownItem"),
-                                    text = { Text(year) },
-                                    onClick = {
-                                      yearString = year
-                                      yearExpanded = false
-                                    })
-                              }
-                            }
-                      }
-                }
-                item {
                   Row(
                       modifier = Modifier.fillMaxWidth().padding(8.dp),
                       horizontalArrangement =
@@ -262,7 +229,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                                     tva = TVA.floatToTVA(tvaString.toFloat()),
                                     description = descriptionString,
                                     subcategoryUID = budget.subcategoryUID,
-                                    year = yearString.toInt()))
+                                    year = budgetModel.subCategory!!.year))
                           } else {
                             budgetViewModel.saveCreating(
                                 BudgetItem(
@@ -272,7 +239,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                                     tva = TVA.floatToTVA(tvaString.toFloat()),
                                     description = descriptionString,
                                     subcategoryUID = budget.subcategoryUID,
-                                    year = yearString.toInt()))
+                                    year = budgetModel.subCategory!!.year))
                           }
                         },
                         modifier = Modifier.testTag("editConfirmButton"),
