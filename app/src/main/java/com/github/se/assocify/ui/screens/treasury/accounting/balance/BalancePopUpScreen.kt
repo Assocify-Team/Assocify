@@ -116,15 +116,13 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   singleLine = true,
                   modifier = Modifier.padding(8.dp).testTag("editDialogName"),
                   value = nameString,
-                  isError = balanceModel.errorName,
+                  isError = balanceModel.errorName != null,
                   onValueChange = {
                     nameString = it
                     balanceDetailedViewModel.checkName(nameString)
                   },
                   label = { Text("Name") },
-                  supportingText = {
-                    if (balanceModel.errorName) Text(balanceModel.errorNameMessage)
-                  })
+                  supportingText = { Text(balanceModel.errorName ?: "") })
             }
 
             // The receipt selector
@@ -135,12 +133,8 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onExpandedChange = { receiptExpanded = !receiptExpanded },
                   modifier = Modifier.testTag("receiptDropdown").padding(8.dp)) {
                     OutlinedTextField(
-                        isError = balanceModel.errorReceipt || balanceModel.receiptAlreadyAssigned,
-                        supportingText = {
-                          if (balanceModel.errorReceipt) Text("You have to choose a receipt!")
-                          else if (balanceModel.receiptAlreadyAssigned)
-                              Text("This receipt is already assigned!")
-                        },
+                        isError = balanceModel.errorReceipt != null,
+                        supportingText = { Text(balanceModel.errorReceipt ?: "") },
                         value = receiptName,
                         onValueChange = { balanceDetailedViewModel.checkReceipt(receiptName) },
                         label = { Text("Receipt") },
@@ -171,7 +165,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             item {
               OutlinedTextField(
                   singleLine = true,
-                  isError = balanceModel.errorAmount,
+                  isError = balanceModel.errorAmount != null,
                   modifier = Modifier.padding(8.dp),
                   value = amountString,
                   onValueChange = {
@@ -181,9 +175,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   label = { Text("Amount") },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  supportingText = {
-                    if (balanceModel.errorAmount) Text("The amount must be a valid number!")
-                  })
+                  supportingText = { Text(balanceModel.errorAmount ?: "") })
             }
 
             // The TVA box
@@ -224,6 +216,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             // The description field
             item {
               OutlinedTextField(
+                  isError = balanceModel.errorDescription != null,
                   singleLine = true,
                   modifier = Modifier.padding(8.dp),
                   value = descriptionString,
@@ -232,9 +225,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     balanceDetailedViewModel.checkDescription(descriptionString)
                   },
                   label = { Text("Description") },
-                  supportingText = {
-                    if (balanceModel.errorDescription) Text("The description is too long!!")
-                  })
+                  supportingText = { Text(text = balanceModel.errorDescription ?: "") })
             }
             // The date screen
             item {
@@ -253,7 +244,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
             item {
               OutlinedTextField(
                   singleLine = true,
-                  isError = balanceModel.errorAssignee,
+                  isError = balanceModel.errorAssignee != null,
                   modifier = Modifier.padding(8.dp).testTag("editDialogAssignee"),
                   value = assignee,
                   onValueChange = {
@@ -261,9 +252,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     balanceDetailedViewModel.checkAssignee(assignee)
                   },
                   label = { Text("Assignee") },
-                  supportingText = {
-                    if (balanceModel.errorAssignee) Text("You have to enter a valid assignee!")
-                  })
+                  supportingText = { Text(balanceModel.errorAssignee ?: "") })
             }
             // The status picker
             item {

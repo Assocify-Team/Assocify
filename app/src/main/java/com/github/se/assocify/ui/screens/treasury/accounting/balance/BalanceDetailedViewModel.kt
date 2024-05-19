@@ -223,12 +223,11 @@ class BalanceDetailedViewModel(
         _uiState.value.copy(
             editing = true,
             editedBalanceItem = balanceItem,
-            errorName = false,
-            errorReceipt = false,
-            errorAmount = false,
-            errorAssignee = false,
-            errorDescription = false,
-            receiptAlreadyAssigned = false)
+            errorName = null,
+            errorReceipt = null,
+            errorAmount = null,
+            errorAssignee = null,
+            errorDescription = null)
   }
 
   /**
@@ -237,12 +236,11 @@ class BalanceDetailedViewModel(
    * @param balanceItem the new edited budgetItem
    */
   fun saveEditing(balanceItem: BalanceItem) {
-    if (_uiState.value.errorName ||
-        _uiState.value.errorReceipt ||
-        _uiState.value.errorAmount ||
-        _uiState.value.errorAssignee ||
-        _uiState.value.receiptAlreadyAssigned ||
-        _uiState.value.errorDescription) {
+    if (_uiState.value.errorName == null ||
+        _uiState.value.errorReceipt == null ||
+        _uiState.value.errorAmount == null ||
+        _uiState.value.errorAssignee == null ||
+        _uiState.value.errorDescription == null) {
       return
     }
     balanceApi.updateBalance(
@@ -261,7 +259,7 @@ class BalanceDetailedViewModel(
                       else _uiState.value.balanceList.filter { it.uid != balanceItem.uid },
                   editedBalanceItem = null)
         },
-        { _uiState.value = _uiState.value.copy(receiptAlreadyAssigned = true) })
+        { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
   }
 
   /** Exit the edit state without keeping the modifications done */
@@ -287,21 +285,19 @@ class BalanceDetailedViewModel(
     _uiState.value =
         _uiState.value.copy(
             creating = true,
-            errorName = false,
-            errorReceipt = false,
-            errorAmount = false,
-            errorAssignee = false,
-            errorDescription = false,
-            receiptAlreadyAssigned = false)
+            errorName = null,
+            errorReceipt = null,
+            errorAmount = null,
+            errorAssignee = null,
+            errorDescription = null)
   }
 
   fun saveCreation(balanceItem: BalanceItem) {
-    if (_uiState.value.errorName ||
-        _uiState.value.errorReceipt ||
-        _uiState.value.errorAmount ||
-        _uiState.value.errorAssignee ||
-        _uiState.value.receiptAlreadyAssigned ||
-        _uiState.value.errorDescription) {
+    if (_uiState.value.errorName == null ||
+        _uiState.value.errorReceipt == null ||
+        _uiState.value.errorAmount == null ||
+        _uiState.value.errorAssignee == null ||
+        _uiState.value.errorDescription == null) {
       return
     }
     balanceApi.addBalance(
@@ -318,39 +314,49 @@ class BalanceDetailedViewModel(
                           _uiState.value.balanceList + balanceItem
                       else _uiState.value.balanceList)
         },
-        { _uiState.value = _uiState.value.copy(receiptAlreadyAssigned = true) })
+        { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
   }
 
   fun checkName(name: String) {
     if (name.length > maxNameLength) {
-      _uiState.value = _uiState.value.copy(errorNameMessage = "Name is too long", errorName = true)
+      _uiState.value = _uiState.value.copy(errorName = "Name is too long")
     } else if (name.isEmpty()) {
-      _uiState.value =
-          _uiState.value.copy(errorNameMessage = "Name cannot be empty", errorName = true)
+      _uiState.value = _uiState.value.copy(errorName = "Name cannot be empty")
     } else {
-      _uiState.value = _uiState.value.copy(errorNameMessage = "", errorName = false)
+      _uiState.value = _uiState.value.copy(errorName = null)
     }
   }
 
   fun checkReceipt(receiptUid: String) {
-    _uiState.value =
-        _uiState.value.copy(errorReceipt = receiptUid.isEmpty(), receiptAlreadyAssigned = false)
+    if (receiptUid.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorReceipt = "The receipt cannot be empty!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorReceipt = null)
+    }
   }
 
   fun checkAmount(amount: String) {
-    _uiState.value =
-        _uiState.value.copy(
-            errorAmount =
-                amount.isEmpty() || amount.toDoubleOrNull() == null || amount.toDouble() < 0)
+    if (amount.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
+    } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorAmount = null)
+    }
   }
 
   fun checkAssignee(assignee: String) {
-    _uiState.value = _uiState.value.copy(errorAssignee = assignee.isEmpty())
+    if (assignee.isEmpty())
+        _uiState.value = _uiState.value.copy(errorAssignee = "Cannot have an empty assignee!")
+    else _uiState.value = _uiState.value.copy(errorAssignee = null)
   }
 
   fun checkDescription(description: String) {
-    _uiState.value =
-        _uiState.value.copy(errorDescription = description.length > maxDescriptionLength)
+    if (description.length > maxDescriptionLength) {
+      _uiState.value = _uiState.value.copy(errorDescription = "Description is too long")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDescription = null)
+    }
   }
 
   fun checkAll(
@@ -398,11 +404,9 @@ data class BalanceItemState(
     val year: Int = Year.now().value,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
-    val errorName: Boolean = false,
-    val errorNameMessage: String = "",
-    val errorReceipt: Boolean = false,
-    val errorAmount: Boolean = false,
-    val errorAssignee: Boolean = false,
-    val errorDescription: Boolean = false,
-    val receiptAlreadyAssigned: Boolean = false
+    val errorName: String? = "",
+    val errorReceipt: String? = "",
+    val errorAmount: String? = "",
+    val errorAssignee: String? = "",
+    val errorDescription: String? = ""
 )
