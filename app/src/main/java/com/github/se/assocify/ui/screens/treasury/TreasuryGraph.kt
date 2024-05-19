@@ -13,7 +13,6 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.balanceDetailedGraph
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.budgetDetailedGraph
-import com.github.se.assocify.ui.screens.treasury.accounting.newcategory.addAccountingCategory
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.receipt.receiptGraph
 
@@ -53,5 +52,4 @@ fun NavGraphBuilder.treasuryGraph(
       receiptsAPI,
       accountingSubCategoryAPI,
       accountingCategoryAPI)
-  addAccountingCategory(navigationActions)
 }

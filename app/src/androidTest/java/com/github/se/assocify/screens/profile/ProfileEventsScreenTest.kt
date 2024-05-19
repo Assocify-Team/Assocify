@@ -7,7 +7,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.profile.notifications.ProfileNotificationsScreen
+import com.github.se.assocify.ui.screens.profile.events.ProfileEventsScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -19,7 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ProfileNotificationsScreenTest :
+class ProfileEventsScreenTest :
     TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -33,12 +33,12 @@ class ProfileNotificationsScreenTest :
 
     every { navActions.back() } answers { goBack = true }
 
-    composeTestRule.setContent { ProfileNotificationsScreen(navActions = navActions) }
+    composeTestRule.setContent { ProfileEventsScreen(navActions = navActions) }
   }
 
   @Test
   fun display() {
-    with(composeTestRule) { onNodeWithTag("Notifications Screen").assertIsDisplayed() }
+    with(composeTestRule) { onNodeWithTag("ProfileEvents Screen").assertIsDisplayed() }
   }
 
   @Test

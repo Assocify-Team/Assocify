@@ -187,6 +187,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun deleteTask(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("task").delete { filter { SupabaseTask::uid eq id } }
+      taskCache = taskCache?.filter { it.uid != id }
       onSuccess()
     }
   }

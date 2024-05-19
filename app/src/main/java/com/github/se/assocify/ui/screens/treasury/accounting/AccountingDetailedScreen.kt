@@ -292,9 +292,16 @@ fun DisplayBudgetItem(
     budgetItem: BudgetItem,
     testTag: String
 ) {
+  val budgetState by budgetDetailedViewModel.uiState.collectAsState()
   ListItem(
       headlineContent = { Text(budgetItem.nameItem) },
-      trailingContent = { Text(PriceUtil.fromCents(budgetItem.amount)) },
+      trailingContent = {
+        Text(
+            if (budgetState.filterActive)
+                PriceUtil.fromCents(
+                    budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt())
+            else PriceUtil.fromCents(budgetItem.amount))
+      },
       supportingContent = { Text(budgetItem.description) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
@@ -312,12 +319,18 @@ fun DisplayBalanceItem(
     balanceItem: BalanceItem,
     testTag: String
 ) {
+  val balanceState by balanceDetailedViewModel.uiState.collectAsState()
   ListItem(
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text(
-              PriceUtil.fromCents(balanceItem.amount),
+              text =
+                  if (balanceState.filterActive)
+                      PriceUtil.fromCents(
+                          balanceItem.amount +
+                              (balanceItem.amount * balanceItem.tva.rate / 100f).toInt())
+                  else PriceUtil.fromCents(balanceItem.amount),
               modifier = Modifier.padding(end = 4.dp),
               style = MaterialTheme.typography.bodyMedium)
           /*Icon(

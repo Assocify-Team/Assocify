@@ -7,7 +7,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.profile.roles.ProfileRolesScreen
+import com.github.se.assocify.ui.screens.profile.treasuryTags.ProfileTreasuryTagsScreen
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -19,7 +19,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ProfileRolesScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
+class ProfileTreasuryTagsScreenTest :
+    TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
   private val navActions = mockk<NavigationActions>()
@@ -32,12 +33,12 @@ class ProfileRolesScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.wit
 
     every { navActions.back() } answers { goBack = true }
 
-    composeTestRule.setContent { ProfileRolesScreen(navActions = navActions) }
+    composeTestRule.setContent { ProfileTreasuryTagsScreen(navActions = navActions) }
   }
 
   @Test
   fun display() {
-    with(composeTestRule) { onNodeWithTag("Roles Screen").assertIsDisplayed() }
+    with(composeTestRule) { onNodeWithTag("TreasuryTags Screen").assertIsDisplayed() }
   }
 
   @Test
