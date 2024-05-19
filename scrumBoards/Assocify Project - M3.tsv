@@ -1,0 +1,113 @@
+Title	URL	Assignees	Status	Task Type	Nature	Epic	Sprint	Expected time	Actual time
+Epic 2 : As a member, I want to register a receipt to be able to be reimbursed later, and keep track of the other receipts I have			Product Backlog						
+Epic 3 : As the treasurer of my association, I want to see my budget to edit one of its items then create a new balance item as I received a new receipt			Product Backlog						
+User Story : As a commitee member of the association, I want to make an announcements regarding the next meeting of the association			Product Backlog						
+User Story : As a member of the association, I want to keep track of what's said during a meeting by recording it			Product Backlog						
+User Story : As a member of multiple associations, I want to easily change from one association to the other to see the minutes of meeting of the week for each of them			Product Backlog						
+User Story: As a member of an association, I want to receive notifications when new items related to me are added in the app (tasks, receipts...)			Product Backlog						
+User Story : As the treasurer of the association, I want to plan the budget for the year to come, with the help of the previous ones for comparison			Product Backlog						
+only admin or presidence should be able to add or edit categories in budget/balance			Product Backlog						
+Clean AccountingDetailedScreen	https://github.com/Assocify-Team/Assocify/issues/363	sarahbadr17	Product Backlog						
+Home screen UI	https://github.com/Assocify-Team/Assocify/issues/275		Product Backlog	Frontend : UI	Sprint Task	Home Page			
+User Story : As the treasurer of my association I want to keep track of receipts (in the accounting books)			Sprint Backlog						
+User Story: As a treasurer, I want to create the budget of the current year and keep track of the balance			Done in Sprint 8						
+Loading system	https://github.com/Assocify-Team/Assocify/issues/258	SidonieBouthors	Done in Sprint 7	Frontend : UI			Sprint 7	5	5.5
+Add loading for receipt images	https://github.com/Assocify-Team/Assocify/issues/247	SekoiaTree	Done in Sprint 7	Backend	Sprint Task	Receipts	Sprint 7	3	3
+Balance API	https://github.com/Assocify-Team/Assocify/issues/176	zizouet	Done in Sprint 7	Backend	Sprint Task	Accounting	Sprint 7	12	10
+Accounting SubCategoryAPI	https://github.com/Assocify-Team/Assocify/issues/202	zizouet	Done in Sprint 7	Backend	Sprint Task	Accounting	Sprint 7	7	5
+Viewmodel for budget sheet	https://github.com/Assocify-Team/Assocify/issues/108	sarahbadr17	Done in Sprint 7	Frontend : Functionality	Sprint Task	Accounting	Sprint 7	6	6
+Epic 4 : As the president of 2 associations, I want to register both in the app			Done in Sprint 7						
+Profile : add option to add assoc (go to select/create asso)	https://github.com/Assocify-Team/Assocify/issues/239	Mai-LinhC	Done in Sprint 7	Frontend : Functionality	Sprint Task		Sprint 7	3	5
+Reduce Complexity Issues	https://github.com/Assocify-Team/Assocify/issues/267	SidonieBouthors	Done in Sprint 7	Extra	Sprint Task	Misc	Sprint 7	2	2
+Fix map position on the tab	https://github.com/Assocify-Team/Assocify/issues/209	Polymeth	Done in Sprint 7	Bug Fix		Task Map	Sprint 7	4	1
+Fix map tab swipe gesture priority	https://github.com/Assocify-Team/Assocify/issues/210	Polymeth	Done in Sprint 7			Task Map	Sprint 7	1	1
+Schedule UI	https://github.com/Assocify-Team/Assocify/issues/199	SidonieBouthors	Done in Sprint 7	Frontend : UI	Sprint Task		Sprint 7	6	5
+Consistency between tabs + Tab structure	https://github.com/Assocify-Team/Assocify/issues/200	SidonieBouthors	Done in Sprint 7	Frontend : UI	Sprint Task	Misc	Sprint 7	4	3.5
+UI for profile : Theme settings	https://github.com/Assocify-Team/Assocify/issues/170	Mai-LinhC	Done in Sprint 7	Frontend : UI	Sprint Task		Sprint 7	4	4
+Viewmodel for balance items	https://github.com/Assocify-Team/Assocify/issues/160	sarahbadr17	Done in Sprint 7	Frontend : Functionality	Sprint Task	Accounting	Sprint 7	6	5
+User Story: As a staff member, I want to see the to-dos on the map			Sprint Backlog						
+User Story: As a user, I want to be able to set my preferences from my profile, such as the App theme and text size			Sprint Backlog						
+Viewmodel for balance sheet	https://github.com/Assocify-Team/Assocify/issues/245	sarahbadr17	Done in Sprint 7	Frontend : Functionality		Accounting	Sprint 7	4	2
+Create the UI and ViewModel of the Edit of BudgetDetail	https://github.com/Assocify-Team/Assocify/issues/293	ortoLover	Done in Sprint 7	Frontend : UI	Sprint Task	Accounting	Sprint 7	6	7
+Create the UI and ViewModel of the Edit of BudgetDetail	https://github.com/Assocify-Team/Assocify/issues/296	ortoLover	Done in Sprint 7	Frontend : UI	Sprint Task	Accounting	Sprint 7	8	12
+User Story: As a commitee, I want to create tasks			Done in Sprint 7						
+User Story : As a staff member of an event, I want to see what tasks need to be done			Done in Sprint 7						
+User Story: As a staff member, I want to see the details of a task by clicking on it			Done in Sprint 7						
+User Story: As a staff member, I want my schedule to reflect my tasks			Done in Sprint 7						
+Functionality for settings : Theme	https://github.com/Assocify-Team/Assocify/issues/252	Mai-LinhC	Product Backlog	Frontend : Functionality				4	
+Functionality for settings : Text size	https://github.com/Assocify-Team/Assocify/issues/253	Mai-LinhC	Product Backlog	Frontend : Functionality				4	
+Link amount of items to subCategory	https://github.com/Assocify-Team/Assocify/issues/317	sarahbadr17	Done in Sprint 8		Sprint Task	Accounting	Sprint 8	4	7
+Add the calculation of TVA in the accounting screen	https://github.com/Assocify-Team/Assocify/issues/312	sarahbadr17	Done in Sprint 8			Accounting	Sprint 8	3	3
+Link receipt to balance items	https://github.com/Assocify-Team/Assocify/issues/264	sarahbadr17	Sprint Tasks	Frontend : Functionality		Accounting	Sprint 9	4	
+Don't reupload images if they haven't been changed in receipts	https://github.com/Assocify-Team/Assocify/issues/263		Product Backlog	Frontend : Functionality	Sprint Task	Receipts		3	
+Fix: filter events by association (EventAPI/EventScreen)			Product Backlog						
+Fix : expect error when loading categories offline (should be solved when loading is done)			Product Backlog						
+Invitation management	https://github.com/Assocify-Team/Assocify/issues/196		Product Backlog	Frontend : Functionality	Sprint Task			6	
+UI on Figma: pending request for joining an association	https://github.com/Assocify-Team/Assocify/issues/127		Product Backlog	Figma	Sprint Task			2	0
+Actual system of invitation/request to join asso			Product Backlog						
+End-to-end test 2	https://github.com/Assocify-Team/Assocify/issues/224	Mai-LinhC	Product Backlog					2	6
+Languagefix: VAT instead of TVA...			Product Backlog						
+Refactor possible : Not have a balanceVM in budgetScreen & vice versa			Product Backlog						
+Add Row Level Security in Supabase	https://github.com/Assocify-Team/Assocify/issues/322		Product Backlog						
+Notifications Look	https://github.com/Assocify-Team/Assocify/issues/211	ortoLover	Product Backlog	Frontend : UI	Sprint Task	Profile		4	
+Notifications Backend	https://github.com/Assocify-Team/Assocify/issues/207	ortoLover	Product Backlog	Frontend : Functionality	Sprint Task	Profile		8	
+UI for profile : Notifications settings	https://github.com/Assocify-Team/Assocify/issues/172	Mai-LinhC	Product Backlog	Frontend : UI	Sprint Task			4	
+UI for profile : Security/Privacy settings	https://github.com/Assocify-Team/Assocify/issues/171	Mai-LinhC	Product Backlog					4	
+UI for profile : Association roles management	https://github.com/Assocify-Team/Assocify/issues/230		Product Backlog						
+Permissions for treasury	https://github.com/Assocify-Team/Assocify/issues/323	sarahbadr17	Sprint Tasks	Frontend : Functionality		Accounting	Sprint 9	8	
+Pick task location	https://github.com/Assocify-Team/Assocify/issues/201	Polymeth	Sprint Tasks	Frontend : Functionality	Sprint Task		Sprint 9	4	
+GPS sensor on the map	https://github.com/Assocify-Team/Assocify/issues/326	Polymeth	Sprint Tasks				Sprint 9	7	
+Profile pictures	https://github.com/Assocify-Team/Assocify/issues/262	SekoiaTree	Sprint Tasks	Frontend : Functionality	Sprint Task	Profile	Sprint 9	5	
+Association logo (load of image)	https://github.com/Assocify-Team/Assocify/issues/338	SekoiaTree	Sprint Tasks				Sprint 9	5	
+Fix : No user in Receipt entity	https://github.com/Assocify-Team/Assocify/issues/306	SekoiaTree	Sprint Tasks	Backend	Sprint Task	Receipts	Sprint 9	0.5	
+Add error messages in create/select asso + login	https://github.com/Assocify-Team/Assocify/issues/336	SekoiaTree	Sprint Tasks				Sprint 9	3	
+Association settings UI	https://github.com/Assocify-Team/Assocify/issues/327	Mai-LinhC	Sprint Tasks				Sprint 9	4	
+Association settings VM	https://github.com/Assocify-Team/Assocify/issues/328	Mai-LinhC	Sprint Tasks				Sprint 9	10	
+Permissions for Assoc Settings: Event create / modify	https://github.com/Assocify-Team/Assocify/issues/324	SidonieBouthors	Sprint Tasks	Frontend : Functionality	Sprint Task	Profile	Sprint 9	2	
+Permissions for Assoc Setting : Tags create / modify	https://github.com/Assocify-Team/Assocify/issues/325	SidonieBouthors	Sprint Tasks	Frontend : Functionality	Sprint Task	Profile	Sprint 9	2	
+Snackbar Gestionnaire	https://github.com/Assocify-Team/Assocify/issues/352	SidonieBouthors	Sprint Tasks	Frontend : Functionality	Sprint Task	Misc	Sprint 9	3	
+Drag down to reload	https://github.com/Assocify-Team/Assocify/issues/353	SidonieBouthors	Sprint Tasks	Frontend : Functionality	Sprint Task	Misc	Sprint 9	4	
+Add logout to profile error	https://github.com/Assocify-Team/Assocify/issues/354	SidonieBouthors	Sprint Tasks	Frontend : Functionality	Sprint Task	Profile	Sprint 9	1	
+Add a license to the projet	https://github.com/Assocify-Team/Assocify/issues/342	zizouet	Done in Sprint 9	Extra	Sprint Task		Sprint 9	0	0
+Mini code cleanup	https://github.com/Assocify-Team/Assocify/issues/350	zizouet	Done in Sprint 9	Bug Fix			Sprint 9	0.5	0.5
+Add new subcategory viewmodel	https://github.com/Assocify-Team/Assocify/issues/351	SidonieBouthors	Done in Sprint 9	Frontend : Functionality	Sprint Task	Accounting	Sprint 9	3	3.5
+Bugfix: New category UI	https://github.com/Assocify-Team/Assocify/issues/340	sarahbadr17	Done in Sprint 8	Frontend : UI		Accounting	Sprint 8	1.5	2
+Handle year filter and year List in treasury	https://github.com/Assocify-Team/Assocify/issues/285	ortoLover	Done in Sprint 8	Frontend : Functionality	Sprint Task	Accounting	Sprint 8	4	6
+Treasury : TVA & Year filters	https://github.com/Assocify-Team/Assocify/issues/276	ortoLover	Done in Sprint 8	Frontend : Functionality	Sprint Task	Accounting	Sprint 8	2	5
+Create Budget ViewModel and UI	https://github.com/Assocify-Team/Assocify/issues/225	ortoLover	Done in Sprint 8	Frontend : Functionality	Sprint Task	Accounting	Sprint 8	7	12
+Create Balance ViewModel and UI	https://github.com/Assocify-Team/Assocify/issues/226	ortoLover	Done in Sprint 8	Frontend : UI	Sprint Task	Accounting	Sprint 8	7	14
+Loading screen for treasury	https://github.com/Assocify-Team/Assocify/issues/321	SidonieBouthors	Done in Sprint 8	Frontend : UI	Sprint Task	Accounting	Sprint 8	3	4
+Adapt profile to what will be functional	https://github.com/Assocify-Team/Assocify/issues/334	Mai-LinhC	Done in Sprint 8				Sprint 8	1	2
+One map per event	https://github.com/Assocify-Team/Assocify/issues/208	Polymeth	Done in Sprint 8			Task Map	Sprint 8	4	2
+Viewmodel for tasks map : Add pins	https://github.com/Assocify-Team/Assocify/issues/125	Polymeth	Done in Sprint 8				Sprint 8	6	6
+Cache system for the map tiles	https://github.com/Assocify-Team/Assocify/issues/282	Polymeth	Done in Sprint 8			Task Map	Sprint 8	2	3
+Add caching to APIs	https://github.com/Assocify-Team/Assocify/issues/206	SekoiaTree	Done in Sprint 8	Backend	Sprint Task	Misc	Sprint 7	8	12
+Viewmodel for subcategories: implement search	https://github.com/Assocify-Team/Assocify/issues/260	sarahbadr17	Done in Sprint 8	Frontend		Accounting	Sprint 8	4	2
+Bugfix : Problem with cache when joining asso	https://github.com/Assocify-Team/Assocify/issues/333	Mai-LinhC	Done in Sprint 8				Sprint 8	2	3.5
+Text inputs are multiline	https://github.com/Assocify-Team/Assocify/issues/331	SekoiaTree	Done in Sprint 8	Frontend : Functionality	Sprint Task	Misc	Sprint 8	2	2
+Association Util : Check if name is valid (not too long, not the same as already existing one ?)	https://github.com/Assocify-Team/Assocify/issues/131	Mai-LinhC, SekoiaTree	Done in Sprint 8	Backend	Sprint Task		Sprint 8	2	3.5
+Image Loading	https://github.com/Assocify-Team/Assocify/issues/314	SidonieBouthors	Done in Sprint 8	Frontend : Functionality	Sprint Task	Receipts	Sprint 8	2	3
+Fix budget/ balance screens : add padding at the bottom to be able to see the total	https://github.com/Assocify-Team/Assocify/issues/286	Mai-LinhC	Done in Sprint 8				Sprint 8	0.5	0.5
+Edit an accounting subcategory	https://github.com/Assocify-Team/Assocify/issues/254	sarahbadr17	Done in Sprint 8	Frontend			Sprint 8	5	10
+Task duration & Schedule Collisions	https://github.com/Assocify-Team/Assocify/issues/257	SidonieBouthors	Done in Sprint 8			Tasks	Sprint 8	5	7.5
+BugFix: link detailedScreen to corresponding Subcategory in AccountingScreen	https://github.com/Assocify-Team/Assocify/issues/269	sarahbadr17	Done in Sprint 8	Frontend	Sprint Task	Accounting	Sprint 8	2	2
+Schedule ViewModel	https://github.com/Assocify-Team/Assocify/issues/259	SidonieBouthors	Done in Sprint 8	Frontend : Functionality	Sprint Task	Tasks	Sprint 8	5	6
+Bugfix: event time is loaded as 2 hours earlier than what was input	https://github.com/Assocify-Team/Assocify/issues/298	SidonieBouthors	Done in Sprint 8				Sprint 8	2	2
+Link subcategories to Budget/Balance Items	https://github.com/Assocify-Team/Assocify/issues/280	zizouet	Done in Sprint 8	Backend	Sprint Task	Accounting	Sprint 8	3	2
+User parameter API	https://github.com/Assocify-Team/Assocify/issues/261	zizouet	Done in Sprint 8	Backend	Sprint Task	Profile	Sprint 8	4	5
+Allow changing the category of an Item	https://github.com/Assocify-Team/Assocify/issues/289	zizouet	Done in Sprint 8	Backend	Sprint Task	Accounting	Sprint 8	0.5	0.5
+Bugfix: receipt amount, dot/comma crash & delete error	https://github.com/Assocify-Team/Assocify/issues/294	SidonieBouthors	Done in Sprint 8				Sprint 8	2	1.5
+Bugfix: join association	https://github.com/Assocify-Team/Assocify/issues/330	Mai-LinhC	Done in Sprint 8				Sprint 8	0.5	0.5
+Bugfix: task cache delete	https://github.com/Assocify-Team/Assocify/issues/345		Done in Sprint 8	Backend	Sprint Task	Tasks	Sprint 8	0.5	0.5
+Fix : TVA is only displayed in total	https://github.com/Assocify-Team/Assocify/issues/348	ortoLover	Done in Sprint 8				Sprint 8	0.5	0.5
+User Story : As a member of multiple associations, I want to keep track of the news of all of them quickly to plan my future tasks			Sprint Backlog						
+User Story: As a treasurer, I want to quickly see new pending receipts			Sprint Backlog						
+User Story: As a member of an assoc, I want to see the event of my association			Sprint Backlog						
+User Story: As a president / admin of my assoc, I want to be able to add new events			Sprint Backlog						
+User Story: As a comitee member of my assoc, I want to be able to see the list of members and manage it			Sprint Backlog						
+User Story: as a member of an assoc, I want to be able to see when a new member just joined			Sprint Backlog						
+UI of Waiting Tasks on Home Screen	https://github.com/Assocify-Team/Assocify/issues/355	ortoLover	Sprint Tasks	Frontend : UI	Sprint Task	Home Page	Sprint 9	7	
+ViewModel of waiting tasks on Home Screen	https://github.com/Assocify-Team/Assocify/issues/356	ortoLover	Sprint Tasks	Frontend : Functionality	Sprint Task	Home Page	Sprint 9	8	
+Link event to an association (in DB)	https://github.com/Assocify-Team/Assocify/issues/360	zizouet	Sprint Tasks	Backend			Sprint 9	4	
+Link event to an association (in app)	https://github.com/Assocify-Team/Assocify/issues/361	zizouet	Sprint Tasks	Frontend : Functionality			Sprint 9	4	
+Link receipt to an association	https://github.com/Assocify-Team/Assocify/issues/362	zizouet	Sprint Tasks				Sprint 9	4	
