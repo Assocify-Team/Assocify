@@ -21,15 +21,15 @@ Assocify is an application to centralize all of your student organization needs 
 - When to Meet
 
 ## Team
-| Name                |                                     GitHub username  |
-|---------------------|------------------------------------------------------|
-| Lorenzo Padrini     | [ortoLover](https://github.com/ortoLover)            |
-| Sarah Badr          | [sarahbadr17](https://github.com/sarahbadr17)        |
-| Maï-Linh Cordonnier | [Mai-LinhC](https://github.com/Mai-LinhC)            |
-| Rayan Boucheny      | [Polymeth](https://github.com/polymeth)              |
-| François Théron     | [ZiZouet](https://github.com/ZiZouet)                |
-| Sebastien Kobler    | [SekoiaTree](https://github.com/SekoiaTree)          |
-| Sidonie Bouthors    | [SidonieBouthors](https://github.com/SidonieBouthors)|
+| Name                | GitHub username                                       |
+|---------------------|-------------------------------------------------------|
+| Lorenzo Padrini     | [ortoLover](https://github.com/ortoLover)             |
+| Sarah Badr          | [sarahbadr17](https://github.com/sarahbadr17)         |
+| Maï-Linh Cordonnier | [Mai-LinhC](https://github.com/Mai-LinhC)             |
+| Rayan Boucheny      | [Polymeth](https://github.com/polymeth)               |
+| François Théron     | [ZiZouet](https://github.com/ZiZouet)                 |
+| Sebastien Kobler    | [SekoiaTree](https://github.com/SekoiaTree)           |
+| Sidonie Bouthors    | [SidonieBouthors](https://github.com/SidonieBouthors) |
 
 ## Quick Links
 

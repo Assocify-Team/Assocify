@@ -46,7 +46,6 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
  *
  * @param navActions Navigation actions to navigate to other screens.
  * @param eventScreenViewModel The view model for the event screen.
- * @param taskListViewModel The view model for the task list.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
