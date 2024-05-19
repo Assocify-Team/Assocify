@@ -18,8 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -134,26 +132,20 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   val yearList = DateUtil.getYearList().reversed()
   val tvaList: List<String> = listOf("HT", "TTC")
   val categoryList = listOf("Global") + model.categoryList.map { it.name }
-
-  // selected filters
-  var selectedYear by remember { mutableStateOf(yearList.first()) }
-  var selectedCategory by remember { mutableStateOf(categoryList.first()) }
-  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+  val category = if (model.selectedCategory != null) model.selectedCategory!!.name else "Global"
 
   // Row of dropdown filters
   Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
     DropdownFilterChip(model.yearFilter.toString(), yearList, "yearFilterChip") {
-      selectedYear = it
-      accountingViewModel.onYearFilter(selectedYear.toInt())
+      accountingViewModel.onYearFilter(it.toInt())
     }
-    DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
-      selectedCategory = it
-      accountingViewModel.onSelectedCategory(selectedCategory)
+
+    DropdownFilterChip(category, categoryList, "categoryFilterChip") {
+      accountingViewModel.onSelectedCategory(it)
     }
 
     DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
-      selectedTVA = it
-      accountingViewModel.activeTVA(selectedTVA == "TTC")
+      accountingViewModel.activeTVA(it == "TTC")
     }
   }
 }

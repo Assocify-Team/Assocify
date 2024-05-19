@@ -107,7 +107,7 @@ class AccountingViewModel(
           _uiState.value.copy(
               subCategoryList =
                   allSubCategoryList.filter {
-                    it.categoryUID == _uiState.value.selectedCatUid &&
+                    it.categoryUID == _uiState.value.selectedCategory!!.uid &&
                         it.year == _uiState.value.yearFilter &&
                         it.name.contains(_uiState.value.searchQuery, ignoreCase = true)
                   })
@@ -196,7 +196,7 @@ class AccountingViewModel(
       _uiState.value = _uiState.value.copy(globalSelected = false)
       _uiState.value =
           _uiState.value.copy(
-              selectedCatUid = _uiState.value.categoryList.find { it.name == categoryName }!!.uid)
+              selectedCategory = _uiState.value.categoryList.find { it.name == categoryName })
     }
     filterSubCategories()
   }
@@ -325,7 +325,7 @@ data class AccountingState(
     val loading: Boolean = false,
     val error: String? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
-    val selectedCatUid: String = "",
+    val selectedCategory: AccountingCategory? = null,
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val allSubCategoryList: List<AccountingSubCategory> = emptyList(),
     val budgetItemsList: List<BudgetItem> = emptyList(),
