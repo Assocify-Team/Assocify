@@ -171,8 +171,6 @@ fun AccountingDetailedScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
         ) {
           item {
             Row(Modifier.testTag("filterRowDetailed").horizontalScroll(rememberScrollState())) {
