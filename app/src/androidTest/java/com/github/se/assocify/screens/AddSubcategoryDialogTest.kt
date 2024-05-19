@@ -10,8 +10,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.accountingComposables.AddSubcategoryDialog
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -44,6 +48,8 @@ class AddSubcategoryDialogTest :
 
   val accountingCategoryAPI = mockk<AccountingCategoryAPI>()
   val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>()
+    val balanceAPI = mockk<BalanceAPI>()
+    val budgetAPI = mockk<BudgetAPI>()
   lateinit var viewModel: AccountingViewModel
 
   @Before
@@ -62,10 +68,23 @@ class AddSubcategoryDialogTest :
         {
           thirdArg<() -> Unit>().invoke()
         }
+      every { balanceAPI.getBalance(any(), any(), any()) } answers
+        {
+            val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
+            onSuccessCallback(emptyList())
+        }
+      every { budgetAPI.getBudget(any(), any(), any()) } answers
+              {
+                  val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
+                  onSuccessCallback(emptyList())
+              }
     viewModel =
         AccountingViewModel(
             accountingCategoryAPI = accountingCategoryAPI,
-            accountingSubCategoryAPI = accountingSubCategoryAPI)
+            accountingSubCategoryAPI = accountingSubCategoryAPI,
+            balanceAPI = balanceAPI,
+            budgetAPI = budgetAPI
+        )
     composeTestRule.setContent { AddSubcategoryDialog(viewModel) }
     viewModel.showNewSubcategoryDialog()
   }
