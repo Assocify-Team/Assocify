@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -82,7 +82,6 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
   var amountString by remember { mutableStateOf(PriceUtil.fromCents(budget.amount)) }
   var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(budget.description) }
-  var yearString by remember { mutableStateOf(budget.year.toString()) }
 
   Dialog(
       onDismissRequest = {
@@ -203,18 +202,17 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                 item {
                   Row(
                       modifier = Modifier.fillMaxWidth().padding(8.dp),
-                      horizontalArrangement =
-                          if (budgetModel.editing) Arrangement.SpaceBetween else Arrangement.End,
+                      horizontalArrangement = Arrangement.End,
                   ) {
                     if (budgetModel.editing) {
-                      Button(
+                      TextButton(
                           onClick = { budgetViewModel.deleteEditing() },
                           modifier = Modifier.testTag("deleteButton"),
                       ) {
-                        Text("Delete")
+                        Text("Delete", color = MaterialTheme.colorScheme.error)
                       }
                     }
-                    Button(
+                    TextButton(
                         onClick = {
                           budgetViewModel.setTitle(nameString)
                           budgetViewModel.setAmount(amountString)
