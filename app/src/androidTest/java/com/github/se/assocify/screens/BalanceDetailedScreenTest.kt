@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -30,6 +31,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
+import com.github.se.assocify.ui.util.PriceUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -75,7 +77,7 @@ class BalanceDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              LocalDate.of(2022, 4, 14),
+              LocalDate.of(2023, 4, 14),
               "François Théron",
               Status.Pending),
           BalanceItem(
@@ -208,12 +210,9 @@ class BalanceDetailedScreenTest :
   fun testDisplay() {
     // Test the accounting screen
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithTag("AccountingDetailedScreen").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
       onNodeWithTag("totalItems").assertIsDisplayed()
-      onNodeWithTag("yearListTag").assertIsDisplayed()
       onNodeWithTag("statusListTag").assertIsDisplayed()
       onNodeWithTag("tvaListTag").assertIsDisplayed()
     }
@@ -223,8 +222,8 @@ class BalanceDetailedScreenTest :
   @Test
   fun testEmptyList() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2021").performClick()
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("Approved").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
       onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
           .assertIsDisplayed()
@@ -235,19 +234,16 @@ class BalanceDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
-      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
       // Assert that the name of the subCategory is displayed
       onNodeWithText("Logistics").assertIsDisplayed()
     }
 
     assert(
-        balanceItems.filter { it.date.year == 2023 && it.subcategoryUID == subCategoryUid } ==
+        balanceItems.filter { it.subcategoryUID == subCategoryUid } ==
             balanceDetailedViewModel.uiState.value.balanceList)
-    assert(2023 == balanceDetailedViewModel.uiState.value.year)
   }
 
   /** Tests if the total amount correspond to the sum of the items */
@@ -255,8 +251,6 @@ class BalanceDetailedScreenTest :
   fun testTotalAmount() {
     // Test the accounting screen
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithTag("totalItems").assertIsDisplayed()
       var total = 0
       balanceItems.forEach { total += it.amount }
@@ -278,15 +272,13 @@ class BalanceDetailedScreenTest :
   fun testStatusFiltering() {
     with(composeTestRule) {
       // Initially, select the "Status" filter to change its value to Pending and 2022
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
       // Assert that only the item "pair of scissors" is displayed
       onNodeWithText("pair of scissors").assertIsDisplayed()
       assert(
-          balanceItems.filter { it.date.year == 2022 && it.status == Status.Pending } ==
+          balanceItems.filter { it.status == Status.Pending } ==
               balanceDetailedViewModel.uiState.value.balanceList)
 
       // Change the status filter to "All Status"
@@ -294,11 +286,9 @@ class BalanceDetailedScreenTest :
       onNodeWithText("All Status").performClick()
 
       // Assert that all items of 2022 are displayed
-      onNodeWithText("pair of scissors").assertIsDisplayed()
       assert(
-          balanceItems.filter { it.date.year == 2022 } ==
+          balanceItems.filter { it.subcategoryUID == subCategoryUid } ==
               balanceDetailedViewModel.uiState.value.balanceList)
-      assert(2022 == balanceDetailedViewModel.uiState.value.year)
       assert(null == balanceDetailedViewModel.uiState.value.status)
     }
   }
@@ -377,12 +367,16 @@ class BalanceDetailedScreenTest :
   @Test
   fun tvaFilterWorks() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
-      onNodeWithText("HT").performClick()
-      onNodeWithText(("12.00")).assertIsDisplayed()
+      onNodeWithTag("tvaListTag").performClick()
       onNodeWithText("TTC").performClick()
-      onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
+      val totalAmountTTC =
+          PriceUtil.fromCents(
+              balanceItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
+      onNodeWithText(totalAmountTTC).assertIsDisplayed()
+      onNodeWithTag("tvaListTag").performClick()
+      onNodeWithText("HT").performClick()
+      val totalAmount = PriceUtil.fromCents(balanceItems.sumOf { it.amount })
+      onNodeWithText(totalAmount).assertIsDisplayed()
     }
   }
 
@@ -471,8 +465,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testEditDeleteScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -489,8 +481,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testEditModifyScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -511,8 +501,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testCancelModifyScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -554,6 +542,10 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editDialogAssignee"))
       onNodeWithTag("editDialogAssignee").performTextClearance()
       onNodeWithTag("editDialogAssignee").performTextInput("François Théron")
+      onNodeWithTag("editDialogDate").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012023")
+      onNodeWithText("OK").performClick()
       onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
       onNodeWithTag("editConfirmButton").performClick()
       onNodeWithTag("editDialogName").assertIsNotDisplayed()

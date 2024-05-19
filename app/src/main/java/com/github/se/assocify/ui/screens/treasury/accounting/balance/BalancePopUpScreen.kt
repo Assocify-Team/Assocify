@@ -234,10 +234,12 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onDateSelect = { newDate ->
                     if (newDate != null) {
                       date = newDate
+                      balanceDetailedViewModel.checkDate(date)
                     }
                   },
-                  modifier = Modifier.padding(8.dp),
-              )
+                  modifier = Modifier.padding(8.dp).testTag("editDialogDate"),
+                  isError = balanceModel.errorDate != null,
+                  supportingText = { Text(balanceModel.errorDate ?: "") })
             }
 
             // The assignee field
@@ -303,7 +305,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     content = { Text("Confirm") },
                     onClick = {
                       balanceDetailedViewModel.checkAll(
-                          nameString, receiptUid, amountString, assignee, descriptionString)
+                          nameString, receiptUid, amountString, assignee, descriptionString, date)
                       val newBalanceItem =
                           BalanceItem(
                               balance.uid,

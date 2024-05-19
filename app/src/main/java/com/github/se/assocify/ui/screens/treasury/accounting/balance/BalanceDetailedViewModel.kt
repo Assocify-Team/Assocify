@@ -13,7 +13,8 @@ import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
-import java.time.Year
+import com.github.se.assocify.ui.util.PriceUtil
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -98,13 +99,9 @@ class BalanceDetailedViewModel(
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
-          // Filter the balanceList to only include items with the matching subCategoryUid, year and
-          // status
+          // Filter the balanceList to only include items with the matching subCategoryUid
           val filteredBalanceList =
-              balanceList.filter { balanceItem ->
-                balanceItem.date.year == _uiState.value.year &&
-                    balanceItem.subcategoryUID == subCategoryUid
-              }
+              balanceList.filter { balanceItem -> balanceItem.subcategoryUID == subCategoryUid }
 
           // if status is not null, filter the list by status
           val statusFilteredBalanceList =
@@ -130,16 +127,6 @@ class BalanceDetailedViewModel(
           if (--innerLoadCounter == 0) endLoad()
         },
         { endLoad("Error loading tags") })
-  }
-
-  /**
-   * Handle the year filter
-   *
-   * @param year the year to filter by
-   */
-  fun onYearFilter(year: Int) {
-    _uiState.value = _uiState.value.copy(year = year)
-    updateDatabaseValuesInBalance()
   }
 
   /**
@@ -226,7 +213,8 @@ class BalanceDetailedViewModel(
             errorReceipt = null,
             errorAmount = null,
             errorAssignee = null,
-            errorDescription = null)
+            errorDescription = null,
+            errorDate = null)
   }
 
   /**
@@ -239,7 +227,8 @@ class BalanceDetailedViewModel(
         _uiState.value.errorReceipt != null ||
         _uiState.value.errorAmount != null ||
         _uiState.value.errorAssignee != null ||
-        _uiState.value.errorDescription != null) {
+        _uiState.value.errorDescription != null ||
+        _uiState.value.errorDate != null) {
       return
     }
     balanceApi.updateBalance(
@@ -252,10 +241,7 @@ class BalanceDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   balanceList =
-                      if (_uiState.value.year == balanceItem.date.year)
-                          _uiState.value.balanceList.filter { it.uid != balanceItem.uid } +
-                              balanceItem
-                      else _uiState.value.balanceList.filter { it.uid != balanceItem.uid },
+                      _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
                   editedBalanceItem = null)
         },
         { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
@@ -288,7 +274,8 @@ class BalanceDetailedViewModel(
             errorReceipt = null,
             errorAmount = null,
             errorAssignee = null,
-            errorDescription = null)
+            errorDescription = null,
+            errorDate = null)
   }
 
   fun saveCreation(balanceItem: BalanceItem) {
@@ -296,7 +283,8 @@ class BalanceDetailedViewModel(
         _uiState.value.errorReceipt != null ||
         _uiState.value.errorAmount != null ||
         _uiState.value.errorAssignee != null ||
-        _uiState.value.errorDescription != null) {
+        _uiState.value.errorDescription != null ||
+        _uiState.value.errorDate != null) {
       return
     }
     balanceApi.addBalance(
@@ -307,11 +295,7 @@ class BalanceDetailedViewModel(
         {
           _uiState.value =
               _uiState.value.copy(
-                  creating = false,
-                  balanceList =
-                      if (_uiState.value.year == balanceItem.date.year)
-                          _uiState.value.balanceList + balanceItem
-                      else _uiState.value.balanceList)
+                  creating = false, balanceList = _uiState.value.balanceList + balanceItem)
         },
         { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
   }
@@ -339,6 +323,8 @@ class BalanceDetailedViewModel(
       _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
     } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
       _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
+    } else if (PriceUtil.isTooLarge(amount)) {
+      _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
     } else {
       _uiState.value = _uiState.value.copy(errorAmount = null)
     }
@@ -358,18 +344,31 @@ class BalanceDetailedViewModel(
     }
   }
 
+  fun checkDate(date: LocalDate) {
+    if (date.year != _uiState.value.subCategory!!.year) {
+      _uiState.value =
+          _uiState.value.copy(
+              errorDate =
+                  "The year doesn't match ${_uiState.value.subCategory!!.name}'s year: ${_uiState.value.subCategory!!.year}")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDate = null)
+    }
+  }
+
   fun checkAll(
       name: String,
       receiptUid: String,
       amount: String,
       assignee: String,
-      description: String
+      description: String,
+      date: LocalDate
   ) {
     checkName(name)
     checkReceipt(receiptUid)
     checkAmount(amount)
     checkAssignee(assignee)
     checkDescription(description)
+    checkDate(date)
   }
 }
 
@@ -380,9 +379,14 @@ class BalanceDetailedViewModel(
  * @param error the error message, if any
  * @param balanceList the current list of balance items
  * @param subCategory the current subcategory of the item
- * @param status the current status
+ * @param categoryList the list of categories
+ * @param loadingCategory whether the categories are loading
+ * @param status the current status filter
+ * @param receiptList the list of receipts
+ * @param subCategoryList the list of subcategories
+ * @param editing whether the item is being edited
+ * @param editedBalanceItem the item being edited
  * @param subCatEditing whether the subcategory is being edited
- * @param year the current year
  * @param snackbarState the snackbar state
  * @param filterActive if the tva filter is active or not
  */
@@ -400,12 +404,12 @@ data class BalanceItemState(
     val creating: Boolean = false,
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = Year.now().value,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val errorName: String? = "",
     val errorReceipt: String? = "",
     val errorAmount: String? = "",
     val errorAssignee: String? = "",
-    val errorDescription: String? = ""
+    val errorDescription: String? = "",
+    val errorDate: String? = ""
 )

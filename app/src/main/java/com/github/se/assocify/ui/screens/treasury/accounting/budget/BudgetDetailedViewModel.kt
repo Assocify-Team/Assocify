@@ -10,7 +10,7 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.navigation.NavigationActions
-import java.time.Year
+import com.github.se.assocify.ui.util.PriceUtil.isTooLarge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,10 +86,7 @@ class BudgetDetailedViewModel(
         { budgetList ->
           // Filter the budgetList to only include items with the matching subCategoryUid
           val filteredList =
-              budgetList.filter { budgetItem ->
-                budgetItem.year == _uiState.value.yearFilter &&
-                    budgetItem.subcategoryUID == subCategoryUid
-              }
+              budgetList.filter { budgetItem -> budgetItem.subcategoryUID == subCategoryUid }
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(budgetList = filteredList)
@@ -105,16 +102,6 @@ class BudgetDetailedViewModel(
           if (--innerLoadCounter == 0) endLoad()
         },
         { endLoad("Error loading tags") })
-  }
-
-  /**
-   * Handle the year filter
-   *
-   * @param yearFilter the year to filter by
-   */
-  fun onYearFilter(yearFilter: Int) {
-    _uiState.value = _uiState.value.copy(yearFilter = yearFilter)
-    updateDatabaseBudgetValues()
   }
 
   /**
@@ -151,10 +138,7 @@ class BudgetDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   budgetList =
-                      if (_uiState.value.yearFilter == budgetItem.year)
-                          _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem
-                      else _uiState.value.budgetList.filter { it.uid != budgetItem.uid },
-                  editedBudgetItem = null)
+                      _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem)
         },
         {})
   }
@@ -259,9 +243,7 @@ class BudgetDetailedViewModel(
         CurrentUser.associationUid!!,
         budgetItem,
         {
-          if (budgetItem.year == _uiState.value.yearFilter)
-              _uiState.value =
-                  _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
+          _uiState.value = _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
         },
         {})
     _uiState.value = _uiState.value.copy(creating = false)
@@ -294,7 +276,10 @@ class BudgetDetailedViewModel(
     _uiState.value =
         _uiState.value.copy(
             amountError =
-                amount.isEmpty() || amount.toDoubleOrNull() == null || amount.toDouble() < 0.0)
+                amount.isEmpty() ||
+                    amount.toDoubleOrNull() == null ||
+                    amount.toDouble() < 0.0 ||
+                    isTooLarge(amount))
   }
 
   fun setDescription(description: String) {
@@ -323,7 +308,6 @@ data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
     val subCategory: AccountingSubCategory? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
-    val yearFilter: Int = Year.now().value,
     val editing: Boolean = false,
     val creating: Boolean = false,
     val subCatEditing: Boolean = false,

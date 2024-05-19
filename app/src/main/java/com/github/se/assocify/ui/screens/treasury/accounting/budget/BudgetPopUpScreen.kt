@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
-import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import java.time.Year
 import java.util.UUID
@@ -83,7 +82,6 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
   var amountString by remember { mutableStateOf(PriceUtil.fromCents(budget.amount)) }
   var tvaString by remember { mutableStateOf(budget.tva.rate.toString()) }
   var descriptionString by remember { mutableStateOf(budget.description) }
-  var yearString by remember { mutableStateOf(budget.year.toString()) }
 
   Dialog(
       onDismissRequest = {
@@ -146,7 +144,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                         amountString = it
                         budgetViewModel.setAmount(it)
                       },
-                      label = { Text("Amount") },
+                      label = { Text("Amount HT") },
                       keyboardOptions =
                           KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                       supportingText = {
@@ -202,53 +200,19 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                       })
                 }
                 item {
-                  var yearExpanded by remember { mutableStateOf(false) }
-                  ExposedDropdownMenuBox(
-                      expanded = yearExpanded,
-                      onExpandedChange = { yearExpanded = !yearExpanded },
-                      modifier = Modifier.padding(8.dp)) {
-                        OutlinedTextField(
-                            value = yearString,
-                            onValueChange = {},
-                            label = { Text("Year") },
-                            trailingIcon = {
-                              ExposedDropdownMenuDefaults.TrailingIcon(expanded = yearExpanded)
-                            },
-                            readOnly = true,
-                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                            modifier =
-                                Modifier.menuAnchor()
-                                    .clickable { yearExpanded = !yearExpanded }
-                                    .testTag("editYearBox"))
-                        ExposedDropdownMenu(
-                            expanded = yearExpanded, onDismissRequest = { yearExpanded = false }) {
-                              DateUtil.getYearList().forEach { year ->
-                                DropdownMenuItem(
-                                    modifier = Modifier.testTag("$year DropdownItem"),
-                                    text = { Text(year) },
-                                    onClick = {
-                                      yearString = year
-                                      yearExpanded = false
-                                    })
-                              }
-                            }
-                      }
-                }
-                item {
                   Row(
                       modifier = Modifier.fillMaxWidth().padding(8.dp),
-                      horizontalArrangement =
-                          if (budgetModel.editing) Arrangement.SpaceBetween else Arrangement.End,
+                      horizontalArrangement = Arrangement.End,
                   ) {
                     if (budgetModel.editing) {
-                      Button(
+                      TextButton(
                           onClick = { budgetViewModel.deleteEditing() },
                           modifier = Modifier.testTag("deleteButton"),
                       ) {
-                        Text("Delete")
+                        Text("Delete", color = MaterialTheme.colorScheme.error)
                       }
                     }
-                    Button(
+                    TextButton(
                         onClick = {
                           budgetViewModel.setTitle(nameString)
                           budgetViewModel.setAmount(amountString)
@@ -262,7 +226,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                                     tva = TVA.floatToTVA(tvaString.toFloat()),
                                     description = descriptionString,
                                     subcategoryUID = budget.subcategoryUID,
-                                    year = yearString.toInt()))
+                                    year = budgetModel.subCategory!!.year))
                           } else {
                             budgetViewModel.saveCreating(
                                 BudgetItem(
@@ -272,7 +236,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                                     tva = TVA.floatToTVA(tvaString.toFloat()),
                                     description = descriptionString,
                                     subcategoryUID = budget.subcategoryUID,
-                                    year = yearString.toInt()))
+                                    year = budgetModel.subCategory!!.year))
                           }
                         },
                         modifier = Modifier.testTag("editConfirmButton"),
