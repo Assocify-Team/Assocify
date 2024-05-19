@@ -106,6 +106,7 @@ User Story: As a member of an assoc, I want to see the event of my association		
 User Story: As a president / admin of my assoc, I want to be able to add new events			Sprint Backlog						
 User Story: As a comitee member of my assoc, I want to be able to see the list of members and manage it			Sprint Backlog						
 User Story: as a member of an assoc, I want to be able to see when a new member just joined			Sprint Backlog						
+Create Home UI Scaffold	https://github.com/Assocify-Team/Assocify/issues/366	ortoLover	Sprint Tasks	Frontend : UI			Sprint 9	2	
 UI of Waiting Tasks on Home Screen	https://github.com/Assocify-Team/Assocify/issues/355	ortoLover	Sprint Tasks	Frontend : UI	Sprint Task	Home Page	Sprint 9	7	
 ViewModel of waiting tasks on Home Screen	https://github.com/Assocify-Team/Assocify/issues/356	ortoLover	Sprint Tasks	Frontend : Functionality	Sprint Task	Home Page	Sprint 9	8	
 Link event to an association (in DB)	https://github.com/Assocify-Team/Assocify/issues/360	zizouet	Sprint Tasks	Backend			Sprint 9	4	
