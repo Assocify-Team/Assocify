@@ -234,13 +234,12 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   onDateSelect = { newDate ->
                     if (newDate != null) {
                       date = newDate
-                        balanceDetailedViewModel.checkDate(date)
+                      balanceDetailedViewModel.checkDate(date)
                     }
                   },
                   modifier = Modifier.padding(8.dp),
                   isError = balanceModel.errorDate != null,
-                  supportingText = { Text(balanceModel.errorDate ?: "") }
-              )
+                  supportingText = { Text(balanceModel.errorDate ?: "") })
             }
 
             // The assignee field

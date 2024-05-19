@@ -14,12 +14,12 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.PriceUtil
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 /**
  * View model for the balance detailed screen
@@ -214,8 +214,7 @@ class BalanceDetailedViewModel(
             errorAmount = null,
             errorAssignee = null,
             errorDescription = null,
-            errorDate = null
-        )
+            errorDate = null)
   }
 
   /**
@@ -229,8 +228,7 @@ class BalanceDetailedViewModel(
         _uiState.value.errorAmount != null ||
         _uiState.value.errorAssignee != null ||
         _uiState.value.errorDescription != null ||
-        _uiState.value.errorDate != null
-        ) {
+        _uiState.value.errorDate != null) {
       return
     }
     balanceApi.updateBalance(
@@ -277,8 +275,7 @@ class BalanceDetailedViewModel(
             errorAmount = null,
             errorAssignee = null,
             errorDescription = null,
-            errorDate = null
-        )
+            errorDate = null)
   }
 
   fun saveCreation(balanceItem: BalanceItem) {
@@ -287,8 +284,7 @@ class BalanceDetailedViewModel(
         _uiState.value.errorAmount != null ||
         _uiState.value.errorAssignee != null ||
         _uiState.value.errorDescription != null ||
-        _uiState.value.errorDate != null
-        ) {
+        _uiState.value.errorDate != null) {
       return
     }
     balanceApi.addBalance(
@@ -348,13 +344,16 @@ class BalanceDetailedViewModel(
     }
   }
 
-    fun checkDate(date: LocalDate) {
-        if (date.year != _uiState.value.subCategory!!.year) {
-            _uiState.value = _uiState.value.copy(errorDate = "The year doesn't match ${_uiState.value.subCategory!!.name}'s year: ${_uiState.value.subCategory!!.year}")
-        } else {
-            _uiState.value = _uiState.value.copy(errorDate = null)
-        }
+  fun checkDate(date: LocalDate) {
+    if (date.year != _uiState.value.subCategory!!.year) {
+      _uiState.value =
+          _uiState.value.copy(
+              errorDate =
+                  "The year doesn't match ${_uiState.value.subCategory!!.name}'s year: ${_uiState.value.subCategory!!.year}")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDate = null)
     }
+  }
 
   fun checkAll(
       name: String,
@@ -369,7 +368,7 @@ class BalanceDetailedViewModel(
     checkAmount(amount)
     checkAssignee(assignee)
     checkDescription(description)
-      checkDate(date)
+    checkDate(date)
   }
 }
 
