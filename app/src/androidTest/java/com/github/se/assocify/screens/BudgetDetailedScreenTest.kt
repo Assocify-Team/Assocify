@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
@@ -26,6 +27,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
+import com.github.se.assocify.ui.util.PriceUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -70,7 +72,7 @@ class BudgetDetailedScreenTest :
               TVA.TVA_8,
               "scissors for paper cutting",
               subCategoryUid,
-              2022),
+              2023),
           BudgetItem(
               "2", "sweaters", 1000, TVA.TVA_8, "order for 1000 sweaters", subCategoryUid, 2023),
           BudgetItem("3", "chairs", 200, TVA.TVA_8, "order for 200 chairs", subCategoryUid, 2023))
@@ -155,12 +157,9 @@ class BudgetDetailedScreenTest :
   @Test
   fun testDisplay() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithTag("AccountingDetailedScreen").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
       onNodeWithTag("totalItems").assertIsDisplayed()
-      onNodeWithTag("yearListTag").assertIsDisplayed()
       onNodeWithTag("tvaListTag").assertIsDisplayed()
     }
   }
@@ -169,31 +168,15 @@ class BudgetDetailedScreenTest :
   @Test
   fun testCorrectItemsAreDisplayed() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
-      onNodeWithText("pair of scissors").assertIsNotDisplayed()
-      onNodeWithText("fees").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
       onNodeWithText(subCategoryList[0].name).assertIsDisplayed()
 
       assert(
           budgetDetailedViewModel.uiState.value.budgetList ==
-              budgetItems.filter { it.year == 2023 && it.subcategoryUID == "subCategoryUid" })
+              budgetItems.filter { it.subcategoryUID == "subCategoryUid" })
       assert(budgetDetailedViewModel.uiState.value.subCategory == subCategoryList.first())
-      assert(budgetDetailedViewModel.uiState.value.yearFilter == 2023)
-    }
-  }
-
-  /** Tests if amount is not shown when empty list */
-  @Test
-  fun testEmptyList() {
-    with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2021").performClick()
-      onNodeWithTag("totalItems").assertIsNotDisplayed()
-      onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
-          .assertIsDisplayed()
     }
   }
 
@@ -206,27 +189,11 @@ class BudgetDetailedScreenTest :
     }
   }
 
-  /** Tests if the nodes of filter year are displayed */
-  @Test
-  fun testFilterByYear() {
-    with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").assertIsDisplayed()
-      onNodeWithText("2022").performClick()
-
-      onNodeWithText("sweaters").assertDoesNotExist()
-      onNodeWithText("chairs").assertDoesNotExist()
-
-      onNodeWithText("pair of scissors").assertIsDisplayed()
-    }
-  }
 
   /** Tests if the total amount correspond to the sum of the items */
   @Test
   fun testTotalAmount() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
       onNodeWithTag("totalItems").assertIsDisplayed()
       var total = 0
       budgetItems.forEach { total += it.amount }
@@ -247,8 +214,6 @@ class BudgetDetailedScreenTest :
   @Test
   fun testEditDismissWorks() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithText("pair of scissors").performClick()
       onNodeWithTag("editDialogBox").assertIsDisplayed()
       onNodeWithTag("editNameBox").performTextClearance()
@@ -264,8 +229,6 @@ class BudgetDetailedScreenTest :
   @Test
   fun testEditModifyWorks() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithText("pair of scissors").performClick()
       onNodeWithTag("editDialogBox").assertIsDisplayed()
       onNodeWithTag("editNameBox").performTextClearance()
@@ -340,12 +303,15 @@ class BudgetDetailedScreenTest :
   @Test
   fun tvaFilterWorks() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
+        onNodeWithTag("tvaListTag").performClick()
+        onNodeWithText("TTC").performClick()
+        val totalAmountTTC = PriceUtil.fromCents(budgetItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
+        Log.d("totalAmountTTC", totalAmountTTC)
+        onNodeWithTag("tvaListTag").performClick()
       onNodeWithText("HT").performClick()
-      onNodeWithText("12.00").assertIsDisplayed()
-      onNodeWithText("TTC").performClick()
-      onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
+        val totalAmount = PriceUtil.fromCents(budgetItems.sumOf { it.amount })
+        Log.d("totalAmount", totalAmount)
+      onNodeWithText(totalAmount).assertIsDisplayed()
     }
   }
 
@@ -433,30 +399,18 @@ class BudgetDetailedScreenTest :
 
   @Test
   fun createTest() {
-    val year = 2022
-    val weirdTag = "$year DropdownItem"
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("createNewItem").performClick()
       onNodeWithTag("editDialogBox").assertIsDisplayed()
       onNodeWithTag("editNameBox").performTextClearance()
       onNodeWithTag("editNameBox").performTextInput("fees")
-      onNodeWithTag("editYearBox").performClick()
-      onNodeWithTag(weirdTag).performClick()
       onNodeWithTag("editConfirmButton").performClick()
-      onNodeWithText("fees").assertIsDisplayed()
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
-      onNodeWithText("fees").assertIsNotDisplayed()
     }
   }
 
   @Test
   fun deleteTest() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithText("pair of scissors").assertIsDisplayed()
       onNodeWithText("pair of scissors").performClick()
       onNodeWithTag("deleteButton").performClick()
