@@ -124,6 +124,8 @@ fun ProfilePreferencesScreen(navActions: NavigationActions) {
               onOpenedChange = { openLanguageDropdown = it },
               onSelectOption = { selectedLanguage = it.name },
               modifier = Modifier.testTag("languageDropdown").align(CenterHorizontally))
+
+          Text(text = "Functionalities not yet implemented")
         }
       }
 }

@@ -31,7 +31,8 @@ fun DropdownWithSetOptions(
     opened: Boolean,
     onOpenedChange: (Boolean) -> Unit,
     onSelectOption: (DropdownOption) -> Unit,
-    label: String = ""
+    label: String = "",
+    errorMessage: String? = null,
 ) {
 
   ExposedDropdownMenuBox(
@@ -48,7 +49,9 @@ fun DropdownWithSetOptions(
               if (options.size > 1) ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened)
             },
             modifier = Modifier.menuAnchor(),
-            leadingIcon = selectedOption.leadIcon)
+            leadingIcon = selectedOption.leadIcon,
+            isError = !errorMessage.isNullOrEmpty(),
+            supportingText = errorMessage?.let { { Text(it) } })
 
         ExposedDropdownMenu(expanded = opened, onDismissRequest = { onOpenedChange(false) }) {
           options.forEach { item ->

@@ -83,6 +83,16 @@ class BudgetDetailedScreenTest :
               onSuccessCallback(budgetItems)
             }
         every { updateBudgetItem(any(), any(), any(), any()) } answers {}
+        every { addBudgetItem(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { deleteBudgetItem(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
@@ -145,6 +155,8 @@ class BudgetDetailedScreenTest :
   @Test
   fun testDisplay() {
     with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
       onNodeWithTag("AccountingDetailedScreen").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
       onNodeWithTag("totalItems").assertIsDisplayed()
@@ -177,8 +189,6 @@ class BudgetDetailedScreenTest :
   @Test
   fun testEmptyList() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2024").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
       onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
           .assertIsDisplayed()
@@ -213,6 +223,8 @@ class BudgetDetailedScreenTest :
   @Test
   fun testTotalAmount() {
     with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
       onNodeWithTag("totalItems").assertIsDisplayed()
       var total = 0
       budgetItems.forEach { total += it.amount }
@@ -239,7 +251,7 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editDialogBox").assertIsDisplayed()
       onNodeWithTag("editNameBox").performTextClearance()
       onNodeWithTag("editNameBox").performTextInput("scotch")
-      onNodeWithTag("editDismissButton").performClick()
+      onNodeWithTag("editSubCategoryCancelButton").performClick()
       onNodeWithTag("editDialogBox").assertIsNotDisplayed()
       onNodeWithText("pair of scissors").assertIsDisplayed()
       onNodeWithText("scotch").assertIsNotDisplayed()
@@ -257,7 +269,6 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editNameBox").performTextClearance()
       onNodeWithTag("editNameBox").performTextInput("scotch")
       onNodeWithTag("editConfirmButton").performClick()
-      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
       onNodeWithText("pair of scissors ").assertIsNotDisplayed()
       onNodeWithText("scotch").assertIsDisplayed()
     }
@@ -415,6 +426,39 @@ class BudgetDetailedScreenTest :
       onNodeWithTag("editSubCat").performClick()
       onNodeWithTag("editSubCategoryDeleteButton").performClick()
       onNodeWithText("Failed to delete category").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun createTest() {
+    val year = 2022
+    val weirdTag = "$year DropdownItem"
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("fees")
+      onNodeWithTag("editYearBox").performClick()
+      onNodeWithTag(weirdTag).performClick()
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithText("fees").assertIsDisplayed()
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2023").performClick()
+      onNodeWithText("fees").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun deleteTest() {
+    with(composeTestRule) {
+      onNodeWithTag("yearListTag").performClick()
+      onNodeWithText("2022").performClick()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
+      onNodeWithText("pair of scissors").performClick()
+      onNodeWithTag("deleteButton").performClick()
+      onNodeWithText("pair of scissors").assertIsNotDisplayed()
     }
   }
 }
