@@ -13,6 +13,7 @@ import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.PriceUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -317,6 +318,8 @@ class BalanceDetailedViewModel(
       _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
     } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
       _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
+    } else if(PriceUtil.isTooLarge(amount)) {
+        _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
     } else {
       _uiState.value = _uiState.value.copy(errorAmount = null)
     }
