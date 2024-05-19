@@ -1,4 +1,4 @@
-package com.github.se.assocify.ui.screens.treasury.accounting.newcategory
+package com.github.se.assocify.ui.screens.treasury.accounting.accountingComposables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,43 +28,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.se.assocify.model.entities.AccountingCategory
-import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.composables.DropdownWithSetOptions
+import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.util.DateUtil
 import java.util.UUID
 
-/** The pop up to add a new category */
+/** The dialog to add a new category */
 @Composable
-fun AddCategoryPopUp(show: Boolean) {
-  // Temporary here while we don't have the viewmodel
-  val categoryList =
-      listOf(
-          AccountingCategory("", "Global"),
-          AccountingCategory("", "Pole"),
-          AccountingCategory("", "Events"),
-          AccountingCategory("", "Commission"),
-          AccountingCategory("", "Fees"))
+fun AddSubcategoryDialog(viewModel: AccountingViewModel) {
+
+  val state by viewModel.uiState.collectAsState()
 
   val dropdownOptionsCategory =
-      categoryList.map { category -> DropdownOption(name = category.name, uid = category.uid) }
+      state.categoryList.map { category ->
+        DropdownOption(name = category.name, uid = category.uid)
+      }
 
   val yearList = DateUtil.getYearList().reversed()
   val dropdownOptionsYear =
       yearList.map { year -> DropdownOption(name = year, uid = UUID.randomUUID().toString()) }
-  var showAddCategoryDialog by remember { mutableStateOf(show) }
-  var name by remember { mutableStateOf("") }
-  var year by remember { mutableStateOf(yearList[0]) }
-  var selectedCategory by remember { mutableStateOf(categoryList[0].name) }
-  var categoryUid by remember { mutableStateOf("") }
+
   var expandedCat by remember { mutableStateOf(false) }
   var expandedYear by remember { mutableStateOf(false) }
 
   val horizontalPadding = 16.dp
   val verticalSpacing = 8.dp
-  if (showAddCategoryDialog) {
-    Dialog(onDismissRequest = { showAddCategoryDialog = false }) {
+  if (state.showNewSubcategoryDialog) {
+    Dialog(onDismissRequest = { viewModel.hideNewSubcategoryDialog() }) {
       Card(
           modifier =
               Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
@@ -73,7 +65,7 @@ fun AddCategoryPopUp(show: Boolean) {
         Column(
             modifier =
                 Modifier.verticalScroll(rememberScrollState())
-                    .padding(horizontal = horizontalPadding),
+                    .padding(horizontal = horizontalPadding, vertical = verticalSpacing),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(verticalSpacing)) {
               // Title
@@ -89,42 +81,48 @@ fun AddCategoryPopUp(show: Boolean) {
                     Icons.Default.Close,
                     contentDescription = "Close dialog",
                     modifier =
-                        Modifier.clickable { showAddCategoryDialog = false }
+                        Modifier.clickable { viewModel.hideNewSubcategoryDialog() }
                             .testTag("cancelButton"))
               }
 
               // Name field
               OutlinedTextField(
                   modifier = Modifier.fillMaxWidth().testTag("categoryNameField"),
-                  value = name,
+                  value = state.newSubcategoryTitle,
                   singleLine = true,
-                  onValueChange = { name = it },
-                  label = { Text("Category name") })
+                  onValueChange = { viewModel.setNewSubcategoryTitle(it) },
+                  label = { Text("Category name") },
+                  isError = state.newSubcategoryTitleError != null,
+                  supportingText = { Text(state.newSubcategoryTitleError ?: "") })
 
               // Accounting category dropdown
               DropdownWithSetOptions(
                   options = dropdownOptionsCategory,
                   selectedOption =
-                      DropdownOption(
-                          selectedCategory,
-                          categoryList.find { it.name == selectedCategory }?.uid ?: ""),
+                      if (state.newSubcategoryCategory != null) {
+                        DropdownOption(
+                            state.newSubcategoryCategory!!.name, state.newSubcategoryCategory!!.uid)
+                      } else {
+                        DropdownOption("Select Tag", "-")
+                      },
                   opened = expandedCat,
                   onOpenedChange = { expandedCat = it },
                   onSelectOption = { option ->
-                    categoryUid = option.uid
-                    selectedCategory = option.name
+                    viewModel.setNewSubcategoryCategory(
+                        state.categoryList.find { it.uid == option.uid })
                   },
                   modifier = Modifier.fillMaxWidth().testTag("categoryDropdown"),
-                  label = "Tag")
+                  label = "Tag",
+                  errorMessage = state.newSubcategoryCategoryError ?: "")
 
               // Year dropdown
               DropdownWithSetOptions(
                   options = dropdownOptionsYear,
                   selectedOption =
-                      DropdownOption(year, dropdownOptionsYear.find { it.name == year }?.uid ?: ""),
+                      DropdownOption(state.newSubcategoryYear, state.newSubcategoryYear),
                   opened = expandedYear,
                   onOpenedChange = { expandedYear = it },
-                  onSelectOption = { option -> year = option.name },
+                  onSelectOption = { option -> viewModel.setNewSubcategoryYear(option.name) },
                   modifier = Modifier.fillMaxWidth().testTag("yearDropdown"),
                   label = "Year")
             }
@@ -134,13 +132,7 @@ fun AddCategoryPopUp(show: Boolean) {
             horizontalArrangement = Arrangement.Absolute.Right) {
               // Create button
               TextButton(
-                  onClick = {
-                    val newSubCategory =
-                        AccountingSubCategory(
-                            UUID.randomUUID().toString(), categoryUid, name, 0, year.toInt())
-                    /*TODO: create new subcategory*/
-                    showAddCategoryDialog = false
-                  },
+                  onClick = { viewModel.createNewSubcategory() },
                   modifier = Modifier.testTag("createButton"),
               ) {
                 Text("Create")
