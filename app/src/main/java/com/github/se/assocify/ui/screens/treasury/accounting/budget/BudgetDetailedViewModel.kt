@@ -10,6 +10,7 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.navigation.NavigationActions
+import java.time.Year
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +41,8 @@ class BudgetDetailedViewModel(
   }
 
   private var loadCounter = 0
+  private val maxNameLength = 50
+  private val maxDescriptionLength = 200
 
   fun loadBudgetDetails() {
     loadCounter += 2
@@ -120,7 +123,13 @@ class BudgetDetailedViewModel(
    * @param budgetItem the item we want to edit
    */
   fun startEditing(budgetItem: BudgetItem) {
-    _uiState.value = _uiState.value.copy(editing = true, editedBudgetItem = budgetItem)
+    _uiState.value =
+        _uiState.value.copy(
+            editing = true,
+            editedBudgetItem = budgetItem,
+            titleError = false,
+            amountError = false,
+            descriptionError = false)
   }
 
   /**
@@ -129,16 +138,47 @@ class BudgetDetailedViewModel(
    * @param budgetItem the new edited budgetItem
    */
   fun saveEditing(budgetItem: BudgetItem) {
-    _uiState.value =
-        _uiState.value.copy(
-            editing = false,
-            budgetList = _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem,
-            editedBudgetItem = null)
+    if (_uiState.value.titleError ||
+        _uiState.value.amountError ||
+        _uiState.value.descriptionError) {
+      return
+    }
+    budgetApi.updateBudgetItem(
+        CurrentUser.associationUid!!,
+        budgetItem,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  editing = false,
+                  budgetList =
+                      if (_uiState.value.yearFilter == budgetItem.year)
+                          _uiState.value.budgetList.filter { it.uid != budgetItem.uid } + budgetItem
+                      else _uiState.value.budgetList.filter { it.uid != budgetItem.uid },
+                  editedBudgetItem = null)
+        },
+        {})
   }
 
   /** Exit the edit state without keeping the modifications done */
   fun cancelEditing() {
     _uiState.value = _uiState.value.copy(editing = false, editedBudgetItem = null)
+  }
+
+  /** Delete the item that is being edited from the list */
+  fun deleteEditing() {
+    budgetApi.deleteBudgetItem(
+        _uiState.value.editedBudgetItem!!.uid,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  editing = false,
+                  budgetList =
+                      _uiState.value.budgetList.filter {
+                        it.uid != _uiState.value.editedBudgetItem!!.uid
+                      },
+                  editedBudgetItem = null)
+        },
+        {})
   }
 
   fun modifyTVAFilter(tvaActive: Boolean) {
@@ -195,6 +235,72 @@ class BudgetDetailedViewModel(
           }
         })
   }
+
+  fun startCreating() {
+    _uiState.value =
+        _uiState.value.copy(
+            creating = true, titleError = false, amountError = false, descriptionError = false)
+  }
+
+  fun cancelCreating() {
+    _uiState.value =
+        _uiState.value.copy(
+            creating = false,
+        )
+  }
+
+  fun saveCreating(budgetItem: BudgetItem) {
+    if (_uiState.value.titleError ||
+        _uiState.value.amountError ||
+        _uiState.value.descriptionError) {
+      return
+    }
+    budgetApi.addBudgetItem(
+        CurrentUser.associationUid!!,
+        budgetItem,
+        {
+          if (budgetItem.year == _uiState.value.yearFilter)
+              _uiState.value =
+                  _uiState.value.copy(budgetList = _uiState.value.budgetList + budgetItem)
+        },
+        {})
+    _uiState.value = _uiState.value.copy(creating = false)
+  }
+
+  /**
+   * Checks if the format of title is good and changes the error depending on it
+   *
+   * @param title the string that is checked
+   */
+  fun setTitle(title: String) {
+    if (title.length > maxNameLength) {
+      _uiState.value =
+          _uiState.value.copy(
+              titleError = true,
+              titleErrorString = "Title is too long, max length is $maxNameLength")
+    } else if (title.isEmpty()) {
+      _uiState.value = _uiState.value.copy(titleError = true, titleErrorString = "Title is empty")
+    } else {
+      _uiState.value = _uiState.value.copy(titleError = false)
+    }
+  }
+
+  /**
+   * Checks if the format of amount is good and changes the error depending on it
+   *
+   * @param amount the string that is checked
+   */
+  fun setAmount(amount: String) {
+    _uiState.value =
+        _uiState.value.copy(
+            amountError =
+                amount.isEmpty() || amount.toDoubleOrNull() == null || amount.toDouble() < 0.0)
+  }
+
+  fun setDescription(description: String) {
+    _uiState.value =
+        _uiState.value.copy(descriptionError = description.length > maxDescriptionLength)
+  }
 }
 
 /**
@@ -217,10 +323,15 @@ data class BudgetItemState(
     val budgetList: List<BudgetItem> = emptyList(),
     val subCategory: AccountingSubCategory? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
-    val yearFilter: Int = 2023,
+    val yearFilter: Int = Year.now().value,
     val editing: Boolean = false,
+    val creating: Boolean = false,
     val subCatEditing: Boolean = false,
     val editedBudgetItem: BudgetItem? = null,
     val snackbarState: SnackbarHostState = SnackbarHostState(),
-    val filterActive: Boolean = false
+    val filterActive: Boolean = false,
+    val titleError: Boolean = false,
+    val titleErrorString: String = "",
+    val amountError: Boolean = false,
+    val descriptionError: Boolean = false
 )
