@@ -306,11 +306,10 @@ class BudgetDetailedScreenTest :
         onNodeWithTag("tvaListTag").performClick()
         onNodeWithText("TTC").performClick()
         val totalAmountTTC = PriceUtil.fromCents(budgetItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
-        Log.d("totalAmountTTC", totalAmountTTC)
+        onNodeWithText(totalAmountTTC).assertIsDisplayed()
         onNodeWithTag("tvaListTag").performClick()
       onNodeWithText("HT").performClick()
         val totalAmount = PriceUtil.fromCents(budgetItems.sumOf { it.amount })
-        Log.d("totalAmount", totalAmount)
       onNodeWithText(totalAmount).assertIsDisplayed()
     }
   }
