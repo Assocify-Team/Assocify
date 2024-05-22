@@ -25,6 +25,7 @@ data class Receipt(
     val cents: Int,
     val status: Status,
     val photo: MaybeRemotePhoto?,
+    val userId: String,
 )
 
 @Serializable
