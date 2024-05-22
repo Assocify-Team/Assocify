@@ -11,8 +11,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
-import com.github.se.assocify.model.database.AssociationAPI
-import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.treasuryTags.ProfileTreasuryTagsScreen
@@ -37,8 +35,6 @@ class ProfileTreasuryTagsScreenTest :
 
   private val accCats = listOf(AccountingCategory("1", "cat1"), AccountingCategory("2", "cat2"))
 
-  private val mockAssocAPI = mockk<AssociationAPI>()
-  private val mockUserAPI = mockk<UserAPI>()
   private val mockAccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
         every { getCategories(any(), any(), any()) } answers
@@ -58,7 +54,7 @@ class ProfileTreasuryTagsScreenTest :
     composeTestRule.setContent {
       ProfileTreasuryTagsScreen(
           navActions = navActions,
-          ProfileTreasuryTagsViewModel(mockAssocAPI, mockAccountingCategoryAPI, navActions))
+          ProfileTreasuryTagsViewModel(mockAccountingCategoryAPI, navActions))
     }
   }
 

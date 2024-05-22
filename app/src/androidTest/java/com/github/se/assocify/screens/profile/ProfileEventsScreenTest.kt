@@ -10,7 +10,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.navigation.NavigationActions
@@ -57,19 +56,18 @@ class ProfileEventsScreenTest :
     every { navActions.back() } answers { goBack = true }
 
     composeTestRule.setContent {
-      ProfileEventsScreen(
-          navActions = navActions, ProfileEventsViewModel(mockEventAPI, navActions))
+      ProfileEventsScreen(navActions = navActions, ProfileEventsViewModel(mockEventAPI, navActions))
     }
   }
 
   @Test
   fun display() {
     with(composeTestRule) {
-        onNodeWithTag("ProfileEvents Screen").assertIsDisplayed()
-        onNodeWithTag("addEventButton").assertIsDisplayed().assertHasClickAction()
-        events.forEach { onNodeWithText(it.name).assertIsDisplayed() }
-        onAllNodesWithTag("editEventButton").assertCountEquals(events.size)
-        onAllNodesWithTag("deleteEventButton").assertCountEquals(events.size)
+      onNodeWithTag("ProfileEvents Screen").assertIsDisplayed()
+      onNodeWithTag("addEventButton").assertIsDisplayed().assertHasClickAction()
+      events.forEach { onNodeWithText(it.name).assertIsDisplayed() }
+      onAllNodesWithTag("editEventButton").assertCountEquals(events.size)
+      onAllNodesWithTag("deleteEventButton").assertCountEquals(events.size)
     }
   }
 

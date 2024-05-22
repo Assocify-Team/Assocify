@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
-import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,14 +19,9 @@ class ProfileTreasuryTagsViewModel(
   init {
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList ->
-          _uiState.value =
-              _uiState.value.copy(treasuryTags = categoryList)
-        },
+        { categoryList -> _uiState.value = _uiState.value.copy(treasuryTags = categoryList) },
         { Log.e("treasurytags", "Error loading tags") })
   }
 }
 
-data class ProfileTreasuryTagsUIState(
-    val treasuryTags: List<AccountingCategory> = emptyList()
-)
+data class ProfileTreasuryTagsUIState(val treasuryTags: List<AccountingCategory> = emptyList())
