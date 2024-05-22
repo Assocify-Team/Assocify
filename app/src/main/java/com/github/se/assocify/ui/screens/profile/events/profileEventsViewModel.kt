@@ -27,12 +27,12 @@ class ProfileEventsViewModel(
         eventAPI.getEvents(
             { eventList ->
                 _uiState.value =
-                    _uiState.value.copy(events = _uiState.value.events + eventList)
+                    _uiState.value.copy(events = eventList)
             },
             { Log.e("events", "Error loading events") })
     }
 }
 
 data class ProfileEventsUIState(
-    val events: List<Event> = listOf(Event("add", "Add a new event", "", OffsetDateTime.MIN, OffsetDateTime.MAX, "", ""))
+    val events: List<Event> = emptyList()
 )

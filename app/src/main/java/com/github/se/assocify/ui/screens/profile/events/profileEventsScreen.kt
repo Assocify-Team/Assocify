@@ -3,8 +3,10 @@ package com.github.se.assocify.ui.screens.profile.events
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -14,6 +16,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -45,24 +49,25 @@ fun ProfileEventsScreen(navActions: NavigationActions, profileEventsViewModel: P
                   }
             })
       },
-      contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) {
+      floatingActionButton = {
+        FloatingActionButton(onClick = { /*TODO*/ }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+        }
+      },
+      contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) {
       val state by profileEventsViewModel.uiState.collectAsState()
 
       LazyColumn(
-          modifier = Modifier.fillMaxSize().padding(it),
+          modifier = Modifier
+              .fillMaxSize()
+              .padding(it),
       ) {
-          state.events.forEach { event ->
+          state.events.forEachIndexed { index, event ->
               item {
                   ListItem(
                       headlineContent = { Text(text = event.name) },
                       supportingContent = { Text(text = event.description.ifBlank { "-" }) },
                       trailingContent = {
-                          if (event.uid == "add") {
-                              IconButton(
-                                  onClick = { /*TODO*/}, modifier = Modifier.testTag("addEventButton")) {
-                                  Icon(Icons.Default.Add, contentDescription = "Add")
-                              }
-                          } else {
                               Row {
                                   IconButton(
                                       onClick = { /*TODO*/}, modifier = Modifier.testTag("editEventButton")) {
@@ -74,10 +79,11 @@ fun ProfileEventsScreen(navActions: NavigationActions, profileEventsViewModel: P
                                       Icon(Icons.Default.Delete, contentDescription = "Delete")
                                   }
                               }
-                          }
                       })
+                  if (index != state.events.size - 1) HorizontalDivider()
               }
           }
+          item { Spacer(modifier = Modifier.height(80.dp)) }
       }
       }
 }
