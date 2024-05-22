@@ -7,6 +7,14 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 
-fun NavGraphBuilder.profileEventsGraph(navigationActions: NavigationActions, assoAPI: AssociationAPI, eventAPI: EventAPI) {
-  composable(route = Destination.ProfileEvents.route) { ProfileEventsScreen(navigationActions, profileEventsViewModel = ProfileEventsViewModel(assoAPI, eventAPI, navigationActions)) }
+fun NavGraphBuilder.profileEventsGraph(
+    navigationActions: NavigationActions,
+    assoAPI: AssociationAPI,
+    eventAPI: EventAPI
+) {
+  composable(route = Destination.ProfileEvents.route) {
+    ProfileEventsScreen(
+        navigationActions,
+        profileEventsViewModel = ProfileEventsViewModel(assoAPI, eventAPI, navigationActions))
+  }
 }

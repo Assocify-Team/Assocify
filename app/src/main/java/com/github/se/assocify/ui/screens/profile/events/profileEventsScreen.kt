@@ -1,7 +1,5 @@
 package com.github.se.assocify.ui.screens.profile.events
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -34,7 +31,10 @@ import com.github.se.assocify.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileEventsScreen(navActions: NavigationActions, profileEventsViewModel: ProfileEventsViewModel) {
+fun ProfileEventsScreen(
+    navActions: NavigationActions,
+    profileEventsViewModel: ProfileEventsViewModel
+) {
   Scaffold(
       modifier = Modifier.testTag("ProfileEvents Screen"),
       topBar = {
@@ -50,40 +50,38 @@ fun ProfileEventsScreen(navActions: NavigationActions, profileEventsViewModel: P
             })
       },
       floatingActionButton = {
-        FloatingActionButton(onClick = { /*TODO*/ }) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+        FloatingActionButton(onClick = { /*TODO*/}) {
+          Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) {
-      val state by profileEventsViewModel.uiState.collectAsState()
+        val state by profileEventsViewModel.uiState.collectAsState()
 
-      LazyColumn(
-          modifier = Modifier
-              .fillMaxSize()
-              .padding(it),
-      ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(it),
+        ) {
           state.events.forEachIndexed { index, event ->
-              item {
-                  ListItem(
-                      headlineContent = { Text(text = event.name) },
-                      supportingContent = { Text(text = event.description.ifBlank { "-" }) },
-                      trailingContent = {
-                              Row {
-                                  IconButton(
-                                      onClick = { /*TODO*/}, modifier = Modifier.testTag("editEventButton")) {
-                                      Icon(Icons.Default.Edit, contentDescription = "Edit")
-                                  }
+            item {
+              ListItem(
+                  headlineContent = { Text(text = event.name) },
+                  supportingContent = { Text(text = event.description.ifBlank { "-" }) },
+                  trailingContent = {
+                    Row {
+                      IconButton(
+                          onClick = { /*TODO*/}, modifier = Modifier.testTag("editEventButton")) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit")
+                          }
 
-                                  IconButton(
-                                      onClick = { /*TODO*/}, modifier = Modifier.testTag("deleteEventButton")) {
-                                      Icon(Icons.Default.Delete, contentDescription = "Delete")
-                                  }
-                              }
-                      })
-                  if (index != state.events.size - 1) HorizontalDivider()
-              }
+                      IconButton(
+                          onClick = { /*TODO*/}, modifier = Modifier.testTag("deleteEventButton")) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                          }
+                    }
+                  })
+              if (index != state.events.size - 1) HorizontalDivider()
+            }
           }
           item { Spacer(modifier = Modifier.height(80.dp)) }
-      }
+        }
       }
 }

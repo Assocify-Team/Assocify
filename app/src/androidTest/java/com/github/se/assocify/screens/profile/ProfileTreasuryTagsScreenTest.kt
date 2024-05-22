@@ -58,8 +58,7 @@ class ProfileTreasuryTagsScreenTest :
     composeTestRule.setContent {
       ProfileTreasuryTagsScreen(
           navActions = navActions,
-          ProfileTreasuryTagsViewModel(
-              mockAssocAPI, mockAccountingCategoryAPI, navActions))
+          ProfileTreasuryTagsViewModel(mockAssocAPI, mockAccountingCategoryAPI, navActions))
     }
   }
 
