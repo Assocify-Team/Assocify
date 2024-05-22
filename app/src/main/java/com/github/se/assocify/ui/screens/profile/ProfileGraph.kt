@@ -29,7 +29,7 @@ fun NavGraphBuilder.profileGraph(
   }
 
   profilePreferencesGraph(navigationActions)
-  profileMembersGraph(navigationActions)
+  profileMembersGraph(navigationActions, associationAPI)
   profileTreasuryTagsGraph(navigationActions, accountingCategoryAPI)
   profileEventsGraph(navigationActions, eventAPI)
 }
