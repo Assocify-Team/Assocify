@@ -45,6 +45,7 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private var expectedReceipt =
       Receipt(
           uid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
+          userId = "testUser",
           title = "Test Title",
           description = "",
           cents = -10000,
@@ -264,6 +265,7 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   private var expectedReceipt =
       Receipt(
           uid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
+          userId = "testUser",
           title = "Edited Receipt",
           description = "",
           cents = -10000,
