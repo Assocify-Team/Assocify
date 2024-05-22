@@ -54,21 +54,24 @@ fun ProfileTreasuryTagsScreen(
               ListItem(
                   headlineContent = { Text(text = treasuryTag.name) },
                   trailingContent = {
-                      if (treasuryTag.uid == "add") {
-                          IconButton(onClick = { /*TODO*/ }) {
-                              Icon(Icons.Default.Add, contentDescription = "Add")
+                    if (treasuryTag.uid == "add") {
+                      IconButton(
+                          onClick = { /*TODO*/}, modifier = Modifier.testTag("addTagButton")) {
+                            Icon(Icons.Default.Add, contentDescription = "Add")
                           }
-                      } else {
-                          Row {
-                              IconButton(onClick = { /*TODO*/ }) {
-                                  Icon(Icons.Default.Edit, contentDescription = "Edit")
-                              }
+                    } else {
+                      Row {
+                        IconButton(
+                            onClick = { /*TODO*/}, modifier = Modifier.testTag("editTagButton")) {
+                              Icon(Icons.Default.Edit, contentDescription = "Edit")
+                            }
 
-                              IconButton(onClick = { /*TODO*/ }) {
-                                  Icon(Icons.Default.Delete, contentDescription = "Delete")
-                              }
-                          }
+                        IconButton(
+                            onClick = { /*TODO*/}, modifier = Modifier.testTag("deleteTagButton")) {
+                              Icon(Icons.Default.Delete, contentDescription = "Delete")
+                            }
                       }
+                    }
                   })
             }
           }
