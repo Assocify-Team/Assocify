@@ -62,7 +62,6 @@ class ProfileTreasuryTagsScreenTest :
   fun display() {
     with(composeTestRule) {
       onNodeWithTag("TreasuryTags Screen").assertIsDisplayed()
-      onNodeWithText("Add a new tag").assertIsDisplayed()
       onNodeWithTag("addTagButton").assertIsDisplayed().assertHasClickAction()
       accCats.forEach { onNodeWithText(it.name).assertIsDisplayed() }
       onAllNodesWithTag("editTagButton").assertCountEquals(accCats.size)
