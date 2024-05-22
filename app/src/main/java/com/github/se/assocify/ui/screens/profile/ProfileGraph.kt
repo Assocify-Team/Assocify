@@ -30,6 +30,6 @@ fun NavGraphBuilder.profileGraph(
 
   profilePreferencesGraph(navigationActions)
   profileMembersGraph(navigationActions)
-  profileTreasuryTagsGraph(navigationActions, associationAPI, accountingCategoryAPI)
-  profileEventsGraph(navigationActions, associationAPI, eventAPI)
+  profileTreasuryTagsGraph(navigationActions, accountingCategoryAPI)
+  profileEventsGraph(navigationActions, eventAPI)
 }

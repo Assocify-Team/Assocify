@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ProfileTreasuryTagsViewModel(
-    assoAPI: AssociationAPI,
     accountingCategoryAPI: AccountingCategoryAPI,
     navActions: NavigationActions
 ) : ViewModel() {
@@ -23,12 +22,12 @@ class ProfileTreasuryTagsViewModel(
         CurrentUser.associationUid!!,
         { categoryList ->
           _uiState.value =
-              _uiState.value.copy(treasuryTags = _uiState.value.treasuryTags + categoryList)
+              _uiState.value.copy(treasuryTags = categoryList)
         },
         { Log.e("treasurytags", "Error loading tags") })
   }
 }
 
 data class ProfileTreasuryTagsUIState(
-    val treasuryTags: List<AccountingCategory> = listOf(AccountingCategory("add", "Add a new tag"))
+    val treasuryTags: List<AccountingCategory> = emptyList()
 )
