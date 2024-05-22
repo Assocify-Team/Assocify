@@ -50,7 +50,7 @@ fun ProfileEventsScreen(
             })
       },
       floatingActionButton = {
-        FloatingActionButton(onClick = { /*TODO*/}) {
+        FloatingActionButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("addEventButton")) {
           Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
       },

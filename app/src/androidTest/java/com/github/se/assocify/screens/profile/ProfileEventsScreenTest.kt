@@ -1,8 +1,12 @@
 package com.github.se.assocify.screens.profile
 
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
@@ -36,7 +40,6 @@ class ProfileEventsScreenTest :
           Event("1", "event1", "desc1", OffsetDateTime.MIN, OffsetDateTime.MAX, "", ""),
           Event("2", "event2", "desc2", OffsetDateTime.MIN, OffsetDateTime.MAX, "", ""))
 
-  private val mockAssocAPI = mockk<AssociationAPI>()
   private val mockEventAPI =
       mockk<EventAPI> {
         every { getEvents(any(), any()) } answers
@@ -55,13 +58,19 @@ class ProfileEventsScreenTest :
 
     composeTestRule.setContent {
       ProfileEventsScreen(
-          navActions = navActions, ProfileEventsViewModel(mockAssocAPI, mockEventAPI, navActions))
+          navActions = navActions, ProfileEventsViewModel(mockEventAPI, navActions))
     }
   }
 
   @Test
   fun display() {
-    with(composeTestRule) { onNodeWithTag("ProfileEvents Screen").assertIsDisplayed() }
+    with(composeTestRule) {
+        onNodeWithTag("ProfileEvents Screen").assertIsDisplayed()
+        onNodeWithTag("addEventButton").assertIsDisplayed().assertHasClickAction()
+        events.forEach { onNodeWithText(it.name).assertIsDisplayed() }
+        onAllNodesWithTag("editEventButton").assertCountEquals(events.size)
+        onAllNodesWithTag("deleteEventButton").assertCountEquals(events.size)
+    }
   }
 
   @Test
