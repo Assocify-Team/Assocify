@@ -7,9 +7,7 @@ import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.AccountingCategory
-import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.screens.profile.ProfileUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -19,19 +17,15 @@ class ProfileTreasuryTagsViewModel(
     private val accountingCategoryAPI: AccountingCategoryAPI,
     private val navActions: NavigationActions
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ProfileTreasuryTagsUIState())
-    val uiState: StateFlow<ProfileTreasuryTagsUIState> = _uiState
+  private val _uiState = MutableStateFlow(ProfileTreasuryTagsUIState())
+  val uiState: StateFlow<ProfileTreasuryTagsUIState> = _uiState
 
-    init {
-        accountingCategoryAPI.getCategories(
-            CurrentUser.associationUid!!,
-            { categoryList ->
-                _uiState.value = _uiState.value.copy(treasuryTags = categoryList)
-            },
-            { Log.e("treasurytags", "Error loading tags") })
-    }
+  init {
+    accountingCategoryAPI.getCategories(
+        CurrentUser.associationUid!!,
+        { categoryList -> _uiState.value = _uiState.value.copy(treasuryTags = _uiState.value.treasuryTags + categoryList) },
+        { Log.e("treasurytags", "Error loading tags") })
+  }
 }
 
-data class ProfileTreasuryTagsUIState(
-    val treasuryTags: List<AccountingCategory> = emptyList()
-)
+data class ProfileTreasuryTagsUIState(val treasuryTags: List<AccountingCategory> = listOf(AccountingCategory("add", "Add a new tag")))

@@ -1,13 +1,12 @@
 package com.github.se.assocify.ui.screens.profile.treasuryTags
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -20,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -29,10 +27,13 @@ import com.github.se.assocify.ui.composables.BackButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileTreasuryTagsScreen(navActions: NavigationActions, treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
-    val state by treasuryTagsViewModel.uiState.collectAsState()
+fun ProfileTreasuryTagsScreen(
+    navActions: NavigationActions,
+    treasuryTagsViewModel: ProfileTreasuryTagsViewModel
+) {
+  val state by treasuryTagsViewModel.uiState.collectAsState()
 
-    Scaffold(
+  Scaffold(
       modifier = Modifier.testTag("TreasuryTags Screen"),
       topBar = {
         CenterAlignedTopAppBar(
@@ -44,28 +45,33 @@ fun ProfileTreasuryTagsScreen(navActions: NavigationActions, treasuryTagsViewMod
                   modifier = Modifier.testTag("backButton"))
             })
       },
-        contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)
-    ) {
-
+      contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
+            modifier = Modifier.fillMaxSize().padding(it),
         ) {
-            state.treasuryTags.forEach { treasuryTag ->
-                item { ListItem(headlineContent = { Text(text = treasuryTag.name) },
-                    trailingContent = {
+          state.treasuryTags.forEach { treasuryTag ->
+            item {
+              ListItem(
+                  headlineContent = { Text(text = treasuryTag.name) },
+                  trailingContent = {
+                      if (treasuryTag.uid == "add") {
+                          IconButton(onClick = { /*TODO*/ }) {
+                              Icon(Icons.Default.Add, contentDescription = "Add")
+                          }
+                      } else {
+                          Row {
+                              IconButton(onClick = { /*TODO*/ }) {
+                                  Icon(Icons.Default.Edit, contentDescription = "Edit")
+                              }
 
-                        Row {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
-                    }
-
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
-                    }
-                }}) }
+                              IconButton(onClick = { /*TODO*/ }) {
+                                  Icon(Icons.Default.Delete, contentDescription = "Delete")
+                              }
+                          }
+                      }
+                  })
             }
+          }
         }
       }
 }
