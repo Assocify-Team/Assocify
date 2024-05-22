@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ProfileTreasuryTagsViewModel(
     assoAPI: AssociationAPI,
-    userAPI: UserAPI,
     accountingCategoryAPI: AccountingCategoryAPI,
     navActions: NavigationActions
 ) : ViewModel() {

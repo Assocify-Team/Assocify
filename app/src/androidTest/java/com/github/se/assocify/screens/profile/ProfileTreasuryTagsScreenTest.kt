@@ -59,7 +59,7 @@ class ProfileTreasuryTagsScreenTest :
       ProfileTreasuryTagsScreen(
           navActions = navActions,
           ProfileTreasuryTagsViewModel(
-              mockAssocAPI, mockUserAPI, mockAccountingCategoryAPI, navActions))
+              mockAssocAPI, mockAccountingCategoryAPI, navActions))
     }
   }
 

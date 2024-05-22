@@ -2,25 +2,35 @@ package com.github.se.assocify.ui.screens.profile.events
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.github.se.assocify.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileEventsScreen(navActions: NavigationActions) {
+fun ProfileEventsScreen(navActions: NavigationActions, profileEventsViewModel: ProfileEventsViewModel) {
   Scaffold(
       modifier = Modifier.testTag("ProfileEvents Screen"),
       topBar = {
@@ -34,12 +44,40 @@ fun ProfileEventsScreen(navActions: NavigationActions) {
                         contentDescription = "Arrow Back")
                   }
             })
-      }) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize().padding(it)) {
-              Text(text = "Events settings Screen : not yet implemented")
-            }
+      },
+      contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) {
+      val state by profileEventsViewModel.uiState.collectAsState()
+
+      LazyColumn(
+          modifier = Modifier.fillMaxSize().padding(it),
+      ) {
+          state.events.forEach { event ->
+              item {
+                  ListItem(
+                      headlineContent = { Text(text = event.name) },
+                      supportingContent = { Text(text = event.description.ifBlank { "-" }) },
+                      trailingContent = {
+                          if (event.uid == "add") {
+                              IconButton(
+                                  onClick = { /*TODO*/}, modifier = Modifier.testTag("addEventButton")) {
+                                  Icon(Icons.Default.Add, contentDescription = "Add")
+                              }
+                          } else {
+                              Row {
+                                  IconButton(
+                                      onClick = { /*TODO*/}, modifier = Modifier.testTag("editEventButton")) {
+                                      Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                  }
+
+                                  IconButton(
+                                      onClick = { /*TODO*/}, modifier = Modifier.testTag("deleteEventButton")) {
+                                      Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                  }
+                              }
+                          }
+                      })
+              }
+          }
+      }
       }
 }

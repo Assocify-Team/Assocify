@@ -11,13 +11,12 @@ import com.github.se.assocify.navigation.NavigationActions
 fun NavGraphBuilder.profileTreasuryTagsGraph(
     navigationActions: NavigationActions,
     associationAPI: AssociationAPI,
-    userAPI: UserAPI,
     accountingCategoryAPI: AccountingCategoryAPI
 ) {
   composable(route = Destination.ProfileTreasuryTags.route) {
     ProfileTreasuryTagsScreen(
         navigationActions,
         ProfileTreasuryTagsViewModel(
-            associationAPI, userAPI, accountingCategoryAPI, navigationActions))
+            associationAPI, accountingCategoryAPI, navigationActions))
   }
 }
