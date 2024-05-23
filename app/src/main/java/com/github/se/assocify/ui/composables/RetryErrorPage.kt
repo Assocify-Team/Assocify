@@ -31,8 +31,6 @@ fun ErrorMessagePage(
             })
       },
   ) {
-    ErrorMessage(errorMessage) {
-        onRetry?.invoke()
-    }
+    ErrorMessage(errorMessage) { onRetry?.invoke() }
   }
 }

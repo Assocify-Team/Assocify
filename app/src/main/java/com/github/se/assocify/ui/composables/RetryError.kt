@@ -15,7 +15,7 @@ fun ErrorMessage(errorMessage: String?, modifier: Modifier? = null, onRetry: (()
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
-      modifier = modifier ?: Modifier.fillMaxSize()){
+      modifier = modifier ?: Modifier.fillMaxSize()) {
         errorMessage?.let { Text(text = it, modifier = Modifier.testTag("errorMessage")) }
         onRetry?.let { Button(onClick = it) { Text(text = "Retry") } }
       }
