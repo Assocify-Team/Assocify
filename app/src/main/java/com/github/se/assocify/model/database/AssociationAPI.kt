@@ -11,12 +11,12 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
+import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import java.time.LocalDate
 
 /**
  * API for interacting with the associations in the database
@@ -368,19 +368,20 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
                 """{"user_id": "$userId","role_id": ${invitation["role_id"]}}"""))
   }
 
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun tempGetMembers(
-        associationId: String,
-        onSuccess: (List<AssociationMember>) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        val tempList = listOf(
-            AssociationMember
-                (User("1", "Sarah"),
+  @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+  fun tempGetMembers(
+      associationId: String,
+      onSuccess: (List<AssociationMember>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    val tempList =
+        listOf(
+            AssociationMember(
+                User("1", "Sarah"),
                 Association("a", "Association", "Description", LocalDate.EPOCH),
                 PermissionRole("r", associationId, RoleType.MEMBER)))
-        onSuccess(tempList)
-    }
+    onSuccess(tempList)
+  }
 
   @Serializable
   private data class Applicant(
