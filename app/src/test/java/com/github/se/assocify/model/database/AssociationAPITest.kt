@@ -2,6 +2,7 @@ package com.github.se.assocify.model.database
 
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.Association
+import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
@@ -18,7 +19,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
 import java.util.UUID
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
@@ -37,7 +37,6 @@ class AssociationAPITest {
 
   private lateinit var assoAPI: AssociationAPI
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
     APITestUtils.setup()
@@ -399,5 +398,61 @@ class AssociationAPITest {
     assert(!assoAPI.associationNameValid("   "))
     assert(!assoAPI.associationNameValid(""))
     assert(!assoAPI.associationNameValid("\t"))
+  }
+
+  @Test
+  fun testGetMembers() {
+    error = false
+    response =
+        """
+      [{
+        "uid": "$uuid1",
+        "name": "Test",
+        "description": "Test",
+        "creation_date": "2022-01-01"
+      }, {
+        "uid": "$uuid2",
+        "name": "Test2",
+        "description": "Test2",
+        "creation_date": "2022-01-02"
+      }, ${APITestUtils.ASSOCIATION_JSON}]
+        """
+            .trimIndent()
+
+    val successMock1 = mockk<(Map<String, Association>) -> Unit>(relaxed = true)
+    val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
+
+    assoAPI.updateCache(successMock1, failureMock)
+    verify(timeout = 1000) { successMock1(any()) }
+    verify(exactly = 0) { failureMock(any()) }
+    clearMocks(successMock1, failureMock)
+
+    val successMock = mockk<(List<AssociationMember>) -> Unit>(relaxed = true)
+
+    response =
+        """
+          [{
+            "users": ${APITestUtils.USER_JSON},
+            "role": ${APITestUtils.PERMISSION_JSON}
+          }]
+      """
+            .trimIndent()
+    assoAPI.getMembers(APITestUtils.ASSOCIATION.uid, successMock, failureMock)
+    verify(timeout = 1000) { successMock(listOf(APITestUtils.ASSOCIATION_MEMBER)) }
+    verify(exactly = 0) { failureMock(any()) }
+    clearMocks(successMock, failureMock)
+
+    error = true
+    assoAPI.getMembers(APITestUtils.ASSOCIATION.uid, successMock, failureMock)
+    verify(timeout = 1000) { successMock(listOf(APITestUtils.ASSOCIATION_MEMBER)) }
+    verify(exactly = 0) { failureMock(any()) }
+    clearMocks(successMock, failureMock)
+
+    // User uid just so we have a different UID.
+    assoAPI.getMembers(APITestUtils.USER.uid, successMock, failureMock)
+
+    verify(timeout = 1000) { failureMock(any()) }
+    verify(exactly = 0) { successMock(any()) }
+    clearMocks(successMock, failureMock)
   }
 }
