@@ -1,12 +1,18 @@
 package com.github.se.assocify.ui.screens.profile.members
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: AssociationAPI) :
     ViewModel() {
   private val _uiState = MutableStateFlow(ProfileMembersUIState())
@@ -28,18 +34,22 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
       )
 
   init {
-    //    associationAPI.getApplicants(
-    //        CurrentUser.associationUid!!,
-    //        { applicants -> _uiState.value = _uiState.value.copy(applicants = applicants) },
-    //        { Log.e("members", "Error loading applicants") })
+    associationAPI.getApplicants(
+        CurrentUser.associationUid!!,
+        { applicants -> _uiState.value = _uiState.value.copy(applicants = applicants) },
+        { Log.e("members", "Error loading applicants") })
     // to debug with a big list :
-    _uiState.value = _uiState.value.copy(applicants = tempMemberList.take(2))
+    //    _uiState.value = _uiState.value.copy(applicants = tempMemberList.take(2))
     // not yet done in API : getMembers of association
-    _uiState.value = _uiState.value.copy(currMembers = tempMemberList)
+    //    _uiState.value = _uiState.value.copy(currMembers = tempMemberList)
+    associationAPI.tempGetMembers(
+        CurrentUser.associationUid!!,
+        { members -> _uiState.value = _uiState.value.copy(currMembers = members) },
+        { Log.e("members", "Error loading members") })
   }
 }
 
 data class ProfileMembersUIState(
-    val currMembers: List<User> = emptyList(),
+    val currMembers: List<AssociationMember> = emptyList(),
     val applicants: List<User> = emptyList()
 )

@@ -1,5 +1,7 @@
 package com.github.se.assocify.ui.screens.profile.members
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.BackButton
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileMembersScreen(
@@ -103,12 +106,13 @@ fun ProfileMembersScreen(
             item {
               if (i == 0) HorizontalDivider()
               ListItem(
-                  headlineContent = { Text(text = member.name) },
+                  headlineContent = { Text(text = member.user.name) },
                   trailingContent = {
                     IconButton(onClick = { /*TODO*/}) {
                       Icon(Icons.Default.Edit, contentDescription = "Edit")
                     }
-                  })
+                  },
+                  supportingContent = { Text(text = member.role.type.name) })
               HorizontalDivider()
             }
           }
