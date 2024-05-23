@@ -23,18 +23,19 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
           User("5", "Charlie"),
           User("6", "David"),
           User("7", "Eve"),
-            User("8", "Frank"),
-            User("9", "Grace"),
-            User("10", "Hank"),
-            User("11", "Ivy"),
+          User("8", "Frank"),
+          User("9", "Grace"),
+          User("10", "Hank"),
+          User("11", "Ivy"),
       )
 
   init {
-    /*associationAPI.getApplicants(
+    associationAPI.getApplicants(
         CurrentUser.associationUid!!,
         { applicants -> _uiState.value = _uiState.value.copy(applicants = applicants) },
-        { Log.e("members", "Error loading applicants") })*/
-      _uiState.value = _uiState.value.copy(applicants = tempMemberList)
+        { Log.e("members", "Error loading applicants") })
+    // to debug with a big list :
+    //    _uiState.value = _uiState.value.copy(applicants = tempMemberList)
     // not yet done in API : getMembers of association
     _uiState.value = _uiState.value.copy(currMembers = tempMemberList)
   }
