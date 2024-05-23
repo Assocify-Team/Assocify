@@ -6,8 +6,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.members.ProfileMembersScreen
+import com.github.se.assocify.ui.screens.profile.members.ProfileMembersViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -26,6 +28,8 @@ class ProfileMembersScreenTest :
   private val navActions = mockk<NavigationActions>()
   private var goBack = false
 
+  private val associationAPI = mockk<AssociationAPI>()
+
   @Before
   fun testSetup() {
     CurrentUser.userUid = "1"
@@ -33,7 +37,10 @@ class ProfileMembersScreenTest :
 
     every { navActions.back() } answers { goBack = true }
 
-    composeTestRule.setContent { ProfileMembersScreen(navActions = navActions) }
+    composeTestRule.setContent {
+      ProfileMembersScreen(
+          navActions = navActions, ProfileMembersViewModel(navActions, associationAPI))
+    }
   }
 
   @Test

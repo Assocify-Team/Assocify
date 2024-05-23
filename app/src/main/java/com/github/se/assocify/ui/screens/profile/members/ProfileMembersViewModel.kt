@@ -1,8 +1,6 @@
 package com.github.se.assocify.ui.screens.profile.members
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
@@ -17,7 +15,7 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
   private val tempMemberList =
       listOf(
           User("1", "Sarah"),
-          User("2", "John"),
+          User("2", "hjibcdsbqdihjvkbqkvjbqdsipvbjkdvbj"),
           User("3", "Alice"),
           User("4", "Bob"),
           User("5", "Charlie"),
@@ -30,12 +28,12 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
       )
 
   init {
-    associationAPI.getApplicants(
-        CurrentUser.associationUid!!,
-        { applicants -> _uiState.value = _uiState.value.copy(applicants = applicants) },
-        { Log.e("members", "Error loading applicants") })
+    //    associationAPI.getApplicants(
+    //        CurrentUser.associationUid!!,
+    //        { applicants -> _uiState.value = _uiState.value.copy(applicants = applicants) },
+    //        { Log.e("members", "Error loading applicants") })
     // to debug with a big list :
-    //    _uiState.value = _uiState.value.copy(applicants = tempMemberList)
+    _uiState.value = _uiState.value.copy(applicants = tempMemberList.take(2))
     // not yet done in API : getMembers of association
     _uiState.value = _uiState.value.copy(currMembers = tempMemberList)
   }
