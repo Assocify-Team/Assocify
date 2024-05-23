@@ -1,8 +1,11 @@
 package com.github.se.assocify.model.database
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
@@ -13,6 +16,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import java.time.LocalDate
 
 /**
  * API for interacting with the associations in the database
@@ -363,6 +367,20 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
             Json.decodeFromString<JsonElement>(
                 """{"user_id": "$userId","role_id": ${invitation["role_id"]}}"""))
   }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    fun tempGetMembers(
+        associationId: String,
+        onSuccess: (List<AssociationMember>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val tempList = listOf(
+            AssociationMember
+                (User("1", "Sarah"),
+                Association("a", "Association", "Description", LocalDate.EPOCH),
+                PermissionRole("r", associationId, RoleType.MEMBER)))
+        onSuccess(tempList)
+    }
 
   @Serializable
   private data class Applicant(
