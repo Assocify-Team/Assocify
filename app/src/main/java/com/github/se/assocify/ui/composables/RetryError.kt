@@ -11,11 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 
 @Composable
-fun ErrorMessage(errorMessage: String?, onRetry: (() -> Unit)? = null) {
+fun ErrorMessage(errorMessage: String?, modifier: Modifier? = null, onRetry: (() -> Unit)? = null) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,
-      modifier = Modifier.fillMaxSize()) {
+      modifier = modifier ?: Modifier.fillMaxSize()){
         errorMessage?.let { Text(text = it, modifier = Modifier.testTag("errorMessage")) }
         onRetry?.let { Button(onClick = it) { Text(text = "Retry") } }
       }

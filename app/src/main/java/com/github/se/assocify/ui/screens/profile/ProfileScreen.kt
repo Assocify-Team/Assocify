@@ -93,13 +93,26 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
         }
 
         if (state.error != null) {
-          ErrorMessage(errorMessage = state.error) { viewmodel.loadProfile() }
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                ErrorMessage(errorMessage = state.error, Modifier.padding(8.dp)) { viewmodel.loadProfile() }
+                LogoutButton(viewmodel = viewmodel)
+            }
           return@Scaffold
         }
 
         Column(
             modifier =
-                Modifier.padding(innerPadding).verticalScroll(rememberScrollState()).fillMaxWidth(),
+            Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
               Row(
                   modifier = Modifier.fillMaxWidth(),
@@ -110,17 +123,20 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     if (state.profileImageURI != null) {
                       AsyncImage(
                           modifier =
-                              Modifier.size(80.dp)
-                                  .clip(CircleShape) // Clip the image to a circle shape
-                                  .aspectRatio(1f)
-                                  .clickable { viewmodel.controlBottomSheet(true) }
-                                  .testTag("profilePicture"),
+                          Modifier
+                              .size(80.dp)
+                              .clip(CircleShape) // Clip the image to a circle shape
+                              .aspectRatio(1f)
+                              .clickable { viewmodel.controlBottomSheet(true) }
+                              .testTag("profilePicture"),
                           model = state.profileImageURI,
                           contentDescription = "profile picture",
                           contentScale = ContentScale.Crop)
                     } else {
                       IconButton(
-                          modifier = Modifier.testTag("default profile icon").size(80.dp),
+                          modifier = Modifier
+                              .testTag("default profile icon")
+                              .size(80.dp),
                           onClick = { viewmodel.controlBottomSheet(true) }) {
                             Icon(
                                 modifier = Modifier.fillMaxSize(),
@@ -130,11 +146,15 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     }
 
                     // personal information : name and role (depends on current association)
-                    Column(modifier = Modifier.testTag("profileInfos").weight(1f)) {
+                    Column(modifier = Modifier
+                        .testTag("profileInfos")
+                        .weight(1f)) {
                       Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             state.myName,
-                            modifier = Modifier.testTag("profileName").weight(1f),
+                            modifier = Modifier
+                                .testTag("profileName")
+                                .weight(1f),
                             style = MaterialTheme.typography.headlineSmall)
 
                         // edit name button
@@ -163,15 +183,18 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   onOpenedChange = { viewmodel.controlAssociationDropdown(it) },
                   onSelectOption = { viewmodel.setAssociation(it) },
                   modifier =
-                      Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally))
+                  Modifier
+                      .testTag("associationDropdown")
+                      .align(Alignment.CenterHorizontally))
 
               Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
 
               Column(
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .testTag("settingsList")
-                          .clip(RoundedCornerShape(12.dp))) {
+                  Modifier
+                      .fillMaxWidth()
+                      .testTag("settingsList")
+                      .clip(RoundedCornerShape(12.dp))) {
                     MySettings.entries.forEach { setting ->
                       ListItem(
                           leadingContent = {
@@ -189,8 +212,10 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                               ListItemDefaults.colors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer),
                           modifier =
-                              Modifier.testTag(setting.name).clickable {
-                                navActions.navigateTo(setting.getDestination())
+                          Modifier
+                              .testTag(setting.name)
+                              .clickable {
+                                  navActions.navigateTo(setting.getDestination())
                               })
                     }
                   }
@@ -202,9 +227,10 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
 
               Column(
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .testTag("manageAssociationList")
-                          .clip(RoundedCornerShape(12.dp))) {
+                  Modifier
+                      .fillMaxWidth()
+                      .testTag("manageAssociationList")
+                      .clip(RoundedCornerShape(12.dp))) {
                     AssociationSettings.entries.forEach { s ->
                       ListItem(
                           leadingContent = {
@@ -220,26 +246,16 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                               ListItemDefaults.colors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer),
                           modifier =
-                              Modifier.testTag(s.name).clickable {
-                                navActions.navigateTo(s.getDestination())
+                          Modifier
+                              .testTag(s.name)
+                              .clickable {
+                                  navActions.navigateTo(s.getDestination())
                               })
                     }
                   }
 
               // log out button (for everyone)
-              TextButton(
-                  onClick = { viewmodel.logout() },
-                  modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-                  contentPadding = ButtonDefaults.TextButtonContentPadding,
-                  colors =
-                      ButtonDefaults.textButtonColors(
-                          contentColor = MaterialTheme.colorScheme.error)) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Log out Icon")
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    Text(text = "Log out", textAlign = TextAlign.Center)
-                  }
+              LogoutButton(viewmodel = viewmodel)
             }
 
         // open dialog to edit member
@@ -247,23 +263,30 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
           Dialog(onDismissRequest = { viewmodel.controlNameEdit(false) }) {
             ElevatedCard {
               Column(
-                  modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                  modifier = Modifier
+                      .padding(16.dp)
+                      .fillMaxWidth(),
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     OutlinedTextField(
                         value = state.modifyingName,
                         singleLine = true,
                         onValueChange = { viewmodel.modifyName(it) },
                         label = { Text("Edit your name") },
-                        modifier = Modifier.fillMaxWidth().testTag("editName"))
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("editName"))
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                           OutlinedButton(
                               onClick = { viewmodel.confirmModifyName() },
                               modifier =
-                                  Modifier.wrapContentSize()
-                                      .weight(1f)
-                                      .testTag("confirmModifyButton")) {
+                              Modifier
+                                  .wrapContentSize()
+                                  .weight(1f)
+                                  .testTag("confirmModifyButton")) {
                                 Text(text = "Confirm", textAlign = TextAlign.Center)
                               }
                         }
@@ -279,4 +302,25 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
             setImageUri = { viewmodel.setImage(it) },
             signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
       }
+}
+
+
+@Composable
+fun LogoutButton(viewmodel: ProfileViewModel) {
+    // log out button (for everyone)
+    TextButton(
+        onClick = { viewmodel.logout() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("logoutButton"),
+        contentPadding = ButtonDefaults.TextButtonContentPadding,
+        colors =
+        ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.error)) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Logout,
+            contentDescription = "Log out Icon")
+        Spacer(modifier = Modifier.padding(4.dp))
+        Text(text = "Log out", textAlign = TextAlign.Center)
+    }
 }
