@@ -112,8 +112,8 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2023, 3, 11),
               28,
               Status.Pending,
-              null),
-      )
+              null,
+              "userId"))
 
   val mockBalanceAPI: BalanceAPI =
       mockk<BalanceAPI>() {
