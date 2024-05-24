@@ -3,13 +3,11 @@ package com.github.se.assocify.model.database
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
-import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
-import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
