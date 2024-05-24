@@ -422,6 +422,7 @@ class AssociationAPITest {
     val successMock1 = mockk<(Map<String, Association>) -> Unit>(relaxed = true)
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
 
+    // Init cache
     assoAPI.updateCache(successMock1, failureMock)
     verify(timeout = 1000) { successMock1(any()) }
     verify(exactly = 0) { failureMock(any()) }
@@ -442,12 +443,14 @@ class AssociationAPITest {
     verify(exactly = 0) { failureMock(any()) }
     clearMocks(successMock, failureMock)
 
+    // Test cache, we shouldn't need the API
     error = true
     assoAPI.getMembers(APITestUtils.ASSOCIATION.uid, successMock, failureMock)
     verify(timeout = 1000) { successMock(listOf(APITestUtils.ASSOCIATION_MEMBER)) }
     verify(exactly = 0) { failureMock(any()) }
     clearMocks(successMock, failureMock)
 
+    // Since we never queried this association, we should get a failure
     // User uid just so we have a different UID.
     assoAPI.getMembers(APITestUtils.USER.uid, successMock, failureMock)
 

@@ -301,13 +301,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
         onSuccess(members)
       }
     } else {
-      updateCache(
-          {
-            if (associationCache.containsKey(associationId))
-                getMembers(associationId, onSuccess, onFailure)
-            else onFailure(Exception("Association not found"))
-          },
-          onFailure)
+      onFailure(Exception("Association not found"))
     }
   }
 
