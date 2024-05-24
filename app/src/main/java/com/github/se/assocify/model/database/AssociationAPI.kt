@@ -1,7 +1,5 @@
 package com.github.se.assocify.model.database
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
@@ -368,7 +366,6 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
                 """{"user_id": "$userId","role_id": ${invitation["role_id"]}}"""))
   }
 
-  @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
   fun tempGetMembers(
       associationId: String,
       onSuccess: (List<AssociationMember>) -> Unit,
@@ -378,7 +375,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
         listOf(
             AssociationMember(
                 User("1", "Sarah"),
-                Association("a", "Association", "Description", LocalDate.EPOCH),
+                Association("a", "Association", "Description", LocalDate.now()),
                 PermissionRole("r", associationId, RoleType.MEMBER)))
     onSuccess(tempList)
   }

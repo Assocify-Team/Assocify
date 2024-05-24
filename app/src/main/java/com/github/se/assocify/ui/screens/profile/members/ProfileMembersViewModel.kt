@@ -1,8 +1,6 @@
 package com.github.se.assocify.ui.screens.profile.members
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -12,7 +10,6 @@ import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: AssociationAPI) :
     ViewModel() {
   private val _uiState = MutableStateFlow(ProfileMembersUIState())
