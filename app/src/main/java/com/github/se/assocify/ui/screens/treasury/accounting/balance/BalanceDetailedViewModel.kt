@@ -296,6 +296,117 @@ class BalanceDetailedViewModel(
         },
         { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
   }
+
+  fun startCreation() {
+    _uiState.value =
+        _uiState.value.copy(
+            creating = true,
+            errorName = null,
+            errorReceipt = null,
+            errorAmount = null,
+            errorAssignee = null,
+            errorDescription = null,
+            errorDate = null)
+  }
+
+  fun saveCreation(balanceItem: BalanceItem) {
+    if (_uiState.value.errorName != null ||
+        _uiState.value.errorReceipt != null ||
+        _uiState.value.errorAmount != null ||
+        _uiState.value.errorAssignee != null ||
+        _uiState.value.errorDescription != null ||
+        _uiState.value.errorDate != null) {
+      return
+    }
+    balanceApi.addBalance(
+        CurrentUser.associationUid!!,
+        balanceItem.subcategoryUID,
+        balanceItem.receiptUID,
+        balanceItem,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  creating = false,
+                  balanceList =
+                      if (_uiState.value.status == null ||
+                          balanceItem.status == _uiState.value.status)
+                          _uiState.value.balanceList + balanceItem
+                      else _uiState.value.balanceList,
+                  editedBalanceItem = null)
+        },
+        { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
+  }
+
+  fun checkName(name: String) {
+    if (name.length > maxNameLength) {
+      _uiState.value = _uiState.value.copy(errorName = "Name is too long")
+    } else if (name.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorName = "Name cannot be empty")
+    } else {
+      _uiState.value = _uiState.value.copy(errorName = null)
+    }
+  }
+
+  fun checkReceipt(receiptUid: String) {
+    if (receiptUid.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorReceipt = "The receipt cannot be empty!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorReceipt = null)
+    }
+  }
+
+  fun checkAmount(amount: String) {
+    if (amount.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
+    } else if (amount.toDoubleOrNull() == null) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
+    } else if (PriceUtil.isTooLarge(amount)) {
+      _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorAmount = null)
+    }
+  }
+
+  fun checkAssignee(assignee: String) {
+    if (assignee.isEmpty())
+        _uiState.value = _uiState.value.copy(errorAssignee = "Cannot have an empty assignee!")
+    else _uiState.value = _uiState.value.copy(errorAssignee = null)
+  }
+
+  fun checkDescription(description: String) {
+    if (description.length > maxDescriptionLength) {
+      _uiState.value = _uiState.value.copy(errorDescription = "Description is too long")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDescription = null)
+    }
+  }
+
+  fun checkDate(date: LocalDate) {
+    if (date.year != _uiState.value.subCategory!!.year) {
+      _uiState.value =
+          _uiState.value.copy(
+              errorDate =
+                  "The year doesn't match ${_uiState.value.subCategory!!.name}'s year: ${_uiState.value.subCategory!!.year}")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDate = null)
+    }
+  }
+
+  fun checkAll(
+      name: String,
+      receiptUid: String,
+      amount: String,
+      assignee: String,
+      description: String,
+      date: LocalDate
+  ) {
+    checkName(name)
+    checkReceipt(receiptUid)
+    checkAmount(amount)
+    checkAssignee(assignee)
+    checkDescription(description)
+    checkDate(date)
+  }
 }
 
 /**
