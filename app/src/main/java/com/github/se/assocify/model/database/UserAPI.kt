@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import android.net.Uri
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
@@ -8,6 +9,8 @@ import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.storage
+import java.nio.file.Path
 import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,9 +23,10 @@ import kotlinx.serialization.json.JsonObject
  *
  * @property db the Supabase client
  */
-class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
+class UserAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
 
   private var userCache = mutableMapOf<String, User>()
+  private val imageCacher = ImageCacher(60 * 60_000, cachePath, db.storage["profile-picture"])
 
   init {
     updateUserCache({}, {})
@@ -111,6 +115,34 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
       onSuccess()
     }
+  }
+
+  /**
+   * Sets the profile picture of a user.
+   *
+   * @param userId the id of the user to set the profile picture of
+   * @param newProfilePicture the URI of the new profile picture
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun setProfilePicture(
+      userId: String,
+      newProfilePicture: Uri,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    imageCacher.uploadImage(userId, newProfilePicture, onSuccess, onFailure)
+  }
+
+  /**
+   * Gets the profile picture of a user.
+   *
+   * @param userId the id of the user to get the profile picture of
+   * @param onSuccess called on success with the URI of the profile picture
+   * @param onFailure called on failure
+   */
+  fun getProfilePicture(userId: String, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
+    imageCacher.fetchImage(userId, { onSuccess(Uri.fromFile(it.toFile())) }, onFailure)
   }
 
   /**

@@ -16,6 +16,7 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.io.File
 import java.lang.Thread.sleep
 import java.util.UUID
 import org.junit.Assert.fail
@@ -43,6 +44,7 @@ class UserAPITest {
   fun setup() {
     APITestUtils.setup()
     error = true
+    val cachePath = File("cache").toPath()
     userAPI =
         UserAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -54,7 +56,8 @@ class UserAPITest {
                   respondBadRequest()
                 }
               }
-            })
+            },
+            cachePath)
     error = false
     sleep(300) // Sleep to let the init pass by
   }
@@ -310,6 +313,20 @@ class UserAPITest {
 
     userAPI.getCurrentUserRole({ fail("Should not succeed") }, onFailure)
 
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testSetGetProfilePicture() {
+    error = true
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    userAPI.getProfilePicture(uuid1.toString(), { fail("Should not succeed") }, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+    clearMocks(onFailure)
+
+    // We can't test success :(
+    userAPI.setProfilePicture(uuid1.toString(), mockk(), { fail("Should not succeed") }, onFailure)
     verify(timeout = 1000) { onFailure(any()) }
   }
 }

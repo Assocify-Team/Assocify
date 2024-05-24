@@ -16,9 +16,9 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
+import java.io.File
 import java.time.LocalDate
 import java.util.UUID
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
@@ -37,11 +37,11 @@ class AssociationAPITest {
 
   private lateinit var assoAPI: AssociationAPI
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setup() {
     APITestUtils.setup()
     error = true
+    val cachePath = File("cache").toPath()
     assoAPI =
         AssociationAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -53,7 +53,8 @@ class AssociationAPITest {
                   respondBadRequest()
                 }
               }
-            })
+            },
+            cachePath)
     error = false
   }
 
@@ -399,5 +400,19 @@ class AssociationAPITest {
     assert(!assoAPI.associationNameValid("   "))
     assert(!assoAPI.associationNameValid(""))
     assert(!assoAPI.associationNameValid("\t"))
+  }
+
+  @Test
+  fun testSetGetLogo() {
+    error = true
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    assoAPI.getLogo(uuid1.toString(), { fail("Should not succeed") }, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+    clearMocks(onFailure)
+
+    // We can't test success :(
+    assoAPI.setLogo(uuid1.toString(), mockk(), { fail("Should not succeed") }, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
   }
 }

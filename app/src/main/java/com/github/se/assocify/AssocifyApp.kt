@@ -27,8 +27,13 @@ fun AssocifyApp(loginSaver: LoginSave) {
 
   loginSaver.loadUserInfo()
 
-  val userAPI = UserAPI(SupabaseClient.supabaseClient)
-  val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
+  val userAPI =
+      UserAPI(
+          SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath().resolve("users"))
+  val associationAPI =
+      AssociationAPI(
+          SupabaseClient.supabaseClient,
+          LocalContext.current.cacheDir.toPath().resolve("associations"))
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
   val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
   val receiptsAPI =

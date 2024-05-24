@@ -39,7 +39,7 @@ fun LoginApp() {
         install(Postgrest)
         httpEngine = MockEngine { respondBadRequest() }
       }
-  val userAPI = UserAPI(supabaseClient)
+  val userAPI = UserAPI(supabaseClient, mockk())
   NavHost(navController = navController, startDestination = Destination.Login.route) {
     loginGraph(navigationActions = navActions, userAPI = userAPI)
   }

@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import android.net.Uri
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
@@ -8,6 +9,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.storage.storage
+import java.nio.file.Path
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -19,8 +22,9 @@ import kotlinx.serialization.json.JsonObject
  *
  * @property db the Supabase client
  */
-class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
+class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
   private var associationCache = mapOf<String, Association>()
+  private val imageCacher = ImageCacher(60 * 60_000, cachePath, db.storage["association"])
 
   init {
     updateCache({}, {}) // Try and fill the cache as quickly as possible
@@ -362,6 +366,34 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
         .insert(
             Json.decodeFromString<JsonElement>(
                 """{"user_id": "$userId","role_id": ${invitation["role_id"]}}"""))
+  }
+
+  /**
+   * Sets the logo of an association.
+   *
+   * @param associationId the association to set the logo for
+   * @param uri the URI of the logo
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun setLogo(
+      associationId: String,
+      uri: Uri,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    imageCacher.uploadImage(associationId, uri, onSuccess, onFailure)
+  }
+
+  /**
+   * Gets the logo of an association.
+   *
+   * @param associationId the association to get the logo for
+   * @param onSuccess called on success with the URI of the logo
+   * @param onFailure called on failure
+   */
+  fun getLogo(associationId: String, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
+    imageCacher.fetchImage(associationId, { onSuccess(Uri.fromFile(it.toFile())) }, onFailure)
   }
 
   @Serializable
