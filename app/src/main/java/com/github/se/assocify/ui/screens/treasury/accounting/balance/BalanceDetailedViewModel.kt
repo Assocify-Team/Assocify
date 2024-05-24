@@ -232,6 +232,25 @@ class BalanceDetailedViewModel(
         _uiState.value.errorDate != null) {
       return
     }
+    // update the status of the receipt
+    val receipt = _uiState.value.receiptList.find { it.uid == balanceItem.receiptUID }
+    if (receipt != null && receipt.status != balanceItem.status) {
+      receiptAPI.uploadReceipt(
+          receipt.copy(status = balanceItem.status),
+          {},
+          {},
+          { receiptFail, _ ->
+            if (receiptFail) {
+              CoroutineScope(Dispatchers.Main).launch {
+                _uiState.value.snackbarState.showSnackbar(
+                    message = "Failed to save status of the receipt",
+                    actionLabel = "Retry",
+                )
+              }
+            }
+          })
+    }
+
     balanceApi.updateBalance(
         CurrentUser.associationUid!!,
         balanceItem,
