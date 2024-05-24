@@ -7,6 +7,9 @@ import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.storage.resumable.MemoryResumableCache
+import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.mockk.every
 import io.mockk.mockkStatic
 import java.time.LocalDate
@@ -47,7 +50,7 @@ object APITestUtils {
    * - Dispatchers
    * - Current user
    */
-  @OptIn(ExperimentalCoroutinesApi::class)
+  @OptIn(ExperimentalCoroutinesApi::class, SupabaseInternal::class)
   fun setup() {
     mockkStatic(Log::class)
     every { Log.e(any(), any()) } answers
@@ -77,5 +80,9 @@ object APITestUtils {
     Dispatchers.setMain(UnconfinedTestDispatcher())
     CurrentUser.userUid = USER.uid
     CurrentUser.associationUid = ASSOCIATION.uid
+
+    // Workaround for supabase internals that create a class unsupported on Linux.
+    mockkStatic(::createDefaultResumableCache)
+    every { createDefaultResumableCache() } returns MemoryResumableCache()
   }
 }

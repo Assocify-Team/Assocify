@@ -6,12 +6,9 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.resumable.MemoryResumableCache
-import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
@@ -24,7 +21,6 @@ import io.mockk.mockkStatic
 import io.mockk.verify
 import java.io.File
 import java.time.LocalDate
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail
 import org.junit.Before
@@ -102,16 +98,11 @@ class ReceiptsAPITest {
 
   private val receivedListJson = "[$remoteJson, $localJson]"
 
-  @OptIn(SupabaseInternal::class, ExperimentalCoroutinesApi::class)
   @Before
   fun setUp() {
     APITestUtils.setup()
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
-
-    // Workaround for supabase internals that create a class unsupported on Linux.
-    mockkStatic(::createDefaultResumableCache)
-    every { createDefaultResumableCache() } returns MemoryResumableCache()
 
     CurrentUser.userUid = "2c256037-ad67-4185-991a-1a2b9bb1f9b3"
     CurrentUser.associationUid = "2c256037-4185-ad67-991a-1a2b9bb1f9b3"

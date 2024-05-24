@@ -8,6 +8,7 @@ import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
@@ -49,6 +50,7 @@ class UserAPITest {
         UserAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
+              install(Storage)
               httpEngine = MockEngine {
                 if (!error) {
                   respond(response)
