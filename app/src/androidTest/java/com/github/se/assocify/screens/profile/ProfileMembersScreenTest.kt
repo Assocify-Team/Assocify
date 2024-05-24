@@ -64,7 +64,7 @@ class ProfileMembersScreenTest :
             {
               secondArg<(List<User>) -> Unit>().invoke(tempMemberList)
             }
-        every { tempGetMembers(any(), any(), any()) } answers
+        every { getMembers(any(), any(), any()) } answers
             {
               secondArg<(List<AssociationMember>) -> Unit>().invoke(tempAssoMembers)
             }

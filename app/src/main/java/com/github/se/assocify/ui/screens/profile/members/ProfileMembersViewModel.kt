@@ -34,15 +34,15 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
     associationAPI.getApplicants(
         CurrentUser.associationUid!!,
         { applicants -> _uiState.value = _uiState.value.copy(applicants = applicants) },
-        { Log.e("members", "Error loading applicants") })
+        { Log.e("members", "Error loading applicants : ${it.message}") })
     // to debug with a big list :
     //    _uiState.value = _uiState.value.copy(applicants = tempMemberList.take(2))
     // not yet done in API : getMembers of association
     //    _uiState.value = _uiState.value.copy(currMembers = tempMemberList)
-    associationAPI.tempGetMembers(
+    associationAPI.getMembers(
         CurrentUser.associationUid!!,
         { members -> _uiState.value = _uiState.value.copy(currMembers = members) },
-        { Log.e("members", "Error loading members") })
+        { Log.e("members", "Error loading members : ${it.message}") })
   }
 }
 

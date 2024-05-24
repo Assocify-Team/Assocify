@@ -29,7 +29,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   }
 
   /**
-   * Updates the cache of associations from the database.
+   * Updates the cache of associations from the database. Also invalidates the member cache.
    *
    * @param onSuccess called on success with the map of associations (id, association)
    * @param onFailure called on failure
@@ -38,6 +38,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     tryAsync(onFailure, tag = "updateCache") {
       val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
       associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
+      memberCache = null
       onSuccess(associationCache)
     }
   }
@@ -262,6 +263,50 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     }
   }
 
+  @Serializable
+  private data class MemberOf(
+      @SerialName("users") val user: User,
+      @SerialName("role") val role: PermissionRole,
+  )
+
+  private var memberCache: Pair<String, List<AssociationMember>>? = null
+
+  /**
+   * Gets the members of an association. Lightly cached. If `associationId` isn't in the association
+   * cache, the cache is refreshed. If it still isn't, the failure callback is called.
+   *
+   * @param associationId the association to get the members for
+   * @param onSuccess called on success with the list of members
+   * @param onFailure called on failure
+   */
+  fun getMembers(
+      associationId: String,
+      onSuccess: (List<AssociationMember>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    if (memberCache?.first == associationId) {
+      onSuccess(memberCache!!.second)
+      return
+    }
+
+    val association = associationCache[associationId]
+    if (association != null) {
+      tryAsync(onFailure, tag = "getMembers") {
+        val members =
+            db.from("member_of")
+                .select(Columns.list("users(*)", "role!inner(*)")) {
+                  filter { eq("role.association_id", associationId) }
+                }
+                .decodeList<MemberOf>()
+                .map { AssociationMember(it.user, association, it.role) }
+        memberCache = associationId to members
+        onSuccess(members)
+      }
+    } else {
+      onFailure(Exception("Association not found"))
+    }
+  }
+
   private suspend fun addRoleSus(role: PermissionRole) {
     val supabaseRole = SupabaseRole(role.uid, role.associationId, role.type.name.lowercase())
     db.from("role").insert(supabaseRole)
@@ -364,20 +409,6 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
         .insert(
             Json.decodeFromString<JsonElement>(
                 """{"user_id": "$userId","role_id": ${invitation["role_id"]}}"""))
-  }
-
-  fun tempGetMembers(
-      associationId: String,
-      onSuccess: (List<AssociationMember>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    val tempList =
-        listOf(
-            AssociationMember(
-                User("1", "Sarah"),
-                Association("a", "Association", "Description", LocalDate.now()),
-                PermissionRole("r", associationId, RoleType.MEMBER)))
-    onSuccess(tempList)
   }
 
   @Serializable
