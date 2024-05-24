@@ -3,6 +3,7 @@ package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 import android.net.Uri
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -27,6 +28,7 @@ class ReceiptViewModel {
   private val receiptApi: ReceiptAPI
   private val navActions: NavigationActions
   private val receiptUid: String
+  private var receiptCreatorUid: String
 
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
@@ -35,6 +37,7 @@ class ReceiptViewModel {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = UUID.randomUUID().toString()
+    this.receiptCreatorUid = CurrentUser.userUid!!
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = true, pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
   }
@@ -43,6 +46,8 @@ class ReceiptViewModel {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = receiptUid
+    // Temporary. Gets overridden once the receipt is fetched
+    this.receiptCreatorUid = CurrentUser.userUid!!
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
     loadReceipt()
@@ -67,7 +72,7 @@ class ReceiptViewModel {
                   incoming = receipt.cents >= 0)
 
           _uiState.value = _uiState.value.copy(loading = false, error = null)
-
+          this.receiptCreatorUid = receipt.userId
           loadImage()
         },
         onFailure = {
@@ -197,7 +202,8 @@ class ReceiptViewModel {
                 PriceUtil.toCents(_uiState.value.amount) * (if (_uiState.value.incoming) 1 else -1),
             date = date,
             status = _uiState.value.status,
-            photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
+            photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!),
+            userId = receiptCreatorUid)
     receiptApi.uploadReceipt(
         receipt,
         onPhotoUploadSuccess = {},

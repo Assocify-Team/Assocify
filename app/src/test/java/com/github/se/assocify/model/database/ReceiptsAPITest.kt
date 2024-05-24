@@ -44,6 +44,7 @@ class ReceiptsAPITest {
   private val remoteReceipt =
       Receipt(
           uid = "00000000-ABCD-0000-0000-000000000000",
+          userId = "ABCD0001-ABCD-0000-0000-000000000001",
           date = LocalDate.EPOCH,
           cents = -100,
           status = Status.Pending,
@@ -54,6 +55,7 @@ class ReceiptsAPITest {
   private val localReceipt =
       Receipt(
           uid = "00000001-ABCD-0000-0000-000000000001",
+          userId = "ABCD0001-ABCD-0000-0000-000000000001",
           date = LocalDate.EPOCH,
           cents = -100,
           status = Status.Approved,
@@ -72,7 +74,7 @@ class ReceiptsAPITest {
         },
         "title": "title",
         "description": "notes",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "user_id": "ABCD0001-ABCD-0000-0000-000000000001",
         "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
       }
     """
@@ -89,7 +91,7 @@ class ReceiptsAPITest {
         },
         "title": "title",
         "description": "notes",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "user_id": "ABCD0001-ABCD-0000-0000-000000000001",
         "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
       }
     """
