@@ -66,7 +66,7 @@ fun ProfileMembersScreen(
         item {
           ElevatedCard(
               elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxWidth().testTag("applicantCard-${applicant.uid}"),
           ) {
             Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
               Text(
@@ -102,9 +102,10 @@ fun ProfileMembersScreen(
         item {
           if (i == 0) HorizontalDivider()
           ListItem(
+              modifier = Modifier.testTag("memberItem-${member.user.uid}"),
               headlineContent = { Text(text = member.user.name) },
               trailingContent = {
-                IconButton(onClick = { /*TODO*/}) {
+                IconButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("editButton")) {
                   Icon(Icons.Default.Edit, contentDescription = "Edit")
                 }
               },

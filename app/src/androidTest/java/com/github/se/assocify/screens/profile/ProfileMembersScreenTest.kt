@@ -1,7 +1,9 @@
 package com.github.se.assocify.screens.profile
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -35,10 +37,10 @@ class ProfileMembersScreenTest :
   private val navActions = mockk<NavigationActions>()
   private var goBack = false
 
-  private val tempMemberList =
+  private val userList =
       listOf(
           User("1", "Sarah"),
-          User("2", "hjibcdsbqdihjvkbqkvjbqdsipvbjkdvbj"),
+          User("2", "veryveryveryverylooooooooooooooooooooongnameeeeeeeeee"),
           User("3", "Alice"),
           User("4", "Bob"),
           User("5", "Charlie"),
@@ -50,8 +52,10 @@ class ProfileMembersScreenTest :
           User("11", "Ivy"),
       )
 
-  private val tempAssoMembers: List<AssociationMember> =
-      tempMemberList.map {
+  private val applicantList = userList.take(2)
+
+  private val assoMembers: List<AssociationMember> =
+      userList.map {
         AssociationMember(
             it,
             Association("a", "assoName", "", LocalDate.EPOCH),
@@ -62,11 +66,11 @@ class ProfileMembersScreenTest :
       mockk<AssociationAPI> {
         every { getApplicants(any(), any(), any()) } answers
             {
-              secondArg<(List<User>) -> Unit>().invoke(tempMemberList)
+              secondArg<(List<User>) -> Unit>().invoke(applicantList)
             }
         every { getMembers(any(), any(), any()) } answers
             {
-              secondArg<(List<AssociationMember>) -> Unit>().invoke(tempAssoMembers)
+              secondArg<(List<AssociationMember>) -> Unit>().invoke(assoMembers)
             }
       }
 
@@ -87,7 +91,15 @@ class ProfileMembersScreenTest :
   fun display() {
     with(composeTestRule) {
       onNodeWithTag("Members Screen").assertIsDisplayed()
+
       onNodeWithText("New requests").assertIsDisplayed()
+      applicantList.forEach { onNodeWithTag("applicantCard-${it.uid}").assertIsDisplayed() }
+      onAllNodesWithTag("rejectButton").assertCountEquals(applicantList.size)
+      onAllNodesWithTag("acceptButton").assertCountEquals(applicantList.size)
+
+      onNodeWithText("Current members").assertIsDisplayed()
+      assoMembers.forEach { onNodeWithTag("memberItem-${it.user.uid}").assertIsDisplayed() }
+      onAllNodesWithTag("editButton").assertCountEquals(assoMembers.size)
     }
   }
 
