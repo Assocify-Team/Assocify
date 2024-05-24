@@ -152,6 +152,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                             DropdownMenuItem(
                                 text = { Text(receipt.title) },
                                 onClick = {
+                                  amountString = PriceUtil.fromCents(receipt.cents)
                                   receiptUid = receipt.uid
                                   receiptName = receipt.title
                                   receiptExpanded = false
@@ -169,13 +170,17 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   modifier = Modifier.padding(8.dp),
                   value = amountString,
                   onValueChange = {
-                    amountString = it
-                    balanceDetailedViewModel.checkAmount(amountString)
+                    if (receiptUid == "") {
+                      amountString = it
+                      balanceDetailedViewModel.checkAmount(amountString)
+                    }
                   },
                   label = { Text("Amount") },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  supportingText = { Text(balanceModel.errorAmount ?: "") })
+                  supportingText = { Text(balanceModel.errorAmount ?: "") },
+                  enabled = receiptUid == "" // Disable editing if receipt is not null
+                  )
             }
 
             // The TVA box

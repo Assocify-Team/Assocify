@@ -358,7 +358,7 @@ class BalanceDetailedViewModel(
   fun checkAmount(amount: String) {
     if (amount.isEmpty()) {
       _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
-    } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
+    } else if (amount.toDoubleOrNull() == null) {
       _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
     } else if (PriceUtil.isTooLarge(amount)) {
       _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
