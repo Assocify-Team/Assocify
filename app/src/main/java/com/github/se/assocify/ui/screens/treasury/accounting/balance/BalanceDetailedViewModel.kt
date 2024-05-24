@@ -14,7 +14,6 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.PriceUtil
-import io.ktor.client.utils.EmptyContent.status
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -238,7 +237,15 @@ class BalanceDetailedViewModel(
       receiptAPI.uploadReceipt(
           receipt.copy(status = balanceItem.status),
           {},
-          {},
+          {
+            _uiState.value =
+                _uiState.value.copy(
+                    receiptList =
+                        _uiState.value.receiptList.map {
+                          if (it.uid == receipt.uid) receipt.copy(status = balanceItem.status)
+                          else it
+                        })
+          },
           { receiptFail, _ ->
             if (receiptFail) {
               CoroutineScope(Dispatchers.Main).launch {
