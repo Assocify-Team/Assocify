@@ -57,7 +57,7 @@ fun ProfileMembersScreen(
       },
       contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
   ) {
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(it)) {
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(it).testTag("membersScreen")) {
       item { Text(text = "New requests", style = MaterialTheme.typography.titleMedium) }
 
       item { Spacer(Modifier.height(16.dp)) }

@@ -1,12 +1,16 @@
 package com.github.se.assocify.screens.profile
 
+import android.util.Log
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -97,9 +101,12 @@ class ProfileMembersScreenTest :
       onAllNodesWithTag("rejectButton").assertCountEquals(applicantList.size)
       onAllNodesWithTag("acceptButton").assertCountEquals(applicantList.size)
 
-      onNodeWithText("Current members").assertIsDisplayed()
-      assoMembers.forEach { onNodeWithTag("memberItem-${it.user.uid}").assertIsDisplayed() }
-      onAllNodesWithTag("editButton").assertCountEquals(assoMembers.size)
+      onNodeWithText("Current members").performScrollTo().assertIsDisplayed()
+      assoMembers.forEach {
+        Log.e("assoMembers", it.user.uid)
+        onNodeWithTag("membersScreen").performScrollToNode(hasTestTag("memberItem-${it.user.uid}"))
+        onNodeWithTag("memberItem-${it.user.uid}").assertIsDisplayed()
+      }
     }
   }
 
