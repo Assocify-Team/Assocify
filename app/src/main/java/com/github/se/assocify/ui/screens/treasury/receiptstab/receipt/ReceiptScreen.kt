@@ -100,49 +100,6 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
                 Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Box(
-                  modifier =
-                      Modifier.testTag("statusDropdownChip")
-                          .padding(bottom = 5.dp)
-                          .fillMaxWidth()) {
-                    var statusExpanded by remember { mutableStateOf(false) }
-                    FilterChip(
-                        modifier = Modifier.testTag("statusChip"),
-                        selected = false,
-                        onClick = { statusExpanded = !statusExpanded },
-                        label = { Text(receiptState.status.name) },
-                        leadingIcon = {
-                          Icon(
-                              modifier = Modifier.testTag("currentStatusIcon"),
-                              imageVector = receiptState.status.getIcon(),
-                              contentDescription = "status icon")
-                        },
-                        trailingIcon = {
-                          Icon(
-                              imageVector = Icons.Filled.ArrowDropDown,
-                              contentDescription = "Expand")
-                        })
-                    DropdownMenu(
-                        modifier = Modifier.testTag("statusDropdownMenu"),
-                        expanded = statusExpanded,
-                        onDismissRequest = { statusExpanded = false },
-                        properties = PopupProperties(focusable = true)) {
-                          Status.entries.forEach { status ->
-                            DropdownMenuItem(
-                                text = { Text(status.name) },
-                                onClick = {
-                                  viewModel.setStatus(status)
-                                  statusExpanded = false
-                                },
-                                leadingIcon = {
-                                  Icon(
-                                      modifier = Modifier.testTag("statusIcon"),
-                                      imageVector = status.getIcon(),
-                                      contentDescription = "Status icon")
-                                })
-                          }
-                        }
-                  }
               OutlinedTextField(
                   modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = receiptState.title,
