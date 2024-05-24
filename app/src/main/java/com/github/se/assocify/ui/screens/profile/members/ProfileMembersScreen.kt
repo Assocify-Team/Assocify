@@ -2,9 +2,11 @@ package com.github.se.assocify.ui.screens.profile.members
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -55,64 +57,61 @@ fun ProfileMembersScreen(
       },
       contentWindowInsets = WindowInsets(20.dp, 20.dp, 20.dp, 0.dp),
   ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(it),
-        verticalArrangement = Arrangement.spacedBy(16.dp)) {
-          item { Text(text = "New requests", style = MaterialTheme.typography.titleMedium) }
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(it)) {
+      item { Text(text = "New requests", style = MaterialTheme.typography.titleMedium) }
 
-          state.applicants.forEach { applicant ->
-            item {
-              ElevatedCard(
-                  elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                  modifier = Modifier.fillMaxWidth(),
-              ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically) {
-                      Text(
-                          text = applicant.name,
-                          modifier = Modifier.padding(16.dp).weight(1f),
-                          maxLines = 1,
-                          overflow = TextOverflow.Ellipsis,
-                      )
+      item { Spacer(Modifier.height(16.dp)) }
 
-                      Row(horizontalArrangement = Arrangement.End) {
-                        IconButton(
-                            onClick = { /*TODO*/}, modifier = Modifier.testTag("rejectButton")) {
-                              Icon(
-                                  Icons.Default.Close,
-                                  contentDescription = "Reject",
-                                  tint = MaterialTheme.colorScheme.error)
-                            }
-                        IconButton(
-                            onClick = { /*TODO*/}, modifier = Modifier.testTag("acceptButton")) {
-                              Icon(
-                                  Icons.Default.Check,
-                                  contentDescription = "Accept",
-                                  tint = Color.Green)
-                            }
-                      }
-                    }
+      state.applicants.forEach { applicant ->
+        item {
+          ElevatedCard(
+              elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+              modifier = Modifier.fillMaxWidth(),
+          ) {
+            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+              Text(
+                  text = applicant.name,
+                  modifier = Modifier.padding(16.dp).weight(1f),
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
+              )
+
+              Row(horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("rejectButton")) {
+                  Icon(
+                      Icons.Default.Close,
+                      contentDescription = "Reject",
+                      tint = MaterialTheme.colorScheme.error)
+                }
+                IconButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("acceptButton")) {
+                  Icon(Icons.Default.Check, contentDescription = "Accept", tint = Color.Green)
+                }
               }
             }
           }
-
-          item { Text(text = "Current members", style = MaterialTheme.typography.titleMedium) }
-
-          state.currMembers.forEachIndexed { i, member ->
-            item {
-              if (i == 0) HorizontalDivider()
-              ListItem(
-                  headlineContent = { Text(text = member.user.name) },
-                  trailingContent = {
-                    IconButton(onClick = { /*TODO*/}) {
-                      Icon(Icons.Default.Edit, contentDescription = "Edit")
-                    }
-                  },
-                  supportingContent = { Text(text = member.role.type.name) })
-              HorizontalDivider()
-            }
-          }
         }
+      }
+
+      item { Spacer(Modifier.height(16.dp)) }
+
+      item { Text(text = "Current members", style = MaterialTheme.typography.titleMedium) }
+
+      item { Spacer(Modifier.height(16.dp)) }
+
+      state.currMembers.forEachIndexed { i, member ->
+        item {
+          if (i == 0) HorizontalDivider()
+          ListItem(
+              headlineContent = { Text(text = member.user.name) },
+              trailingContent = {
+                IconButton(onClick = { /*TODO*/}) {
+                  Icon(Icons.Default.Edit, contentDescription = "Edit")
+                }
+              },
+              supportingContent = { Text(text = member.role.type.name) })
+          HorizontalDivider()
+        }
+      }
+    }
   }
 }
