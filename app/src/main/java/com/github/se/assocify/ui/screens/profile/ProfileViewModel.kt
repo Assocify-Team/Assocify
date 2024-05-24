@@ -2,12 +2,11 @@ package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -69,6 +68,7 @@ class ProfileViewModel(
       loadCounter = 0
     } else if (--loadCounter == 0) {
       _uiState.value = _uiState.value.copy(loading = false, error = null)
+      loadCounter = 0
     }
   }
 
@@ -285,23 +285,17 @@ data class ProfileUIState(
  * icon corresponding to the setting.
  */
 enum class MySettings {
-  Preferences,
-  Privacy,
-  Notifications;
+  Preferences;
 
   fun getIcon(): ImageVector {
     return when (this) {
       Preferences -> Icons.Default.LightMode
-      Privacy -> Icons.Default.Lock
-      Notifications -> Icons.Default.Notifications
     }
   }
 
   fun getDestination(): Destination {
     return when (this) {
       Preferences -> Destination.ProfilePreferences
-      Privacy -> Destination.ProfileSecurityPrivacy
-      Notifications -> Destination.ProfileNotifications
     }
   }
 }
@@ -312,19 +306,30 @@ enum class MySettings {
  */
 enum class AssociationSettings {
   Members,
-  Roles;
+  TreasuryTags,
+  Events;
 
   fun getIcon(): ImageVector {
     return when (this) {
       Members -> Icons.Default.People
-      Roles -> Icons.Default.ManageAccounts
+      TreasuryTags -> Icons.Default.Savings
+      Events -> Icons.Default.Event
+    }
+  }
+
+  override fun toString(): String {
+    return when (this) {
+      Members -> "Members"
+      TreasuryTags -> "Treasury Tags"
+      Events -> "Events"
     }
   }
 
   fun getDestination(): Destination {
     return when (this) {
       Members -> Destination.ProfileMembers
-      Roles -> Destination.ProfileRoles
+      TreasuryTags -> Destination.ProfileTreasuryTags
+      Events -> Destination.ProfileEvents
     }
   }
 }

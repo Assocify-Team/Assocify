@@ -284,7 +284,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
               cents = receipt.cents,
               title = receipt.title,
               description = receipt.description,
-              userId = CurrentUser.userUid!!,
+              userId = receipt.userId,
               associationId = CurrentUser.associationUid!!)
     }
 
@@ -296,7 +296,8 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
             title = this.title,
             description = this.description,
             status = this.receiptStatus!!.status,
-            photo = MaybeRemotePhoto.Remote(this.uid))
+            photo = MaybeRemotePhoto.Remote(this.uid),
+            userId = this.userId)
   }
 
   @Serializable private data class ReceiptStatus(val status: Status)

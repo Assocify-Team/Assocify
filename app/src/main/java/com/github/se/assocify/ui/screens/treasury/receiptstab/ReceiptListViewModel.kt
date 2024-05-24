@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Viewmodel for the "Receipts" page in Treasury menu
  *
- * @param currentUser: Current user of the app
  * @param receiptsDatabase: Database API for receipts. A default one is passed
  */
 class ReceiptListViewModel(

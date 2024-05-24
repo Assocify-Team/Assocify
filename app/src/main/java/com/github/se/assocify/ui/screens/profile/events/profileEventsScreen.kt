@@ -1,5 +1,8 @@
-package com.github.se.assocify.ui.screens.profile.securityPrivacy
+package com.github.se.assocify.ui.screens.profile.events
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -10,18 +13,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.se.assocify.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileSecurityPrivacyScreen(navActions: NavigationActions) {
+fun ProfileEventsScreen(navActions: NavigationActions) {
   Scaffold(
-      modifier = Modifier.testTag("security/privacy Screen"),
+      modifier = Modifier.testTag("ProfileEvents Screen"),
       topBar = {
         CenterAlignedTopAppBar(
-            title = { Text("Security/Privacy Settings") },
+            title = { Text("Events Management") },
             navigationIcon = {
               IconButton(
                   onClick = { navActions.back() }, modifier = Modifier.testTag("backButton")) {
@@ -31,7 +35,11 @@ fun ProfileSecurityPrivacyScreen(navActions: NavigationActions) {
                   }
             })
       }) {
-        Text(
-            modifier = Modifier.padding(it), text = "Security/Privacy Screen : not yet implemented")
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize().padding(it)) {
+              Text(text = "Events settings Screen : not yet implemented")
+            }
       }
 }

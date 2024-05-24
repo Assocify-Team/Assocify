@@ -7,6 +7,7 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.screens.event.maptab.EventMapViewModel
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,7 @@ class EventScreenViewModel(
 ) : ViewModel() {
 
   val taskListViewModel: EventTaskViewModel = EventTaskViewModel(taskAPI) { showSnackbar(it) }
+  val mapViewModel: EventMapViewModel = EventMapViewModel(taskAPI)
   val scheduleViewModel: EventScheduleViewModel = EventScheduleViewModel(navActions, taskAPI)
 
   private val _uiState: MutableStateFlow<EventScreenState> = MutableStateFlow(EventScreenState())
@@ -86,7 +88,9 @@ class EventScreenViewModel(
           _uiState.value.selectedEvents - event
         }
     _uiState.value = _uiState.value.copy(selectedEvents = selectedEvents)
+
     taskListViewModel.setEvents(selectedEvents)
+    mapViewModel.setEvents(selectedEvents)
     scheduleViewModel.setEvents(selectedEvents)
   }
 
@@ -101,16 +105,10 @@ class EventScreenViewModel(
 
   /** Filter the elements from the current tab depending on the current search query */
   fun searchTaskLists() {
-    when (_uiState.value.currentTab) {
-      EventPageIndex.Tasks -> {
-        taskListViewModel.search(_uiState.value.searchQuery)
-      }
-      EventPageIndex.Map -> {
-        /*TODO: implement for map screen*/
-      }
-      EventPageIndex.Schedule -> {
-        /*TODO: implement for schedule screen*/
-      }
+    if (_uiState.value.currentTab == EventPageIndex.Tasks) {
+      taskListViewModel.search(_uiState.value.searchQuery)
+    } else if (_uiState.value.currentTab == EventPageIndex.Map) {
+      mapViewModel
     }
   }
 
@@ -131,7 +129,6 @@ class EventScreenViewModel(
  * @param selectedEvents the list of selected events
  * @param currentTab the current tab
  * @param error whether an error occurred
- * @param errorText the error message
  */
 data class EventScreenState(
     val loading: Boolean = false,
@@ -141,7 +138,7 @@ data class EventScreenState(
     val stateBarDisplay: Boolean = false,
     val events: List<Event> = emptyList(),
     val selectedEvents: List<Event> = emptyList(),
-    val currentTab: EventPageIndex = EventPageIndex.Tasks
+    val currentTab: EventPageIndex = EventPageIndex.Tasks,
 )
 
 /** Event tabs */

@@ -13,9 +13,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
@@ -49,7 +53,6 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           AccountingSubCategory("2", "1", "OGJ", 2000, 1000),
           AccountingSubCategory("3", "1", "Subsonic", 100, 50),
       )
-
   val mockAccountingCategoriesAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
         every { getCategories(any(), any(), any()) } answers
@@ -65,6 +68,24 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             {
               val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
               onSuccessCallback(subCategoryList)
+            }
+      }
+
+  val mockBalanceAPI: BalanceAPI =
+      mockk<BalanceAPI>() {
+        every { getBalance(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<BalanceItem>) -> Unit>()
+              onSuccessCallback(emptyList())
+            }
+      }
+
+  val mockBudgetAPI: BudgetAPI =
+      mockk<BudgetAPI>() {
+        every { getBudget(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(List<BudgetItem>) -> Unit>()
+              onSuccessCallback(emptyList())
             }
       }
 
@@ -89,7 +110,11 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
     accountingViewModel =
-        AccountingViewModel(mockAccountingCategoriesAPI, mockAccountingSubCategoryAPI)
+        AccountingViewModel(
+            mockAccountingCategoriesAPI,
+            mockAccountingSubCategoryAPI,
+            mockBalanceAPI,
+            mockBudgetAPI)
     val viewModel = TreasuryViewModel(navActions, receiptListViewModel, accountingViewModel)
     composeTestRule.setContent {
       TreasuryScreen(navActions, accountingViewModel, receiptListViewModel, viewModel)

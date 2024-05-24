@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.testTag
  * @param opened: The state of the dropdown
  * @param onOpenedChange: The callback when the dropdown is opened or closed
  * @param onSelectOption: The callback when an option is selected
- * @param leadIcon: The leading icon of the dropdown : default is null
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +30,8 @@ fun DropdownWithSetOptions(
     opened: Boolean,
     onOpenedChange: (Boolean) -> Unit,
     onSelectOption: (DropdownOption) -> Unit,
+    label: String = "",
+    errorMessage: String? = null,
 ) {
 
   ExposedDropdownMenuBox(
@@ -41,12 +42,15 @@ fun DropdownWithSetOptions(
             enabled = options.size > 1,
             value = selectedOption.name,
             onValueChange = {},
+            label = { Text(label) },
             readOnly = true,
             trailingIcon = {
               if (options.size > 1) ExposedDropdownMenuDefaults.TrailingIcon(expanded = opened)
             },
             modifier = Modifier.menuAnchor(),
-            leadingIcon = selectedOption.leadIcon)
+            leadingIcon = selectedOption.leadIcon,
+            isError = !errorMessage.isNullOrEmpty(),
+            supportingText = errorMessage?.let { { Text(it) } })
 
         ExposedDropdownMenu(expanded = opened, onDismissRequest = { onOpenedChange(false) }) {
           options.forEach { item ->

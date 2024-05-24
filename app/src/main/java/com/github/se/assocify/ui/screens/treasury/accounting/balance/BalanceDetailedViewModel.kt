@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -11,18 +12,25 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
+import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.PriceUtil
+import io.ktor.client.utils.EmptyContent.status
+import java.time.LocalDate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * View model for the balance detailed screen
  *
  * @param balanceApi the balance api
- * @param accountingSubCategoryAPI the accounting subcategory api
  * @param accountingCategoryAPI the accounting category api
  * @param subCategoryUid the subcategory uid
  */
 class BalanceDetailedViewModel(
+    private var navigationActions: NavigationActions,
     private var balanceApi: BalanceAPI,
     private var receiptAPI: ReceiptAPI,
     private var subCategoryAPI: AccountingSubCategoryAPI,
@@ -31,11 +39,30 @@ class BalanceDetailedViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<BalanceItemState> = MutableStateFlow(BalanceItemState())
   val uiState: StateFlow<BalanceItemState>
+  private val maxDescriptionLength = 100
+  private val maxNameLength = 50
 
   init {
-    updateDatabaseValuesInBalance()
-    setSubCategoryInBalance(subCategoryUid)
+    loadBalanceDetails()
     uiState = _uiState
+  }
+
+  private var loadCounter = 0
+
+  fun loadBalanceDetails() {
+    loadCounter += 2
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+    setSubCategoryInBalance(subCategoryUid)
+    updateDatabaseValuesInBalance()
+  }
+
+  private fun endLoad(error: String? = null) {
+    loadCounter--
+    if (error != null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = error)
+    } else if (loadCounter == 0 && _uiState.value.error == null) {
+      _uiState.value = _uiState.value.copy(loading = false, error = null)
+    }
   }
 
   /**
@@ -51,18 +78,21 @@ class BalanceDetailedViewModel(
           if (subCategory != null) {
             _uiState.value = _uiState.value.copy(subCategory = subCategory)
           }
+          endLoad()
         },
-        {})
+        { endLoad("Error loading category") })
   }
 
   /** Update the database values */
   private fun updateDatabaseValuesInBalance() {
+    var innerLoadCounter = 2
+
       receiptAPI.getAllReceipts(
           { receiptList ->
               _uiState.value = _uiState.value.copy(receiptList = receiptList) },
           {})
 
-    subCategoryAPI.getSubCategories(
+      subCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
@@ -72,13 +102,9 @@ class BalanceDetailedViewModel(
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
-          // Filter the balanceList to only include items with the matching subCategoryUid, year and
-          // status
+          // Filter the balanceList to only include items with the matching subCategoryUid
           val filteredBalanceList =
-              balanceList.filter { balanceItem ->
-                balanceItem.date.year == _uiState.value.year &&
-                    balanceItem.subcategoryUID == subCategoryUid
-              }
+              balanceList.filter { balanceItem -> balanceItem.subcategoryUID == subCategoryUid }
 
           // if status is not null, filter the list by status
           val statusFilteredBalanceList =
@@ -92,24 +118,18 @@ class BalanceDetailedViewModel(
 
           // Update the UI state with the filtered list
           _uiState.value = _uiState.value.copy(balanceList = statusFilteredBalanceList)
+          if (--innerLoadCounter == 0) endLoad()
         },
-        {})
+        { endLoad("Error loading balance items") })
 
     // Get the categories from the database
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList -> _uiState.value = _uiState.value.copy(categoryList = categoryList) },
-        {})
-  }
-
-  /**
-   * Handle the year filter
-   *
-   * @param year the year to filter by
-   */
-  fun onYearFilter(year: Int) {
-    _uiState.value = _uiState.value.copy(year = year)
-    updateDatabaseValuesInBalance()
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(categoryList = categoryList)
+          if (--innerLoadCounter == 0) endLoad()
+        },
+        { endLoad("Error loading tags") })
   }
 
   /**
@@ -136,8 +156,20 @@ class BalanceDetailedViewModel(
    */
   fun saveSubCategoryEditingInBalance(name: String, categoryUid: String, year: Int) {
     val subCategory = AccountingSubCategory(subCategoryUid, categoryUid, name, 0, year)
-    subCategoryAPI.updateSubCategory(subCategory, {}, {})
-    _uiState.value = _uiState.value.copy(subCatEditing = false, subCategory = subCategory)
+    subCategoryAPI.updateSubCategory(
+        subCategory,
+        {
+          _uiState.value = _uiState.value.copy(subCategory = subCategory)
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+        },
+        {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to update category",
+            )
+          }
+        })
   }
 
   /** Cancel the Subcategory editing */
@@ -147,9 +179,18 @@ class BalanceDetailedViewModel(
 
   /** Delete the subcategory and all items related to it */
   fun deleteSubCategoryInBalance() {
-    subCategoryAPI.deleteSubCategory(_uiState.value.subCategory, {}, {})
-    _uiState.value = _uiState.value.copy(balanceList = emptyList())
-    _uiState.value = _uiState.value.copy(subCatEditing = false)
+    if (_uiState.value.subCategory == null) return
+    subCategoryAPI.deleteSubCategory(
+        _uiState.value.subCategory!!,
+        { navigationActions.back() },
+        {
+          _uiState.value = _uiState.value.copy(subCatEditing = false)
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarState.showSnackbar(
+                message = "Failed to delete category",
+            )
+          }
+        })
   }
 
   /**
@@ -167,7 +208,16 @@ class BalanceDetailedViewModel(
    * @param balanceItem the item we want to edit
    */
   fun startEditing(balanceItem: BalanceItem) {
-    _uiState.value = _uiState.value.copy(editing = true, editedBalanceItem = balanceItem)
+    _uiState.value =
+        _uiState.value.copy(
+            editing = true,
+            editedBalanceItem = balanceItem,
+            errorName = null,
+            errorReceipt = null,
+            errorAmount = null,
+            errorAssignee = null,
+            errorDescription = null,
+            errorDate = null)
   }
 
   /**
@@ -176,6 +226,14 @@ class BalanceDetailedViewModel(
    * @param balanceItem the new edited budgetItem
    */
   fun saveEditing(balanceItem: BalanceItem) {
+    if (_uiState.value.errorName != null ||
+        _uiState.value.errorReceipt != null ||
+        _uiState.value.errorAmount != null ||
+        _uiState.value.errorAssignee != null ||
+        _uiState.value.errorDescription != null ||
+        _uiState.value.errorDate != null) {
+      return
+    }
     balanceApi.updateBalance(
         CurrentUser.associationUid!!,
         balanceItem,
@@ -186,15 +244,20 @@ class BalanceDetailedViewModel(
               _uiState.value.copy(
                   editing = false,
                   balanceList =
-                      _uiState.value.balanceList.filter { it.uid != balanceItem.uid } + balanceItem,
+                      if (_uiState.value.status == null ||
+                          balanceItem.status == _uiState.value.status)
+                          _uiState.value.balanceList.filter { it.uid != balanceItem.uid } +
+                              balanceItem
+                      else _uiState.value.balanceList.filter { it.uid != balanceItem.uid },
                   editedBalanceItem = null)
         },
-        { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
+        { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
   }
 
   /** Exit the edit state without keeping the modifications done */
-  fun cancelEditing() {
-    _uiState.value = _uiState.value.copy(editing = false, editedBalanceItem = null)
+  fun cancelPopUp() {
+    _uiState.value =
+        _uiState.value.copy(editing = false, editedBalanceItem = null, creating = false)
   }
 
   fun deleteBalanceItem(balanceItemUid: String) {
@@ -210,29 +273,156 @@ class BalanceDetailedViewModel(
         { _uiState.value = _uiState.value.copy(editedBalanceItem = null, editing = false) })
   }
 
+  fun startCreation() {
+    _uiState.value =
+        _uiState.value.copy(
+            creating = true,
+            errorName = null,
+            errorReceipt = null,
+            errorAmount = null,
+            errorAssignee = null,
+            errorDescription = null,
+            errorDate = null)
+  }
+
+  fun saveCreation(balanceItem: BalanceItem) {
+    if (_uiState.value.errorName != null ||
+        _uiState.value.errorReceipt != null ||
+        _uiState.value.errorAmount != null ||
+        _uiState.value.errorAssignee != null ||
+        _uiState.value.errorDescription != null ||
+        _uiState.value.errorDate != null) {
+      return
+    }
+    balanceApi.addBalance(
+        CurrentUser.associationUid!!,
+        balanceItem.subcategoryUID,
+        balanceItem.receiptUID,
+        balanceItem,
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  creating = false,
+                  balanceList =
+                      if (_uiState.value.status == null ||
+                          balanceItem.status == _uiState.value.status)
+                          _uiState.value.balanceList + balanceItem
+                      else _uiState.value.balanceList,
+                  editedBalanceItem = null)
+        },
+        { _uiState.value = _uiState.value.copy(errorReceipt = "The receipt is already used!") })
+  }
+
+  fun checkName(name: String) {
+    if (name.length > maxNameLength) {
+      _uiState.value = _uiState.value.copy(errorName = "Name is too long")
+    } else if (name.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorName = "Name cannot be empty")
+    } else {
+      _uiState.value = _uiState.value.copy(errorName = null)
+    }
+  }
+
+  fun checkReceipt(receiptUid: String) {
+    if (receiptUid.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorReceipt = "The receipt cannot be empty!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorReceipt = null)
+    }
+  }
+
+  fun checkAmount(amount: String) {
+    if (amount.isEmpty()) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
+    } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
+      _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
+    } else if (PriceUtil.isTooLarge(amount)) {
+      _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
+    } else {
+      _uiState.value = _uiState.value.copy(errorAmount = null)
+    }
+  }
+
+  fun checkAssignee(assignee: String) {
+    if (assignee.isEmpty())
+        _uiState.value = _uiState.value.copy(errorAssignee = "Cannot have an empty assignee!")
+    else _uiState.value = _uiState.value.copy(errorAssignee = null)
+  }
+
+  fun checkDescription(description: String) {
+    if (description.length > maxDescriptionLength) {
+      _uiState.value = _uiState.value.copy(errorDescription = "Description is too long")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDescription = null)
+    }
+  }
+
+  fun checkDate(date: LocalDate) {
+    if (date.year != _uiState.value.subCategory!!.year) {
+      _uiState.value =
+          _uiState.value.copy(
+              errorDate =
+                  "The year doesn't match ${_uiState.value.subCategory!!.name}'s year: ${_uiState.value.subCategory!!.year}")
+    } else {
+      _uiState.value = _uiState.value.copy(errorDate = null)
+    }
+  }
+
+  fun checkAll(
+      name: String,
+      receiptUid: String,
+      amount: String,
+      assignee: String,
+      description: String,
+      date: LocalDate
+  ) {
+    checkName(name)
+    checkReceipt(receiptUid)
+    checkAmount(amount)
+    checkAssignee(assignee)
+    checkDescription(description)
+    checkDate(date)
+  }
 }
 
 /**
  * The state for the balance item
  *
+ * @param loading whether the page is loading
+ * @param error the error message, if any
  * @param balanceList the current list of balance items
  * @param subCategory the current subcategory of the item
- * @param status the current status
+ * @param categoryList the list of categories
+ * @param loadingCategory whether the categories are loading
+ * @param status the current status filter
+ * @param receiptList the list of receipts
+ * @param subCategoryList the list of subcategories
+ * @param editing whether the item is being edited
+ * @param editedBalanceItem the item being edited
  * @param subCatEditing whether the subcategory is being edited
- * @param year the current year
+ * @param snackbarState the snackbar state
  * @param filterActive if the tva filter is active or not
  */
 data class BalanceItemState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val balanceList: List<BalanceItem> = emptyList(),
-    val subCategory: AccountingSubCategory = AccountingSubCategory("", "", "", 0, 2023),
+    val subCategory: AccountingSubCategory? = null,
     val categoryList: List<AccountingCategory> = emptyList(),
     val loadingCategory: Boolean = false,
     val status: Status? = null,
     val receiptList: List<Receipt> = emptyList(),
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val editing: Boolean = false,
+    val creating: Boolean = false,
     val editedBalanceItem: BalanceItem? = null,
     val subCatEditing: Boolean = false,
-    val year: Int = 2023,
-    val filterActive: Boolean = false
+    val snackbarState: SnackbarHostState = SnackbarHostState(),
+    val filterActive: Boolean = false,
+    val errorName: String? = "",
+    val errorReceipt: String? = "",
+    val errorAmount: String? = "",
+    val errorAssignee: String? = "",
+    val errorDescription: String? = "",
+    val errorDate: String? = ""
 )

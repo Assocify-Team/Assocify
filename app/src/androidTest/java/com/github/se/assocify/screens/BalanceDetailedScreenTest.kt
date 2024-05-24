@@ -2,8 +2,10 @@ package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -22,12 +24,14 @@ import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
+import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
+import com.github.se.assocify.ui.util.PriceUtil
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -50,7 +54,6 @@ class BalanceDetailedScreenTest :
 
   @RelaxedMockK lateinit var mockNavActions: NavigationActions
   @RelaxedMockK lateinit var mockBudgetAPI: BudgetAPI
-  @RelaxedMockK lateinit var mockReceiptAPI: ReceiptAPI
   val subCategoryUid = "subCategoryUid"
   val categoryList =
       listOf(
@@ -74,7 +77,7 @@ class BalanceDetailedScreenTest :
               5,
               TVA.TVA_8,
               "scissors for paper cutting",
-              LocalDate.of(2022, 4, 14),
+              LocalDate.of(2023, 4, 14),
               "François Théron",
               Status.Pending),
           BalanceItem(
@@ -100,6 +103,18 @@ class BalanceDetailedScreenTest :
               "Sidonie Bouthors",
               Status.Reimbursed))
 
+  private val userReceipts =
+      listOf<Receipt>(
+          Receipt(
+              "00000000-0000-0000-0000-000000000000",
+              "r1",
+              "a cool receipt",
+              LocalDate.of(2023, 3, 11),
+              28,
+              Status.Pending,
+              null,
+              "userId"))
+
   val mockBalanceAPI: BalanceAPI =
       mockk<BalanceAPI>() {
         every { getBalance(any(), any(), any()) } answers
@@ -118,6 +133,11 @@ class BalanceDetailedScreenTest :
               val onSuccessCallback = arg<() -> Unit>(4)
               onSuccessCallback()
             }
+        every { addBalance(any(), any(), any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = arg<() -> Unit>(4)
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingSubCategoryAPI: AccountingSubCategoryAPI =
@@ -127,8 +147,16 @@ class BalanceDetailedScreenTest :
               val onSuccessCallback = secondArg<(List<AccountingSubCategory>) -> Unit>()
               onSuccessCallback(subCategoryList)
             }
-        every { updateSubCategory(any(), any(), any()) } answers {}
-        every { deleteSubCategory(any(), any(), any()) } answers {}
+        every { updateSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
+        every { deleteSubCategory(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   val mockAccountingCategoryAPI: AccountingCategoryAPI =
@@ -141,6 +169,15 @@ class BalanceDetailedScreenTest :
             }
       }
 
+  val mockReceiptAPI: ReceiptAPI =
+      mockk<ReceiptAPI>() {
+        every { getUserReceipts(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
+              onSuccessCallback(userReceipts)
+            }
+      }
+
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
   lateinit var balanceDetailedViewModel: BalanceDetailedViewModel
 
@@ -150,9 +187,14 @@ class BalanceDetailedScreenTest :
     CurrentUser.associationUid = "associationId"
     budgetDetailedViewModel =
         BudgetDetailedViewModel(
-            mockBudgetAPI, mockAccountingSubCategoryAPI, mockAccountingCategoryAPI, subCategoryUid)
+            mockNavActions,
+            mockBudgetAPI,
+            mockAccountingSubCategoryAPI,
+            mockAccountingCategoryAPI,
+            subCategoryUid)
     balanceDetailedViewModel =
         BalanceDetailedViewModel(
+            mockNavActions,
             mockBalanceAPI,
             mockReceiptAPI,
             mockAccountingSubCategoryAPI,
@@ -171,7 +213,6 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("AccountingDetailedScreen").assertIsDisplayed()
       onNodeWithTag("filterRowDetailed").assertIsDisplayed()
       onNodeWithTag("totalItems").assertIsDisplayed()
-      onNodeWithTag("yearListTag").assertIsDisplayed()
       onNodeWithTag("statusListTag").assertIsDisplayed()
       onNodeWithTag("tvaListTag").assertIsDisplayed()
     }
@@ -181,8 +222,8 @@ class BalanceDetailedScreenTest :
   @Test
   fun testEmptyList() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2024").performClick()
+      onNodeWithTag("statusListTag").performClick()
+      onNodeWithText("Approved").performClick()
       onNodeWithTag("totalItems").assertIsNotDisplayed()
       onNodeWithText("No items for the ${subCategoryList.first().name} sheet with these filters")
           .assertIsDisplayed()
@@ -195,15 +236,14 @@ class BalanceDetailedScreenTest :
     with(composeTestRule) {
       onNodeWithText("sweaters").assertIsDisplayed()
       onNodeWithText("chairs").assertIsDisplayed()
-      onNodeWithText("pair of scissors").assertIsNotDisplayed()
+      onNodeWithText("pair of scissors").assertIsDisplayed()
       // Assert that the name of the subCategory is displayed
       onNodeWithText("Logistics").assertIsDisplayed()
     }
 
     assert(
-        balanceItems.filter { it.date.year == 2023 && it.subcategoryUID == subCategoryUid } ==
+        balanceItems.filter { it.subcategoryUID == subCategoryUid } ==
             balanceDetailedViewModel.uiState.value.balanceList)
-    assert(2023 == balanceDetailedViewModel.uiState.value.year)
   }
 
   /** Tests if the total amount correspond to the sum of the items */
@@ -232,15 +272,13 @@ class BalanceDetailedScreenTest :
   fun testStatusFiltering() {
     with(composeTestRule) {
       // Initially, select the "Status" filter to change its value to Pending and 2022
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
       // Assert that only the item "pair of scissors" is displayed
       onNodeWithText("pair of scissors").assertIsDisplayed()
       assert(
-          balanceItems.filter { it.date.year == 2022 && it.status == Status.Pending } ==
+          balanceItems.filter { it.status == Status.Pending } ==
               balanceDetailedViewModel.uiState.value.balanceList)
 
       // Change the status filter to "All Status"
@@ -248,11 +286,9 @@ class BalanceDetailedScreenTest :
       onNodeWithText("All Status").performClick()
 
       // Assert that all items of 2022 are displayed
-      onNodeWithText("pair of scissors").assertIsDisplayed()
       assert(
-          balanceItems.filter { it.date.year == 2022 } ==
+          balanceItems.filter { it.subcategoryUID == subCategoryUid } ==
               balanceDetailedViewModel.uiState.value.balanceList)
-      assert(2022 == balanceDetailedViewModel.uiState.value.year)
       assert(null == balanceDetailedViewModel.uiState.value.status)
     }
   }
@@ -286,9 +322,9 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsDisplayed()
-      assert(balanceDetailedViewModel.uiState.value.subCategory.name == "newName")
-      assert(balanceDetailedViewModel.uiState.value.subCategory.year == 2024)
-      assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "1")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.name == "newName")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.year == 2024)
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.categoryUID == "1")
     }
   }
 
@@ -311,9 +347,9 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
       assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithText("newName").assertIsNotDisplayed()
-      assert(balanceDetailedViewModel.uiState.value.subCategory.name == "Logistics")
-      assert(balanceDetailedViewModel.uiState.value.subCategory.year == 2023)
-      assert(balanceDetailedViewModel.uiState.value.subCategory.categoryUID == "2")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.name == "Logistics")
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.year == 2023)
+      assert(balanceDetailedViewModel.uiState.value.subCategory!!.categoryUID == "2")
     }
   }
 
@@ -324,29 +360,111 @@ class BalanceDetailedScreenTest :
       assert(balanceDetailedViewModel.uiState.value.subCatEditing)
       onNodeWithTag("editSubCategoryDialog").assertIsDisplayed()
       onNodeWithTag("editSubCategoryDeleteButton").performClick()
-      onNodeWithTag("editSubCategoryDialog").assertIsNotDisplayed()
-      assert(!balanceDetailedViewModel.uiState.value.subCatEditing)
-      assert(balanceDetailedViewModel.uiState.value.balanceList.isEmpty())
+      verify { mockNavActions.back() }
     }
   }
 
   @Test
   fun tvaFilterWorks() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2023").performClick()
-      onNodeWithText("HT").performClick()
-      onNodeWithText(("12.00")).assertIsDisplayed()
+      onNodeWithTag("tvaListTag").performClick()
       onNodeWithText("TTC").performClick()
-      onNodeWithText(((1200 + (1200 * 8.1 / 100).toInt()) / 100.0).toString()).assertIsDisplayed()
+      val totalAmountTTC =
+          PriceUtil.fromCents(
+              balanceItems.sumOf { (it.amount + it.amount * it.tva.rate / 100f).toInt() })
+      onNodeWithText(totalAmountTTC).assertIsDisplayed()
+      onNodeWithTag("tvaListTag").performClick()
+      onNodeWithText("HT").performClick()
+      val totalAmount = PriceUtil.fromCents(balanceItems.sumOf { it.amount })
+      onNodeWithText(totalAmount).assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testLoadSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.getSubCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      balanceDetailedViewModel.loadBalanceDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading category")
+    }
+  }
+
+  @Test
+  fun testLoadBalanceError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockBalanceAPI.getBalance(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      balanceDetailedViewModel.loadBalanceDetails()
+      onNodeWithTag("errorMessage")
+          .assertIsDisplayed()
+          .assertTextContains("Error loading balance items")
+    }
+  }
+
+  @Test
+  fun testLoadCategoriesError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingCategoryAPI.getCategories(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      balanceDetailedViewModel.loadBalanceDetails()
+      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading tags")
+    }
+  }
+
+  @Test
+  fun testSaveSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.updateSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryNameBox").assertIsDisplayed()
+      onNodeWithTag("editSubCategoryNameBox").performTextClearance()
+      onNodeWithTag("editSubCategoryNameBox").performTextInput("newName")
+      onNodeWithTag("editSubCategorySaveButton").performClick()
+      onNodeWithText("Failed to update category").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testDeleteSubCategoryError() {
+    val errorMessage = "error"
+    val error = Exception(errorMessage)
+    every { mockAccountingSubCategoryAPI.deleteSubCategory(any(), any(), any()) } answers
+        {
+          val onErrorCallback = thirdArg<(Exception) -> Unit>()
+          onErrorCallback(error)
+        }
+    with(composeTestRule) {
+      onNodeWithTag("editSubCat").performClick()
+      onNodeWithTag("editSubCategoryDeleteButton").performClick()
+      onNodeWithText("Failed to delete category").assertIsDisplayed()
     }
   }
 
   @Test
   fun testEditDeleteScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -363,8 +481,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testEditModifyScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -385,8 +501,6 @@ class BalanceDetailedScreenTest :
   @Test
   fun testCancelModifyScreen() {
     with(composeTestRule) {
-      onNodeWithTag("yearListTag").performClick()
-      onNodeWithText("2022").performClick()
       onNodeWithTag("statusListTag").performClick()
       onNodeWithText("Pending").performClick()
 
@@ -400,6 +514,42 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editSubCategoryCancelButton").performClick()
       onNodeWithText("money").assertIsNotDisplayed()
       onNodeWithText("pair of scissors").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testCancelCreateScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogName").assertIsDisplayed()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("money")
+      onNodeWithTag("editSubCategoryCancelButton").performClick()
+      onNodeWithText("money").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
+  fun testSaveCreateScreen() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogName").assertIsDisplayed()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("lots of money")
+      onNodeWithTag("receiptDropdown").assertIsDisplayed()
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("r1").performClick()
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editDialogAssignee"))
+      onNodeWithTag("editDialogAssignee").performTextClearance()
+      onNodeWithTag("editDialogAssignee").performTextInput("François Théron")
+      onNodeWithTag("editDialogDate").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012023")
+      onNodeWithText("OK").performClick()
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
+      onNodeWithTag("editConfirmButton").performClick()
+      onNodeWithTag("editDialogName").assertIsNotDisplayed()
+      onNodeWithText("lots of money").assertIsDisplayed()
     }
   }
 }

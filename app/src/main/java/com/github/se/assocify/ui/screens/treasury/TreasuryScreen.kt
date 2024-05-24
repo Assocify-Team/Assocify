@@ -27,6 +27,7 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.accountingComposables.AddSubcategoryDialog
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
@@ -49,6 +50,7 @@ fun TreasuryScreen(
 ) {
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
+  val accountingState by accountingViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
   Scaffold(
@@ -83,10 +85,8 @@ fun TreasuryScreen(
             onClick = {
               when (pagerState.currentPage) {
                 TreasuryPageIndex.Receipts.ordinal -> navActions.navigateTo(Destination.NewReceipt)
-                TreasuryPageIndex.Budget.ordinal ->
-                    navActions.navigateTo(Destination.NewBalanceCategory)
-                TreasuryPageIndex.Balance.ordinal ->
-                    navActions.navigateTo(Destination.NewBalanceCategory)
+                TreasuryPageIndex.Budget.ordinal -> accountingViewModel.showNewSubcategoryDialog()
+                TreasuryPageIndex.Balance.ordinal -> accountingViewModel.showNewSubcategoryDialog()
               }
             }) {
               Icon(Icons.Outlined.Add, "Create")
@@ -101,8 +101,14 @@ fun TreasuryScreen(
 
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(accountingViewModel)
-            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(accountingViewModel)
+            TreasuryPageIndex.Budget.ordinal -> {
+              AccountingFilterBar(accountingViewModel)
+              AddSubcategoryDialog(accountingViewModel)
+            }
+            TreasuryPageIndex.Balance.ordinal -> {
+              AccountingFilterBar(accountingViewModel)
+              AddSubcategoryDialog(accountingViewModel)
+            }
           }
 
           // Pages content
