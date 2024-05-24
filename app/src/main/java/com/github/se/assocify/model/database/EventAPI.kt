@@ -27,9 +27,11 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
   fun updateEventCache(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       val events =
-          postgrest.from(collectionName).select{
-            filter { SupabaseEvent::associationUID eq CurrentUser.associationUid }
-          }.decodeList<SupabaseEvent>().map { it.toEvent() }
+          postgrest
+              .from(collectionName)
+              .select { filter { SupabaseEvent::associationUID eq CurrentUser.associationUid } }
+              .decodeList<SupabaseEvent>()
+              .map { it.toEvent() }
       eventCache = events
       onSuccess(events)
     }
@@ -55,9 +57,8 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
                   endDate = event.endDate.toString(),
                   guestsOrArtists = event.guestsOrArtists,
                   location = event.location,
-                  associationUID = CurrentUser.associationUid
+                  associationUID = CurrentUser.associationUid))
 
-              ))
       eventCache = eventCache?.plus(event)
       onSuccess(event.uid)
     }
