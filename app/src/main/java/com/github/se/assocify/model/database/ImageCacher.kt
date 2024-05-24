@@ -15,6 +15,12 @@ import okhttp3.internal.toHexString
 class ImageCacher(val timeout: Long, val cacheDir: Path, private val bucket: BucketApi) {
   private val scope = CoroutineScope(Dispatchers.Main)
 
+  init {
+    if (!cacheDir.toFile().exists()) {
+      cacheDir.toFile().mkdirs()
+    }
+  }
+
   private fun tryAsync(onFailure: (Exception) -> Unit, block: suspend () -> Unit) {
     scope.launch {
       try {
@@ -72,7 +78,7 @@ class ImageCacher(val timeout: Long, val cacheDir: Path, private val bucket: Buc
       }
       onFailure(it)
     }) {
-      bucket.downloadAuthenticatedTo(pathInBucket, tmpImageCacheFile)
+      bucket.downloadAuthenticatedTo(pathInBucket, tmpImageCacheFile.toPath())
       val renamed = tmpImageCacheFile.renameTo(imageFile.toFile())
       if (!renamed) {
         Log.w("IMG", "Failed to rename temporary image cache file ($pathInBucket)")
