@@ -85,8 +85,9 @@ class BalanceDetailedViewModel(
 
   /** Update the database values */
   private fun updateDatabaseValuesInBalance() {
+    var innerLoadCounter = 2
 
-    receiptAPI.getUserReceipts(
+    receiptAPI.getAllReceipts(
         { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
 
     subCategoryAPI.getSubCategories(
