@@ -348,7 +348,7 @@ class BalanceDetailedViewModel(
   }
 
   fun checkReceipt(receiptUid: String) {
-    if (receiptUid.isEmpty()) {
+    if (receiptUid.isEmpty() && !_uiState.value.noReceiptSelected) {
       _uiState.value = _uiState.value.copy(errorReceipt = "The receipt cannot be empty!")
     } else {
       _uiState.value = _uiState.value.copy(errorReceipt = null)
@@ -407,6 +407,15 @@ class BalanceDetailedViewModel(
     checkDescription(description)
     checkDate(date)
   }
+
+  /**
+   * Set the no receipt selected state
+   *
+   * @param selected whether no receipt is selected
+   */
+  fun noReceiptSelected(selected: Boolean) {
+    _uiState.value = _uiState.value.copy(noReceiptSelected = selected)
+  }
 }
 
 /**
@@ -420,6 +429,7 @@ class BalanceDetailedViewModel(
  * @param loadingCategory whether the categories are loading
  * @param status the current status filter
  * @param receiptList the list of receipts
+ * @param noReceiptSelected whether no receipt is selected
  * @param subCategoryList the list of subcategories
  * @param editing whether the item is being edited
  * @param editedBalanceItem the item being edited
@@ -436,6 +446,7 @@ data class BalanceItemState(
     val loadingCategory: Boolean = false,
     val status: Status? = null,
     val receiptList: List<Receipt> = emptyList(),
+    val noReceiptSelected: Boolean = true,
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val editing: Boolean = false,
     val creating: Boolean = false,

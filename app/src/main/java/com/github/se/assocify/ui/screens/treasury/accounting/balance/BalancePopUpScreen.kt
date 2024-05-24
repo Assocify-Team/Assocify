@@ -148,10 +148,23 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     ExposedDropdownMenu(
                         expanded = receiptExpanded,
                         onDismissRequest = { receiptExpanded = false }) {
+
+                          // Adding the "No receipt" item
+                          DropdownMenuItem(
+                              text = { Text("No receipt") },
+                              onClick = {
+                                balanceDetailedViewModel.noReceiptSelected(true)
+                                amountString = "" // Clear the amount
+                                receiptUid = "" // Clear the receipt UID
+                                receiptName = "No receipt" // Set the receipt name to "No receipt"
+                                receiptExpanded = false
+                              })
+
                           balanceModel.receiptList.forEach { receipt ->
                             DropdownMenuItem(
                                 text = { Text(receipt.title) },
                                 onClick = {
+                                  balanceDetailedViewModel.noReceiptSelected(false)
                                   amountString = PriceUtil.fromCents(receipt.cents)
                                   receiptUid = receipt.uid
                                   receiptName = receipt.title
