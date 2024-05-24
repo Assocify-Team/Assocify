@@ -32,7 +32,8 @@ fun AssocifyApp(loginSaver: LoginSave) {
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
   val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
   val receiptsAPI =
-      ReceiptAPI(SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath())
+      ReceiptAPI(
+          SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath().resolve("receipts"))
   val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
   val accountingCategoriesAPI = AccountingCategoryAPI(SupabaseClient.supabaseClient)
   val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
