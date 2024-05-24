@@ -87,12 +87,10 @@ class BalanceDetailedViewModel(
   private fun updateDatabaseValuesInBalance() {
     var innerLoadCounter = 2
 
-      receiptAPI.getAllReceipts(
-          { receiptList ->
-              _uiState.value = _uiState.value.copy(receiptList = receiptList) },
-          {})
+    receiptAPI.getAllReceipts(
+        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
 
-      subCategoryAPI.getSubCategories(
+    subCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
