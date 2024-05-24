@@ -14,26 +14,6 @@ enum class RoleType {
   @SerialName("staff") STAFF
 }
 
-data class Role(val name: String) {
-  constructor() : this("")
-
-  /**
-   * Returns the role type of the role
-   *
-   * @return the role type of the role
-   */
-  fun getRoleType(): RoleType {
-    return when (name.lowercase()) {
-      "presidency" -> RoleType.PRESIDENCY
-      "treasury" -> RoleType.TREASURY
-      "committee" -> RoleType.COMMITTEE
-      "member" -> RoleType.MEMBER
-      "staff" -> RoleType.STAFF
-      else -> RoleType.STAFF
-    }
-  }
-}
-
 @Serializable
 data class PermissionRole(
     val uid: String,
