@@ -56,13 +56,17 @@ class ProfileViewModel(
    * and the current association. It also gets the user's role in the association.
    */
   fun loadProfile() {
-      val loadSystem = SyncSystem(
-          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
-          { error -> _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = error) }
-      )
-     if (!loadSystem.start(4)) return
+    val loadSystem =
+        SyncSystem(
+            {
+              _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null)
+            },
+            { error ->
+              _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = error)
+            })
+    if (!loadSystem.start(4)) return
 
-      _uiState.value = _uiState.value.copy(loading = true, error = null)
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
 
     userAPI.getUser(
         CurrentUser.userUid!!,
@@ -113,48 +117,40 @@ class ProfileViewModel(
                             imageVector = Icons.Default.People,
                             contentDescription = "Association Logo")
                       })
-            loadSystem.end()
+          loadSystem.end()
         },
         {
           if (_uiState.value.myAssociations.isNotEmpty()) {
             _uiState.value =
                 _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
           }
-            loadSystem.end("Error loading current association")
+          loadSystem.end("Error loading current association")
         })
     userAPI.getCurrentUserRole(
         { role ->
           _uiState.value = _uiState.value.copy(currentRole = role)
-            loadSystem.end()
+          loadSystem.end()
         },
         { loadSystem.end("Error loading role") })
   }
 
-    fun refreshProfile() {
-        val refreshSystem = SyncSystem(
+  fun refreshProfile() {
+    val refreshSystem =
+        SyncSystem(
             { loadProfile() },
             { error ->
-                _uiState.value = _uiState.value.copy(refresh = false)
-                CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.value.snackbarHostState.showSnackbar(
-                        message = error, duration = SnackbarDuration.Short)
-                }
-            }
-        )
-        if (!refreshSystem.start(2)) return
-        _uiState.value = _uiState.value.copy(refresh = true)
+              _uiState.value = _uiState.value.copy(refresh = false)
+              CoroutineScope(Dispatchers.Main).launch {
+                _uiState.value.snackbarHostState.showSnackbar(
+                    message = error, duration = SnackbarDuration.Short)
+              }
+            })
+    if (!refreshSystem.start(2)) return
+    _uiState.value = _uiState.value.copy(refresh = true)
 
-        assoAPI.updateCache({
-            refreshSystem.end()
-        }, {
-            refreshSystem.end("Could not refresh")
-        })
-        userAPI.updateUserCache({
-            refreshSystem.end()
-        }, {
-            refreshSystem.end("Could not refresh")
-        })
-    }
+    assoAPI.updateCache({ refreshSystem.end() }, { refreshSystem.end("Could not refresh") })
+    userAPI.updateUserCache({ refreshSystem.end() }, { refreshSystem.end("Could not refresh") })
+  }
 
   /**
    * This function is used to modify the name of the (current) user as they're editing it.
