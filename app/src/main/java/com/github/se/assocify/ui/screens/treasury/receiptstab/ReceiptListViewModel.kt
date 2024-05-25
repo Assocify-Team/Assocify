@@ -5,6 +5,7 @@ import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -21,29 +22,50 @@ class ReceiptListViewModel(
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState>
 
-  private var loadCounter = 0
+    private val loadSystem = SyncSystem(
+        {_uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null)},
+        {_uiState.value = _uiState.value.copy(loading = false, refresh = false, error = it) }
+    )
+
+    private val refreshSystem = SyncSystem(
+        { updateReceipts() },
+        {error ->
+            _uiState.value = _uiState.value.copy(refresh = false)
+            Log.e("ReceiptListScreen", error)
+        }
+    )
 
   init {
-    updateReceipts()
     uiState = _uiState
+    updateReceipts()
   }
 
+
+
   fun updateReceipts() {
-    loadCounter = 2
+    if (!loadSystem.start(2)) return
+
     _uiState.value = _uiState.value.copy(loading = true)
+
     updateUserReceipts()
     updateAllReceipts()
   }
 
-  private fun endLoading() {
-    if (--loadCounter == 0) {
-      _uiState.value = _uiState.value.copy(loading = false, error = null)
-    }
-  }
+    fun refreshReceipts() {
+        if (!refreshSystem.start(2)) return
 
-  private fun loadingError() {
-    _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipts")
-  }
+        _uiState.value = _uiState.value.copy(refresh = true)
+
+        // two callbacks !
+        receiptsDatabase.updateCaches(
+            onSuccess = { _, _ ->
+                refreshSystem.end()
+            },
+            onFailure = { _, _ ->
+                refreshSystem.end("Error refreshing receipts")
+            }
+        )
+    }
 
   /** Update the user's receipts */
   private fun updateUserReceipts() {
@@ -55,11 +77,11 @@ class ReceiptListViewModel(
                       receipts.filter {
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
-          endLoading()
+          loadSystem.end()
         },
         onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching user receipts", it)
-          loadingError()
+          loadSystem.end("Error loading user receipts")
         })
   }
 
@@ -74,11 +96,11 @@ class ReceiptListViewModel(
                       receipts.filter {
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
-          endLoading()
+          loadSystem.end()
         },
         onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching all receipts", it)
-          loadingError()
+          loadSystem.end("Error loading receipts")
         })
   }
 
@@ -107,6 +129,7 @@ class ReceiptListViewModel(
 data class ReceiptUIState(
     val loading: Boolean = false,
     val error: String? = null,
+    val refresh: Boolean = false,
     val userReceipts: List<Receipt> = listOf(),
     val allReceipts: List<Receipt> = listOf(),
     val searchQuery: String = ""

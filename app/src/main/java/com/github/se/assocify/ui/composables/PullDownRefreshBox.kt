@@ -11,6 +11,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 /**
  * A container to make a scrollable content pullable to refresh.
@@ -26,13 +27,13 @@ import androidx.compose.ui.Modifier
 fun PullDownRefreshBox(
     refreshing: Boolean,
     onRefresh: () -> Unit,
-    paddingValues: PaddingValues,
+    paddingValues: PaddingValues? = null,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
   val pullRefreshState = rememberPullRefreshState(refreshing, onRefresh)
 
-  Box(modifier = modifier.padding(paddingValues).fillMaxSize().pullRefresh(pullRefreshState)) {
+  Box(modifier = modifier.padding(paddingValues ?: PaddingValues(0.dp)).fillMaxSize().pullRefresh(pullRefreshState)) {
     content()
     PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
   }

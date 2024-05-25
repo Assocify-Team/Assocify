@@ -8,10 +8,10 @@ package com.github.se.assocify.ui.util
  *
  * In particular useful for loading or refreshing several things at once (asynchronous)
  *
- * @param success The callback to call when all operations are completed successfully.
- * @param error The callback to call when an error occurs during any of the operations.
+ * @param onSuccess The callback to call when all operations are completed successfully.
+ * @param onError The callback to call when an error occurs during any of the operations.
  */
-class SyncSystem(private val success: () -> Unit, private val error: (String) -> Unit) {
+class SyncSystem(private val onSuccess: () -> Unit, private val onError: (String) -> Unit) {
   private var counter = 0
   private var errorOccurred = false
 
@@ -42,11 +42,11 @@ class SyncSystem(private val success: () -> Unit, private val error: (String) ->
     if (error != null) {
       errorOccurred = true
       counter = 0
-      error(error)
+      onError(error)
     } else {
       counter -= 1
       if (counter == 0) {
-        success()
+        onSuccess()
       }
     }
   }
