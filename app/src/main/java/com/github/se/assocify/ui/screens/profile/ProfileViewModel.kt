@@ -85,6 +85,15 @@ class ProfileViewModel(
           endLoading()
         },
         { endLoading("Error loading profile") })
+    userAPI.getProfilePicture(
+        "${CurrentUser.userUid!!}.jpg",
+        { uri -> _uiState.value = _uiState.value.copy(profileImageURI = uri) },
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Error loading profile picture", duration = SnackbarDuration.Short)
+          }
+        })
     userAPI.getCurrentUserAssociations(
         { associations ->
           _uiState.value =
@@ -229,6 +238,17 @@ class ProfileViewModel(
    */
   fun setImage(uri: Uri?) {
     if (uri == null) return
+
+    userAPI.setProfilePicture(
+        "${CurrentUser.userUid!!}.jpg",
+        uri,
+        {},
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Couldn't change profile picture", duration = SnackbarDuration.Short)
+          }
+        })
     _uiState.value = _uiState.value.copy(profileImageURI = uri)
   }
 
