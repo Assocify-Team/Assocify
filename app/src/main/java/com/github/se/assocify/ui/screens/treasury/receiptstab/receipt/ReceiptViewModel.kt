@@ -13,15 +13,14 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import com.github.se.assocify.ui.util.SyncSystem
-import java.lang.Thread.sleep
-import java.time.LocalDate
-import java.util.UUID
-import kotlin.math.absoluteValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.UUID
+import kotlin.math.absoluteValue
 
 class ReceiptViewModel {
 
@@ -93,7 +92,6 @@ class ReceiptViewModel {
     val refreshSystem =
         SyncSystem(
             {
-              sleep(1000)
               Log.e("ReceiptViewModel", "end : ${_uiState.value.refresh}")
               loadReceipt()
             },

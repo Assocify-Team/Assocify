@@ -24,9 +24,6 @@ import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -63,15 +60,13 @@ import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
+import com.github.se.assocify.ui.composables.PullDownRefreshBox
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun ReceiptScreen(viewModel: ReceiptViewModel) {
 
   val receiptState by viewModel.uiState.collectAsState()
-
-  val pullRefreshState =
-      rememberPullRefreshState(receiptState.refresh, { viewModel.refreshReceipt() })
 
   Scaffold(
       modifier = Modifier.testTag("receiptScreen"),
@@ -93,6 +88,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             hostState = receiptState.snackbarHostState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
+
         if (receiptState.loading) {
           Log.e("ReceiptScreen", "receiptState.loading")
           CenteredCircularIndicator()
@@ -105,12 +101,15 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
         }
 
         // box wrapper to add pull down refresh
-        Box(modifier = Modifier.pullRefresh(pullRefreshState)) {
+        PullDownRefreshBox(
+            refreshing = receiptState.refresh,
+            onRefresh = { viewModel.refreshReceipt() },
+            paddingValues = paddingValues,
+        ) {
+
           Column(
               modifier =
-                  Modifier.fillMaxSize()
-                      .padding(paddingValues)
-                      .verticalScroll(rememberScrollState()),
+                  Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
               verticalArrangement = Arrangement.spacedBy(5.dp),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
@@ -276,9 +275,6 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
 
                 Spacer(modifier = Modifier.weight(1.0f))
               }
-
-          PullRefreshIndicator(
-              receiptState.refresh, pullRefreshState, Modifier.align(Alignment.TopCenter))
         }
 
         PhotoSelectionSheet(
