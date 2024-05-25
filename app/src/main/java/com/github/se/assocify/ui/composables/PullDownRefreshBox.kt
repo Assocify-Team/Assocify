@@ -33,8 +33,13 @@ fun PullDownRefreshBox(
 ) {
   val pullRefreshState = rememberPullRefreshState(refreshing, onRefresh)
 
-  Box(modifier = modifier.padding(paddingValues ?: PaddingValues(0.dp)).fillMaxSize().pullRefresh(pullRefreshState)) {
-    content()
-    PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
-  }
+  Box(
+      modifier =
+          modifier
+              .padding(paddingValues ?: PaddingValues(0.dp))
+              .fillMaxSize()
+              .pullRefresh(pullRefreshState)) {
+        content()
+        PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
+      }
 }
