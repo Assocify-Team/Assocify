@@ -15,8 +15,7 @@ import androidx.compose.ui.Modifier
 /**
  * A container to make a scrollable content pullable to refresh.
  *
- * NOTE:
- * Pass the scaffold padding values to the box itself, NOT the content inside the box.
+ * NOTE: Pass the scaffold padding values to the box itself, NOT the content inside the box.
  *
  * @param refreshing Whether the content is currently refreshing.
  * @param onRefresh The callback to call when the user pulls down to refresh.
@@ -31,15 +30,10 @@ fun PullDownRefreshBox(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
-    val pullRefreshState = rememberPullRefreshState(refreshing, onRefresh)
+  val pullRefreshState = rememberPullRefreshState(refreshing, onRefresh)
 
-    Box(
-        modifier = modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-            .pullRefresh(pullRefreshState)
-    ) {
-        content()
-        PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
-    }
+  Box(modifier = modifier.padding(paddingValues).fillMaxSize().pullRefresh(pullRefreshState)) {
+    content()
+    PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
+  }
 }
