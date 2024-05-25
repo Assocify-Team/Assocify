@@ -88,7 +88,6 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             hostState = receiptState.snackbarHostState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
-
         if (receiptState.loading) {
           Log.e("ReceiptScreen", "receiptState.loading")
           CenteredCircularIndicator()
@@ -106,10 +105,8 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             onRefresh = { viewModel.refreshReceipt() },
             paddingValues = paddingValues,
         ) {
-
           Column(
-              modifier =
-                  Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+              modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
               verticalArrangement = Arrangement.spacedBy(5.dp),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
