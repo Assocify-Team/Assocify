@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
@@ -11,14 +12,16 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
-import java.time.LocalDate
-import java.util.UUID
-import kotlin.math.absoluteValue
+import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.lang.Thread.sleep
+import java.time.LocalDate
+import java.util.UUID
+import kotlin.math.absoluteValue
 
 class ReceiptViewModel {
 
@@ -59,9 +62,11 @@ class ReceiptViewModel {
    */
   fun loadReceipt() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
+    Log.e("ReceiptViewModel", "Loading receipt")
     this.receiptApi.getReceipt(
         receiptUid,
         onSuccess = { receipt ->
+            Log.e("ReceiptViewModel", "Loaded receipt")
           _uiState.value =
               _uiState.value.copy(
                   status = receipt.status,
@@ -71,14 +76,44 @@ class ReceiptViewModel {
                   date = DateUtil.formatDate(receipt.date),
                   incoming = receipt.cents >= 0)
 
-          _uiState.value = _uiState.value.copy(loading = false, error = null)
+          _uiState.value = _uiState.value.copy(refresh = false, loading = false, error = null)
           this.receiptCreatorUid = receipt.userId
           loadImage()
         },
         onFailure = {
-          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
+            Log.e("ReceiptViewModel", "Error loading receipt", it)
+          _uiState.value = _uiState.value.copy(refresh = false, loading = false, error = "Error loading receipt")
         })
   }
+
+    fun refreshReceipt() {
+        _uiState.value = _uiState.value.copy(refresh = true)
+
+        val refreshSystem = SyncSystem(
+            {
+                sleep(1000)
+                Log.e("ReceiptViewModel", "end : ${_uiState.value.refresh}")
+                loadReceipt()
+            },
+            { error ->
+                _uiState.value = _uiState.value.copy(refresh = false)
+                CoroutineScope(Dispatchers.Main).launch {
+                    _uiState.value.snackbarHostState.showSnackbar(
+                        message = error, duration = SnackbarDuration.Short)
+                }
+            }
+        )
+
+        if (!refreshSystem.start(2)) return
+
+        Log.e("ReceiptViewModel", "Refreshing receipt")
+
+        // calls success / failure twice ! need 2 in refresh system start
+        receiptApi.updateCaches(
+            { _, _ -> refreshSystem.end() },
+            { _, _ -> refreshSystem.end("Could not refresh") }
+        )
+    }
 
   /**
    * Load receipt image from database If successful, update the UI state with the image URI If
@@ -253,6 +288,7 @@ class ReceiptViewModel {
 data class ReceiptState(
     val loading: Boolean = false,
     val error: String? = null,
+    val refresh: Boolean = false,
     val imageLoading: Boolean = false,
     val imageError: String? = null,
     val isNewReceipt: Boolean,

@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -16,12 +17,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -59,11 +64,13 @@ import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun ReceiptScreen(viewModel: ReceiptViewModel) {
 
   val receiptState by viewModel.uiState.collectAsState()
+
+  val pullRefreshState = rememberPullRefreshState(receiptState.refresh, { viewModel.refreshReceipt() })
 
   Scaffold(
       modifier = Modifier.testTag("receiptScreen"),
@@ -86,6 +93,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
         if (receiptState.loading) {
+            Log.e("ReceiptScreen", "receiptState.loading")
           CenteredCircularIndicator()
           return@Scaffold
         }
@@ -95,16 +103,22 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
           return@Scaffold
         }
 
-        Column(
-            modifier =
-                Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Box(
-                  modifier =
-                      Modifier.testTag("statusDropdownChip")
-                          .padding(bottom = 5.dp)
-                          .fillMaxWidth()) {
+        // box wrapper to add pull down refresh
+        Box (modifier = Modifier.pullRefresh(pullRefreshState)) {
+            Column(
+                modifier =
+                Modifier.fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier =
+                    Modifier.testTag("statusDropdownChip")
+                        .padding(bottom = 5.dp)
+                        .fillMaxWidth()
+                ) {
                     var statusExpanded by remember { mutableStateOf(false) }
                     FilterChip(
                         modifier = Modifier.testTag("statusChip"),
@@ -112,157 +126,172 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
                         onClick = { statusExpanded = !statusExpanded },
                         label = { Text(receiptState.status.name) },
                         leadingIcon = {
-                          Icon(
-                              modifier = Modifier.testTag("currentStatusIcon"),
-                              imageVector = receiptState.status.getIcon(),
-                              contentDescription = "status icon")
+                            Icon(
+                                modifier = Modifier.testTag("currentStatusIcon"),
+                                imageVector = receiptState.status.getIcon(),
+                                contentDescription = "status icon"
+                            )
                         },
                         trailingIcon = {
-                          Icon(
-                              imageVector = Icons.Filled.ArrowDropDown,
-                              contentDescription = "Expand")
+                            Icon(
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Expand"
+                            )
                         })
                     DropdownMenu(
                         modifier = Modifier.testTag("statusDropdownMenu"),
                         expanded = statusExpanded,
                         onDismissRequest = { statusExpanded = false },
-                        properties = PopupProperties(focusable = true)) {
-                          Status.entries.forEach { status ->
+                        properties = PopupProperties(focusable = true)
+                    ) {
+                        Status.entries.forEach { status ->
                             DropdownMenuItem(
                                 text = { Text(status.name) },
                                 onClick = {
-                                  viewModel.setStatus(status)
-                                  statusExpanded = false
+                                    viewModel.setStatus(status)
+                                    statusExpanded = false
                                 },
                                 leadingIcon = {
-                                  Icon(
-                                      modifier = Modifier.testTag("statusIcon"),
-                                      imageVector = status.getIcon(),
-                                      contentDescription = "Status icon")
+                                    Icon(
+                                        modifier = Modifier.testTag("statusIcon"),
+                                        imageVector = status.getIcon(),
+                                        contentDescription = "Status icon"
+                                    )
                                 })
-                          }
                         }
-                  }
-              OutlinedTextField(
-                  modifier = Modifier.testTag("titleField").fillMaxWidth(),
-                  value = receiptState.title,
-                  singleLine = true,
-                  onValueChange = { viewModel.setTitle(it) },
-                  label = { Text("Title") },
-                  isError = receiptState.titleError != null,
-                  supportingText = { receiptState.titleError?.let { Text(it) } })
-              OutlinedTextField(
-                  modifier = Modifier.testTag("descriptionField").fillMaxWidth(),
-                  value = receiptState.description,
-                  onValueChange = { viewModel.setDescription(it) },
-                  label = { Text("Description") },
-                  minLines = 3,
-                  supportingText = {})
-              OutlinedTextField(
-                  modifier = Modifier.testTag("amountField").fillMaxWidth(),
-                  value = receiptState.amount,
-                  singleLine = true,
-                  onValueChange = { viewModel.setAmount(it) },
-                  label = { Text("Amount") },
-                  keyboardOptions =
-                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  isError = receiptState.amountError != null,
-                  supportingText = { receiptState.amountError?.let { Text(it) } })
-              DatePickerWithDialog(
-                  modifier = Modifier.testTag("dateField").fillMaxWidth(),
-                  value = receiptState.date,
-                  onDateSelect = { viewModel.setDate(it) },
-                  label = { Text("Date") },
-                  isError = receiptState.dateError != null,
-                  supportingText = { receiptState.dateError?.let { Text(it) } })
-              Card(
-                  modifier =
-                      Modifier.testTag("imageCard")
-                          .fillMaxWidth()
-                          .aspectRatio(1f)
-                          .padding(top = 15.dp, bottom = 5.dp)) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                      when {
-                        receiptState.imageLoading -> {
-                          CenteredCircularIndicator()
-                        }
-                        receiptState.imageError != null -> {
-                          ErrorMessage(errorMessage = receiptState.imageError) {
-                            viewModel.loadImage()
-                          }
-                        }
-                        receiptState.receiptImageURI == null -> {
-                          Image(
-                              modifier = Modifier.align(Alignment.Center).size(100.dp),
-                              imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
-                              contentDescription = "receipt icon")
-                        }
-                        else -> {
-                          AsyncImage(
-                              model = receiptState.receiptImageURI,
-                              modifier = Modifier.align(Alignment.Center),
-                              contentDescription = "receipt image",
-                          )
-                        }
-                      }
-                      FilledIconButton(
-                          modifier =
-                              Modifier.testTag("editImageButton")
-                                  .align(Alignment.BottomEnd)
-                                  .padding(10.dp),
-                          onClick = { viewModel.showBottomSheet() },
-                      ) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
-                      }
                     }
-                  }
-              Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                FilterChip(
-                    modifier = Modifier.testTag("expenseChip"),
-                    selected = !receiptState.incoming,
-                    onClick = { viewModel.setIncoming(false) },
-                    label = { Text("Expense") },
-                    leadingIcon = {
-                      if (!receiptState.incoming) {
-                        Icon(Icons.Filled.Check, contentDescription = "Selected")
-                      }
-                    })
-                FilterChip(
-                    modifier = Modifier.testTag("earningChip"),
-                    selected = receiptState.incoming,
-                    onClick = { viewModel.setIncoming(true) },
-                    label = { Text("Earning") },
-                    leadingIcon = {
-                      if (receiptState.incoming) {
-                        Icon(Icons.Filled.Check, contentDescription = "Selected")
-                      }
-                    })
-              }
+                }
+                OutlinedTextField(
+                    modifier = Modifier.testTag("titleField").fillMaxWidth(),
+                    value = receiptState.title,
+                    singleLine = true,
+                    onValueChange = { viewModel.setTitle(it) },
+                    label = { Text("Title") },
+                    isError = receiptState.titleError != null,
+                    supportingText = { receiptState.titleError?.let { Text(it) } })
+                OutlinedTextField(
+                    modifier = Modifier.testTag("descriptionField").fillMaxWidth(),
+                    value = receiptState.description,
+                    onValueChange = { viewModel.setDescription(it) },
+                    label = { Text("Description") },
+                    minLines = 3,
+                    supportingText = {})
+                OutlinedTextField(
+                    modifier = Modifier.testTag("amountField").fillMaxWidth(),
+                    value = receiptState.amount,
+                    singleLine = true,
+                    onValueChange = { viewModel.setAmount(it) },
+                    label = { Text("Amount") },
+                    keyboardOptions =
+                    KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+                    isError = receiptState.amountError != null,
+                    supportingText = { receiptState.amountError?.let { Text(it) } })
+                DatePickerWithDialog(
+                    modifier = Modifier.testTag("dateField").fillMaxWidth(),
+                    value = receiptState.date,
+                    onDateSelect = { viewModel.setDate(it) },
+                    label = { Text("Date") },
+                    isError = receiptState.dateError != null,
+                    supportingText = { receiptState.dateError?.let { Text(it) } })
+                Card(
+                    modifier =
+                    Modifier.testTag("imageCard")
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .padding(top = 15.dp, bottom = 5.dp)
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        when {
+                            receiptState.imageLoading -> {
+                                CenteredCircularIndicator()
+                            }
 
-              Column {
-                Button(
-                    modifier = Modifier.testTag("saveButton").fillMaxWidth(),
-                    onClick = { viewModel.saveReceipt() },
-                    content = { Text("Save") })
-                OutlinedButton(
-                    modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
-                    onClick = { viewModel.deleteReceipt() },
-                    content = {
-                      Text(
-                          if (receiptState.isNewReceipt) {
-                            "Cancel"
-                          } else {
-                            "Delete"
-                          })
-                    },
-                    colors =
+                            receiptState.imageError != null -> {
+                                ErrorMessage(errorMessage = receiptState.imageError) {
+                                    viewModel.loadImage()
+                                }
+                            }
+
+                            receiptState.receiptImageURI == null -> {
+                                Image(
+                                    modifier = Modifier.align(Alignment.Center).size(100.dp),
+                                    imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
+                                    contentDescription = "receipt icon"
+                                )
+                            }
+
+                            else -> {
+                                AsyncImage(
+                                    model = receiptState.receiptImageURI,
+                                    modifier = Modifier.align(Alignment.Center),
+                                    contentDescription = "receipt image",
+                                )
+                            }
+                        }
+                        FilledIconButton(
+                            modifier =
+                            Modifier.testTag("editImageButton")
+                                .align(Alignment.BottomEnd)
+                                .padding(10.dp),
+                            onClick = { viewModel.showBottomSheet() },
+                        ) {
+                            Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                        }
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    FilterChip(
+                        modifier = Modifier.testTag("expenseChip"),
+                        selected = !receiptState.incoming,
+                        onClick = { viewModel.setIncoming(false) },
+                        label = { Text("Expense") },
+                        leadingIcon = {
+                            if (!receiptState.incoming) {
+                                Icon(Icons.Filled.Check, contentDescription = "Selected")
+                            }
+                        })
+                    FilterChip(
+                        modifier = Modifier.testTag("earningChip"),
+                        selected = receiptState.incoming,
+                        onClick = { viewModel.setIncoming(true) },
+                        label = { Text("Earning") },
+                        leadingIcon = {
+                            if (receiptState.incoming) {
+                                Icon(Icons.Filled.Check, contentDescription = "Selected")
+                            }
+                        })
+                }
+
+                Column {
+                    Button(
+                        modifier = Modifier.testTag("saveButton").fillMaxWidth(),
+                        onClick = { viewModel.saveReceipt() },
+                        content = { Text("Save") })
+                    OutlinedButton(
+                        modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
+                        onClick = { viewModel.deleteReceipt() },
+                        content = {
+                            Text(
+                                if (receiptState.isNewReceipt) {
+                                    "Cancel"
+                                } else {
+                                    "Delete"
+                                }
+                            )
+                        },
+                        colors =
                         ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error))
-              }
+                            contentColor = MaterialTheme.colorScheme.error
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                    )
+                }
 
-              Spacer(modifier = Modifier.weight(1.0f))
+                Spacer(modifier = Modifier.weight(1.0f))
             }
+
+            PullRefreshIndicator(receiptState.refresh, pullRefreshState, Modifier.align(Alignment.TopCenter))
+        }
 
         PhotoSelectionSheet(
             visible = receiptState.showBottomSheet,
