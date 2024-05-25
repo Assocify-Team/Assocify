@@ -22,25 +22,23 @@ class ReceiptListViewModel(
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState>
 
-    private val loadSystem = SyncSystem(
-        {_uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null)},
-        {_uiState.value = _uiState.value.copy(loading = false, refresh = false, error = it) }
-    )
+  private val loadSystem =
+      SyncSystem(
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = it) })
 
-    private val refreshSystem = SyncSystem(
-        { updateReceipts() },
-        {error ->
+  private val refreshSystem =
+      SyncSystem(
+          { updateReceipts() },
+          { error ->
             _uiState.value = _uiState.value.copy(refresh = false)
             Log.e("ReceiptListScreen", error)
-        }
-    )
+          })
 
   init {
     uiState = _uiState
     updateReceipts()
   }
-
-
 
   fun updateReceipts() {
     if (!loadSystem.start(2)) return
@@ -51,21 +49,16 @@ class ReceiptListViewModel(
     updateAllReceipts()
   }
 
-    fun refreshReceipts() {
-        if (!refreshSystem.start(2)) return
+  fun refreshReceipts() {
+    if (!refreshSystem.start(2)) return
 
-        _uiState.value = _uiState.value.copy(refresh = true)
+    _uiState.value = _uiState.value.copy(refresh = true)
 
-        // two callbacks !
-        receiptsDatabase.updateCaches(
-            onSuccess = { _, _ ->
-                refreshSystem.end()
-            },
-            onFailure = { _, _ ->
-                refreshSystem.end("Error refreshing receipts")
-            }
-        )
-    }
+    // two callbacks !
+    receiptsDatabase.updateCaches(
+        onSuccess = { _, _ -> refreshSystem.end() },
+        onFailure = { _, _ -> refreshSystem.end("Error refreshing receipts") })
+  }
 
   /** Update the user's receipts */
   private fun updateUserReceipts() {
