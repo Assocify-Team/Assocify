@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
@@ -60,6 +62,8 @@ import com.github.se.assocify.ui.util.PriceUtil
 fun AccountingDetailedScreen(
     page: AccountingPage,
     navigationActions: NavigationActions,
+    subCategory: AccountingSubCategory?,
+    snackbarState: SnackbarHostState,
     budgetDetailedViewModel: BudgetDetailedViewModel,
     balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
@@ -73,13 +77,7 @@ fun AccountingDetailedScreen(
       topBar = {
         CenterAlignedTopAppBar(
             title = {
-              Text(
-                  text =
-                      when (page) {
-                        AccountingPage.BALANCE -> balanceState.subCategory!!.name
-                        AccountingPage.BUDGET -> budgetState.subCategory!!.name
-                      },
-                  style = MaterialTheme.typography.titleLarge)
+              Text(text = subCategory!!.name, style = MaterialTheme.typography.titleLarge)
             },
             navigationIcon = {
               IconButton(
@@ -121,11 +119,7 @@ fun AccountingDetailedScreen(
       },
       snackbarHost = {
         SnackbarHost(
-            hostState =
-                when (page) {
-                  AccountingPage.BALANCE -> balanceState.snackbarState
-                  AccountingPage.BUDGET -> budgetState.snackbarState
-                },
+            hostState = snackbarState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { innerPadding ->
         // Call the various editing popups
@@ -154,11 +148,7 @@ fun AccountingDetailedScreen(
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                   balanceDetailedViewModel.onStatusFilter(
-                      if (it == "All Status") {
-                        null
-                      } else {
-                        Status.valueOf(it)
-                      })
+                      it.takeIf { it != "All Status" }?.let { Status.valueOf(it) })
                 }
               }
 
