@@ -74,19 +74,10 @@ fun AccountingDetailedScreen(
   val totalAmount =
       when (page) {
         AccountingPage.BUDGET ->
-            if (!budgetState.filterActive) budgetState.budgetList.sumOf { it.amount }
-            else
-                budgetState.budgetList.sumOf {
-                  it.amount + (it.amount * it.tva.rate / 100f).toInt()
-                }
+            budgetState.budgetList.sumOf { it.getAmount(budgetState.filterActive) }
         AccountingPage.BALANCE ->
-            if (!balanceState.filterActive) balanceState.balanceList.sumOf { it.amount }
-            else
-                balanceState.balanceList.sumOf {
-                  it.amount + (it.amount * it.tva.rate / 100f).toInt()
-                }
+            balanceState.balanceList.sumOf { it.getAmount(budgetState.filterActive) }
       }
-
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
@@ -277,14 +268,11 @@ fun DisplayBudgetItem(
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = {
         Text(
-            if (budgetState.filterActive)
-                PriceUtil.fromCents(
-                    budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt())
-            else PriceUtil.fromCents(budgetItem.amount),
+            PriceUtil.fromCents(budgetItem.getAmount(budgetState.filterActive)),
             style = MaterialTheme.typography.bodyMedium)
       },
       supportingContent = {
-        if (budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description)
+                          Text(budgetItem.getDescription())
       },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
@@ -309,12 +297,7 @@ fun DisplayBalanceItem(
       trailingContent = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text(
-              text =
-                  if (balanceState.filterActive)
-                      PriceUtil.fromCents(
-                          balanceItem.amount +
-                              (balanceItem.amount * balanceItem.tva.rate / 100f).toInt())
-                  else PriceUtil.fromCents(balanceItem.amount),
+              text = PriceUtil.fromCents(balanceItem.getAmount(balanceState.filterActive)),
               modifier = Modifier.padding(end = 4.dp),
               style = MaterialTheme.typography.bodyMedium)
         }
