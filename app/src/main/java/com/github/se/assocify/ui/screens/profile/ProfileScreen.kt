@@ -248,58 +248,46 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                         }
 
                     // log out button (for everyone)
-                    TextButton(
-                        onClick = { viewmodel.logout() },
-                        modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-                        contentPadding = ButtonDefaults.TextButtonContentPadding,
-                        colors =
-                            ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.error)) {
-                          Icon(
-                              imageVector = Icons.AutoMirrored.Filled.Logout,
-                              contentDescription = "Log out Icon")
-                          Spacer(modifier = Modifier.padding(4.dp))
-                          Text(text = "Log out", textAlign = TextAlign.Center)
-                        }
+                    LogoutButton(viewmodel = viewmodel)
                   }
-            }
 
-        // open dialog to edit member
-        if (state.openEdit) {
-          Dialog(onDismissRequest = { viewmodel.controlNameEdit(false) }) {
-            ElevatedCard {
-              Column(
-                  modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                  horizontalAlignment = Alignment.CenterHorizontally) {
-                    OutlinedTextField(
-                        value = state.modifyingName,
-                        singleLine = true,
-                        onValueChange = { viewmodel.modifyName(it) },
-                        label = { Text("Edit your name") },
-                        modifier = Modifier.fillMaxWidth().testTag("editName"))
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                          OutlinedButton(
-                              onClick = { viewmodel.confirmModifyName() },
-                              modifier =
-                                  Modifier.wrapContentSize()
-                                      .weight(1f)
-                                      .testTag("confirmModifyButton")) {
-                                Text(text = "Confirm", textAlign = TextAlign.Center)
+              // open dialog to edit member
+              if (state.openEdit) {
+                Dialog(onDismissRequest = { viewmodel.controlNameEdit(false) }) {
+                  ElevatedCard {
+                    Column(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                          OutlinedTextField(
+                              value = state.modifyingName,
+                              singleLine = true,
+                              onValueChange = { viewmodel.modifyName(it) },
+                              label = { Text("Edit your name") },
+                              modifier = Modifier.fillMaxWidth().testTag("editName"))
+                          Row(
+                              modifier = Modifier.fillMaxWidth().padding(4.dp),
+                              horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                OutlinedButton(
+                                    onClick = { viewmodel.confirmModifyName() },
+                                    modifier =
+                                        Modifier.wrapContentSize()
+                                            .weight(1f)
+                                            .testTag("confirmModifyButton")) {
+                                      Text(text = "Confirm", textAlign = TextAlign.Center)
+                                    }
                               }
                         }
                   }
-            }
-          }
-        }
+                }
+              }
 
-        // open bottom sheet to select a (profile) picture
-        PhotoSelectionSheet(
-            visible = state.showPicOptions,
-            hideSheet = { viewmodel.controlBottomSheet(false) },
-            setImageUri = { viewmodel.setImage(it) },
-            signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
+              // open bottom sheet to select a (profile) picture
+              PhotoSelectionSheet(
+                  visible = state.showPicOptions,
+                  hideSheet = { viewmodel.controlBottomSheet(false) },
+                  setImageUri = { viewmodel.setImage(it) },
+                  signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
+            }
       }
 }
 
