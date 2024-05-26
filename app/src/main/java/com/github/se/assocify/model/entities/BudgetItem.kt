@@ -24,7 +24,7 @@ data class BudgetItem(
     else this.amount
   }
 
-  fun getDescription(): String {
+  fun getFormattedDescription(): String {
     return this.description.ifEmpty { "-" }
   }
 }

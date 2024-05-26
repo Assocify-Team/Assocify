@@ -250,7 +250,7 @@ fun DisplayBudgetItem(
             PriceUtil.fromCents(budgetItem.getAmount(budgetState.filterActive)),
             style = MaterialTheme.typography.bodyMedium)
       },
-      supportingContent = { Text(budgetItem.getDescription()) },
+      supportingContent = { Text(budgetItem.getFormattedDescription()) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
