@@ -17,10 +17,13 @@ class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : 
           { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
           { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = it) })
 
-  private val refreshSystem = SyncSystem({ updateTasks() }, {
-      _uiState.value = _uiState.value.copy(refresh = false)
-      showSnackbar(it)
-  })
+  private val refreshSystem =
+      SyncSystem(
+          { updateTasks() },
+          {
+            _uiState.value = _uiState.value.copy(refresh = false)
+            showSnackbar(it)
+          })
 
   init {
     uiState = _uiState
