@@ -4,12 +4,23 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
+import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : ViewModel() {
   private val _uiState = MutableStateFlow(EventTaskState())
   val uiState: StateFlow<EventTaskState>
+
+  private val loadSystem =
+      SyncSystem(
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = it) })
+
+  private val refreshSystem = SyncSystem({ updateTasks() }, {
+      _uiState.value = _uiState.value.copy(refresh = false)
+      showSnackbar(it)
+  })
 
   init {
     uiState = _uiState
@@ -18,14 +29,23 @@ class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : 
 
   /** Updates the list of tasks in the UI. */
   fun updateTasks() {
+    if (!loadSystem.start(1)) return
+
     _uiState.value = _uiState.value.copy(loading = true, error = null)
+
     db.getTasks(
         { tasks ->
-          _uiState.value = _uiState.value.copy(loading = false, error = null)
           _uiState.value = _uiState.value.copy(tasks = tasks)
           filterTasks()
+          loadSystem.end()
         },
-        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks") })
+        { loadSystem.end("Error loading tasks") })
+  }
+
+  fun refreshTasks() {
+    if (!refreshSystem.start(1)) return
+    _uiState.value = _uiState.value.copy(refresh = true)
+    db.updateTaskCache({ refreshSystem.end() }, { refreshSystem.end("Could not refresh tasks") })
   }
 
   /**
@@ -92,6 +112,7 @@ class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : 
 data class EventTaskState(
     val loading: Boolean = false,
     val error: String? = null,
+    val refresh: Boolean = false,
     val tasks: List<Task> = emptyList(),
     val filteredTasks: List<Task> = emptyList(),
     val filteredEvents: List<Event> = emptyList(),
