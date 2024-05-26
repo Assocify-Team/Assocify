@@ -93,7 +93,15 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
         }
 
         if (state.error != null) {
-          ErrorMessage(errorMessage = state.error) { viewmodel.loadProfile() }
+          Column(
+              modifier = Modifier.padding(innerPadding).fillMaxSize(),
+              verticalArrangement = Arrangement.Center,
+              horizontalAlignment = Alignment.CenterHorizontally) {
+                ErrorMessage(errorMessage = state.error, Modifier.padding(8.dp)) {
+                  viewmodel.loadProfile()
+                }
+                LogoutButton(viewmodel = viewmodel)
+              }
           return@Scaffold
         }
 
@@ -227,19 +235,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   }
 
               // log out button (for everyone)
-              TextButton(
-                  onClick = { viewmodel.logout() },
-                  modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-                  contentPadding = ButtonDefaults.TextButtonContentPadding,
-                  colors =
-                      ButtonDefaults.textButtonColors(
-                          contentColor = MaterialTheme.colorScheme.error)) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Log out Icon")
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    Text(text = "Log out", textAlign = TextAlign.Center)
-                  }
+              LogoutButton(viewmodel = viewmodel)
             }
 
         // open dialog to edit member
@@ -278,5 +274,19 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
             hideSheet = { viewmodel.controlBottomSheet(false) },
             setImageUri = { viewmodel.setImage(it) },
             signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
+      }
+}
+
+@Composable
+fun LogoutButton(viewmodel: ProfileViewModel) {
+  // log out button (for everyone)
+  TextButton(
+      onClick = { viewmodel.logout() },
+      modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
+      contentPadding = ButtonDefaults.TextButtonContentPadding,
+      colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+        Icon(imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = "Log out Icon")
+        Spacer(modifier = Modifier.padding(4.dp))
+        Text(text = "Log out", textAlign = TextAlign.Center)
       }
 }

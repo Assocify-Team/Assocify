@@ -31,7 +31,7 @@ class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : Supabase
   }
 
   /**
-   * Updates the cache of associations from the database.
+   * Updates the cache of associations from the database. Also invalidates the member cache.
    *
    * @param onSuccess called on success with the map of associations (id, association)
    * @param onFailure called on failure
@@ -40,6 +40,7 @@ class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : Supabase
     tryAsync(onFailure, tag = "updateCache") {
       val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
       associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
+      memberCache = null
       onSuccess(associationCache)
     }
   }
@@ -261,6 +262,50 @@ class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : Supabase
               .select { filter { PermissionRole::associationId eq associationId } }
               .decodeList<PermissionRole>()
       onSuccess(roles)
+    }
+  }
+
+  @Serializable
+  private data class MemberOf(
+      @SerialName("users") val user: User,
+      @SerialName("role") val role: PermissionRole,
+  )
+
+  private var memberCache: Pair<String, List<AssociationMember>>? = null
+
+  /**
+   * Gets the members of an association. Lightly cached. If `associationId` isn't in the association
+   * cache, the cache is refreshed. If it still isn't, the failure callback is called.
+   *
+   * @param associationId the association to get the members for
+   * @param onSuccess called on success with the list of members
+   * @param onFailure called on failure
+   */
+  fun getMembers(
+      associationId: String,
+      onSuccess: (List<AssociationMember>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    if (memberCache?.first == associationId) {
+      onSuccess(memberCache!!.second)
+      return
+    }
+
+    val association = associationCache[associationId]
+    if (association != null) {
+      tryAsync(onFailure, tag = "getMembers") {
+        val members =
+            db.from("member_of")
+                .select(Columns.list("users(*)", "role!inner(*)")) {
+                  filter { eq("role.association_id", associationId) }
+                }
+                .decodeList<MemberOf>()
+                .map { AssociationMember(it.user, association, it.role) }
+        memberCache = associationId to members
+        onSuccess(members)
+      }
+    } else {
+      onFailure(Exception("Association not found"))
     }
   }
 

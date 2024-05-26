@@ -20,7 +20,7 @@ import kotlinx.coroutines.test.setMain
 
 object APITestUtils {
   val USER = User("DEADBEEF-0000-0000-0000-000000000000", "API Test User", "test@example.com")
-  val USER_JSON = """{"uid":"${USER.uid}", "name": "${USER.name}}"""
+  val USER_JSON = """{"uid":"${USER.uid}", "name": "${USER.name}", "email": "${USER.email}"}"""
   val ASSOCIATION =
       Association(
           "13379999-0000-0000-0000-000000000000",
