@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import android.net.Uri
 import android.util.Log
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
@@ -11,6 +12,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
@@ -84,5 +86,9 @@ object APITestUtils {
     // Workaround for supabase internals that create a class unsupported on Linux.
     mockkStatic(::createDefaultResumableCache)
     every { createDefaultResumableCache() } returns MemoryResumableCache()
+
+    // Mock android.net.Uri `fromFile`:
+    mockkStatic(Uri::class)
+    every { Uri.fromFile(any()) } answers { mockk() }
   }
 }
