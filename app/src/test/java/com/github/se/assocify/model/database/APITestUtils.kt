@@ -9,11 +9,18 @@ import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.storage.BucketApi
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.UploadData
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.mockkStatic
+import java.io.File
+import java.nio.file.Path
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -90,5 +97,47 @@ object APITestUtils {
     // Mock android.net.Uri `fromFile`:
     mockkStatic(Uri::class)
     every { Uri.fromFile(any()) } answers { mockk() }
+  }
+
+  fun setupImageCacher(error: () -> Boolean): Path {
+    val fileMock = mockk<File>()
+    val cachePath = mockk<Path>()
+
+    every { fileMock.exists() } returns false
+    every { fileMock.mkdirs() } returns true
+    every { fileMock.delete() } returns true
+    every { fileMock.lastModified() } returns 0L
+    every { fileMock.toPath() } returns cachePath
+    every { fileMock.renameTo(any()) } returns true
+
+    every { cachePath.resolve(any<String>()) } returns cachePath
+    every { cachePath.resolve(any<Path>()) } returns cachePath
+    every { cachePath.toFile() } returns fileMock
+
+    val mockBucketApi = mockk<BucketApi>(relaxUnitFun = true)
+    // Note: this doesn't work. `upload` with a URI is inlined,
+    // but in the inline `applicationContext` is called, which throws an error.
+    // So we can't mock uploading.
+    coEvery { mockBucketApi.upload(any(), any<UploadData>(), any()) } answers
+        {
+          if (error()) {
+            throw Exception("error = true, HTTP should throw error")
+          } else {
+            firstArg()
+          }
+        }
+    coEvery { mockBucketApi.downloadAuthenticated(any(), any(), any()) } answers
+        {
+          if (error()) {
+            throw Exception("error = true, HTTP should throw error")
+          }
+        }
+
+    val mockStorageImpl = mockk<Storage>(relaxUnitFun = true)
+    every { mockStorageImpl[any()] } returns mockBucketApi
+
+    mockkObject(Storage)
+    every { Storage.create(any(), any()) } returns mockStorageImpl
+    return cachePath
   }
 }
