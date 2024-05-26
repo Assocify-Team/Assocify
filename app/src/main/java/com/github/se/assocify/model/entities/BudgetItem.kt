@@ -1,7 +1,5 @@
 package com.github.se.assocify.model.entities
 
-import androidx.compose.material3.Text
-
 /**
  * Represents an item in the budget sheet For example some sweater in the category Logistics Pole
  *
@@ -20,11 +18,13 @@ data class BudgetItem(
     val description: String,
     val subcategoryUID: String,
     val year: Int
-){
-    fun getAmount(tvaActive: Boolean): Int{
-        return  if (tvaActive) this.amount + (this.amount * this.tva.rate / 100f).toInt() else this.amount
-    }
-    fun getDescription(): String{
-        return this.description.ifEmpty { "-" }
-}
+) {
+  fun getAmount(tvaActive: Boolean): Int {
+    return if (tvaActive) this.amount + (this.amount * this.tva.rate / 100f).toInt()
+    else this.amount
+  }
+
+  fun getDescription(): String {
+    return this.description.ifEmpty { "-" }
+  }
 }

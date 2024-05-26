@@ -1,6 +1,5 @@
 package com.github.se.assocify.model.entities
 
-import androidx.compose.material3.Text
 import java.time.LocalDate
 
 /**
@@ -28,11 +27,11 @@ data class BalanceItem(
     val date: LocalDate,
     val assignee: String,
     val status: Status,
-){
-    fun getAmount(tvaActive: Boolean): Int{
-        return  if (tvaActive) this.amount + (this.amount * this.tva.rate / 100f).toInt() else this.amount
-    }
-
+) {
+  fun getAmount(tvaActive: Boolean): Int {
+    return if (tvaActive) this.amount + (this.amount * this.tva.rate / 100f).toInt()
+    else this.amount
+  }
 }
 
 /**

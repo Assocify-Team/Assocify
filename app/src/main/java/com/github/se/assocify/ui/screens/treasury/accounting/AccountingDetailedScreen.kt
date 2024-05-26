@@ -42,11 +42,9 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayCreateBalance
-import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEditBalance
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalancePopUpScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.DisplayCreateBudget
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.DisplayEditBudget
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetPopUpScreen
 import com.github.se.assocify.ui.util.PriceUtil
 
 /**
@@ -71,13 +69,6 @@ fun AccountingDetailedScreen(
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("HT", "TTC")
 
-  val totalAmount =
-      when (page) {
-        AccountingPage.BUDGET ->
-            budgetState.budgetList.sumOf { it.getAmount(budgetState.filterActive) }
-        AccountingPage.BALANCE ->
-            balanceState.balanceList.sumOf { it.getAmount(budgetState.filterActive) }
-      }
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
@@ -101,15 +92,10 @@ fun AccountingDetailedScreen(
               IconButton(
                   onClick = {
                     // Sets the editing state to true
-                    when (page) {
-                      AccountingPage.BALANCE ->
-                          if (balanceState.subCategory != null) {
-                            balanceDetailedViewModel.startSubCategoryEditingInBalance()
-                          }
-                      AccountingPage.BUDGET ->
-                          if (budgetState.subCategory != null) {
-                            budgetDetailedViewModel.startSubCategoryEditingInBudget()
-                          }
+                    if (page == AccountingPage.BALANCE && balanceState.subCategory != null) {
+                      balanceDetailedViewModel.startSubCategoryEditingInBalance()
+                    } else if (page == AccountingPage.BUDGET && budgetState.subCategory != null) {
+                      budgetDetailedViewModel.startSubCategoryEditingInBudget()
                     }
                   },
                   modifier = Modifier.testTag("editSubCat")) {
@@ -143,8 +129,8 @@ fun AccountingDetailedScreen(
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { innerPadding ->
         // Call the various editing popups
-        if (budgetState.editing && page == AccountingPage.BUDGET) {
-          DisplayEditBudget(budgetDetailedViewModel)
+        if ((budgetState.editing || budgetState.creating) && page == AccountingPage.BUDGET) {
+          BudgetPopUpScreen(budgetViewModel = budgetDetailedViewModel)
         } else if ((budgetState.subCatEditing && page == AccountingPage.BUDGET) ||
             (balanceState.subCatEditing && page == AccountingPage.BALANCE)) {
           DisplayEditSubCategory(
@@ -154,12 +140,9 @@ fun AccountingDetailedScreen(
               navigationActions,
               balanceState,
               budgetState)
-        } else if (balanceState.editing && page == AccountingPage.BALANCE) {
-          DisplayEditBalance(balanceDetailedViewModel)
-        } else if (budgetState.creating && page == AccountingPage.BUDGET) {
-          DisplayCreateBudget(budgetViewModel = budgetDetailedViewModel)
-        } else if (balanceState.creating && page == AccountingPage.BALANCE) {
-          DisplayCreateBalance(balanceDetailedViewModel)
+        } else if ((balanceState.editing || balanceState.creating) &&
+            page == AccountingPage.BALANCE) {
+          BalancePopUpScreen(balanceDetailedViewModel = balanceDetailedViewModel)
         }
 
         LazyColumn(
@@ -197,7 +180,10 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (balanceState.balanceList.isNotEmpty()) {
-                item { TotalItems(totalAmount) }
+                item {
+                  TotalItems(
+                      balanceState.balanceList.sumOf { it.getAmount(budgetState.filterActive) })
+                }
               } else {
                 item {
                   Text(
@@ -213,7 +199,10 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (budgetState.budgetList.isNotEmpty()) {
-                item { TotalItems(totalAmount) }
+                item {
+                  TotalItems(
+                      budgetState.budgetList.sumOf { it.getAmount(budgetState.filterActive) })
+                }
               } else {
                 item {
                   Text(
@@ -271,9 +260,7 @@ fun DisplayBudgetItem(
             PriceUtil.fromCents(budgetItem.getAmount(budgetState.filterActive)),
             style = MaterialTheme.typography.bodyMedium)
       },
-      supportingContent = {
-                          Text(budgetItem.getDescription())
-      },
+      supportingContent = { Text(budgetItem.getDescription()) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
