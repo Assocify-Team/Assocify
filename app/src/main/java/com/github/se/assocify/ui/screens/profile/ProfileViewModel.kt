@@ -7,6 +7,9 @@ import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -311,9 +314,9 @@ enum class AssociationSettings {
 
   fun getIcon(): ImageVector {
     return when (this) {
-      Members -> Icons.Default.People
-      TreasuryTags -> Icons.Default.Savings
-      Events -> Icons.Default.Event
+      Members -> Icons.Outlined.People
+      TreasuryTags -> Icons.Outlined.Savings
+      Events -> Icons.Outlined.Event
     }
   }
 
