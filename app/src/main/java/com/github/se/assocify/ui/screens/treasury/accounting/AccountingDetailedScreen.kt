@@ -122,6 +122,7 @@ fun AccountingDetailedScreen(
             hostState = snackbarState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { innerPadding ->
+
         // Call the various editing popups
         if ((budgetState.editing || budgetState.creating) && page == AccountingPage.BUDGET) {
           BudgetPopUpScreen(budgetViewModel = budgetDetailedViewModel)
@@ -159,7 +160,6 @@ fun AccountingDetailedScreen(
               }
             }
           }
-
           // Display the items
           when (page) {
             AccountingPage.BALANCE -> {
