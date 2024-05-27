@@ -38,6 +38,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   private var receipts: List<Receipt>? = null
   /// The user's UID
   private var userUid: String? = CurrentUser.userUid
+  private var associationUid: String? = CurrentUser.associationUid
 
   init {
     updateCaches({ _, _ -> }, { _, _ -> })
@@ -101,8 +102,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
 
       // Update the cache
-      if (CurrentUser.userUid != userUid) {
+      if (CurrentUser.userUid != userUid || CurrentUser.associationUid != associationUid) {
         // Invalidate cache if the user changed
+        associationUid = null
         userReceipts = null
         receipts = null
       }
@@ -159,10 +161,16 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
     tryAsync(onFailure) {
       userReceipts =
           db.from("receipt")
-              .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
+              .select(columns) {
+                filter {
+                  SupabaseReceipt::userId eq CurrentUser.userUid
+                  SupabaseReceipt::associationId eq CurrentUser.associationUid
+                }
+              }
               .decodeList<SupabaseReceipt>()
               .map { it.toReceipt() }
       userUid = CurrentUser.userUid
+      associationUid = CurrentUser.associationUid
 
       onSuccess(userReceipts!!)
     }
@@ -171,8 +179,14 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   private fun updateCache(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       receipts =
-          db.from("receipt").select(columns).decodeList<SupabaseReceipt>().map { it.toReceipt() }
-
+          db.from("receipt")
+              .select(columns) {
+                filter { SupabaseReceipt::associationId eq CurrentUser.associationUid }
+              }
+              .decodeList<SupabaseReceipt>()
+              .map { it.toReceipt() }
+      userUid = CurrentUser.userUid
+      associationUid = CurrentUser.associationUid
       onSuccess(receipts!!)
     }
   }
@@ -204,7 +218,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called when the fetch fails with the exception that occurred
    */
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
-    if (userReceipts != null && userUid == CurrentUser.userUid) {
+    if (userReceipts != null &&
+        userUid == CurrentUser.userUid &&
+        associationUid == CurrentUser.associationUid) {
       onSuccess(userReceipts!!)
       return
     }
@@ -225,7 +241,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
           ?: onFailure(Exception("Receipt not found"))
     }
 
-    if (receipts != null && userUid == CurrentUser.userUid) {
+    if (receipts != null &&
+        userUid == CurrentUser.userUid &&
+        associationUid == CurrentUser.associationUid) {
       getReceiptFromCache(receipts)
       return
     }
@@ -240,7 +258,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called whenever an error has occurred with the exception that occurred
    */
   fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
-    if (receipts != null && userUid == CurrentUser.userUid) {
+    if (receipts != null &&
+        userUid == CurrentUser.userUid &&
+        associationUid == CurrentUser.associationUid) {
       onSuccess(receipts!!)
       return
     }
