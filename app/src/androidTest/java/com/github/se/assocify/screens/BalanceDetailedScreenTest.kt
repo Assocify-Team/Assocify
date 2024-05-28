@@ -114,15 +114,15 @@ class BalanceDetailedScreenTest :
               Status.Pending,
               null,
               "userId"),
-          Receipt("00000000-0000-0000-0000-000000000000",
+          Receipt(
+              "00000000-0000-0000-0000-000000000000",
               "r2",
               "a bad receipt",
               LocalDate.of(2023, 3, 11),
               28,
               Status.Approved,
               null,
-              "userId")
-      )
+              "userId"))
 
   val mockBalanceAPI: BalanceAPI =
       mockk<BalanceAPI>() {
