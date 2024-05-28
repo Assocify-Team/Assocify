@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
@@ -234,28 +235,7 @@ class BalanceDetailedViewModel(
     // update the status of the receipt
     val receipt = _uiState.value.receiptList.find { it.uid == balanceItem.receiptUID }
     if (receipt != null && receipt.status != balanceItem.status) {
-      receiptAPI.uploadReceipt(
-          receipt.copy(status = balanceItem.status),
-          {},
-          {
-            _uiState.value =
-                _uiState.value.copy(
-                    receiptList =
-                        _uiState.value.receiptList.map {
-                          if (it.uid == receipt.uid) receipt.copy(status = balanceItem.status)
-                          else it
-                        })
-          },
-          { receiptFail, _ ->
-            if (receiptFail) {
-              CoroutineScope(Dispatchers.Main).launch {
-                _uiState.value.snackbarState.showSnackbar(
-                    message = "Failed to save status of the receipt",
-                    actionLabel = "Retry",
-                )
-              }
-            }
-          })
+      modifyReceiptStatus(receipt, balanceItem.status)
     }
 
     balanceApi.updateBalance(
@@ -285,6 +265,13 @@ class BalanceDetailedViewModel(
   }
 
   fun deleteBalanceItem(balanceItemUid: String) {
+    // before deleting, put the status of receipt to pending
+    val balanceItem = _uiState.value.balanceList.find { it.uid == balanceItemUid } ?: return
+    val receipt = _uiState.value.receiptList.find { it.uid == balanceItem.receiptUID }
+    if (receipt != null) {
+      modifyReceiptStatus(receipt, Status.Pending)
+    }
+
     balanceApi.deleteBalance(
         balanceItemUid,
         {
@@ -318,6 +305,12 @@ class BalanceDetailedViewModel(
         _uiState.value.errorDate != null) {
       return
     }
+    // update the status of the receipt
+    val receipt = _uiState.value.receiptList.find { it.uid == balanceItem.receiptUID }
+    if (receipt != null && receipt.status != balanceItem.status) {
+      modifyReceiptStatus(receipt, balanceItem.status)
+    }
+
     balanceApi.addBalance(
         CurrentUser.associationUid!!,
         balanceItem.subcategoryUID,
@@ -415,6 +408,39 @@ class BalanceDetailedViewModel(
    */
   fun noReceiptSelected(selected: Boolean) {
     _uiState.value = _uiState.value.copy(noReceiptSelected = selected)
+  }
+
+  /**
+   * Modify the status receipt
+   *
+   * @param receipt the receipt to modify
+   * @param status the new status of the receipt
+   */
+  fun modifyReceiptStatus(receipt: Receipt, status: Status) {
+    receiptAPI.uploadReceipt(
+        receipt.copy(status = status),
+        {},
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  receiptList =
+                      _uiState.value.receiptList.map {
+                        if (it.uid == receipt.uid) {
+                          receipt.copy(status = status)
+                        } else it
+                      })
+          Log.d("Receipt", "Receipt status updated")
+        },
+        { receiptFail, _ ->
+          if (receiptFail) {
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarState.showSnackbar(
+                  message = "Failed to save status of the receipt",
+                  actionLabel = "Retry",
+              )
+            }
+          }
+        })
   }
 }
 

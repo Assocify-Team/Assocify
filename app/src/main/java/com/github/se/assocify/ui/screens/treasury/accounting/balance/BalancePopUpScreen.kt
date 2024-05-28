@@ -180,7 +180,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               OutlinedTextField(
                   singleLine = true,
                   isError = balanceModel.errorAmount != null,
-                  modifier = Modifier.padding(8.dp),
+                  modifier = Modifier.padding(8.dp).testTag("editAmount"),
                   value = amountString,
                   onValueChange = {
                     if (receiptUid == "") {
@@ -202,7 +202,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               ExposedDropdownMenuBox(
                   expanded = balanceTvaExpanded,
                   onExpandedChange = { balanceTvaExpanded = !balanceTvaExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                  modifier = Modifier.testTag("editTVADropdown").padding(8.dp)) {
                     OutlinedTextField(
                         value = "$tvaString%",
                         onValueChange = {},
@@ -280,7 +280,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               ExposedDropdownMenuBox(
                   expanded = statusExpanded,
                   onExpandedChange = { statusExpanded = !statusExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                  modifier = Modifier.testTag("editStatusDropdown").padding(8.dp)) {
                     OutlinedTextField(
                         value = mutableStatus.name,
                         onValueChange = {},
