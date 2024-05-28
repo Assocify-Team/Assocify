@@ -103,7 +103,7 @@ class BalanceDetailedScreenTest :
               "Sidonie Bouthors",
               Status.Reimbursed))
 
-  private val userReceipts =
+  private val receiptList =
       listOf<Receipt>(
           Receipt(
               "00000000-0000-0000-0000-000000000000",
@@ -113,7 +113,16 @@ class BalanceDetailedScreenTest :
               28,
               Status.Pending,
               null,
-              "userId"))
+              "userId"),
+          Receipt("00000000-0000-0000-0000-000000000000",
+              "r2",
+              "a bad receipt",
+              LocalDate.of(2023, 3, 11),
+              28,
+              Status.Approved,
+              null,
+              "userId")
+      )
 
   val mockBalanceAPI: BalanceAPI =
       mockk<BalanceAPI>() {
@@ -171,10 +180,10 @@ class BalanceDetailedScreenTest :
 
   val mockReceiptAPI: ReceiptAPI =
       mockk<ReceiptAPI>() {
-        every { getUserReceipts(any(), any()) } answers
+        every { getAllReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback(userReceipts)
+              onSuccessCallback(receiptList)
             }
       }
 
