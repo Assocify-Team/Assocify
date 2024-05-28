@@ -1,7 +1,9 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -185,6 +187,8 @@ class BalanceDetailedScreenTest :
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
               onSuccessCallback(receiptList)
             }
+
+        every { uploadReceipt(any(), any(), any(), any()) } answers {}
       }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
@@ -559,6 +563,43 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editConfirmButton").performClick()
       onNodeWithTag("editDialogName").assertIsNotDisplayed()
       onNodeWithText("lots of money").assertIsDisplayed()
+    }
+  }
+
+  /** Tests what happens when you select or not a receipt */
+  @Test
+  fun testReceiptAmountLinkedToBalanceAmount() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("receiptDropdown").assertIsDisplayed()
+      // select the receipt r1
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("r1").performClick()
+      onNodeWithTag("editAmount").assertIsNotEnabled()
+      onNodeWithText("0.28").assertIsDisplayed() // the amount of r1
+      assert(!balanceDetailedViewModel.uiState.value.noReceiptSelected)
+
+      // select no receipt
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("No receipt").performClick()
+      assert(balanceDetailedViewModel.uiState.value.noReceiptSelected)
+      onNodeWithTag("editAmount").assertIsEnabled().performTextInput("500")
+    }
+  }
+
+  /** Tests that status of the receipt is correctly changed */
+  @Test
+  fun testReceiptStatusLinkedToBalanceStatus() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("receiptDropdown").assertIsDisplayed()
+      // select the receipt r1
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("r1").performClick()
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
+      onNodeWithTag("editStatusDropdown").performClick()
+      onNodeWithText("Approved").performClick()
+      onNodeWithTag("editConfirmButton").performClick()
     }
   }
 }
