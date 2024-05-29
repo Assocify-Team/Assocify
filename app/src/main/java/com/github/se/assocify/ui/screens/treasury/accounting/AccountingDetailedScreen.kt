@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -269,14 +271,20 @@ fun DisplayBalanceItem(
     testTag: String
 ) {
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
+  val receipt = balanceState.receiptList.find { it.uid == balanceItem.receiptUID }
   ListItem(
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(horizontalAlignment = Alignment.End) {
           Text(
               text = PriceUtil.fromCents(balanceItem.getAmount(balanceState.filterActive)),
               modifier = Modifier.padding(end = 4.dp),
               style = MaterialTheme.typography.bodyMedium)
+
+          Icon(
+              receipt?.status?.getIcon() ?: Icons.Filled.CheckCircle,
+              contentDescription = "Status",
+          )
         }
       },
       supportingContent = { Text(balanceItem.assignee) },

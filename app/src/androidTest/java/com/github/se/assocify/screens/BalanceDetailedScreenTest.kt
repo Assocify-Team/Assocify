@@ -1,7 +1,9 @@
 package com.github.se.assocify.screens
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -103,7 +105,7 @@ class BalanceDetailedScreenTest :
               "Sidonie Bouthors",
               Status.Reimbursed))
 
-  private val userReceipts =
+  private val receiptList =
       listOf<Receipt>(
           Receipt(
               "00000000-0000-0000-0000-000000000000",
@@ -112,6 +114,15 @@ class BalanceDetailedScreenTest :
               LocalDate.of(2023, 3, 11),
               28,
               Status.Pending,
+              null,
+              "userId"),
+          Receipt(
+              "00000000-0000-0000-0000-000000000001",
+              "r2",
+              "a bad receipt",
+              LocalDate.of(2023, 3, 11),
+              28,
+              Status.Approved,
               null,
               "userId"))
 
@@ -171,11 +182,13 @@ class BalanceDetailedScreenTest :
 
   val mockReceiptAPI: ReceiptAPI =
       mockk<ReceiptAPI>() {
-        every { getUserReceipts(any(), any()) } answers
+        every { getAllReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback(userReceipts)
+              onSuccessCallback(receiptList)
             }
+
+        every { uploadReceipt(any(), any(), any(), any()) } answers { thirdArg<() -> Unit>()() }
       }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
@@ -550,6 +563,54 @@ class BalanceDetailedScreenTest :
       onNodeWithTag("editConfirmButton").performClick()
       onNodeWithTag("editDialogName").assertIsNotDisplayed()
       onNodeWithText("lots of money").assertIsDisplayed()
+    }
+  }
+
+  /** Tests what happens when you select or not a receipt */
+  @Test
+  fun testReceiptAmountLinkedToBalanceAmount() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+
+      onNodeWithTag("receiptDropdown").assertIsDisplayed()
+      // select the receipt r1
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("r1").performClick()
+      onNodeWithTag("editAmount").assertIsNotEnabled()
+      onNodeWithText("0.28").assertIsDisplayed() // the amount of r1
+      assert(!balanceDetailedViewModel.uiState.value.noReceiptSelected)
+
+      // select no receipt
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("No receipt").performClick()
+      assert(balanceDetailedViewModel.uiState.value.noReceiptSelected)
+      onNodeWithTag("editAmount").assertIsEnabled().performTextInput("500")
+    }
+  }
+
+  /** Tests that status of the receipt is correctly changed */
+  @Test
+  fun testReceiptStatusLinkedToBalanceStatus() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("lots of money")
+      onNodeWithTag("receiptDropdown").assertIsDisplayed()
+      onNodeWithTag("receiptDropdown").performClick()
+      onNodeWithText("r1").performClick()
+      onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
+      onNodeWithTag("editStatusDropdown").performClick()
+      onNodeWithText("Approved").performClick()
+      onNodeWithTag("editDialogAssignee").performTextInput("new name")
+      onNodeWithTag("editDialogDate").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012023")
+      onNodeWithText("OK").performClick()
+      onNodeWithTag("editConfirmButton").performClick()
+      verify { mockReceiptAPI.uploadReceipt(any(), any(), any(), any()) }
+      assert(
+          balanceDetailedViewModel.uiState.value.receiptList.find { it.title == "r1" }!!.status ==
+              Status.Approved)
     }
   }
 }
