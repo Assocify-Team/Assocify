@@ -92,7 +92,7 @@ fun AccountingDetailedScreen(
                     // Sets the editing state to true
                     if (page == AccountingPage.BALANCE && subCategory != null) {
                       balanceDetailedViewModel.startSubCategoryEditingInBalance()
-                    } else if (page == AccountingPage.BUDGET &&  subCategory != null) {
+                    } else if (page == AccountingPage.BUDGET && subCategory != null) {
                       budgetDetailedViewModel.startSubCategoryEditingInBudget()
                     }
                   },
