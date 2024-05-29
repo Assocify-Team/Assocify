@@ -9,14 +9,11 @@ sealed class Destination(
     @StringRes val labelId: Int? = null,
     @DrawableRes val iconId: Int? = null
 ) {
-  data object Home : Destination("home", R.string.home_tab_label, R.drawable.home_tab_icon)
 
   data object Treasury :
       Destination("treasury", R.string.treasury_tab_label, R.drawable.treasury_tab_icon)
 
   data object Event : Destination("event", R.string.event_tab_label, R.drawable.event_tab_icon)
-
-  data object Chat : Destination("chat", R.string.chat_tab_label, R.drawable.chat_tab_icon)
 
   data object Profile :
       Destination("profile", R.string.profile_tab_label, R.drawable.profile_tab_icon)
