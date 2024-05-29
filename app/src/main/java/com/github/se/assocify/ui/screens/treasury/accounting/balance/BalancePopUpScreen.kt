@@ -41,16 +41,6 @@ import com.github.se.assocify.ui.util.PriceUtil
 import java.time.LocalDate
 import java.util.UUID
 
-@Composable
-fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
-  BalancePopUpScreen(balanceDetailedViewModel)
-}
-
-@Composable
-fun DisplayCreateBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
-  BalancePopUpScreen(balanceDetailedViewModel)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
