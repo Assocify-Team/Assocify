@@ -41,7 +41,7 @@ fun NavGraphBuilder.mainNavGraph(
       accountingSubCategoryAPI)
   eventGraph(navActions, eventAPI, taskAPI)
   chatGraph(navActions)
-  profileGraph(navActions, userAPI, associationAPI)
+  profileGraph(navActions, userAPI, associationAPI, accountingCategoriesAPI, eventAPI)
   loginGraph(navActions, userAPI)
   selectAssociationGraph(navActions, userAPI, associationAPI)
   createAssociationGraph(navActions, userAPI, associationAPI)

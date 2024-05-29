@@ -2,7 +2,6 @@ package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
@@ -13,14 +12,12 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import com.github.se.assocify.ui.util.SyncSystem
+import com.github.se.assocify.ui.util.SnackbarSystem
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.math.absoluteValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class ReceiptViewModel {
 
@@ -32,6 +29,8 @@ class ReceiptViewModel {
   private val receiptUid: String
   private var receiptCreatorUid: String
 
+  private val snackbarSystem: SnackbarSystem
+
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
 
@@ -42,6 +41,7 @@ class ReceiptViewModel {
     this.receiptCreatorUid = CurrentUser.userUid!!
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = true, pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
+    snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
   }
 
   constructor(receiptUid: String, navActions: NavigationActions, receiptApi: ReceiptAPI) {
@@ -52,6 +52,7 @@ class ReceiptViewModel {
     this.receiptCreatorUid = CurrentUser.userUid!!
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
+    snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
     loadReceipt()
   }
 
@@ -191,10 +192,7 @@ class ReceiptViewModel {
   }
 
   fun signalCameraPermissionDenied() {
-    CoroutineScope(Dispatchers.Main).launch {
-      _uiState.value.snackbarHostState.showSnackbar(
-          message = "Camera permission denied", duration = SnackbarDuration.Short)
-    }
+    snackbarSystem.showSnackbar("Camera permission denied")
   }
 
   fun saveReceipt() {
@@ -209,10 +207,7 @@ class ReceiptViewModel {
     }
 
     if (_uiState.value.receiptImageURI == null) {
-      CoroutineScope(Dispatchers.Main).launch {
-        _uiState.value.snackbarHostState.showSnackbar(
-            message = "Receipt image is required", duration = SnackbarDuration.Short)
-      }
+      snackbarSystem.showSnackbar("Receipt image is required")
       return
     }
 
@@ -235,19 +230,9 @@ class ReceiptViewModel {
         onReceiptUploadSuccess = { navActions.back() },
         onFailure = { receiptFail, _ ->
           if (receiptFail) {
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Failed to save receipt",
-                  actionLabel = "Retry",
-              )
-            }
+            snackbarSystem.showSnackbar("Failed to save receipt", "Retry", { saveReceipt() })
           } else {
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Failed to save image",
-                  actionLabel = "Retry",
-              )
-            }
+            snackbarSystem.showSnackbar("Failed to save image", "Retry", { saveReceipt() })
           }
         })
   }
@@ -260,12 +245,7 @@ class ReceiptViewModel {
           id = receiptUid,
           onSuccess = { navActions.back() },
           onFailure = { _ ->
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Failed to delete receipt",
-                  actionLabel = "Retry",
-              )
-            }
+            snackbarSystem.showSnackbar("Failed to delete receipt", "Retry", { deleteReceipt() })
           })
     }
   }

@@ -27,7 +27,12 @@ data class BalanceItem(
     val date: LocalDate,
     val assignee: String,
     val status: Status,
-)
+) {
+  fun getAmount(tvaActive: Boolean): Int {
+    return if (tvaActive) this.amount + (this.amount * this.tva.rate / 100f).toInt()
+    else this.amount
+  }
+}
 
 /**
  * Represents the TVA of a budget or balance item, these types are also represented in the database

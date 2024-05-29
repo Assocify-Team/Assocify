@@ -40,6 +40,14 @@ fun BudgetDetailedScreen(
     return
   }
 
+  val subCategory = budgetState.subCategory
+  val snackbarState = budgetState.snackbarState
+
   AccountingDetailedScreen(
-      AccountingPage.BUDGET, navigationActions, budgetDetailedViewModel, balanceDetailedViewModel)
+      AccountingPage.BUDGET,
+      navigationActions,
+      subCategory,
+      snackbarState,
+      budgetDetailedViewModel,
+      balanceDetailedViewModel)
 }
