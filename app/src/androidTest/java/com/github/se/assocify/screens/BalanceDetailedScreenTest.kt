@@ -117,7 +117,7 @@ class BalanceDetailedScreenTest :
               null,
               "userId"),
           Receipt(
-              "00000000-0000-0000-0000-000000000000",
+              "00000000-0000-0000-0000-000000000001",
               "r2",
               "a bad receipt",
               LocalDate.of(2023, 3, 11),
@@ -188,7 +188,7 @@ class BalanceDetailedScreenTest :
               onSuccessCallback(receiptList)
             }
 
-        every { uploadReceipt(any(), any(), any(), any()) } answers {}
+        every { uploadReceipt(any(), any(), any(), any()) } answers { thirdArg<() -> Unit>()() }
       }
 
   lateinit var budgetDetailedViewModel: BudgetDetailedViewModel
@@ -571,6 +571,7 @@ class BalanceDetailedScreenTest :
   fun testReceiptAmountLinkedToBalanceAmount() {
     with(composeTestRule) {
       onNodeWithTag("createNewItem").performClick()
+
       onNodeWithTag("receiptDropdown").assertIsDisplayed()
       // select the receipt r1
       onNodeWithTag("receiptDropdown").performClick()
@@ -592,14 +593,24 @@ class BalanceDetailedScreenTest :
   fun testReceiptStatusLinkedToBalanceStatus() {
     with(composeTestRule) {
       onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogName").performTextClearance()
+      onNodeWithTag("editDialogName").performTextInput("lots of money")
       onNodeWithTag("receiptDropdown").assertIsDisplayed()
-      // select the receipt r1
       onNodeWithTag("receiptDropdown").performClick()
       onNodeWithText("r1").performClick()
       onNodeWithTag("editDialogColumn").performScrollToNode(hasTestTag("editConfirmButton"))
       onNodeWithTag("editStatusDropdown").performClick()
       onNodeWithText("Approved").performClick()
+      onNodeWithTag("editDialogAssignee").performTextInput("new name")
+      onNodeWithTag("editDialogDate").performClick()
+      onNodeWithContentDescription("Switch to text input mode").performClick()
+      onNodeWithContentDescription("Date", true).performClick().performTextInput("01012023")
+      onNodeWithText("OK").performClick()
       onNodeWithTag("editConfirmButton").performClick()
+      verify { mockReceiptAPI.uploadReceipt(any(), any(), any(), any()) }
+      assert(
+          balanceDetailedViewModel.uiState.value.receiptList.find { it.title == "r1" }!!.status ==
+              Status.Approved)
     }
   }
 }

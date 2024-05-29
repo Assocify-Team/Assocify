@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
-import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
@@ -429,7 +428,6 @@ class BalanceDetailedViewModel(
                           receipt.copy(status = status)
                         } else it
                       })
-          Log.d("Receipt", "Receipt status updated")
         },
         { receiptFail, _ ->
           if (receiptFail) {
