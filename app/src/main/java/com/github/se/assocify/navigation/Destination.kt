@@ -50,10 +50,4 @@ sealed class Destination(
   data class EditTask(val taskUid: String) : Destination("event/task/$taskUid")
 }
 
-val MAIN_TABS_LIST =
-    listOf(
-        Destination.Home,
-        Destination.Treasury,
-        Destination.Event,
-        Destination.Chat,
-        Destination.Profile)
+val MAIN_TABS_LIST = listOf(Destination.Treasury, Destination.Event, Destination.Profile)
