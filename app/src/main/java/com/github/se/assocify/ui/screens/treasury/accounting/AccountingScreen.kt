@@ -65,72 +65,63 @@ fun AccountingScreen(
     return
   }
 
-    PullDownRefreshBox(
-        refreshing = accountingState.refresh,
-        onRefresh = { accountingViewModel.refreshAccounting() },
+  PullDownRefreshBox(
+      refreshing = accountingState.refresh,
+      onRefresh = { accountingViewModel.refreshAccounting() },
+  ) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("AccountingScreen"),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            // display the subcategory if list is not empty
-            if (subCategoryList.isNotEmpty()) {
-                items(subCategoryList) {
-                    DisplayLine(
-                        it,
-                        "displayLine${it.name}",
-                        page,
-                        navigationActions,
-                        accountingState
-                    )
-                    HorizontalDivider(Modifier.fillMaxWidth())
-                }
-                item {
-                    val totalAmount =
-                        when (page) {
-                            AccountingPage.BUDGET -> {
-                                if (accountingState.tvaFilterActive)
-                                    accountingState.amountBudgetTTC
-                                        .filter { it.key in subCategoryList.map { it.uid } }
-                                        .values
-                                        .sum()
-                                else
-                                    accountingState.amountBudgetHT
-                                        .filter { it.key in subCategoryList.map { it.uid } }
-                                        .values
-                                        .sum()
-                            }
-
-                            AccountingPage.BALANCE -> {
-                                if (accountingState.tvaFilterActive)
-                                    accountingState.amountBalanceTTC
-                                        .filter { it.key in subCategoryList.map { it.uid } }
-                                        .values
-                                        .sum()
-                                else
-                                    accountingState.amountBalanceHT
-                                        .filter { it.key in subCategoryList.map { it.uid } }
-                                        .values
-                                        .sum()
-                            }
-                        }
-                    TotalLine(totalAmount = totalAmount)
-                }
-            } else {
-                item {
-                    Text(
-                        text = "No data available with these tags",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    )
-                }
-            }
-
-            item { Spacer(modifier = Modifier.height(80.dp)) }
+      // display the subcategory if list is not empty
+      if (subCategoryList.isNotEmpty()) {
+        items(subCategoryList) {
+          DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingState)
+          HorizontalDivider(Modifier.fillMaxWidth())
         }
+        item {
+          val totalAmount =
+              when (page) {
+                AccountingPage.BUDGET -> {
+                  if (accountingState.tvaFilterActive)
+                      accountingState.amountBudgetTTC
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                  else
+                      accountingState.amountBudgetHT
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                }
+                AccountingPage.BALANCE -> {
+                  if (accountingState.tvaFilterActive)
+                      accountingState.amountBalanceTTC
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                  else
+                      accountingState.amountBalanceHT
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                }
+              }
+          TotalLine(totalAmount = totalAmount)
+        }
+      } else {
+        item {
+          Text(
+              text = "No data available with these tags",
+              style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+          )
+        }
+      }
+
+      item { Spacer(modifier = Modifier.height(80.dp)) }
     }
+  }
 }
 
 /**
@@ -149,10 +140,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
   val category = if (model.selectedCategory != null) model.selectedCategory!!.name else "Global"
 
   // Row of dropdown filters
-  Row(
-      Modifier
-          .testTag("filterRow")
-          .horizontalScroll(rememberScrollState())) {
+  Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
     DropdownFilterChip(model.yearFilter.toString(), yearList, "yearFilterChip") {
       accountingViewModel.onYearFilter(it.toInt())
     }
@@ -175,9 +163,7 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 @Composable
 fun TotalLine(totalAmount: Int) {
   ListItem(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("totalLine"),
+      modifier = Modifier.fillMaxWidth().testTag("totalLine"),
       headlineContent = {
         Text(
             text = "Total",
@@ -226,15 +212,13 @@ fun DisplayLine(
         Text(PriceUtil.fromCents(amount), style = MaterialTheme.typography.bodyMedium)
       },
       modifier =
-      Modifier
-          .clickable {
-              when (page) {
+          Modifier.clickable {
+                when (page) {
                   AccountingPage.BUDGET ->
                       navigationActions.navigateTo(Destination.BudgetDetailed(subCategory.uid))
-
                   AccountingPage.BALANCE ->
                       navigationActions.navigateTo(Destination.BalanceDetailed(subCategory.uid))
+                }
               }
-          }
-          .testTag(testTag))
+              .testTag(testTag))
 }
