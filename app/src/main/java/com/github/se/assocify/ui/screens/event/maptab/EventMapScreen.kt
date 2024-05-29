@@ -31,11 +31,6 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
 
-// Initial position of the map (EPFL Agora)
-private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
-// Initial zoom of the map (Zoom made to be focused on the EPFL campus)
-private const val INITIAL_ZOOM = 17.0
-
 /** A screen that displays a map of the event: location with the associated tasks. */
 @Composable
 fun EventMapScreen(viewModel: EventMapViewModel) {
@@ -151,24 +146,10 @@ fun EPFLMapView(
 
   // OSM maps are displayed as an Android view component
   AndroidView(
-      factory = { mapViewState }, modifier = modifier, update = { view -> onLoad?.invoke(view) })
+    factory = { mapViewState },
+    modifier = modifier,
+    update = { view -> onLoad?.invoke(view) }
+  )
 }
 
-/**
- * The custom tile source from the EPFL plan API.
- *
- * @param floorId the floor id of the map to display
- */
-class CampusTileSource(private val floorId: Int) :
-    OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
-  override fun getTileURLString(pMapTileIndex: Long): String {
-    // Select at random the map server to use
-    val epflCampusServerCount = 3
-    // EPFL plan API has 3 servers, tilesX correspond to the server number
-    return "https://plan-epfl-tiles${Random.nextInt(epflCampusServerCount)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${
-      MapTileIndex.getZoom(
-        pMapTileIndex
-      )
-    }/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
-  }
-}
+
