@@ -1,6 +1,7 @@
 package com.github.se.assocify.ui.screens.createAssociation
 
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -11,6 +12,7 @@ import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.SnackbarSystem
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +25,8 @@ class CreateAssociationViewmodel(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(CreateAssoUIState())
   val uiState: StateFlow<CreateAssoUIState> = _uiState
+
+  private val snackbarSystem = SnackbarSystem(uiState.value.snackbarHostState)
 
   private var association =
       Association(UUID.randomUUID().toString(), _uiState.value.name, "", LocalDate.now())
@@ -171,10 +175,14 @@ class CreateAssociationViewmodel(
                     _uiState.value.nameError == null)
   }
 
+  var currentlySaving = false
   /*
    * Saves the association in the database
    */
   fun saveAsso() {
+    if (currentlySaving) return
+
+    currentlySaving = true
     assoAPI.addAssociation(
         association,
         onSuccess = {
@@ -183,12 +191,17 @@ class CreateAssociationViewmodel(
               _uiState.value.members,
               {
                 CurrentUser.associationUid = association.uid
-                userAPI.updateCurrentUserAssociationCache({ navActions.goFromCreateAsso() }, {})
+                currentlySaving = false
+                // Navigate in both cases, so that the error shows up in the profile
+                userAPI.updateCurrentUserAssociationCache(
+                    { navActions.goFromCreateAsso() }, { navActions.goFromCreateAsso() })
               },
-              {})
+              {}) // Exception not dealt with, to do in v1.1 (use server funcs, it's atomic)
         },
         onFailure = { exception ->
+          currentlySaving = false
           Log.e("CreateAssoViewModel", "Failed to add asso: ${exception.message}")
+          snackbarSystem.showSnackbar("Failed to create association.", "Retry", this::saveAsso)
         })
   }
 }
@@ -205,5 +218,6 @@ data class CreateAssoUIState(
         (members.any { member -> member.user.uid == CurrentUser.userUid }) &&
             name.isNotBlank(), // whether the association can be saved
     val nameError: String? = null, // error message when the name is invalid
+    val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     // there should be a logo val but not implemented yet
 )

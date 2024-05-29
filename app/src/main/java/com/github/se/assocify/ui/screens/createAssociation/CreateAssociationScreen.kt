@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -71,6 +72,7 @@ fun CreateAssociationScreen(
             },
             title = { Text(text = "Create your association") })
       },
+      snackbarHost = { SnackbarHost(state.snackbarHostState) },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
