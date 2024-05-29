@@ -35,6 +35,8 @@ fun ProfileEventsScreen(
     navActions: NavigationActions,
     profileEventsViewModel: ProfileEventsViewModel
 ) {
+  val state by profileEventsViewModel.uiState.collectAsState()
+
   Scaffold(
       modifier = Modifier.testTag("ProfileEvents Screen"),
       topBar = {
@@ -50,13 +52,13 @@ fun ProfileEventsScreen(
             })
       },
       floatingActionButton = {
-        FloatingActionButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("addEventButton")) {
-          Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-        }
+        FloatingActionButton(
+            onClick = { profileEventsViewModel.openAddEvent() },
+            modifier = Modifier.testTag("addEventButton")) {
+              Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+            }
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) {
-        val state by profileEventsViewModel.uiState.collectAsState()
-
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(it),
         ) {
@@ -68,12 +70,14 @@ fun ProfileEventsScreen(
                   trailingContent = {
                     Row {
                       IconButton(
-                          onClick = { /*TODO*/}, modifier = Modifier.testTag("editEventButton")) {
+                          onClick = { profileEventsViewModel.modifyEvent(event) },
+                          modifier = Modifier.testTag("editEventButton")) {
                             Icon(Icons.Default.Edit, contentDescription = "Edit")
                           }
 
                       IconButton(
-                          onClick = { /*TODO*/}, modifier = Modifier.testTag("deleteEventButton")) {
+                          onClick = { profileEventsViewModel.deleteEvent(event) },
+                          modifier = Modifier.testTag("deleteEventButton")) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete")
                           }
                     }
