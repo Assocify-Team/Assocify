@@ -11,7 +11,6 @@ import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
@@ -23,11 +22,9 @@ import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownOption
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.github.se.assocify.ui.util.SnackbarSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 /**
  * This ViewModel is used to manage the UI state of the profile screen. It is used to get the user's
@@ -45,6 +42,8 @@ class ProfileViewModel(
 ) : ViewModel() {
   private val _uiState = MutableStateFlow(ProfileUIState())
   val uiState: StateFlow<ProfileUIState> = _uiState
+
+  private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
 
   private var loadCounter = 0 // number of things loading
 
@@ -186,10 +185,7 @@ class ProfileViewModel(
         },
         {
           CurrentUser.associationUid = oldAssociationUid
-          CoroutineScope(Dispatchers.Main).launch {
-            _uiState.value.snackbarHostState.showSnackbar(
-                message = "Couldn't switch association", duration = SnackbarDuration.Short)
-          }
+          snackbarSystem.showSnackbar("Couldn't switch association")
         })
   }
 
@@ -208,10 +204,7 @@ class ProfileViewModel(
           },
           {
             _uiState.value = _uiState.value.copy(openEdit = false)
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Couldn't change name", duration = SnackbarDuration.Short)
-            }
+            snackbarSystem.showSnackbar("Couldn't change name")
           })
     }
   }
@@ -237,10 +230,7 @@ class ProfileViewModel(
 
   /** This function is used to signal to the user that the camera permission was denied. */
   fun signalCameraPermissionDenied() {
-    CoroutineScope(Dispatchers.Main).launch {
-      _uiState.value.snackbarHostState.showSnackbar(
-          message = "Camera permission denied", duration = SnackbarDuration.Short)
-    }
+    snackbarSystem.showSnackbar("Camera permission denied")
   }
 
   fun logout() {
