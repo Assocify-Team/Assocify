@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.DateTimeUtil
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import java.time.LocalTime
 
 class ProfileEventsViewModel(private val eventAPI: EventAPI, navActions: NavigationActions) :
     ViewModel() {
@@ -65,21 +68,57 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI, navActions: Navigat
     _uiState.value = _uiState.value.copy(openDialogue = true)
   }
 
+  fun updateNewName(name: String) {
+    _uiState.value = _uiState.value.copy(newName = name)
+  }
+
+  fun updateNewDescription(description: String) {
+    _uiState.value = _uiState.value.copy(newDescription = description)
+  }
+
+  fun updateNewStartDate(startDate: LocalDate?) {
+      startDate?.let { _uiState.value = _uiState.value.copy(newStartDate = it) }
+  }
+
+
+  fun updateNewEndDate(endDate: LocalDate?) {
+    endDate?.let { _uiState.value = _uiState.value.copy(newEndDate = endDate) }
+  }
+
+  fun updateNewGuestsOrArtists(guestsOrArtists: String) {
+    _uiState.value = _uiState.value.copy(newGuestsOrArtists = guestsOrArtists)
+  }
+
+  fun updateNewLocation(location: String) {
+    _uiState.value = _uiState.value.copy(newLocation = location)
+  }
+
   /** Adds the event that is being created */
   fun confirmAddEvent() {
     val event =
         Event(
             name = _uiState.value.newName,
             description = _uiState.value.newDescription,
-            startDate = _uiState.value.newStartDate,
-            endDate = _uiState.value.newEndDate,
+            startDate = DateTimeUtil.toOffsetDateTime(_uiState.value.newStartDate, LocalTime.MIN),
+            endDate = DateTimeUtil.toOffsetDateTime(_uiState.value.newEndDate, LocalTime.MAX),
             guestsOrArtists = _uiState.value.newGuestsOrArtists,
             location = _uiState.value.newLocation)
     eventAPI.addEvent(
         event,
         {
           eventAPI.getEvents(
-              { eventList -> _uiState.value = _uiState.value.copy(events = eventList) },
+              { eventList ->
+                _uiState.value =
+                    _uiState.value.copy(
+                        events = eventList,
+                        openDialogue = false,
+                        newName = "",
+                        newDescription = "",
+                        newStartDate = LocalDate.now(),
+                        newEndDate = LocalDate.now(),
+                        newGuestsOrArtists = "",
+                        newLocation = "")
+              },
               { Log.e("events", "Error loading events") })
         },
         { Log.e("events", "Error adding event") })
@@ -93,14 +132,16 @@ data class ProfileEventsUIState(
     val modifyingEvent: Event? = null,
     // Whether the dialogue for adding or modifying an event is open
     val openDialogue: Boolean = false,
+    // Whether the dialogue for confirming the deletion of an event is open
+    val deleteDialogue: Boolean = false,
     // The name for the new event
     val newName: String = "",
     // The description for the new event
     val newDescription: String = "",
     // The start date for the new event
-    val newStartDate: OffsetDateTime = OffsetDateTime.now(),
+    val newStartDate: LocalDate = LocalDate.now(),
     // The end date for the new event
-    val newEndDate: OffsetDateTime = OffsetDateTime.now(),
+    val newEndDate: LocalDate = LocalDate.now(),
     // The guests or artists for the new event
     val newGuestsOrArtists: String = "",
     // The location for the new event
