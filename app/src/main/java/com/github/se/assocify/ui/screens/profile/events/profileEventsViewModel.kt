@@ -37,9 +37,9 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI, navActions: Navigat
   }
 
   /** Deletes the event that is currently being modified */
-  fun deleteCurrentEvent() {
+  fun deleteEvent(event: Event) {
     eventAPI.deleteEvent(
-        _uiState.value.modifyingEvent!!.uid,
+        event.uid,
         {
           eventAPI.getEvents(
               { eventList -> _uiState.value = _uiState.value.copy(events = eventList) },
