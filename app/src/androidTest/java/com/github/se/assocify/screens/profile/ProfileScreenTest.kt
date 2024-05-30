@@ -308,7 +308,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   @Test
   fun openProfileSheet() {
     with(composeTestRule) {
-      onNodeWithTag("profilePicture").performClick()
+      onNodeWithTag("default profile icon").performClick()
       onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
       mViewmodel.signalCameraPermissionDenied()
       onNodeWithTag("snackbar").assertIsDisplayed()
