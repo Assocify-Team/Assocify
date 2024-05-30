@@ -26,6 +26,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,7 +87,13 @@ fun SelectAssociationScreen(navActions: NavigationActions, viewModel: SelectAsso
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     containerColor = MaterialTheme.colorScheme.primary))
       },
-      snackbarHost = { SnackbarHost(state.value.snackbarHostState) },
+      snackbarHost = {
+        SnackbarHost(
+            state.value.snackbarHostState,
+            snackbar = { snackbarData ->
+              Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
+            })
+      },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
           SearchBar(

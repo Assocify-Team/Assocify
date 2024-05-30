@@ -27,12 +27,11 @@ class SelectAssociationViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<SelectAssociationState> =
       MutableStateFlow(SelectAssociationState())
-  val uiState: StateFlow<SelectAssociationState>
+  val uiState: StateFlow<SelectAssociationState> = _uiState
 
-  val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
+  private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
 
   init {
-    uiState = _uiState
     updateDatabaseValues()
   }
 

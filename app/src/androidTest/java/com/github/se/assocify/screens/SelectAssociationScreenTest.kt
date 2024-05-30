@@ -49,6 +49,7 @@ class SelectAssociationScreenTest(semanticsProvider: SemanticsNodeInteractionsPr
   val createOrgaButton: KNode = child { hasTestTag("CreateNewOrganizationButton") }
   val searchOrgaButton: KNode = onNode { hasTestTag("SOB") }
   val arrowBackButton: KNode = onNode { hasTestTag("ArrowBackButton") }
+  val snackbar: KNode = onNode { hasTestTag("snackbar") }
 }
 
 /**
@@ -220,6 +221,24 @@ class SelectAssociationTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       arrowBackButton { performClick() }
       searchOrgaButton { assertIsDisplayed() }
       arrowBackButton { assertIsNotDisplayed() }
+    }
+  }
+
+  @Test
+  fun testSelectAssocFailure() {
+    every { mockUserAPI.requestJoin(any(), any(), any()) } answers
+        {
+          val onFailureCallback = thirdArg<(Exception) -> Unit>()
+          onFailureCallback(Exception("Test exception"))
+        }
+
+    val model = SelectAssociationViewModel(mockAssocAPI, mockUserAPI, mockNavActions)
+
+    composeTestRule.setContent { SelectAssociationScreen(mockNavActions, model) }
+    composeTestRule.onNodeWithTag("DisplayOrganizationScreen-${testAssociation.uid}").performClick()
+
+    ComposeScreen.onComposeScreen<SelectAssociationScreenTest>(composeTestRule) {
+      snackbar.assertIsDisplayed()
     }
   }
 }
