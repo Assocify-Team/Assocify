@@ -337,4 +337,19 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     mViewmodel.loadProfile()
     with(composeTestRule) { onNodeWithTag("snackbar").assertIsNotDisplayed() }
   }
+
+  @Test
+  fun displayProfilePictureError() {
+    every { mockUserAPI.setProfilePicture(any(), any(), any(), any()) } answers
+        {
+          val onFailureCallback = arg<(Exception) -> Unit>(3)
+          onFailureCallback(Exception("Testing error"))
+        }
+    with(composeTestRule) {
+      onNodeWithTag("default profile icon").assertIsDisplayed()
+      onNodeWithTag("default profile icon").assertHasClickAction()
+      mViewmodel.setImage(uri)
+      assert(mViewmodel.uiState.value.profileImageURI != null)
+    }
+  }
 }
