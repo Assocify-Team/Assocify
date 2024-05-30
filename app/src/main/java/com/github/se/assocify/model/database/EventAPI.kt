@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
@@ -12,13 +13,14 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
   private val collectionName = "event"
 
   private var eventCache: List<Event>? = null
+  private var associationUid: String? = CurrentUser.associationUid
 
   init {
     updateEventCache({}, {})
   }
 
   /**
-   * Updates the event cache with the events from the database
+   * Updates the event cache with the events from the current Association from the database
    *
    * @param onSuccess called on success with the list of events
    * @param onFailure called on failure
@@ -26,7 +28,11 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
   fun updateEventCache(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       val events =
-          postgrest.from(collectionName).select().decodeList<SupabaseEvent>().map { it.toEvent() }
+          postgrest
+              .from(collectionName)
+              .select { filter { SupabaseEvent::associationUID eq CurrentUser.associationUid } }
+              .decodeList<SupabaseEvent>()
+              .map { it.toEvent() }
       eventCache = events
       onSuccess(events)
     }
@@ -51,7 +57,9 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
                   startDate = event.startDate.toString(),
                   endDate = event.endDate.toString(),
                   guestsOrArtists = event.guestsOrArtists,
-                  location = event.location))
+                  location = event.location,
+                  associationUID = CurrentUser.associationUid))
+
       eventCache = eventCache?.plus(event)
       onSuccess(event.uid)
     }
@@ -64,11 +72,10 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
-    if (eventCache != null) {
+    if (eventCache != null && associationUid == CurrentUser.associationUid) {
       onSuccess(eventCache!!)
       return
     }
-
     updateEventCache(onSuccess, onFailure)
   }
 
@@ -80,7 +87,7 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getEvent(id: String, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
-    if (eventCache != null) {
+    if (eventCache != null && associationUid == CurrentUser.associationUid) {
       val event = eventCache!!.find { it.uid == id }
       event?.let { onSuccess(it) } ?: onFailure(Exception("Event with id $id not found"))
     } else {
@@ -193,7 +200,8 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
       @SerialName("start_date") val startDate: String,
       @SerialName("end_date") val endDate: String,
       @SerialName("guests_or_artists") val guestsOrArtists: String,
-      val location: String
+      val location: String,
+      @SerialName("association_uid") val associationUID: String?
   ) {
     fun toEvent() =
         Event(

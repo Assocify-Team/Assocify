@@ -19,7 +19,6 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import java.io.File
 import java.time.LocalDate
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail
@@ -106,7 +105,7 @@ class ReceiptsAPITest {
 
     CurrentUser.userUid = "2c256037-ad67-4185-991a-1a2b9bb1f9b3"
     CurrentUser.associationUid = "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
-    val cachePath = File("cache").toPath()
+    val cachePath = APITestUtils.setupImageCacher { error }
     api =
         ReceiptAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {

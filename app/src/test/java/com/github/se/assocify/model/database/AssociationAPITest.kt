@@ -18,7 +18,6 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.io.File
 import java.time.LocalDate
 import java.util.UUID
 import org.junit.Assert.fail
@@ -43,7 +42,7 @@ class AssociationAPITest {
   fun setup() {
     APITestUtils.setup()
     error = true
-    val cachePath = File("cache").toPath()
+    val cachePath = APITestUtils.setupImageCacher { error }
     assoAPI =
         AssociationAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {

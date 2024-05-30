@@ -41,16 +41,6 @@ import com.github.se.assocify.ui.util.PriceUtil
 import java.time.LocalDate
 import java.util.UUID
 
-@Composable
-fun DisplayEditBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
-  BalancePopUpScreen(balanceDetailedViewModel)
-}
-
-@Composable
-fun DisplayCreateBalance(balanceDetailedViewModel: BalanceDetailedViewModel) {
-  BalancePopUpScreen(balanceDetailedViewModel)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
@@ -148,10 +138,24 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                     ExposedDropdownMenu(
                         expanded = receiptExpanded,
                         onDismissRequest = { receiptExpanded = false }) {
+
+                          // Adding the "No receipt" item
+                          DropdownMenuItem(
+                              text = { Text("No receipt") },
+                              onClick = {
+                                balanceDetailedViewModel.noReceiptSelected(true)
+                                amountString = "" // Clear the amount
+                                receiptUid = "" // Clear the receipt UID
+                                receiptName = "No receipt" // Set the receipt name to "No receipt"
+                                receiptExpanded = false
+                              })
+
                           balanceModel.receiptList.forEach { receipt ->
                             DropdownMenuItem(
                                 text = { Text(receipt.title) },
                                 onClick = {
+                                  balanceDetailedViewModel.noReceiptSelected(false)
+                                  amountString = PriceUtil.fromCents(receipt.cents)
                                   receiptUid = receipt.uid
                                   receiptName = receipt.title
                                   receiptExpanded = false
@@ -166,16 +170,20 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               OutlinedTextField(
                   singleLine = true,
                   isError = balanceModel.errorAmount != null,
-                  modifier = Modifier.padding(8.dp),
+                  modifier = Modifier.padding(8.dp).testTag("editAmount"),
                   value = amountString,
                   onValueChange = {
-                    amountString = it
-                    balanceDetailedViewModel.checkAmount(amountString)
+                    if (receiptUid == "") {
+                      amountString = it
+                      balanceDetailedViewModel.checkAmount(amountString)
+                    }
                   },
                   label = { Text("Amount") },
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                  supportingText = { Text(balanceModel.errorAmount ?: "") })
+                  supportingText = { Text(balanceModel.errorAmount ?: "") },
+                  enabled = receiptUid == "" // Disable editing if receipt is not null
+                  )
             }
 
             // The TVA box
@@ -184,7 +192,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               ExposedDropdownMenuBox(
                   expanded = balanceTvaExpanded,
                   onExpandedChange = { balanceTvaExpanded = !balanceTvaExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                  modifier = Modifier.testTag("editTVADropdown").padding(8.dp)) {
                     OutlinedTextField(
                         value = "$tvaString%",
                         onValueChange = {},
@@ -262,7 +270,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               ExposedDropdownMenuBox(
                   expanded = statusExpanded,
                   onExpandedChange = { statusExpanded = !statusExpanded },
-                  modifier = Modifier.testTag("categoryDropdown").padding(8.dp)) {
+                  modifier = Modifier.testTag("editStatusDropdown").padding(8.dp)) {
                     OutlinedTextField(
                         value = mutableStatus.name,
                         onValueChange = {},

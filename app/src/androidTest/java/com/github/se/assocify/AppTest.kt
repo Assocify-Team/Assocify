@@ -21,9 +21,13 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.every
 import io.mockk.mockk
+import java.io.File
+import java.nio.file.Path
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,9 +41,25 @@ fun LoginApp() {
   val supabaseClient: SupabaseClient =
       createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
         install(Postgrest)
+        install(Storage)
         httpEngine = MockEngine { respondBadRequest() }
       }
-  val userAPI = UserAPI(supabaseClient, mockk())
+
+  val fileMock = mockk<File>()
+  val cachePath = mockk<Path>()
+
+  every { fileMock.exists() } returns false
+  every { fileMock.mkdirs() } returns true
+  every { fileMock.delete() } returns true
+  every { fileMock.lastModified() } returns 0L
+  every { fileMock.toPath() } returns cachePath
+  every { fileMock.renameTo(any()) } returns true
+
+  every { cachePath.resolve(any<String>()) } returns cachePath
+  every { cachePath.resolve(any<Path>()) } returns cachePath
+  every { cachePath.toFile() } returns fileMock
+
+  val userAPI = UserAPI(supabaseClient, cachePath)
   NavHost(navController = navController, startDestination = Destination.Login.route) {
     loginGraph(navigationActions = navActions, userAPI = userAPI)
   }
