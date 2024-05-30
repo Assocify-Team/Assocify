@@ -86,6 +86,15 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
               val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
               onSuccessCallback(PermissionRole("1", "asso", RoleType.PRESIDENCY))
             }
+
+        // Never return a profile picture, permanently "fetch" the profile picture
+        every { getProfilePicture(any(), any(), any()) } answers {}
+
+        every { setProfilePicture(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   private lateinit var mViewmodel: ProfileViewModel
