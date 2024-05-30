@@ -304,4 +304,20 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading role")
     }
   }
+
+  @Test
+  fun openProfileSheet() {
+    with(composeTestRule) {
+      onNodeWithTag("profilePicture").performClick()
+      onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
+      mViewmodel.signalCameraPermissionDenied()
+      onNodeWithTag("snackbar").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun setUri() {
+    mViewmodel.setImage(mockk())
+    with(composeTestRule) { onNodeWithTag("profilePicture").assertIsDisplayed() }
+  }
 }
