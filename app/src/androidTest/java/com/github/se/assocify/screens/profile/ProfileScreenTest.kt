@@ -3,6 +3,7 @@ package com.github.se.assocify.screens.profile
 import android.net.Uri
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -88,11 +89,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
             }
 
         // Never return a profile picture, permanently "fetch" the profile picture
-        every { getProfilePicture(any(), any(), any()) } answers
-            {
-              val onSuccessCallback = secondArg<(Uri) -> Unit>()
-              onSuccessCallback(mockk())
-            }
+        every { getProfilePicture(any(), any(), any()) } answers {}
 
         every { setProfilePicture(any(), any(), any(), any()) } answers
             {
@@ -328,5 +325,16 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
         }
     mViewmodel.loadProfile()
     with(composeTestRule) { onNodeWithTag("snackbar").assertIsDisplayed() }
+  }
+
+  @Test
+  fun setUriSuccess() {
+    every { mockUserAPI.getProfilePicture(any(), any(), any()) } answers
+        {
+          val onSuccessCallback = secondArg<(Uri) -> Unit>()
+          onSuccessCallback(mockk())
+        }
+    mViewmodel.loadProfile()
+    with(composeTestRule) { onNodeWithTag("snackbar").assertIsNotDisplayed() }
   }
 }
