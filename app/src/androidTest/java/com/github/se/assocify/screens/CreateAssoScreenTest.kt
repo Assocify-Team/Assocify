@@ -203,7 +203,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @Test
   fun openProfileSheet() {
     with(composeTestRule) {
-      onNodeWithTag("default profile icon").performClick()
+      onNodeWithTag("logo").performClick()
       onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
       bigView.signalCameraPermissionDenied()
       onNodeWithTag("snackbar").assertIsDisplayed()
@@ -213,6 +213,6 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
   @Test
   fun setUri() {
     bigView.setLogo(mockk())
-    with(composeTestRule) { onNodeWithTag("profilePicture").assertIsDisplayed() }
+    with(composeTestRule) { onNodeWithTag("logo").assertIsDisplayed() }
   }
 }
