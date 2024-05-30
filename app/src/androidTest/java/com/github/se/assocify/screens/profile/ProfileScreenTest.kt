@@ -88,7 +88,11 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
             }
 
         // Never return a profile picture, permanently "fetch" the profile picture
-        every { getProfilePicture(any(), any(), any()) } answers {}
+        every { getProfilePicture(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(Uri) -> Unit>()
+              onSuccessCallback(mockk())
+            }
 
         every { setProfilePicture(any(), any(), any(), any()) } answers
             {
@@ -316,8 +320,13 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   }
 
   @Test
-  fun setUri() {
-    mViewmodel.setImage(mockk())
-    with(composeTestRule) { onNodeWithTag("profilePicture").assertIsDisplayed() }
+  fun setUriFailure() {
+    every { mockUserAPI.getProfilePicture(any(), any(), any()) } answers
+        {
+          val onFailureCallback = thirdArg<(Exception) -> Unit>()
+          onFailureCallback(Exception("Testing error"))
+        }
+    mViewmodel.loadProfile()
+    with(composeTestRule) { onNodeWithTag("snackbar").assertIsDisplayed() }
   }
 }
