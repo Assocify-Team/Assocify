@@ -17,7 +17,6 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.io.File
 import java.lang.Thread.sleep
 import java.util.UUID
 import org.junit.Assert.fail
@@ -45,21 +44,22 @@ class UserAPITest {
   fun setup() {
     APITestUtils.setup()
     error = true
-    val cachePath = File("cache").toPath()
-    userAPI =
-        UserAPI(
-            createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
-              install(Postgrest)
-              install(Storage)
-              httpEngine = MockEngine {
-                if (!error) {
-                  respond(response)
-                } else {
-                  respondBadRequest()
-                }
-              }
-            },
-            cachePath)
+    val cachePath = APITestUtils.setupImageCacher { error }
+
+    val client =
+        createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
+          install(Postgrest)
+          install(Storage)
+          httpEngine = MockEngine {
+            if (!error) {
+              respond(response)
+            } else {
+              respondBadRequest()
+            }
+          }
+        }
+
+    userAPI = UserAPI(client, cachePath)
     error = false
     sleep(300) // Sleep to let the init pass by
   }

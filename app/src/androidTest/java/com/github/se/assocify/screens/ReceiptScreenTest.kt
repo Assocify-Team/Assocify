@@ -2,7 +2,6 @@ package com.github.se.assocify.screens
 
 import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -86,7 +85,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("backButton").assertIsDisplayed()
       onNodeWithTag("receiptScreen").assertIsDisplayed()
       onNodeWithTag("titleField").assertIsDisplayed()
-      onNodeWithTag("statusDropdownChip").assertIsDisplayed()
       onNodeWithTag("descriptionField").assertIsDisplayed()
       onNodeWithTag("amountField").performScrollTo().assertIsDisplayed()
       onNodeWithTag("dateField").performScrollTo().assertIsDisplayed()
@@ -240,20 +238,6 @@ class ReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("photoSelectionSheet").assertDoesNotExist()
     }
   }
-
-  @Test
-  fun status() {
-    with(composeTestRule) {
-      onNodeWithTag("statusChip").assertTextContains("Pending")
-      onNodeWithTag("statusChip").performScrollTo().performClick()
-      onNodeWithText("Approved", true).assertIsDisplayed()
-      onNodeWithText("Reimbursed", true).assertIsDisplayed()
-      onNodeWithText("Reimbursed", true).performClick()
-      onNodeWithTag("statusChip").assertTextContains("Reimbursed")
-      onNodeWithText("Approved", true).assertIsNotDisplayed()
-      onNodeWithText("Pending", true).assertIsNotDisplayed()
-    }
-  }
 }
 
 @RunWith(AndroidJUnit4::class)
@@ -295,16 +279,17 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     every { UUID.randomUUID() } returns UUID.fromString("08a11dc8-975c-4da1-93a6-865c20c7adec")
   }
 
-  private val viewModel =
-      ReceiptViewModel(
-          receiptUid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
-          navActions = navActions,
-          receiptApi = receiptsAPI)
+  lateinit var viewModel: ReceiptViewModel
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testUser"
+    viewModel =
+        ReceiptViewModel(
+            receiptUid = "08a11dc8-975c-4da1-93a6-865c20c7adec",
+            navActions = navActions,
+            receiptApi = receiptsAPI)
     composeTestRule.setContent { ReceiptScreen(viewModel = viewModel) }
   }
 
@@ -335,6 +320,19 @@ class EditReceiptScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     with(composeTestRule) {
       viewModel.loadReceipt()
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipt")
+    }
+  }
+
+  @Test
+  fun receiptDeleteFail() {
+    every { receiptsAPI.deleteReceipt(any(), any(), any()) } answers
+        {
+          thirdArg<(Exception) -> Unit>().invoke(Exception("error"))
+        }
+    with(composeTestRule) {
+      onNodeWithTag("deleteButton").performScrollTo().performClick()
+      onNodeWithText("Failed to delete receipt", true).assertIsDisplayed()
+      onNodeWithText("Retry", true).performClick()
     }
   }
 }

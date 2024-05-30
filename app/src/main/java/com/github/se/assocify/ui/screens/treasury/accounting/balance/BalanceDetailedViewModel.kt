@@ -14,7 +14,6 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.PriceUtil
-import io.ktor.client.utils.EmptyContent.status
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,7 +86,7 @@ class BalanceDetailedViewModel(
   private fun updateDatabaseValuesInBalance() {
     var innerLoadCounter = 2
 
-    receiptAPI.getUserReceipts(
+    receiptAPI.getAllReceipts(
         { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
 
     subCategoryAPI.getSubCategories(
@@ -232,6 +231,12 @@ class BalanceDetailedViewModel(
         _uiState.value.errorDate != null) {
       return
     }
+    // update the status of the receipt
+    val receipt = _uiState.value.receiptList.find { it.uid == balanceItem.receiptUID }
+    if (receipt != null && receipt.status != balanceItem.status) {
+      modifyReceiptStatus(receipt, balanceItem.status)
+    }
+
     balanceApi.updateBalance(
         CurrentUser.associationUid!!,
         balanceItem,
@@ -259,6 +264,13 @@ class BalanceDetailedViewModel(
   }
 
   fun deleteBalanceItem(balanceItemUid: String) {
+    // before deleting, put the status of receipt to pending
+    val balanceItem = _uiState.value.balanceList.find { it.uid == balanceItemUid } ?: return
+    val receipt = _uiState.value.receiptList.find { it.uid == balanceItem.receiptUID }
+    if (receipt != null) {
+      modifyReceiptStatus(receipt, Status.Pending)
+    }
+
     balanceApi.deleteBalance(
         balanceItemUid,
         {
@@ -292,6 +304,12 @@ class BalanceDetailedViewModel(
         _uiState.value.errorDate != null) {
       return
     }
+    // update the status of the receipt
+    val receipt = _uiState.value.receiptList.find { it.uid == balanceItem.receiptUID }
+    if (receipt != null && receipt.status != balanceItem.status) {
+      modifyReceiptStatus(receipt, balanceItem.status)
+    }
+
     balanceApi.addBalance(
         CurrentUser.associationUid!!,
         balanceItem.subcategoryUID,
@@ -322,7 +340,7 @@ class BalanceDetailedViewModel(
   }
 
   fun checkReceipt(receiptUid: String) {
-    if (receiptUid.isEmpty()) {
+    if (receiptUid.isEmpty() && !_uiState.value.noReceiptSelected) {
       _uiState.value = _uiState.value.copy(errorReceipt = "The receipt cannot be empty!")
     } else {
       _uiState.value = _uiState.value.copy(errorReceipt = null)
@@ -332,7 +350,7 @@ class BalanceDetailedViewModel(
   fun checkAmount(amount: String) {
     if (amount.isEmpty()) {
       _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
-    } else if (amount.toDoubleOrNull() == null || amount.toDouble() < 0) {
+    } else if (amount.toDoubleOrNull() == null) {
       _uiState.value = _uiState.value.copy(errorAmount = "You have to input a correct amount!!")
     } else if (PriceUtil.isTooLarge(amount)) {
       _uiState.value = _uiState.value.copy(errorAmount = "Amount is too large!")
@@ -381,6 +399,47 @@ class BalanceDetailedViewModel(
     checkDescription(description)
     checkDate(date)
   }
+
+  /**
+   * Set the no receipt selected state
+   *
+   * @param selected whether no receipt is selected
+   */
+  fun noReceiptSelected(selected: Boolean) {
+    _uiState.value = _uiState.value.copy(noReceiptSelected = selected)
+  }
+
+  /**
+   * Modify the status receipt
+   *
+   * @param receipt the receipt to modify
+   * @param status the new status of the receipt
+   */
+  fun modifyReceiptStatus(receipt: Receipt, status: Status) {
+    receiptAPI.uploadReceipt(
+        receipt.copy(status = status),
+        {},
+        {
+          _uiState.value =
+              _uiState.value.copy(
+                  receiptList =
+                      _uiState.value.receiptList.map {
+                        if (it.uid == receipt.uid) {
+                          receipt.copy(status = status)
+                        } else it
+                      })
+        },
+        { receiptFail, _ ->
+          if (receiptFail) {
+            CoroutineScope(Dispatchers.Main).launch {
+              _uiState.value.snackbarState.showSnackbar(
+                  message = "Failed to save status of the receipt",
+                  actionLabel = "Retry",
+              )
+            }
+          }
+        })
+  }
 }
 
 /**
@@ -394,6 +453,7 @@ class BalanceDetailedViewModel(
  * @param loadingCategory whether the categories are loading
  * @param status the current status filter
  * @param receiptList the list of receipts
+ * @param noReceiptSelected whether no receipt is selected
  * @param subCategoryList the list of subcategories
  * @param editing whether the item is being edited
  * @param editedBalanceItem the item being edited
@@ -410,6 +470,7 @@ data class BalanceItemState(
     val loadingCategory: Boolean = false,
     val status: Status? = null,
     val receiptList: List<Receipt> = emptyList(),
+    val noReceiptSelected: Boolean = true,
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
     val editing: Boolean = false,
     val creating: Boolean = false,
