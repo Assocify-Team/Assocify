@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
@@ -7,6 +8,7 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -102,20 +104,21 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       }
 
   // treasuryViewModel.otherViewmodel to acces accounting and receipt viewmodels :)
-  val treasuryViewModel =
-      TreasuryViewModel(
-          navActions,
-          mockReceiptAPI,
-          mockAccountingCategoriesAPI,
-          mockAccountingSubCategoryAPI,
-          mockBalanceAPI,
-          mockBudgetAPI,
-      )
+  lateinit var treasuryViewModel: TreasuryViewModel
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
+    treasuryViewModel =
+        TreasuryViewModel(
+            navActions,
+            mockReceiptAPI,
+            mockAccountingCategoriesAPI,
+            mockAccountingSubCategoryAPI,
+            mockBalanceAPI,
+            mockBudgetAPI,
+        )
     composeTestRule.setContent { TreasuryScreen(navActions, treasuryViewModel) }
   }
 
@@ -220,6 +223,19 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     with(composeTestRule) {
       treasuryViewModel.receiptListViewModel.updateReceipts()
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipts")
+    }
+  }
+
+  @Test
+  fun receiptRefresh() {
+    every { mockReceiptAPI.updateCaches(any(), any()) } answers
+        {
+          Log.e("ReceiptListViewModel", "Error fetching all receipts")
+          secondArg<(Boolean, Exception) -> Unit>().invoke(true, Exception("error"))
+        }
+    with(composeTestRule) {
+      treasuryViewModel.receiptListViewModel.refreshReceipts()
+      onNodeWithText("Error refreshing receipts").assertIsDisplayed()
     }
   }
 }

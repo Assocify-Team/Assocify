@@ -14,16 +14,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class TreasuryViewModel(
-    private val navActions: NavigationActions,
-    private val receiptsAPI: ReceiptAPI,
-    private val accountingCategoryAPI: AccountingCategoryAPI,
-    private val accountingSubCategoryAPI: AccountingSubCategoryAPI,
-    private val balanceAPI: BalanceAPI,
-    private val budgetAPI: BudgetAPI,
+    navActions: NavigationActions,
+    receiptsAPI: ReceiptAPI,
+    accountingCategoryAPI: AccountingCategoryAPI,
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    balanceAPI: BalanceAPI,
+    budgetAPI: BudgetAPI,
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<TreasuryUIState> = MutableStateFlow(TreasuryUIState())
-  val uiState: StateFlow<TreasuryUIState>
+  val uiState: StateFlow<TreasuryUIState> = _uiState
 
   private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
 
@@ -33,11 +33,6 @@ class TreasuryViewModel(
   val accountingViewModel: AccountingViewModel =
       AccountingViewModel(
           accountingCategoryAPI, accountingSubCategoryAPI, balanceAPI, budgetAPI, snackbarSystem)
-
-  init {
-    _uiState.value = TreasuryUIState()
-    uiState = _uiState
-  }
 
   fun setSearchQuery(query: String) {
     _uiState.value = _uiState.value.copy(searchQuery = query)
