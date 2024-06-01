@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -55,18 +56,15 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
               date = LocalDate.now(),
               nameItem = "",
               subcategoryUID = "",
-              receiptUID = "",
+              receiptUID = null,
               description = "",
               assignee = "",
               uid = UUID.randomUUID().toString())
   var nameString by remember { mutableStateOf(balance.nameItem) }
-  var receiptUid by remember { mutableStateOf(balance.receiptUID) }
+  var receiptUid: String? by remember { mutableStateOf(balance.receiptUID) }
   var receiptName by remember {
     mutableStateOf(
-        balanceModel.receiptList
-            .filter { it.uid == balance.receiptUID }
-            .map { it.title }
-            .getOrElse(0) { "" })
+        balanceModel.receiptList.find { it.uid == balance.receiptUID }?.title ?: "No receipt")
   }
   var amountString by remember { mutableStateOf(PriceUtil.fromCents(balance.amount)) }
   var tvaString by remember { mutableStateOf(balance.tva.rate.toString()) }
@@ -126,7 +124,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                         isError = balanceModel.errorReceipt != null,
                         supportingText = { Text(balanceModel.errorReceipt ?: "") },
                         value = receiptName,
-                        onValueChange = { balanceDetailedViewModel.checkReceipt(receiptName) },
+                        onValueChange = {},
                         label = { Text("Receipt") },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = receiptExpanded)
@@ -145,7 +143,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                               onClick = {
                                 balanceDetailedViewModel.noReceiptSelected(true)
                                 amountString = "" // Clear the amount
-                                receiptUid = "" // Clear the receipt UID
+                                receiptUid = null // Clear the receipt UID
                                 receiptName = "No receipt" // Set the receipt name to "No receipt"
                                 receiptExpanded = false
                               })
@@ -167,13 +165,14 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
 
             // The amount field
             item {
+                Log.e("BalancePopUpScreen", "receiptUid: $receiptUid")
               OutlinedTextField(
                   singleLine = true,
                   isError = balanceModel.errorAmount != null,
                   modifier = Modifier.padding(8.dp).testTag("editAmount"),
                   value = amountString,
                   onValueChange = {
-                    if (receiptUid == "") {
+                    if (receiptUid == null) {
                       amountString = it
                       balanceDetailedViewModel.checkAmount(amountString)
                     }
@@ -182,7 +181,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                   keyboardOptions =
                       KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
                   supportingText = { Text(balanceModel.errorAmount ?: "") },
-                  enabled = receiptUid == "" // Disable editing if receipt is not null
+                  enabled = receiptUid == null // Disable editing if receipt is not null
                   )
             }
 
@@ -316,6 +315,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                           nameString, receiptUid, amountString, assignee, descriptionString, date)
 
                       if (balanceModel.creating && amountString.toDoubleOrNull() != null) {
+                          Log.e("BalancePopUpScreen", "Creating balance item")
                         val newBalanceItem =
                             BalanceItem(
                                 balance.uid,
@@ -330,6 +330,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                                 mutableStatus)
                         balanceDetailedViewModel.saveCreation(newBalanceItem)
                       } else if (amountString.toDoubleOrNull() != null) {
+                          Log.e("BalancePopUpScreen", "Editing balance item")
                         val newBalanceItem =
                             BalanceItem(
                                 balance.uid,

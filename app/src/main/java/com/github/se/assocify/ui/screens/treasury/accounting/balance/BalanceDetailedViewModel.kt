@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
@@ -14,12 +15,12 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.PriceUtil
-import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 /**
  * View model for the balance detailed screen
@@ -84,17 +85,26 @@ class BalanceDetailedViewModel(
 
   /** Update the database values */
   private fun updateDatabaseValuesInBalance() {
-    var innerLoadCounter = 2
+    var innerLoadCounter = 4
 
     receiptAPI.getAllReceipts(
-        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList) }, {})
+        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList)
+            if (--innerLoadCounter == 0) endLoad()
+        }, {
+            endLoad("Error loading receipts")
+            Log.e("BalanceDetailedViewModel", "Error loading receipts")
+        })
 
     subCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
+            if (--innerLoadCounter == 0) endLoad()
         },
-        {})
+        {
+            endLoad("Error loading subcategories")
+            Log.e("BalanceDetailedViewModel", "Error loading subcategories")
+        })
 
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
@@ -229,6 +239,7 @@ class BalanceDetailedViewModel(
         _uiState.value.errorAssignee != null ||
         _uiState.value.errorDescription != null ||
         _uiState.value.errorDate != null) {
+        Log.e("BalanceDetailedViewModel", "Error in editing")
       return
     }
     // update the status of the receipt
@@ -339,14 +350,6 @@ class BalanceDetailedViewModel(
     }
   }
 
-  fun checkReceipt(receiptUid: String) {
-    if (receiptUid.isEmpty() && !_uiState.value.noReceiptSelected) {
-      _uiState.value = _uiState.value.copy(errorReceipt = "The receipt cannot be empty!")
-    } else {
-      _uiState.value = _uiState.value.copy(errorReceipt = null)
-    }
-  }
-
   fun checkAmount(amount: String) {
     if (amount.isEmpty()) {
       _uiState.value = _uiState.value.copy(errorAmount = "You cannot have an empty amount!")
@@ -386,21 +389,21 @@ class BalanceDetailedViewModel(
 
   fun checkAll(
       name: String,
-      receiptUid: String,
+      receiptUid: String?,
       amount: String,
       assignee: String,
       description: String,
       date: LocalDate
   ) {
     checkName(name)
-    checkReceipt(receiptUid)
+    _uiState.value = _uiState.value.copy(errorReceipt = null)
     checkAmount(amount)
     checkAssignee(assignee)
     checkDescription(description)
     checkDate(date)
   }
 
-  /**
+    /**
    * Set the no receipt selected state
    *
    * @param selected whether no receipt is selected
@@ -479,7 +482,7 @@ data class BalanceItemState(
     val snackbarState: SnackbarHostState = SnackbarHostState(),
     val filterActive: Boolean = false,
     val errorName: String? = "",
-    val errorReceipt: String? = "",
+    val errorReceipt: String? = null,
     val errorAmount: String? = "",
     val errorAssignee: String? = "",
     val errorDescription: String? = "",
