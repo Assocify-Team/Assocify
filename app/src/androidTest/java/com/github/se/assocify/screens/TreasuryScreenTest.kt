@@ -1,6 +1,5 @@
 package com.github.se.assocify.screens
 
-import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
@@ -230,12 +229,26 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   fun receiptRefresh() {
     every { mockReceiptAPI.updateCaches(any(), any()) } answers
         {
-          Log.e("ReceiptListViewModel", "Error fetching all receipts")
           secondArg<(Boolean, Exception) -> Unit>().invoke(true, Exception("error"))
         }
     with(composeTestRule) {
       treasuryViewModel.receiptListViewModel.refreshReceipts()
       onNodeWithText("Error refreshing receipts").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun refreshAccounting() {
+    every { mockBudgetAPI.updateBudgetCache(any(), any(), any()) } answers {}
+    every { mockBalanceAPI.updateBalanceCache(any(), any(), any()) } answers {}
+    every { mockAccountingCategoriesAPI.updateCategoryCache(any(), any(), any()) } answers {}
+    every { mockAccountingSubCategoryAPI.updateSubCategoryCache(any(), any(), any()) } answers
+        {
+          thirdArg<(Exception) -> Unit>().invoke(Exception("error"))
+        }
+    with(composeTestRule) {
+      treasuryViewModel.accountingViewModel.refreshAccounting()
+      onNodeWithText("Error refreshing accounting").assertIsDisplayed()
     }
   }
 }
