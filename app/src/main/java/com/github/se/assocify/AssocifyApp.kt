@@ -46,7 +46,7 @@ fun AssocifyApp(loginSaver: LoginSave) {
 
   val firstDest =
       if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
-        Destination.Home.route
+        Destination.Treasury.route
       } else {
         Destination.Login.route
       }
