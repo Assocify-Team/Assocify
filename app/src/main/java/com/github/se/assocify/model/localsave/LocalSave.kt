@@ -38,7 +38,6 @@ class LocalSave(private val activity: MainActivity, private val themeVM: ThemeVi
   }
 
   fun saveTheme() {
-    Log.d("LoginSave", "Saving theme ${themeVM.theme.value.name}")
     val sharedPref: SharedPreferences =
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
     val editor = sharedPref.edit()
@@ -47,7 +46,6 @@ class LocalSave(private val activity: MainActivity, private val themeVM: ThemeVi
   }
 
   fun loadUserInfo() {
-    Log.d("LoginSave", "Loading user info")
     loadTheme()
     loadUserUid()
     loadAssociation()
@@ -66,10 +64,8 @@ class LocalSave(private val activity: MainActivity, private val themeVM: ThemeVi
   }
 
   fun loadTheme() {
-
     val sharedPref: SharedPreferences =
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
-    Log.d("LoginSave", "Loading theme ${sharedPref.getString(THEME_PREF, null)}")
     themeVM.setTheme(Theme.fromString(sharedPref.getString(THEME_PREF, null)))
   }
 
