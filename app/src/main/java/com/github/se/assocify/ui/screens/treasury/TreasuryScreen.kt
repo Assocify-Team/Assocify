@@ -44,10 +44,11 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
 @Composable
 fun TreasuryScreen(
     navActions: NavigationActions,
-    accountingViewModel: AccountingViewModel,
-    receiptListViewModel: ReceiptListViewModel,
     treasuryViewModel: TreasuryViewModel
 ) {
+
+  val accountingViewModel: AccountingViewModel = treasuryViewModel.accountingViewModel
+  val receiptListViewModel: ReceiptListViewModel = treasuryViewModel.receiptListViewModel
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
   val accountingState by accountingViewModel.uiState.collectAsState()

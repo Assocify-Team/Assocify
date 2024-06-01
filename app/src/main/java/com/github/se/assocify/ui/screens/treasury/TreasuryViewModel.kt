@@ -1,5 +1,10 @@
 package com.github.se.assocify.ui.screens.treasury
 
+import com.github.se.assocify.model.database.AccountingCategoryAPI
+import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.BalanceAPI
+import com.github.se.assocify.model.database.BudgetAPI
+import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
@@ -7,9 +12,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class TreasuryViewModel(
-    private val navActions: NavigationActions,
-    private val receiptListViewModel: ReceiptListViewModel,
-    private val accountingViewModel: AccountingViewModel
+  private val navActions: NavigationActions,
+  private val receiptsAPI: ReceiptAPI,
+  private val accountingCategoryAPI: AccountingCategoryAPI,
+  private val accountingSubCategoryAPI: AccountingSubCategoryAPI,
+  private val balanceAPI: BalanceAPI,
+  private val budgetAPI: BudgetAPI,
+  val receiptListViewModel: ReceiptListViewModel =
+      ReceiptListViewModel(navActions, receiptsAPI),
+  val accountingViewModel: AccountingViewModel =
+      AccountingViewModel(accountingCategoryAPI, accountingSubCategoryAPI, balanceAPI, budgetAPI)
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<TreasuryUIState> = MutableStateFlow(TreasuryUIState())

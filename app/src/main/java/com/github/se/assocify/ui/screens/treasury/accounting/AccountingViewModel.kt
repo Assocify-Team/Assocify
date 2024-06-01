@@ -12,10 +12,10 @@ import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.ui.util.SyncSystem
-import java.time.Year
-import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.Year
+import java.util.UUID
 
 /**
  * The view model for the budget screen
@@ -35,16 +35,16 @@ class AccountingViewModel(
   private val _uiState: MutableStateFlow<AccountingState> = MutableStateFlow(AccountingState())
   val uiState: StateFlow<AccountingState>
 
-  val loadSystem =
+  private val loadSystem =
       SyncSystem(
           {
             filterSubCategories()
             setSubcategoriesAmount()
-            _uiState.value = _uiState.value.copy(loading = false, error = null)
+            _uiState.value = _uiState.value.copy(refresh = false, loading = false, error = null)
           },
-          { _uiState.value = _uiState.value.copy(loading = false, error = it) })
+          { _uiState.value = _uiState.value.copy(refresh = false, loading = false, error = it) })
 
-  val refreshSystem =
+  private val refreshSystem =
       SyncSystem(
           { loadAccounting() },
           {
@@ -68,12 +68,27 @@ class AccountingViewModel(
   }
 
   fun refreshAccounting() {
-    if (!refreshSystem.start(1)) return
+    if (!refreshSystem.start(4)) return
     _uiState.value = _uiState.value.copy(refresh = true)
     accountingSubCategoryAPI.updateSubCategoryCache(
         CurrentUser.associationUid!!,
         { refreshSystem.end() },
         { refreshSystem.end("Error refreshing accounting") })
+      accountingCategoryAPI.updateCategoryCache(
+        CurrentUser.associationUid!!,
+        { refreshSystem.end() },
+        { refreshSystem.end("Error refreshing tags") }
+      )
+      budgetAPI.updateBudgetCache(
+        CurrentUser.associationUid!!,
+        { refreshSystem.end() },
+        { refreshSystem.end("Error refreshing budget") }
+      )
+        balanceAPI.updateBalanceCache(
+            CurrentUser.associationUid!!,
+            { refreshSystem.end() },
+            { refreshSystem.end("Error refreshing balance") }
+        )
   }
 
   /** Function to get the categories from the database */
