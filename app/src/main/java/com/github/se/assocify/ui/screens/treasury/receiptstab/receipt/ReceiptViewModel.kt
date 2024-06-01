@@ -2,7 +2,6 @@ package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
@@ -13,15 +12,11 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 import com.github.se.assocify.ui.util.SnackbarSystem
-import com.github.se.assocify.ui.util.SyncSystem
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.math.absoluteValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class ReceiptViewModel {
 
@@ -78,36 +73,14 @@ class ReceiptViewModel {
                   date = DateUtil.formatDate(receipt.date),
                   incoming = receipt.cents >= 0)
 
-          _uiState.value = _uiState.value.copy(refresh = false, loading = false, error = null)
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
           this.receiptCreatorUid = receipt.userId
           loadImage()
         },
         onFailure = {
           Log.e("ReceiptViewModel", "Error loading receipt", it)
-          _uiState.value =
-              _uiState.value.copy(refresh = false, loading = false, error = "Error loading receipt")
+          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
         })
-  }
-
-  fun refreshReceipt() {
-    _uiState.value = _uiState.value.copy(refresh = true)
-
-    val refreshSystem =
-        SyncSystem(
-            { loadReceipt() },
-            { error ->
-              _uiState.value = _uiState.value.copy(refresh = false)
-              CoroutineScope(Dispatchers.Main).launch {
-                _uiState.value.snackbarHostState.showSnackbar(
-                    message = error, duration = SnackbarDuration.Short)
-              }
-            })
-
-    if (!refreshSystem.start(2)) return
-
-    // calls success / failure twice ! need 2 in refresh system start
-    receiptApi.updateCaches(
-        { _, _ -> refreshSystem.end() }, { _, _ -> refreshSystem.end("Could not refresh") })
   }
 
   /**
@@ -262,7 +235,6 @@ class ReceiptViewModel {
 data class ReceiptState(
     val loading: Boolean = false,
     val error: String? = null,
-    val refresh: Boolean = false,
     val imageLoading: Boolean = false,
     val imageError: String? = null,
     val isNewReceipt: Boolean,
