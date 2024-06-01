@@ -9,10 +9,10 @@ import com.github.se.assocify.ui.util.DateTimeUtil
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.SnackbarSystem
 import com.github.se.assocify.ui.util.SyncSystem
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /** A ViewModel for the EventScheduleScreen. */
 class EventScheduleViewModel(
