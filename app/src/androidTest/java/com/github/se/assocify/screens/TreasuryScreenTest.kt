@@ -102,7 +102,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             }
       }
 
-  // treasuryViewModel.otherViewmodel to acces accounting and receipt viewmodels :)
+  // treasuryViewModel.otherViewmodel to access accounting and receipt viewmodels :)
   lateinit var treasuryViewModel: TreasuryViewModel
 
   @Before
