@@ -1,5 +1,8 @@
 package com.github.se.assocify.ui.screens.treasury
 
+import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.PermissionRole
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
@@ -46,6 +49,15 @@ class TreasuryViewModel(
       }
     }
   }
+
+  fun getCurrentUserRole() {
+    // TODO: change this to receiptListViewModel.uiState.value.currentUserRole when merge with main
+    _uiState.value =
+        _uiState.value.copy(
+            currentUserRole =
+                PermissionRole(
+                    CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER))
+  }
 }
 
 /**
@@ -55,7 +67,9 @@ class TreasuryViewModel(
  */
 data class TreasuryUIState(
     val searchQuery: String = "",
-    val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts
+    val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts,
+    val currentUserRole: PermissionRole =
+        PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)
 )
 
 /** Treasury tabs */
