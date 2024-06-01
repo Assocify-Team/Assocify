@@ -250,44 +250,44 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                     // log out button (for everyone)
                     LogoutButton(viewmodel = viewmodel)
                   }
+            }
 
-              // open dialog to edit member
-              if (state.openEdit) {
-                Dialog(onDismissRequest = { viewmodel.controlNameEdit(false) }) {
-                  ElevatedCard {
-                    Column(
-                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally) {
-                          OutlinedTextField(
-                              value = state.modifyingName,
-                              singleLine = true,
-                              onValueChange = { viewmodel.modifyName(it) },
-                              label = { Text("Edit your name") },
-                              modifier = Modifier.fillMaxWidth().testTag("editName"))
-                          Row(
-                              modifier = Modifier.fillMaxWidth().padding(4.dp),
-                              horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                OutlinedButton(
-                                    onClick = { viewmodel.confirmModifyName() },
-                                    modifier =
-                                        Modifier.wrapContentSize()
-                                            .weight(1f)
-                                            .testTag("confirmModifyButton")) {
-                                      Text(text = "Confirm", textAlign = TextAlign.Center)
-                                    }
+        // open dialog to edit member
+        if (state.openEdit) {
+          Dialog(onDismissRequest = { viewmodel.controlNameEdit(false) }) {
+            ElevatedCard {
+              Column(
+                  modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                  horizontalAlignment = Alignment.CenterHorizontally) {
+                    OutlinedTextField(
+                        value = state.modifyingName,
+                        singleLine = true,
+                        onValueChange = { viewmodel.modifyName(it) },
+                        label = { Text("Edit your name") },
+                        modifier = Modifier.fillMaxWidth().testTag("editName"))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                          OutlinedButton(
+                              onClick = { viewmodel.confirmModifyName() },
+                              modifier =
+                                  Modifier.wrapContentSize()
+                                      .weight(1f)
+                                      .testTag("confirmModifyButton")) {
+                                Text(text = "Confirm", textAlign = TextAlign.Center)
                               }
                         }
                   }
-                }
-              }
-
-              // open bottom sheet to select a (profile) picture
-              PhotoSelectionSheet(
-                  visible = state.showPicOptions,
-                  hideSheet = { viewmodel.controlBottomSheet(false) },
-                  setImageUri = { viewmodel.setImage(it) },
-                  signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
             }
+          }
+        }
+
+        // open bottom sheet to select a (profile) picture
+        PhotoSelectionSheet(
+            visible = state.showPicOptions,
+            hideSheet = { viewmodel.controlBottomSheet(false) },
+            setImageUri = { viewmodel.setImage(it) },
+            signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
       }
 }
 

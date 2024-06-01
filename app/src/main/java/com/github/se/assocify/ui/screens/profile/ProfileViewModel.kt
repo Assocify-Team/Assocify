@@ -65,7 +65,7 @@ class ProfileViewModel(
             { error ->
               _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = error)
             })
-    if (!loadSystem.start(5)) return
+    if (!loadSystem.start(4)) return
 
     _uiState.value = _uiState.value.copy(loading = true, error = null)
 
@@ -76,13 +76,6 @@ class ProfileViewModel(
           loadSystem.end()
         },
         { loadSystem.end("Error loading profile") })
-    userAPI.getProfilePicture(
-        "${CurrentUser.userUid!!}.jpg",
-        { uri ->
-          _uiState.value = _uiState.value.copy(profileImageURI = uri)
-          loadSystem.end()
-        },
-        { loadSystem.end("Error loading profile picture") })
     userAPI.getCurrentUserAssociations(
         { associations ->
           _uiState.value =
@@ -131,6 +124,13 @@ class ProfileViewModel(
           loadSystem.end()
         },
         { loadSystem.end("Error loading role") })
+
+    // This one is seperate from the main loading system because it's not critical,
+    // therefore it doesn't need to block the screen in loading state
+    userAPI.getProfilePicture(
+        "${CurrentUser.userUid!!}.jpg",
+        { uri -> _uiState.value = _uiState.value.copy(profileImageURI = uri) },
+        { snackbarSystem.showSnackbar("Error loading profile picture") })
   }
 
   fun refreshProfile() {
