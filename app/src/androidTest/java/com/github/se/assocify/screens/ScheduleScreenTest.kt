@@ -42,16 +42,7 @@ class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               "Location",
               "eventUid"))
 
-  private val events: List<Event> =
-      listOf(
-          Event(
-              "eventUid",
-              "Event 1",
-              "Event 1",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "Guests?",
-              "BC"))
+  private val events: List<Event> = listOf(Event("eventUid", "Event 1", "Event 1"))
 
   private val taskAPI: TaskAPI =
       mockk<TaskAPI>() {
