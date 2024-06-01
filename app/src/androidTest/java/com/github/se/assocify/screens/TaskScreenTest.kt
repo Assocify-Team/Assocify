@@ -27,12 +27,12 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.LocalTime
-import java.time.OffsetDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalTime
+import java.time.OffsetDateTime
 
 @RunWith(AndroidJUnit4::class)
 class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -43,20 +43,12 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
           Event(
               "testEvent",
               "testEvent1",
-              "Test Event",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "5",
-              "2022-01-01",
+              "Test Event"
           ),
           Event(
               "testEvent2",
               "testEvent2",
-              "Test Event 2",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "10",
-              "2022-01-01",
+              "Test Event 2"
           ))
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
@@ -245,20 +237,12 @@ class EditTaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           Event(
               "testEvent1",
               "testEvent1",
-              "Test Event",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "5",
-              "2022-01-01",
+              "Test Event"
           ),
           Event(
               "testEvent2",
               "testEvent2",
-              "Test Event 2",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "10",
-              "2022-01-01",
+              "Test Event 2"
           ))
 
   private val task =

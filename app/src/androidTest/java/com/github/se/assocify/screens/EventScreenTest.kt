@@ -24,11 +24,11 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
-import java.time.OffsetDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.OffsetDateTime
 
 @RunWith(AndroidJUnit4::class)
 class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -49,11 +49,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
               Event(
                   "eventUID",
                   "testEvent1",
-                  "a",
-                  OffsetDateTime.now(),
-                  OffsetDateTime.now(),
-                  "me",
-                  "46.518726,6.566613")
+                  "a")
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
           onSuccessCallback(listOf(e1))
         }
@@ -139,11 +135,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   Event(
                       "1",
                       "filterChipTestEvent1",
-                      "a",
-                      OffsetDateTime.now(),
-                      OffsetDateTime.now(),
-                      "me",
-                      "home"))
+                      "a"))
           val onSuccessCallback = firstArg<(List<Event>) -> Unit>()
           onSuccessCallback(events)
         }
