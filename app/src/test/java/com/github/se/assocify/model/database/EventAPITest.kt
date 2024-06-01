@@ -162,14 +162,7 @@ class EventAPITest {
             .trimIndent()
 
     eventAPI.addEvent(
-        Event(
-            uid = uuid1.toString(),
-            name = "Test Event",
-            description = "Test Description",
-            startDate = currentTime,
-            endDate = currentTime,
-            guestsOrArtists = "Test Guest",
-            location = "Test Location"),
+        Event(uid = uuid1.toString(), name = "Test Event", description = "Test Description"),
         onSuccess) {
           fail("should not fail")
         }
@@ -210,15 +203,7 @@ class EventAPITest {
     verify(timeout = 1000) { successMockCache(any()) }
 
     eventAPI.updateEvent(
-        Event(
-            uid = "$uuid1",
-            name = "Test Event",
-            description = "Test Description",
-            startDate = currentTime,
-            endDate = currentTime,
-            guestsOrArtists = "Test Guest",
-            location = "Test Location"),
-        onSuccess) {
+        Event(uid = "$uuid1", name = "Test Event", description = "Test Description"), onSuccess) {
           fail("Should not fail")
         }
 

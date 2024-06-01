@@ -10,10 +10,8 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.ui.screens.chat.chatGraph
 import com.github.se.assocify.ui.screens.createAssociation.createAssociationGraph
 import com.github.se.assocify.ui.screens.event.eventGraph
-import com.github.se.assocify.ui.screens.home.homeGraph
 import com.github.se.assocify.ui.screens.login.loginGraph
 import com.github.se.assocify.ui.screens.profile.profileGraph
 import com.github.se.assocify.ui.screens.selectAssociation.selectAssociationGraph
@@ -31,7 +29,6 @@ fun NavGraphBuilder.mainNavGraph(
     accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI
 ) {
-  homeGraph(navActions)
   treasuryGraph(
       navActions,
       budgetAPI,
@@ -40,7 +37,6 @@ fun NavGraphBuilder.mainNavGraph(
       accountingCategoriesAPI,
       accountingSubCategoryAPI)
   eventGraph(navActions, eventAPI, taskAPI)
-  chatGraph(navActions)
   profileGraph(navActions, userAPI, associationAPI, accountingCategoriesAPI, eventAPI)
   loginGraph(navActions, userAPI)
   selectAssociationGraph(navActions, userAPI, associationAPI)

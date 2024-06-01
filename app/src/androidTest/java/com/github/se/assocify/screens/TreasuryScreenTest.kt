@@ -129,7 +129,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun navigate() {
     with(composeTestRule) {
-      onNodeWithTag("mainNavBarItem/home").performClick()
+      onNodeWithTag("mainNavBarItem/profile").performClick()
       assert(tabSelected)
     }
   }

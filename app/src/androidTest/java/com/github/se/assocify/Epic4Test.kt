@@ -219,10 +219,10 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       verify { associationAPI.addAssociation(any(), any(), any()) }
       assert(listAsso.contains(placeholderAssociations[0]))
 
-      // Arrives at home screen with association1 as the current association
+      // Arrives at treasury screen with association1 as the current association
       val toHome = navController.currentBackStackEntry?.destination?.route
-      assert(toHome == Destination.Home.route)
-      onNodeWithTag("homeScreen").assertIsDisplayed()
+      assert(toHome == Destination.Treasury.route)
+      onNodeWithTag("treasuryScreen").assertIsDisplayed()
 
       // Goes to the profile screen to check that and go to add their other association
       onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
