@@ -15,12 +15,12 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.PriceUtil
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 /**
  * View model for the balance detailed screen
@@ -88,22 +88,24 @@ class BalanceDetailedViewModel(
     var innerLoadCounter = 4
 
     receiptAPI.getAllReceipts(
-        { receiptList -> _uiState.value = _uiState.value.copy(receiptList = receiptList)
-            if (--innerLoadCounter == 0) endLoad()
-        }, {
-            endLoad("Error loading receipts")
-            Log.e("BalanceDetailedViewModel", "Error loading receipts")
+        { receiptList ->
+          _uiState.value = _uiState.value.copy(receiptList = receiptList)
+          if (--innerLoadCounter == 0) endLoad()
+        },
+        {
+          endLoad("Error loading receipts")
+          Log.e("BalanceDetailedViewModel", "Error loading receipts")
         })
 
     subCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
-            if (--innerLoadCounter == 0) endLoad()
+          if (--innerLoadCounter == 0) endLoad()
         },
         {
-            endLoad("Error loading subcategories")
-            Log.e("BalanceDetailedViewModel", "Error loading subcategories")
+          endLoad("Error loading subcategories")
+          Log.e("BalanceDetailedViewModel", "Error loading subcategories")
         })
 
     balanceApi.getBalance(
@@ -239,7 +241,7 @@ class BalanceDetailedViewModel(
         _uiState.value.errorAssignee != null ||
         _uiState.value.errorDescription != null ||
         _uiState.value.errorDate != null) {
-        Log.e("BalanceDetailedViewModel", "Error in editing")
+      Log.e("BalanceDetailedViewModel", "Error in editing")
       return
     }
     // update the status of the receipt
@@ -403,7 +405,7 @@ class BalanceDetailedViewModel(
     checkDate(date)
   }
 
-    /**
+  /**
    * Set the no receipt selected state
    *
    * @param selected whether no receipt is selected

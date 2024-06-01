@@ -50,8 +50,9 @@ class EventScreenViewModel(
           _uiState.value = _uiState.value.copy(loading = false, error = null)
         },
         {
-            Log.e("EventScreenViewModel", "Error loading events", it)
-            _uiState.value = _uiState.value.copy(loading = false, error = "Error loading events") })
+          Log.e("EventScreenViewModel", "Error loading events", it)
+          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading events")
+        })
   }
 
   /** Setup the filtered events depending on the current filters */
