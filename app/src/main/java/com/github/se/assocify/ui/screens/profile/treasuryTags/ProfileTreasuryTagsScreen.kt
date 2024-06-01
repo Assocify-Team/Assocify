@@ -86,7 +86,7 @@ fun ProfileTreasuryTagsScreen(
                     Row {
                       IconButton(
                           onClick = { treasuryTagsViewModel.modifying(true, treasuryTag) },
-                          modifier = Modifier.testTag("editTagButton")) {
+                          modifier = Modifier.testTag(treasuryTag.uid.toString())) {
                             Icon(Icons.Default.Edit, contentDescription = "Edit")
                           }
 
@@ -133,7 +133,7 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
               OutlinedTextField(
                   singleLine = true,
                   isError = nameString.isEmpty(),
-                  modifier = Modifier.padding(8.dp),
+                  modifier = Modifier.padding(8.dp).testTag("nameField"),
                   value = nameString,
                   onValueChange = { nameString = it },
                   label = { Text("Name") },
@@ -154,7 +154,7 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
                       else treasuryTagsViewModel.addTag(newTag)
                       treasuryTagsViewModel.cancelPopUp()
                     },
-                    modifier = Modifier,
+                    modifier = Modifier.testTag("saveButton"),
                 )
               }
             }
