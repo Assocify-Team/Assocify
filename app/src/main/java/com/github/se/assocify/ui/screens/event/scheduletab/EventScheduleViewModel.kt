@@ -7,37 +7,62 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateTimeUtil
 import com.github.se.assocify.ui.util.DateUtil
-import java.time.LocalDate
-import java.time.LocalTime
+import com.github.se.assocify.ui.util.SnackbarSystem
+import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import java.time.LocalTime
 
 /** A ViewModel for the EventScheduleScreen. */
 class EventScheduleViewModel(
     private val navActions: NavigationActions,
     private val taskAPI: TaskAPI,
+    private val snackbarSystem: SnackbarSystem,
 ) {
   private val _uiState: MutableStateFlow<ScheduleState> = MutableStateFlow(ScheduleState())
   val uiState: StateFlow<ScheduleState> = _uiState
 
+  private val loadSystem =
+      SyncSystem(
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = it) })
+
+  private val refreshSystem =
+      SyncSystem(
+          { refreshSchedule() },
+          {
+            _uiState.value = _uiState.value.copy(refresh = false)
+            snackbarSystem.showSnackbar(it)
+          })
+
   /** Initializes the ViewModel by setting the current date and fetching the tasks. */
   init {
     changeDate(LocalDate.now())
-    fetchTasks()
+    loadSchedule()
   }
 
   /**
    * Fetches the tasks from the database and updates the UI state. If the tasks could not be loaded,
    * an error message is displayed. If the tasks are loading, a loading indicator is displayed.
    */
-  fun fetchTasks() {
+  fun loadSchedule() {
+    if (!loadSystem.start(1)) return
     _uiState.value = _uiState.value.copy(loading = true, error = null)
     taskAPI.getTasks(
         { tasks ->
           filterTasks(tasks)
-          _uiState.value = _uiState.value.copy(tasks = tasks, loading = false, error = null)
+          _uiState.value = _uiState.value.copy(tasks = tasks)
+          loadSystem.end()
         },
-        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tasks") })
+        { loadSystem.end("Error loading tasks") })
+  }
+
+  fun refreshSchedule() {
+    if (!refreshSystem.start(1)) return
+    _uiState.value = _uiState.value.copy(refresh = true)
+    taskAPI.updateTaskCache(
+        { refreshSystem.end() }, { refreshSystem.end("Could not refresh tasks") })
   }
 
   /**
@@ -292,6 +317,7 @@ class EventScheduleViewModel(
 data class ScheduleState(
     val loading: Boolean = false,
     val error: String? = null,
+    val refresh: Boolean = false,
     val tasks: List<Task> = emptyList(),
     val currentDate: LocalDate = LocalDate.now(),
     val currentDayTasks: List<OverlapTask> = emptyList(),
