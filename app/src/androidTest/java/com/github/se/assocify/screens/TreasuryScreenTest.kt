@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -16,11 +17,15 @@ import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.RoleType
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
@@ -32,6 +37,7 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,6 +59,27 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           AccountingSubCategory("2", "1", "OGJ", 2000, 1000),
           AccountingSubCategory("3", "1", "Subsonic", 100, 50),
       )
+  val receiptList =
+      listOf(
+          Receipt(
+              "1",
+              "receipt1",
+              "desc",
+              LocalDate.of(2021, 1, 1),
+              1000,
+              Status.Pending,
+              null,
+              "testUser"),
+          Receipt(
+              "2",
+              "receipt2",
+              "desc",
+              LocalDate.of(2021, 1, 1),
+              1000,
+              Status.Pending,
+              null,
+              "testUser2"))
+
   val mockAccountingCategoriesAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
         every { getCategories(any(), any(), any()) } answers
@@ -94,21 +121,31 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
         every { getAllReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback(listOf())
+              onSuccessCallback(receiptList)
             }
         every { getUserReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback(listOf())
+              onSuccessCallback(receiptList.filter { it.userId == "testUser" })
             }
       }
-  var receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions, mockReceiptAPI)
+
+  val userAPI: UserAPI =
+      mockk<UserAPI>() {
+        every { getCurrentUserRole(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+              onSuccessCallback(PermissionRole("roleUid", "testAssociation", RoleType.TREASURY))
+            }
+      }
+  lateinit var receiptListViewModel: ReceiptListViewModel
   lateinit var accountingViewModel: AccountingViewModel
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
+    receiptListViewModel = ReceiptListViewModel(navActions, mockReceiptAPI, userAPI)
     accountingViewModel =
         AccountingViewModel(
             mockAccountingCategoriesAPI,
@@ -222,6 +259,16 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     with(composeTestRule) {
       receiptListViewModel.updateReceipts()
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipts")
+    }
+  }
+
+  @Test
+  fun testReceiptPermissions() {
+    with(composeTestRule) {
+      onNodeWithTag("receiptsTab").performClick()
+      onNodeWithText("My Receipts").assertIsDisplayed()
+      onNodeWithText("All Receipts").assertIsDisplayed()
+      assert(receiptListViewModel.uiState.value.userCurrentRole.type == RoleType.TREASURY)
     }
   }
 }
