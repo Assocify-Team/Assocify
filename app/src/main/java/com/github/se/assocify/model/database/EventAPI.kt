@@ -13,6 +13,7 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
   private val collectionName = "event"
 
   private var eventCache: List<Event>? = null
+  private var associationUid: String? = CurrentUser.associationUid
 
   init {
     updateEventCache({}, {})
@@ -71,7 +72,7 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
-    if (eventCache != null) {
+    if (eventCache != null && associationUid == CurrentUser.associationUid) {
       onSuccess(eventCache!!)
       return
     }
@@ -86,7 +87,7 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getEvent(id: String, onSuccess: (Event) -> Unit, onFailure: (Exception) -> Unit) {
-    if (eventCache != null) {
+    if (eventCache != null && associationUid == CurrentUser.associationUid) {
       val event = eventCache!!.find { it.uid == id }
       event?.let { onSuccess(it) } ?: onFailure(Exception("Event with id $id not found"))
     } else {

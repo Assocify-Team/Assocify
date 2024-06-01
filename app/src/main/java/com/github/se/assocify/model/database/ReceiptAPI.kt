@@ -1,7 +1,6 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
-import android.util.Log
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -9,16 +8,15 @@ import com.github.se.assocify.model.entities.Status
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
-import io.github.jan.supabase.storage.downloadAuthenticatedTo
 import io.github.jan.supabase.storage.storage
-import io.github.jan.supabase.storage.upload
 import java.nio.file.Path
 import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : SupabaseApi() {
-  private val bucket = db.storage["receipt"]
+class ReceiptAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
+  // The image fetcher. Caches for 1 minute (60000 milliseconds)
+  private val imageCacher = ImageCacher(60_000, cachePath, db.storage["receipt"])
 
   private val columns =
       Columns.raw(
@@ -38,6 +36,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   private var receipts: List<Receipt>? = null
   /// The user's UID
   private var userUid: String? = CurrentUser.userUid
+  private var associationUid: String? = CurrentUser.associationUid
 
   init {
     updateCaches({ _, _ -> }, { _, _ -> })
@@ -75,25 +74,20 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       onReceiptUploadSuccess: () -> Unit,
       onFailure: (Boolean, Exception) -> Unit
   ) {
-    tryAsync({ onFailure(false, it) }) {
-      receipt.photo?.let {
-        when (it) {
-          is MaybeRemotePhoto.LocalFile -> {
-            bucket.upload(receipt.uid, it.uri, upsert = true)
-            val imageCachePath = cachePath.resolve(receipt.uid + ".jpg")
-            if (!imageCachePath.toFile().delete()) {
-              // If this fails, the cache is corrupted, but it only fails in bad situations
-              // Where the cache breaking is okay
-              Log.w(this.javaClass.simpleName, "Failed to delete image cache file")
-            }
-            onPhotoUploadSuccess(true)
-          }
-          is MaybeRemotePhoto.Remote -> {
-            onPhotoUploadSuccess(false)
-          }
+    receipt.photo?.let { photo ->
+      when (photo) {
+        is MaybeRemotePhoto.LocalFile -> {
+          imageCacher.uploadImage(
+              "${receipt.uid}.jpg",
+              photo.uri,
+              { onPhotoUploadSuccess(true) },
+              { onFailure(false, it) })
         }
-      } ?: onPhotoUploadSuccess(false)
-    }
+        is MaybeRemotePhoto.Remote -> {
+          onPhotoUploadSuccess(false)
+        }
+      }
+    } ?: onPhotoUploadSuccess(false)
 
     tryAsync({ onFailure(true, it) }) {
       val sreceipt = SupabaseReceipt.fromReceipt(receipt)
@@ -101,8 +95,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       db.from("receipt_status").upsert(LinkedReceiptStatus(sreceipt.uid, receipt.status))
 
       // Update the cache
-      if (CurrentUser.userUid != userUid) {
+      if (CurrentUser.userUid != userUid || CurrentUser.associationUid != associationUid) {
         // Invalidate cache if the user changed
+        associationUid = null
         userReceipts = null
         receipts = null
       }
@@ -118,8 +113,7 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
 
   /**
    * Fetches the image of a receipt. If the image is not cached, it will be downloaded from the
-   * network, and stored in disk cache. TODO: limit the size of the cache NOTE: If the *same* image
-   * is requested twice at the same time, the second request will return immediately, *incorrectly*!
+   * network, and stored in disk cache. TODO: limit the size of the cache
    *
    * @param receiptUid the uid of the receipt to fetch the image of
    * @param onSuccess called when the image is fetched successfully with the URI of the image
@@ -130,39 +124,24 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
       onSuccess: (Uri) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    val imageCacheFile = cachePath.resolve("$receiptUid.jpg").toFile()
-    val now = System.currentTimeMillis()
-    if (imageCacheFile.exists() && now - imageCacheFile.lastModified() < 60000) {
-      onSuccess(Uri.fromFile(imageCacheFile))
-      return
-    }
-
-    val tmpImageCacheFile = cachePath.resolve("$receiptUid.jpg.tmp").toFile()
-
-    tryAsync({
-      val deleted = tmpImageCacheFile.delete()
-      if (!deleted) {
-        Log.w(this.javaClass.simpleName, "Failed to delete temporary image cache file")
-      }
-      onFailure(it)
-    }) {
-      bucket.downloadAuthenticatedTo(receiptUid, tmpImageCacheFile.toPath())
-      val renamed = tmpImageCacheFile.renameTo(imageCacheFile)
-      if (!renamed) {
-        Log.w(this.javaClass.simpleName, "Failed to rename temporary image cache file")
-      }
-      onSuccess(Uri.fromFile(imageCacheFile))
-    }
+    imageCacher.fetchImage(
+        "$receiptUid.jpg", { onSuccess(Uri.fromFile(it.toFile())) }, { onFailure(it) })
   }
 
   private fun updateUserCache(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       userReceipts =
           db.from("receipt")
-              .select(columns) { filter { SupabaseReceipt::userId eq CurrentUser.userUid } }
+              .select(columns) {
+                filter {
+                  SupabaseReceipt::userId eq CurrentUser.userUid
+                  SupabaseReceipt::associationId eq CurrentUser.associationUid
+                }
+              }
               .decodeList<SupabaseReceipt>()
               .map { it.toReceipt() }
       userUid = CurrentUser.userUid
+      associationUid = CurrentUser.associationUid
 
       onSuccess(userReceipts!!)
     }
@@ -171,8 +150,14 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
   private fun updateCache(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       receipts =
-          db.from("receipt").select(columns).decodeList<SupabaseReceipt>().map { it.toReceipt() }
-
+          db.from("receipt")
+              .select(columns) {
+                filter { SupabaseReceipt::associationId eq CurrentUser.associationUid }
+              }
+              .decodeList<SupabaseReceipt>()
+              .map { it.toReceipt() }
+      userUid = CurrentUser.userUid
+      associationUid = CurrentUser.associationUid
       onSuccess(receipts!!)
     }
   }
@@ -204,7 +189,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called when the fetch fails with the exception that occurred
    */
   fun getUserReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
-    if (userReceipts != null && userUid == CurrentUser.userUid) {
+    if (userReceipts != null &&
+        userUid == CurrentUser.userUid &&
+        associationUid == CurrentUser.associationUid) {
       onSuccess(userReceipts!!)
       return
     }
@@ -225,7 +212,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
           ?: onFailure(Exception("Receipt not found"))
     }
 
-    if (receipts != null && userUid == CurrentUser.userUid) {
+    if (receipts != null &&
+        userUid == CurrentUser.userUid &&
+        associationUid == CurrentUser.associationUid) {
       getReceiptFromCache(receipts)
       return
     }
@@ -240,7 +229,9 @@ class ReceiptAPI(private val db: SupabaseClient, private val cachePath: Path) : 
    * @param onFailure called whenever an error has occurred with the exception that occurred
    */
   fun getAllReceipts(onSuccess: (List<Receipt>) -> Unit, onFailure: (Exception) -> Unit) {
-    if (receipts != null && userUid == CurrentUser.userUid) {
+    if (receipts != null &&
+        userUid == CurrentUser.userUid &&
+        associationUid == CurrentUser.associationUid) {
       onSuccess(receipts!!)
       return
     }
