@@ -64,7 +64,8 @@ fun AssocifyApp(loginSaver: LoginSave, appThemeViewModel: ThemeViewModel) {
         receiptsAPI = receiptsAPI,
         accountingCategoriesAPI = accountingCategoriesAPI,
         accountingSubCategoryAPI = accountingSubCategoryAPI,
-        appThemeViewModel = appThemeViewModel
+        appThemeViewModel = appThemeViewModel,
+        localSave = loginSaver
     )
   }
 }

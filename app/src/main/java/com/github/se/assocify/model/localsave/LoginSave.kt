@@ -2,14 +2,18 @@ package com.github.se.assocify.model.localsave
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.github.se.assocify.MainActivity
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.Theme
+import com.github.se.assocify.ui.theme.ThemeViewModel
 
-class LoginSave(private val activity: MainActivity) {
+class LoginSave(private val activity: MainActivity, private val themeVM: ThemeViewModel) {
 
   private val ASSOCIFY_PREF = "com.github.se.assocify.PREFERENCE_FILE_KEY"
   private val USER_PREF = "user_uid"
   private val ASSOC_PREF = "association_uid"
+  private val THEME_PREF = "theme"
 
   fun saveUserInfo() {
     val sharedPref: SharedPreferences =
@@ -17,6 +21,7 @@ class LoginSave(private val activity: MainActivity) {
     val editor = sharedPref.edit()
     editor.putString(USER_PREF, CurrentUser.userUid)
     editor.putString(ASSOC_PREF, CurrentUser.associationUid)
+    editor.putString(THEME_PREF, themeVM.theme.value.name)
     editor.apply()
   }
 
@@ -27,8 +32,18 @@ class LoginSave(private val activity: MainActivity) {
     editor.putString(ASSOC_PREF, CurrentUser.associationUid)
     editor.apply()
   }
+  fun saveTheme() {
+    Log.d("LoginSave", "Saving theme ${themeVM.theme.value.name}")
+    val sharedPref: SharedPreferences =
+        activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
+    val editor = sharedPref.edit()
+    editor.putString(THEME_PREF, themeVM.theme.value.name)
+    editor.apply()
+  }
 
   fun loadUserInfo() {
+    Log.d("LoginSave", "Loading user info")
+    loadTheme()
     loadUserUid()
     loadAssociation()
   }
@@ -43,6 +58,13 @@ class LoginSave(private val activity: MainActivity) {
     val sharedPref: SharedPreferences =
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
     CurrentUser.associationUid = sharedPref.getString(ASSOC_PREF, null)
+  }
+  fun loadTheme() {
+
+    val sharedPref: SharedPreferences =
+        activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
+    Log.d("LoginSave", "Loading theme ${sharedPref.getString(THEME_PREF, null)}")
+    themeVM.setTheme(Theme.fromString(sharedPref.getString(THEME_PREF, null)))
   }
 
   fun clearSavedUserInfo() {
@@ -59,6 +81,14 @@ class LoginSave(private val activity: MainActivity) {
         activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
     val editor = sharedPref.edit()
     editor.remove(ASSOC_PREF)
+    editor.apply()
+  }
+
+  fun clearSavedTheme() {
+    val sharedPref: SharedPreferences =
+        activity.getSharedPreferences(ASSOCIFY_PREF, Context.MODE_PRIVATE)
+    val editor = sharedPref.edit()
+    editor.remove(THEME_PREF)
     editor.apply()
   }
 }

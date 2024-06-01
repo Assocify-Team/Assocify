@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.github.se.assocify.MainActivity
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.Theme
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
@@ -111,4 +112,23 @@ class LoginSaveTest {
     assert(user == "newUser")
     assert(assoc == null)
   }
+    @Test
+    fun testSaveTheme() {
+        CurrentUser.theme = Theme.DARK
+        loginSaver.saveTheme()
+        assert(CurrentUser.theme == Theme.DARK)
+    }
+    @Test
+    fun testLoadTheme() {
+        CurrentUser.theme = Theme.LIGHT
+        loginSaver.loadTheme()
+        assert(CurrentUser.theme == Theme.LIGHT)
+    }
+    @Test
+    fun testClearSavedTheme() {
+        CurrentUser.theme = Theme.SYSTEM
+        loginSaver.clearSavedTheme()
+        assert(CurrentUser.theme == null)
+    }
+
 }

@@ -7,6 +7,7 @@ import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.events.profileEventsGraph
@@ -21,7 +22,8 @@ fun NavGraphBuilder.profileGraph(
     associationAPI: AssociationAPI,
     accountingCategoryAPI: AccountingCategoryAPI,
     eventAPI: EventAPI,
-    appThemeVM : ThemeViewModel
+    appThemeVM : ThemeViewModel,
+    localSave : LoginSave
 ) {
   composable(
       route = Destination.Profile.route,
@@ -30,7 +32,7 @@ fun NavGraphBuilder.profileGraph(
     ProfileScreen(navigationActions, profileViewModel)
   }
 
-  profilePreferencesGraph(navigationActions, appThemeVM)
+  profilePreferencesGraph(navigationActions, appThemeVM, localSave)
   profileMembersGraph(navigationActions, associationAPI)
   profileTreasuryTagsGraph(navigationActions, accountingCategoryAPI)
   profileEventsGraph(navigationActions, eventAPI)

@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.Theme
+import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.composables.DropdownWithSetOptions
@@ -47,10 +48,11 @@ import com.github.se.assocify.ui.theme.ThemeViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfilePreferencesScreen(navActions: NavigationActions, appThemeViewModel: ThemeViewModel) {
+fun ProfilePreferencesScreen(navActions: NavigationActions, appThemeViewModel: ThemeViewModel, localSave : LoginSave) {
   // temporary values for the theme, text size, language and currency, waiting for the viewmodel
   val themeOptions = listOf(Theme.LIGHT, Theme.DARK, Theme.SYSTEM)
     val currentTheme by appThemeViewModel.theme.collectAsState()
+
   var themeSelectedIndex by remember { mutableIntStateOf(themeOptions.indexOf(currentTheme)) }
 
   var sliderPosition by remember { mutableFloatStateOf(15f) }
@@ -88,8 +90,13 @@ fun ProfilePreferencesScreen(navActions: NavigationActions, appThemeViewModel: T
                       shape =
                           SegmentedButtonDefaults.itemShape(
                               index = index, count = themeOptions.size),
-                      onClick = { themeSelectedIndex = index
-                        appThemeViewModel.setTheme(label) },
+                      onClick = {
+                          if ( index != themeSelectedIndex){
+                              themeSelectedIndex = index
+                              appThemeViewModel.setTheme(label)
+                              localSave.saveTheme()
+
+                          }},
                       selected = index == themeSelectedIndex
                   ) {
                     Text(label.name)
