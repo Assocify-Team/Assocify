@@ -95,12 +95,12 @@ fun AssocifyTheme(
       when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
           val context = LocalContext.current
-          when(theme) {
-              Theme.LIGHT -> dynamicLightColorScheme(context)
-              Theme.DARK -> dynamicDarkColorScheme(context)
-              Theme.SYSTEM ->
-                  if (isSystemInDarkTheme()) dynamicDarkColorScheme(context)
-                  else dynamicLightColorScheme(context)
+          when (theme) {
+            Theme.LIGHT -> dynamicLightColorScheme(context)
+            Theme.DARK -> dynamicDarkColorScheme(context)
+            Theme.SYSTEM ->
+                if (isSystemInDarkTheme()) dynamicDarkColorScheme(context)
+                else dynamicLightColorScheme(context)
           }
         }
         theme == Theme.DARK -> DarkColorScheme
@@ -112,7 +112,8 @@ fun AssocifyTheme(
     SideEffect {
       val window = (view.context as Activity).window
       window.statusBarColor = colorScheme.primary.toArgb()
-      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = theme == Theme.DARK
+      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+          theme == Theme.DARK
     }
   }
 

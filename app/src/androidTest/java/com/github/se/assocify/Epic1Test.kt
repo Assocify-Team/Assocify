@@ -29,7 +29,7 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.navigation.mainNavGraph
@@ -147,7 +147,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val receiptAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
 
-  private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
+  private val loginSave = mockk<LocalSave>(relaxUnitFun = true)
 
   private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
   private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)

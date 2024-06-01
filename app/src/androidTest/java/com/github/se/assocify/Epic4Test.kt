@@ -27,7 +27,7 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -163,7 +163,7 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val accountingCategoryAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
 
-  private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
+  private val loginSave = mockk<LocalSave>(relaxUnitFun = true)
 
   @Before
   fun testSetup() {

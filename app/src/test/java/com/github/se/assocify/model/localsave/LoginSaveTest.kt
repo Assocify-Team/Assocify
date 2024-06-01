@@ -64,7 +64,7 @@ class LoginSaveTest {
         } answers { prefs }
       }
 
-  val loginSaver = LoginSave(activity)
+  val loginSaver = LocalSave(activity)
 
   @Before
   fun setup() {
@@ -112,23 +112,25 @@ class LoginSaveTest {
     assert(user == "newUser")
     assert(assoc == null)
   }
-    @Test
-    fun testSaveTheme() {
-        CurrentUser.theme = Theme.DARK
-        loginSaver.saveTheme()
-        assert(CurrentUser.theme == Theme.DARK)
-    }
-    @Test
-    fun testLoadTheme() {
-        CurrentUser.theme = Theme.LIGHT
-        loginSaver.loadTheme()
-        assert(CurrentUser.theme == Theme.LIGHT)
-    }
-    @Test
-    fun testClearSavedTheme() {
-        CurrentUser.theme = Theme.SYSTEM
-        loginSaver.clearSavedTheme()
-        assert(CurrentUser.theme == null)
-    }
 
+  @Test
+  fun testSaveTheme() {
+    CurrentUser.theme = Theme.DARK
+    loginSaver.saveTheme()
+    assert(CurrentUser.theme == Theme.DARK)
+  }
+
+  @Test
+  fun testLoadTheme() {
+    CurrentUser.theme = Theme.LIGHT
+    loginSaver.loadTheme()
+    assert(CurrentUser.theme == Theme.LIGHT)
+  }
+
+  @Test
+  fun testClearSavedTheme() {
+    CurrentUser.theme = Theme.SYSTEM
+    loginSaver.clearSavedTheme()
+    assert(CurrentUser.theme == null)
+  }
 }

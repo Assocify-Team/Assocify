@@ -9,7 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.ui.theme.AssocifyTheme
 import com.github.se.assocify.ui.theme.ThemeViewModel
 
@@ -18,14 +18,15 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.main)
     val themeVM = ThemeViewModel()
+    val localSave = LocalSave(this, themeVM)
 
 
     setContent {
       val theme by themeVM.theme.collectAsState()
-      AssocifyTheme(themeVM = themeVM, theme = theme){
+      AssocifyTheme(themeVM = themeVM, theme = theme) {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          AssocifyApp(LoginSave(this, themeVM), themeVM)
+          AssocifyApp(localSave, themeVM)
         }
       }
     }

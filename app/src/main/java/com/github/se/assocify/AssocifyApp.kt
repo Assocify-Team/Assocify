@@ -15,18 +15,18 @@ import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.navigation.mainNavGraph
 import com.github.se.assocify.ui.theme.ThemeViewModel
 
 @Composable
-fun AssocifyApp(loginSaver: LoginSave, appThemeViewModel: ThemeViewModel) {
+fun AssocifyApp(localSaver: LocalSave, appThemeViewModel: ThemeViewModel) {
   val navController = rememberNavController()
-  val navActions = NavigationActions(navController, loginSaver)
+  val navActions = NavigationActions(navController, localSaver)
 
-  loginSaver.loadUserInfo()
+
 
   val userAPI =
       UserAPI(
@@ -65,7 +65,6 @@ fun AssocifyApp(loginSaver: LoginSave, appThemeViewModel: ThemeViewModel) {
         accountingCategoriesAPI = accountingCategoriesAPI,
         accountingSubCategoryAPI = accountingSubCategoryAPI,
         appThemeViewModel = appThemeViewModel,
-        localSave = loginSaver
-    )
+        localSave = localSaver)
   }
 }
