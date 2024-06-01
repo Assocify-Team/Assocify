@@ -138,6 +138,15 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
                 onSuccessCallback.invoke(PermissionRole("1", "b", RoleType.PRESIDENCY))
               }
             }
+
+        // Never return a profile picture, permanently "fetch" the profile picture
+        every { getProfilePicture(any(), any(), any()) } answers {}
+
+        every { setProfilePicture(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   private val eventAPI = mockk<EventAPI>() {}
