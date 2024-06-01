@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       val theme by themeVM.theme.collectAsState()
-      AssocifyTheme(themeVM = themeVM, theme = theme) {
+      AssocifyTheme(theme = theme) {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           AssocifyApp(localSave, themeVM)

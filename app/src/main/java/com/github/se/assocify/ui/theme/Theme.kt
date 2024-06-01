@@ -84,7 +84,6 @@ private val DarkColorScheme =
 
 @Composable
 fun AssocifyTheme(
-    themeVM: ThemeViewModel,
     theme: Theme,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
