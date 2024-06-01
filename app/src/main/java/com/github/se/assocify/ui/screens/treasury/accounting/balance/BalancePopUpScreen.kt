@@ -165,7 +165,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
 
             // The amount field
             item {
-                Log.e("BalancePopUpScreen", "receiptUid: $receiptUid")
+              Log.e("BalancePopUpScreen", "receiptUid: $receiptUid")
               OutlinedTextField(
                   singleLine = true,
                   isError = balanceModel.errorAmount != null,
@@ -315,7 +315,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                           nameString, receiptUid, amountString, assignee, descriptionString, date)
 
                       if (balanceModel.creating && amountString.toDoubleOrNull() != null) {
-                          Log.e("BalancePopUpScreen", "Creating balance item")
+                        Log.e("BalancePopUpScreen", "Creating balance item")
                         val newBalanceItem =
                             BalanceItem(
                                 balance.uid,
@@ -330,7 +330,7 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                                 mutableStatus)
                         balanceDetailedViewModel.saveCreation(newBalanceItem)
                       } else if (amountString.toDoubleOrNull() != null) {
-                          Log.e("BalancePopUpScreen", "Editing balance item")
+                        Log.e("BalancePopUpScreen", "Editing balance item")
                         val newBalanceItem =
                             BalanceItem(
                                 balance.uid,

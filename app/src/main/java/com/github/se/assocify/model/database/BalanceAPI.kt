@@ -6,9 +6,9 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
 
 class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
 
