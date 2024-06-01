@@ -1,7 +1,10 @@
 package com.github.se.assocify.ui.screens.event.tasktab.task
 
 import android.annotation.SuppressLint
+import android.graphics.Canvas
+import android.view.MotionEvent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -45,11 +48,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.PopupProperties
@@ -73,8 +81,10 @@ import com.github.se.assocify.ui.screens.event.maptab.rememberLifecycleObserver
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
 import java.io.File
 
@@ -82,6 +92,7 @@ import java.io.File
 @Composable
 fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
   val taskState by viewModel.uiState.collectAsState()
+  val isMapInteracting = remember { mutableStateOf(false) }
 
   Scaffold(
       modifier = Modifier.testTag("taskScreen"),
@@ -118,7 +129,7 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
         Modifier
           .fillMaxSize()
           .padding(paddingValues)
-          .verticalScroll(rememberScrollState()),
+          .verticalScroll(rememberScrollState(), enabled = !isMapInteracting.value),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
           Box(
@@ -224,20 +235,24 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
               switchModes = false)
 
           // Problem is here
-          Box(
+        Box(
+          modifier = Modifier
+            .size(300.dp)
+            .padding(5.dp)
+        ) {
+          MapPickerView(
             modifier = Modifier
-              .size(300.dp) // You can adjust the size as needed
-              .padding(5.dp)
-          ) {
-            MapPickerView(
-              modifier = Modifier
-                .fillMaxSize(),
-              onLoad = { map ->
-                map.controller.setCenter(INITIAL_POSITION)
-                map.controller.setZoom(INITIAL_ZOOM)
-              }
-            )
-          }
+              .fillMaxWidth(),
+            onLoad = { map ->
+              map.controller.setCenter(INITIAL_POSITION)
+              map.controller.setZoom(INITIAL_ZOOM)
+            },
+            onMapInteraction = { isInteracting ->
+              isMapInteracting.value = isInteracting // Set the flag based on interaction
+            },
+            viewModel
+          )
+        }
 
           Column {
             Button(
@@ -312,6 +327,7 @@ fun rememberMapViewWithLifecycle(): MapView {
   return mapView
 }
 
+
 @Composable
 fun rememberMapLifecycleObserver(mapView: MapView): LifecycleObserver =
   remember(mapView) {
@@ -328,26 +344,66 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleObserver =
     }
   }
 
-@SuppressLint("ModifierFactoryUnreferencedReceiver")
-fun Modifier.noParentScroll(onGesture: () -> Unit = {}): Modifier = pointerInput(Unit) {
-  detectTapGestures(onPress = {
-    onGesture()
-    tryAwaitRelease()
-  })
-  detectTransformGestures { _, _, _, _ -> onGesture() }
-}
-
+@SuppressLint("ClickableViewAccessibility")
 @Composable
 fun MapPickerView(
-  modifier: Modifier,
-  onLoad: ((map: MapView) -> Unit)? = null
+  modifier: Modifier = Modifier,
+  onLoad: ((map: MapView) -> Unit)? = null,
+  onMapInteraction: (Boolean) -> Unit, // Callback to notify interaction
+  viewModel: TaskViewModel
 ) {
   val mapView = rememberMapViewWithLifecycle()
+  val taskState by viewModel.uiState.collectAsState()
 
-  // Display the map inside an android view
   AndroidView(
     factory = { mapView },
     modifier = modifier,
-    update = { view -> onLoad?.invoke(view) }
+    update = { view ->
+      onLoad?.invoke(view)
+      // Handle touch events for interaction detection
+      view.setOnTouchListener { _, event ->
+        when (event.action) {
+          MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+            onMapInteraction(true) // Notify interaction when touch starts or moves
+          }
+          MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+            onMapInteraction(false) // Notify end of interaction when touch ends or is cancelled
+          }
+        }
+        false // Return false to allow touch event to propagate
+      }
+
+      // Handle map clicks to add marker
+      view.overlays.add(object : org.osmdroid.views.overlay.Overlay() {
+        var currentMarker: Marker? = null
+
+        override fun draw(c: Canvas?, osmv: MapView?, shadow: Boolean) {
+          // Nothing to draw here, just intercepting touch events
+        }
+
+        override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean {
+          e?.let {
+            val geoPoint = mapView?.projection?.fromPixels(e.x.toInt(), e.y.toInt())
+            geoPoint?.let { point ->
+              // Remove the old marker if exists
+              currentMarker?.let { mapView.overlays.remove(it) }
+
+              // Add new marker
+              val marker = Marker(mapView).apply {
+                position = point as GeoPoint?
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+              }
+
+              mapView.overlays.add(marker)
+              currentMarker = marker
+
+              mapView.invalidate() // Refresh the map to show the new marker
+            }
+          }
+          return true
+        }
+      })
+    }
   )
 }
+

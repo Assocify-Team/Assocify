@@ -268,6 +268,7 @@ data class TaskState(
     val time: String = "",
     val duration: String = "",
     val event: Event? = null,
+    val location: String? = null,
     val eventList: List<Event> = emptyList(),
     val titleError: String? = null,
     val staffNumberError: String? = null,
