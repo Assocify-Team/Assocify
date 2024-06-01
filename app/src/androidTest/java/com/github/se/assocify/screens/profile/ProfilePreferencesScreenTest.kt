@@ -10,8 +10,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.preferences.ProfilePreferencesScreen
+import com.github.se.assocify.ui.theme.ThemeViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -29,6 +31,8 @@ class ProfilePreferencesScreenTest :
 
   private val navActions = mockk<NavigationActions>()
   private var goBack = false
+  private val themeVM = mockk<ThemeViewModel>(relaxed = true)
+  private val localSave = mockk<LocalSave>()
 
   @Before
   fun testSetup() {
@@ -37,7 +41,7 @@ class ProfilePreferencesScreenTest :
 
     every { navActions.back() } answers { goBack = true }
 
-    composeTestRule.setContent { ProfilePreferencesScreen(navActions = navActions) }
+    composeTestRule.setContent { ProfilePreferencesScreen(navActions = navActions,themeVM, localSave ) }
   }
 
   @Test

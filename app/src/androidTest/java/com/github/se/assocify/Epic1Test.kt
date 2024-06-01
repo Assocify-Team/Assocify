@@ -33,6 +33,7 @@ import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.navigation.mainNavGraph
+import com.github.se.assocify.ui.theme.ThemeViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -151,6 +152,8 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
   private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
+    private val appThemeViewModel = mockk<ThemeViewModel>(relaxUnitFun = true)
+
 
   @Before
   fun testSetup() {
@@ -170,7 +173,10 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           taskAPI,
           receiptAPI,
           accountingCategoriesAPI,
-          accountingSubCategoryAPI)
+          accountingSubCategoryAPI,
+          appThemeViewModel,
+            loginSave
+          )
     }
   }
 
@@ -240,7 +246,9 @@ fun TestAssocifyApp(
     taskAPI: TaskAPI,
     receiptAPI: ReceiptAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
-    accountingSubCategoryAPI: AccountingSubCategoryAPI
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    appThemeViewModel: ThemeViewModel,
+    localSave: LocalSave
 ) {
   CurrentUser.userUid = "1"
 
@@ -255,6 +263,11 @@ fun TestAssocifyApp(
         taskAPI = taskAPI,
         receiptsAPI = receiptAPI,
         accountingCategoriesAPI = accountingCategoriesAPI,
-        accountingSubCategoryAPI = accountingSubCategoryAPI)
+        accountingSubCategoryAPI = accountingSubCategoryAPI,
+        appThemeViewModel = appThemeViewModel,
+        localSave = localSave
+
+
+    )
   }
 }
