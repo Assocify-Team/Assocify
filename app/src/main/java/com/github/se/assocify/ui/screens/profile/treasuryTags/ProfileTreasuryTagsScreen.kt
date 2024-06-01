@@ -112,27 +112,21 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
   var nameString by remember { mutableStateOf(tag.name) }
   Dialog(onDismissRequest = { treasuryTagsViewModel.cancelPopUp() }) {
     Card(
-        modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp).testTag("editDialogBox"),
+        modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp),
         shape = RoundedCornerShape(16.dp),
     ) {
       LazyColumn(
-          horizontalAlignment = Alignment.CenterHorizontally,
-          modifier = Modifier.padding(8.dp).testTag("editDialogColumn")) {
+          horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
             item {
               Row(
                   modifier = Modifier.fillMaxWidth().padding(8.dp),
                   horizontalArrangement = Arrangement.SpaceBetween,
                   verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        state.displayedName,
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.testTag("editDialogTitle"))
+                    Text(state.displayedName, style = MaterialTheme.typography.titleLarge)
                     Icon(
                         Icons.Default.Close,
                         contentDescription = "Close dialog",
-                        modifier =
-                            Modifier.clickable { treasuryTagsViewModel.cancelPopUp() }
-                                .testTag("editSubCategoryCancelButton"))
+                        modifier = Modifier.clickable { treasuryTagsViewModel.cancelPopUp() })
                   }
             }
             item {
@@ -160,7 +154,7 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
                       else treasuryTagsViewModel.addTag(newTag)
                       treasuryTagsViewModel.cancelPopUp()
                     },
-                    modifier = Modifier.testTag("editDeleteButton"),
+                    modifier = Modifier,
                 )
               }
             }
