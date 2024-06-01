@@ -97,6 +97,13 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             onRefresh = { viewModel.refreshReceipt() },
             paddingValues = paddingValues,
         ) {
+          Column(
+              modifier =
+                  Modifier.fillMaxSize()
+                      .padding(paddingValues)
+                      .verticalScroll(rememberScrollState()),
+              verticalArrangement = Arrangement.spacedBy(5.dp),
+              horizontalAlignment = Alignment.CenterHorizontally) {
                 OutlinedTextField(
                     modifier = Modifier.testTag("titleField").fillMaxWidth(),
                     value = receiptState.title,
