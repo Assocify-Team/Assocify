@@ -39,6 +39,7 @@ import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.composables.PullDownRefreshBox
 import com.github.se.assocify.ui.util.DateTimeUtil
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -64,15 +65,18 @@ fun EventScheduleScreen(
   }
 
   if (state.error != null) {
-    ErrorMessage(errorMessage = state.error) { viewModel.fetchTasks() }
+    ErrorMessage(errorMessage = state.error) { viewModel.loadSchedule() }
     return
   }
 
-  Column {
-    DateSwitcher(viewModel)
-    Row(modifier = Modifier.verticalScroll(scrollState)) {
-      ScheduleSidebar(hourHeight = hourHeight)
-      ScheduleContent(hourHeight = hourHeight, tasks = state.currentDayTasks, viewModel = viewModel)
+  PullDownRefreshBox(refreshing = state.refresh, onRefresh = { viewModel.refreshSchedule() }) {
+    Column {
+      DateSwitcher(viewModel)
+      Row(modifier = Modifier.verticalScroll(scrollState)) {
+        ScheduleSidebar(hourHeight = hourHeight)
+        ScheduleContent(
+            hourHeight = hourHeight, tasks = state.currentDayTasks, viewModel = viewModel)
+      }
     }
   }
 }

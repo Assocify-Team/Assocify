@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -9,6 +10,7 @@ import com.github.se.assocify.model.entities.Task
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleScreen
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
+import com.github.se.assocify.ui.util.SnackbarSystem
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -56,7 +58,8 @@ class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
         every { getTasks(any(), any()) } answers { firstArg<(List<Task>) -> Unit>().invoke(tasks) }
       }
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
-  private val viewModel = EventScheduleViewModel(navActions, taskAPI)
+  private val viewModel =
+      EventScheduleViewModel(navActions, taskAPI, SnackbarSystem(SnackbarHostState()))
 
   @Before
   fun testSetup() {

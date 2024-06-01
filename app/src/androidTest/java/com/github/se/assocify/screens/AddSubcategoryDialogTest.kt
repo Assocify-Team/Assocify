@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,6 +19,7 @@ import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.accounting.accountingComposables.AddSubcategoryDialog
+import com.github.se.assocify.ui.util.SnackbarSystem
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -83,7 +85,8 @@ class AddSubcategoryDialogTest :
             accountingCategoryAPI = accountingCategoryAPI,
             accountingSubCategoryAPI = accountingSubCategoryAPI,
             balanceAPI = balanceAPI,
-            budgetAPI = budgetAPI)
+            budgetAPI = budgetAPI,
+            SnackbarSystem(SnackbarHostState()))
     composeTestRule.setContent { AddSubcategoryDialog(viewModel) }
     viewModel.showNewSubcategoryDialog()
   }

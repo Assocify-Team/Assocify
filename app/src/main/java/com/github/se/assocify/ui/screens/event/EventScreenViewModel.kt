@@ -10,6 +10,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.event.maptab.EventMapViewModel
 import com.github.se.assocify.ui.screens.event.scheduletab.EventScheduleViewModel
 import com.github.se.assocify.ui.screens.event.tasktab.EventTaskViewModel
+import com.github.se.assocify.ui.util.SnackbarSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,12 +29,15 @@ class EventScreenViewModel(
     private var eventAPI: EventAPI,
 ) : ViewModel() {
 
-  val taskListViewModel: EventTaskViewModel = EventTaskViewModel(taskAPI) { showSnackbar(it) }
-  val mapViewModel: EventMapViewModel = EventMapViewModel(taskAPI)
-  val scheduleViewModel: EventScheduleViewModel = EventScheduleViewModel(navActions, taskAPI)
-
   private val _uiState: MutableStateFlow<EventScreenState> = MutableStateFlow(EventScreenState())
   val uiState: StateFlow<EventScreenState> = _uiState
+
+  val snackbarSystem: SnackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
+
+  val taskListViewModel: EventTaskViewModel = EventTaskViewModel(taskAPI, snackbarSystem)
+  val mapViewModel: EventMapViewModel = EventMapViewModel(taskAPI)
+  val scheduleViewModel: EventScheduleViewModel =
+      EventScheduleViewModel(navActions, taskAPI, snackbarSystem)
 
   init {
     fetchEvents()
