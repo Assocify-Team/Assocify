@@ -1,8 +1,12 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab
 
 import android.util.Log
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.database.UserAPI
+import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +19,8 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class ReceiptListViewModel(
     private val navActions: NavigationActions,
-    private val receiptsDatabase: ReceiptAPI
+    private val receiptsDatabase: ReceiptAPI,
+    private val userAPI: UserAPI
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
@@ -29,10 +34,24 @@ class ReceiptListViewModel(
   }
 
   fun updateReceipts() {
-    loadCounter = 2
+    loadCounter = 3
     _uiState.value = _uiState.value.copy(loading = true)
+    getCurrentUserRole()
     updateUserReceipts()
     updateAllReceipts()
+  }
+
+  /** Get the current user's role */
+  private fun getCurrentUserRole() {
+    userAPI.getCurrentUserRole(
+        { role ->
+          _uiState.value = _uiState.value.copy(userCurrentRole = role)
+          endLoading()
+        },
+        {
+          Log.e("ReceiptListViewModel", "Error fetching user role", it)
+          loadingError()
+        })
   }
 
   private fun endLoading() {
@@ -65,7 +84,6 @@ class ReceiptListViewModel(
 
   /** Update all receipts */
   private fun updateAllReceipts() {
-    // TODO : Add a permission check.
     receiptsDatabase.getAllReceipts(
         onSuccess = { receipts ->
           _uiState.value =
@@ -109,5 +127,7 @@ data class ReceiptUIState(
     val error: String? = null,
     val userReceipts: List<Receipt> = listOf(),
     val allReceipts: List<Receipt> = listOf(),
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val userCurrentRole: PermissionRole =
+        PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)
 )

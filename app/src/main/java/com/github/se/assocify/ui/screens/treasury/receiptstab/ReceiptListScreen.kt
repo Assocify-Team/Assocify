@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.util.DateUtil
@@ -78,7 +79,9 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
 
         // Global receipts only appear if the user has the permission,
         // which is handled in the viewmodel whatsoever
-        if (viewmodelState.allReceipts.isNotEmpty()) {
+        if (viewmodelState.allReceipts.isNotEmpty() &&
+            (viewmodelState.userCurrentRole.type == RoleType.TREASURY ||
+                viewmodelState.userCurrentRole.type == RoleType.PRESIDENCY)) {
           // Header for the global receipts
           item {
             Text(

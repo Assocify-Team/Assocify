@@ -8,6 +8,7 @@ import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
@@ -22,13 +23,16 @@ fun NavGraphBuilder.treasuryGraph(
     balanceAPI: BalanceAPI,
     receiptsAPI: ReceiptAPI,
     accountingCategoryAPI: AccountingCategoryAPI,
-    accountingSubCategoryAPI: AccountingSubCategoryAPI
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    userAPI: UserAPI
 ) {
 
   composable(
       route = Destination.Treasury.route,
   ) {
-    val receiptListViewModel = remember { ReceiptListViewModel(navigationActions, receiptsAPI) }
+    val receiptListViewModel = remember {
+      ReceiptListViewModel(navigationActions, receiptsAPI, userAPI)
+    }
     val accountingViewModel = remember {
       AccountingViewModel(accountingCategoryAPI, accountingSubCategoryAPI, balanceAPI, budgetAPI)
     }
