@@ -81,7 +81,7 @@ class ProfileEventsScreenTest :
       onAllNodesWithTag("editEventButton").apply {
         fetchSemanticsNodes().forEachIndexed { i, _ ->
           get(i).assertIsDisplayed().assertHasClickAction()
-            if (i == events.size-1) get(i).performClick()
+          if (i == events.size - 1) get(i).performClick()
         }
       }
 
@@ -89,13 +89,13 @@ class ProfileEventsScreenTest :
     }
   }
 
-    @Test
+  @Test
   fun deleteEvent() {
     with(composeTestRule) {
       onAllNodesWithTag("deleteEventButton").apply {
         fetchSemanticsNodes().forEachIndexed { i, _ ->
           get(i).assertIsDisplayed().assertHasClickAction()
-            if (i == events.size - 1) get(i).performClick()
+          if (i == events.size - 1) get(i).performClick()
         }
         onNodeWithTag("deleteEventDialog").assertIsDisplayed()
       }

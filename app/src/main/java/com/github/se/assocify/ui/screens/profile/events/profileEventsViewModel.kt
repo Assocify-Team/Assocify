@@ -4,9 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.EventAPI
 import com.github.se.assocify.model.entities.Event
-import com.github.se.assocify.ui.util.DateTimeUtil
-import java.time.LocalDate
-import java.time.LocalTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -106,10 +103,7 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
                         modifyingEvent = null,
                         newName = "",
                         newDescription = "",
-                        newStartDate = LocalDate.now(),
-                        newEndDate = LocalDate.now(),
-                        newGuestsOrArtists = "",
-                        newLocation = "")
+                    )
               },
               { Log.e("events", loadEventError) })
         },
@@ -118,14 +112,7 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
 
   /** Adds the event that is being created */
   fun confirmAddEvent() {
-    val event =
-        Event(
-            name = _uiState.value.newName,
-            description = _uiState.value.newDescription,
-            startDate = DateTimeUtil.toOffsetDateTime(_uiState.value.newStartDate, LocalTime.MIN),
-            endDate = DateTimeUtil.toOffsetDateTime(_uiState.value.newEndDate, LocalTime.MAX),
-            guestsOrArtists = _uiState.value.newGuestsOrArtists,
-            location = _uiState.value.newLocation)
+    val event = Event(name = _uiState.value.newName, description = _uiState.value.newDescription)
     eventAPI.addEvent(
         event,
         {
@@ -137,10 +124,7 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
                         openDialog = false,
                         newName = "",
                         newDescription = "",
-                        newStartDate = LocalDate.now(),
-                        newEndDate = LocalDate.now(),
-                        newGuestsOrArtists = "",
-                        newLocation = "")
+                    )
               },
               { Log.e("events", loadEventError) })
         },
@@ -158,10 +142,6 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
  * @param deleteDialog whether the dialog for confirming the deletion of an event is open
  * @param newName the name for the new event
  * @param newDescription the description for the new event
- * @param newStartDate the start date for the new event
- * @param newEndDate the end date for the new event
- * @param newGuestsOrArtists the guests or artists for the new event
- * @param newLocation the location for the new event
  */
 data class ProfileEventsUIState(
     // The list of current events
@@ -178,12 +158,4 @@ data class ProfileEventsUIState(
     val newName: String = "",
     // The description for the new event
     val newDescription: String = "",
-    // The start date for the new event
-    val newStartDate: LocalDate = LocalDate.now(),
-    // The end date for the new event
-    val newEndDate: LocalDate = LocalDate.now(),
-    // The guests or artists for the new event
-    val newGuestsOrArtists: String = "",
-    // The location for the new event
-    val newLocation: String = ""
 )
