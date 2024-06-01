@@ -165,8 +165,7 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   private val accountingCategoryAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
 
   private val loginSave = mockk<LocalSave>(relaxUnitFun = true)
-    private val appThemeViewModel = mockk<ThemeViewModel>(relaxUnitFun = true)
-
+  private val appThemeViewModel = mockk<ThemeViewModel>(relaxUnitFun = true)
 
   @Before
   fun testSetup() {
@@ -187,10 +186,8 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           receiptAPI,
           accountingCategoryAPI,
           accountingSubCategoryAPI,
-            appThemeViewModel,
-          loginSave
-
-          )
+          appThemeViewModel,
+          loginSave)
     }
   }
 

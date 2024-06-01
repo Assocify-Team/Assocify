@@ -36,25 +36,25 @@ fun TestScreen() {
 class ThemeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
   @get:Rule val composeTestRule = createComposeRule()
 
-   @get:Rule val mockkRule = MockKRule(this)
+  @get:Rule val mockkRule = MockKRule(this)
 
-        private lateinit var themeVM: ThemeViewModel
+  private lateinit var themeVM: ThemeViewModel
 
-
-  @Before fun testSetup() {
-      MockKAnnotations.init(this)
-      themeVM = mockk<ThemeViewModel> {
+  @Before
+  fun testSetup() {
+    MockKAnnotations.init(this)
+    themeVM =
+        mockk<ThemeViewModel> {
           every { theme.value } returns Theme.DARK
           every { theme.value.name } returns "DARK"
-      }
+        }
   }
 
   @Test
   fun darkTheme() {
 
-
     composeTestRule.setContent {
-      AssocifyTheme(theme = Theme.DARK, dynamicColor = false, themeVM = themeVM ) { TestScreen() }
+      AssocifyTheme(theme = Theme.DARK, dynamicColor = false, themeVM = themeVM) { TestScreen() }
     }
     with(composeTestRule) {
       onNodeWithText("Test")

@@ -152,8 +152,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
   private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
-    private val appThemeViewModel = mockk<ThemeViewModel>(relaxUnitFun = true)
-
+  private val appThemeViewModel = mockk<ThemeViewModel>(relaxUnitFun = true)
 
   @Before
   fun testSetup() {
@@ -175,8 +174,7 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           accountingCategoriesAPI,
           accountingSubCategoryAPI,
           appThemeViewModel,
-            loginSave
-          )
+          loginSave)
     }
   }
 
@@ -265,9 +263,6 @@ fun TestAssocifyApp(
         accountingCategoriesAPI = accountingCategoriesAPI,
         accountingSubCategoryAPI = accountingSubCategoryAPI,
         appThemeViewModel = appThemeViewModel,
-        localSave = localSave
-
-
-    )
+        localSave = localSave)
   }
 }

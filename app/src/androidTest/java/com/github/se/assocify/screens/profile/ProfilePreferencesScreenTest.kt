@@ -41,7 +41,9 @@ class ProfilePreferencesScreenTest :
 
     every { navActions.back() } answers { goBack = true }
 
-    composeTestRule.setContent { ProfilePreferencesScreen(navActions = navActions,themeVM, localSave ) }
+    composeTestRule.setContent {
+      ProfilePreferencesScreen(navActions = navActions, themeVM, localSave)
+    }
   }
 
   @Test
