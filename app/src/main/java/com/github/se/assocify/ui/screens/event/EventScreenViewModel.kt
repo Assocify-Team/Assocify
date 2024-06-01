@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.event
 
-import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
@@ -49,10 +48,7 @@ class EventScreenViewModel(
           _uiState.value = _uiState.value.copy(events = events)
           _uiState.value = _uiState.value.copy(loading = false, error = null)
         },
-        {
-          Log.e("EventScreenViewModel", "Error loading events", it)
-          _uiState.value = _uiState.value.copy(loading = false, error = "Error loading events")
-        })
+        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading events") })
   }
 
   /** Setup the filtered events depending on the current filters */
