@@ -79,6 +79,11 @@ class ImageCacher(val timeout: Long, val cacheDir: Path, private val bucket: Buc
       onFailure(it)
     }) {
       bucket.downloadAuthenticatedTo(pathInBucket, tmpImageCacheFile.toPath())
+      if (tmpImageCacheFile.length() < 100L) {
+        // Instead of throwing an exception, the bucket API writes a file with the error JSON.
+        // So we do this...
+        throw Exception("Image not found")
+      }
       val renamed = tmpImageCacheFile.renameTo(imageFile.toFile())
       if (!renamed) {
         Log.w("IMG", "Failed to rename temporary image cache file ($pathInBucket)")

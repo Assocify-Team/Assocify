@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
@@ -22,8 +23,11 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.util.SnackbarSystem
 import com.github.se.assocify.ui.util.SyncSystem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * This ViewModel is used to manage the UI state of the profile screen. It is used to get the user's
@@ -61,7 +65,7 @@ class ProfileViewModel(
             { error ->
               _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = error)
             })
-    if (!loadSystem.start(4)) return
+    if (!loadSystem.start(5)) return
 
     _uiState.value = _uiState.value.copy(loading = true, error = null)
 
@@ -72,6 +76,13 @@ class ProfileViewModel(
           loadSystem.end()
         },
         { loadSystem.end("Error loading profile") })
+    userAPI.getProfilePicture(
+        "${CurrentUser.userUid!!}.jpg",
+        { uri ->
+          _uiState.value = _uiState.value.copy(profileImageURI = uri)
+          loadSystem.end()
+        },
+        { loadSystem.end("Error loading profile picture") })
     userAPI.getCurrentUserAssociations(
         { associations ->
           _uiState.value =
@@ -224,6 +235,17 @@ class ProfileViewModel(
    */
   fun setImage(uri: Uri?) {
     if (uri == null) return
+
+    userAPI.setProfilePicture(
+        "${CurrentUser.userUid!!}.jpg",
+        uri,
+        {},
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Couldn't change profile picture", duration = SnackbarDuration.Short)
+          }
+        })
     _uiState.value = _uiState.value.copy(profileImageURI = uri)
   }
 
