@@ -56,7 +56,7 @@ class ProfileEventsScreenTest :
     every { navActions.back() } answers { goBack = true }
 
     composeTestRule.setContent {
-      ProfileEventsScreen(navActions = navActions, ProfileEventsViewModel(mockEventAPI, navActions))
+      ProfileEventsScreen(navActions = navActions, ProfileEventsViewModel(mockEventAPI))
     }
   }
 

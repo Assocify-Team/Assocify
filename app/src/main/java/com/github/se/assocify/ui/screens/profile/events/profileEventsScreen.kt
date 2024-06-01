@@ -17,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
@@ -39,12 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.navigation.NavigationActions
-import com.github.se.assocify.ui.composables.DatePickerWithDialog
-import com.github.se.assocify.ui.util.DateTimeUtil
-import com.github.se.assocify.ui.util.DateUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +80,12 @@ fun ProfileEventsScreen(
             item {
               ListItem(
                   headlineContent = { Text(text = event.name) },
-                  supportingContent = { Text(text = event.description.ifBlank { "-" }) },
+                  supportingContent = {
+                    Text(
+                        text = event.description.ifBlank { "-" },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis)
+                  },
                   trailingContent = {
                     Row {
                       IconButton(
@@ -93,7 +95,7 @@ fun ProfileEventsScreen(
                           }
 
                       IconButton(
-                          onClick = { profileEventsViewModel.openDeleteDialogue(event) },
+                          onClick = { profileEventsViewModel.openDeleteDialog(event) },
                           modifier = Modifier.testTag("deleteEventButton")) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete")
                           }
@@ -105,7 +107,7 @@ fun ProfileEventsScreen(
           item { Spacer(modifier = Modifier.height(80.dp)) }
 
           // open dialog to edit/add event
-          if (state.openDialogue) {
+          if (state.openDialog) {
             item {
               Dialog(onDismissRequest = { profileEventsViewModel.clearModifyingEvent() }) {
                 ElevatedCard {
@@ -131,7 +133,11 @@ fun ProfileEventsScreen(
 
                         // confirm button
                         OutlinedButton(
-                            onClick = { if (state.modifyingEvent != null) profileEventsViewModel.updateCurrentEvent() else profileEventsViewModel.confirmAddEvent() },
+                            onClick = {
+                              if (state.modifyingEvent != null)
+                                  profileEventsViewModel.updateCurrentEvent()
+                              else profileEventsViewModel.confirmAddEvent()
+                            },
                             modifier = Modifier.wrapContentSize().testTag("confirmButton")) {
                               Text(text = "Confirm", textAlign = TextAlign.Center)
                             }
@@ -141,38 +147,41 @@ fun ProfileEventsScreen(
             }
           }
 
-            // confirm delete dialog
-            if (state.deleteDialogue) {
-                item{
-                    Dialog(onDismissRequest = { profileEventsViewModel.clearDeleteDialogue() }) {
-                        ElevatedCard {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                    Text("Are you sure you want to delete the event ${state.deletingEvent?.name}?")
-                                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                        OutlinedButton(
-                                            onClick = { profileEventsViewModel.clearDeleteDialogue() },
-                                            modifier = Modifier.wrapContentSize().testTag("cancelButton"),
-                                            ) {
-                                                Text(text = "Cancel", textAlign = TextAlign.Center)
-                                            }
-                                        OutlinedButton(
-                                            onClick = { profileEventsViewModel.deleteEvent(state.deletingEvent!!) },
-                                            modifier = Modifier.wrapContentSize().testTag("confirmButton"),
-                                            colors = ButtonDefaults.outlinedButtonColors(
-                                                contentColor = MaterialTheme.colorScheme.error),
-                                            border = BorderStroke(1.0.dp, MaterialTheme.colorScheme.error)
-                                        ) {
-                                                Text(text = "Confirm", textAlign = TextAlign.Center)
-                                            }
-                                    }
-                                }
+          // open dialog to confirm delete
+          if (state.deleteDialog) {
+            item {
+              Dialog(onDismissRequest = { profileEventsViewModel.clearDeleteDialog() }) {
+                ElevatedCard {
+                  Column(
+                      modifier = Modifier.padding(16.dp),
+                      horizontalAlignment = Alignment.CenterHorizontally,
+                      verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Text(
+                            "Are you sure you want to delete the event ${state.deletingEvent?.name}?")
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                          OutlinedButton(
+                              onClick = { profileEventsViewModel.clearDeleteDialog() },
+                              modifier = Modifier.wrapContentSize().testTag("cancelButton"),
+                          ) {
+                            Text(text = "Cancel", textAlign = TextAlign.Center)
+                          }
+                          OutlinedButton(
+                              onClick = {
+                                profileEventsViewModel.deleteEvent(state.deletingEvent!!)
+                              },
+                              modifier = Modifier.wrapContentSize().testTag("confirmButton"),
+                              colors =
+                                  ButtonDefaults.outlinedButtonColors(
+                                      contentColor = MaterialTheme.colorScheme.error),
+                              border = BorderStroke(1.0.dp, MaterialTheme.colorScheme.error)) {
+                                Text(text = "Confirm", textAlign = TextAlign.Center)
+                              }
                         }
-                    }
+                      }
                 }
+              }
             }
+          }
         }
       }
 }
