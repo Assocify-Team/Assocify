@@ -141,6 +141,9 @@ dependencies {
     implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation("androidx.compose.material:material-icons-extended") // extra icons
 
+    // For pull to refresh
+    implementation("androidx.compose.material:material:1.6.7")
+
     // Navigation
     val navVersion = "2.7.7"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
