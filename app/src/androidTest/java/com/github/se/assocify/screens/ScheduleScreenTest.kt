@@ -16,13 +16,13 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -42,12 +42,7 @@ class ScheduleScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               "Location",
               "eventUid"))
 
-  private val events: List<Event> =
-      listOf(
-          Event(
-              "eventUid",
-              "Event 1",
-              "Event 1"))
+  private val events: List<Event> = listOf(Event("eventUid", "Event 1", "Event 1"))
 
   private val taskAPI: TaskAPI =
       mockk<TaskAPI>() {

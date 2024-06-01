@@ -33,10 +33,7 @@ class ProfileEventsScreenTest :
   private val navActions = mockk<NavigationActions>()
   private var goBack = false
 
-  private val events =
-      listOf(
-          Event("1", "event1", "desc1"),
-          Event("2", "event2", "desc2"))
+  private val events = listOf(Event("1", "event1", "desc1"), Event("2", "event2", "desc2"))
 
   private val mockEventAPI =
       mockk<EventAPI> {

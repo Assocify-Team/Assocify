@@ -24,11 +24,11 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule
+import java.time.OffsetDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.OffsetDateTime
 
 @RunWith(AndroidJUnit4::class)
 class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSupport()) {
@@ -45,11 +45,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   fun testSetup() {
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
-          val e1 =
-              Event(
-                  "eventUID",
-                  "testEvent1",
-                  "a")
+          val e1 = Event("eventUID", "testEvent1", "a")
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
           onSuccessCallback(listOf(e1))
         }
@@ -130,12 +126,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   fun testFilterChipShowAssoc() {
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
-          val events =
-              listOf(
-                  Event(
-                      "1",
-                      "filterChipTestEvent1",
-                      "a"))
+          val events = listOf(Event("1", "filterChipTestEvent1", "a"))
           val onSuccessCallback = firstArg<(List<Event>) -> Unit>()
           onSuccessCallback(events)
         }
