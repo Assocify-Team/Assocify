@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.profile.treasuryTags
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -17,10 +16,18 @@ class ProfileTreasuryTagsViewModel(
   val uiState: StateFlow<ProfileTreasuryTagsUIState> = _uiState
 
   init {
+    fetchCategories()
+  }
+
+  fun fetchCategories() {
+    _uiState.value = _uiState.value.copy(loading = true)
     accountingCategoryAPI.getCategories(
         CurrentUser.associationUid!!,
-        { categoryList -> _uiState.value = _uiState.value.copy(treasuryTags = categoryList) },
-        { Log.e("treasurytags", "Error loading tags") })
+        { categoryList ->
+          _uiState.value = _uiState.value.copy(treasuryTags = categoryList)
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
+        },
+        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipts") })
   }
 
   fun modifying(modifying: Boolean, editedTag: AccountingCategory) {
@@ -77,5 +84,7 @@ data class ProfileTreasuryTagsUIState(
     val modify: Boolean = false,
     val creating: Boolean = false,
     val editedTag: AccountingCategory? = null,
-    val displayedName: String = ""
+    val displayedName: String = "",
+    val error: String? = null,
+    val loading: Boolean = false
 )

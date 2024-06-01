@@ -43,6 +43,8 @@ import androidx.compose.ui.window.Dialog
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.BackButton
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessage
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,6 +54,17 @@ fun ProfileTreasuryTagsScreen(
     treasuryTagsViewModel: ProfileTreasuryTagsViewModel
 ) {
   val state by treasuryTagsViewModel.uiState.collectAsState()
+
+  if (state.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (state.error != null) {
+    ErrorMessage(errorMessage = state.error) { treasuryTagsViewModel.fetchCategories() }
+    return
+  }
+
   if (state.creating || state.modify) {
     NamePopUp(treasuryTagsViewModel = treasuryTagsViewModel)
   }
@@ -132,7 +145,7 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
             item {
               OutlinedTextField(
                   singleLine = true,
-                  isError = nameString.isEmpty(),
+                  isError = state.error,
                   modifier = Modifier.padding(8.dp).testTag("nameField"),
                   value = nameString,
                   onValueChange = { nameString = it },
