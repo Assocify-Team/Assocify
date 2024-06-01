@@ -30,7 +30,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
-import kotlin.Exception
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -293,6 +292,20 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       mViewmodel.loadProfile() // reload page in case already loaded by before
       waitUntil { mViewmodel.uiState.value.error != null }
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading role")
+    }
+  }
+
+  @Test
+  fun refreshProfile() {
+    every { mockAssocAPI.updateCache(any(), any()) } answers {}
+    every { mockUserAPI.updateUserCache(any(), any()) } answers
+        {
+          val onErrorCallback = secondArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.refreshProfile()
+      onNodeWithText("Could not refresh").assertIsDisplayed()
     }
   }
 }
