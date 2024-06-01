@@ -39,11 +39,20 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI, navActions: Navigat
     _uiState.value = _uiState.value.copy(openDialogue = false)
   }
 
+    fun openDeleteDialogue(event: Event) {
+    _uiState.value = _uiState.value.copy(deletingEvent = event, deleteDialogue = true)
+    }
+
+    fun clearDeleteDialogue() {
+        _uiState.value = _uiState.value.copy(deleteDialogue = false, deletingEvent = null)
+    }
+
   /** Deletes the event that is currently being modified */
   fun deleteEvent(event: Event) {
     eventAPI.deleteEvent(
         event.uid,
         {
+            _uiState.value = _uiState.value.copy(deleteDialogue = false, deletingEvent = null)
           eventAPI.getEvents(
               { eventList -> _uiState.value = _uiState.value.copy(events = eventList) },
               { Log.e("events", "Error loading events") })
@@ -57,7 +66,15 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI, navActions: Navigat
         _uiState.value.modifyingEvent!!,
         {
           eventAPI.getEvents(
-              { eventList -> _uiState.value = _uiState.value.copy(events = eventList) },
+              { eventList -> _uiState.value = _uiState.value.copy(events = eventList,
+                  openDialogue = false,
+                  modifyingEvent = null,
+                  newName = "",
+                  newDescription = "",
+                  newStartDate = LocalDate.now(),
+                  newEndDate = LocalDate.now(),
+                  newGuestsOrArtists = "",
+                  newLocation = "") },
               { Log.e("events", "Error loading events") })
         },
         { Log.e("events", "Error updating event") })
@@ -69,29 +86,13 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI, navActions: Navigat
   }
 
   fun updateNewName(name: String) {
-    _uiState.value = _uiState.value.copy(newName = name)
+    _uiState.value = _uiState.value.copy(newName = name, modifyingEvent = _uiState.value.modifyingEvent?.copy(name = name) ?: _uiState.value.modifyingEvent)
   }
 
   fun updateNewDescription(description: String) {
-    _uiState.value = _uiState.value.copy(newDescription = description)
+    _uiState.value = _uiState.value.copy(newDescription = description, modifyingEvent = _uiState.value.modifyingEvent?.copy(description = description) ?: _uiState.value.modifyingEvent)
   }
 
-  fun updateNewStartDate(startDate: LocalDate?) {
-      startDate?.let { _uiState.value = _uiState.value.copy(newStartDate = it) }
-  }
-
-
-  fun updateNewEndDate(endDate: LocalDate?) {
-    endDate?.let { _uiState.value = _uiState.value.copy(newEndDate = endDate) }
-  }
-
-  fun updateNewGuestsOrArtists(guestsOrArtists: String) {
-    _uiState.value = _uiState.value.copy(newGuestsOrArtists = guestsOrArtists)
-  }
-
-  fun updateNewLocation(location: String) {
-    _uiState.value = _uiState.value.copy(newLocation = location)
-  }
 
   /** Adds the event that is being created */
   fun confirmAddEvent() {
@@ -130,6 +131,8 @@ data class ProfileEventsUIState(
     val events: List<Event> = emptyList(),
     // The event that is currently being modified
     val modifyingEvent: Event? = null,
+    // The event that is currently being deleted
+    val deletingEvent: Event? = null,
     // Whether the dialogue for adding or modifying an event is open
     val openDialogue: Boolean = false,
     // Whether the dialogue for confirming the deletion of an event is open
