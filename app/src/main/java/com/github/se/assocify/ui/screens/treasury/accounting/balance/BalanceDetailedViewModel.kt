@@ -92,10 +92,7 @@ class BalanceDetailedViewModel(
           _uiState.value = _uiState.value.copy(receiptList = receiptList)
           if (--innerLoadCounter == 0) endLoad()
         },
-        {
-          endLoad("Error loading receipts")
-          Log.e("BalanceDetailedViewModel", "Error loading receipts")
-        })
+        { endLoad("Error loading receipts") })
 
     subCategoryAPI.getSubCategories(
         CurrentUser.associationUid!!,
@@ -103,10 +100,7 @@ class BalanceDetailedViewModel(
           _uiState.value = _uiState.value.copy(subCategoryList = subCategoryList)
           if (--innerLoadCounter == 0) endLoad()
         },
-        {
-          endLoad("Error loading balance category")
-          Log.e("BalanceDetailedViewModel", "Error loading subcategories")
-        })
+        { endLoad("Error loading balance category") })
 
     balanceApi.getBalance(
         CurrentUser.associationUid!!,
