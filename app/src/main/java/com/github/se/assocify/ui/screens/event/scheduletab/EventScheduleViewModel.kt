@@ -30,7 +30,7 @@ class EventScheduleViewModel(
 
   private val refreshSystem =
       SyncSystem(
-          { refreshSchedule() },
+          { loadSchedule() },
           {
             _uiState.value = _uiState.value.copy(refresh = false)
             snackbarSystem.showSnackbar(it)
