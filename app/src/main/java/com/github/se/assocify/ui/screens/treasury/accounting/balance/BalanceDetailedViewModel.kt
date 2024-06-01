@@ -104,7 +104,7 @@ class BalanceDetailedViewModel(
           if (--innerLoadCounter == 0) endLoad()
         },
         {
-          endLoad("Error loading subcategories")
+          endLoad("Error loading balance category")
           Log.e("BalanceDetailedViewModel", "Error loading subcategories")
         })
 
