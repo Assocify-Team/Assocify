@@ -6,9 +6,9 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalDate
 
 class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
 
@@ -60,7 +60,7 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun addBalance(
       associationUID: String,
       categoryUID: String,
-      receiptUID: String,
+      receiptUID: String?,
       balanceItem: BalanceItem,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -80,7 +80,7 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun updateBalance(
       associationUID: String,
       balanceItem: BalanceItem,
-      receiptUID: String,
+      receiptUID: String?,
       categoryUID: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -114,7 +114,7 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       @SerialName("uid") val uid: String,
       @SerialName("name") val nameItem: String,
       @SerialName("association_uid") val associationUID: String,
-      @SerialName("receipt_uid") val receiptUID: String,
+      @SerialName("receipt_uid") val receiptUID: String?,
       @SerialName("subcategory_uid") val subcategoryUID: String,
       @SerialName("amount") val amount: Int, // unsigned: can be positive or negative
       @SerialName("tva") val tva: Float,
@@ -142,7 +142,7 @@ class BalanceAPI(private val db: SupabaseClient) : SupabaseApi() {
       fun fromBalanceItem(
           balanceItem: BalanceItem,
           associationUID: String,
-          receiptUID: String,
+          receiptUID: String?,
           categoryUID: String
       ) =
           SupabaseBalanceItem(
