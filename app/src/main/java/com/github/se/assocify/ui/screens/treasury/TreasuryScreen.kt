@@ -50,7 +50,6 @@ fun TreasuryScreen(
 ) {
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
-  val accountingState by accountingViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
   Scaffold(
