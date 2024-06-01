@@ -2,11 +2,9 @@ package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Savings
@@ -130,10 +128,7 @@ class ProfileViewModel(
             { loadProfile() },
             { error ->
               _uiState.value = _uiState.value.copy(refresh = false)
-              CoroutineScope(Dispatchers.Main).launch {
-                _uiState.value.snackbarHostState.showSnackbar(
-                    message = error, duration = SnackbarDuration.Short)
-              }
+              snackbarSystem.showSnackbar(error)
             })
     if (!refreshSystem.start(2)) return
     _uiState.value = _uiState.value.copy(refresh = true)
