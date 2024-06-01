@@ -5,6 +5,7 @@ import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.SnackbarSystem
 import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class ReceiptListViewModel(
     private val navActions: NavigationActions,
-    private val receiptsDatabase: ReceiptAPI
+    private val receiptsDatabase: ReceiptAPI,
+    private val snackbarSystem: SnackbarSystem
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
