@@ -2,11 +2,9 @@ package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Savings
@@ -145,6 +143,13 @@ class ProfileViewModel(
     userAPI.getCurrentUserRole(
         { role ->
           _uiState.value = _uiState.value.copy(currentRole = role)
+          when (role.type) {
+            RoleType.PRESIDENCY -> _uiState.value = _uiState.value.copy(isAdmin = true)
+            RoleType.TREASURY -> _uiState.value = _uiState.value.copy(isAdmin = false)
+            RoleType.COMMITTEE -> _uiState.value = _uiState.value.copy(isAdmin = false)
+            RoleType.STAFF -> _uiState.value = _uiState.value.copy(isAdmin = false)
+            RoleType.MEMBER -> _uiState.value = _uiState.value.copy(isAdmin = false)
+          }
           endLoading()
         },
         { endLoading("Error loading role") })
@@ -267,6 +272,8 @@ data class ProfileUIState(
     val loading: Boolean = false,
     // the error message, if any
     val error: String? = null,
+    // true if the user is an admin, false if not
+    val isAdmin: Boolean = false,
     // the name of the user
     val myName: String = "",
     // the name of the user as they're editing it
