@@ -18,6 +18,7 @@ import com.github.se.assocify.ui.screens.login.loginGraph
 import com.github.se.assocify.ui.screens.profile.profileGraph
 import com.github.se.assocify.ui.screens.selectAssociation.selectAssociationGraph
 import com.github.se.assocify.ui.screens.treasury.treasuryGraph
+import com.github.se.assocify.ui.theme.ThemeViewModel
 
 fun NavGraphBuilder.mainNavGraph(
     navActions: NavigationActions,
@@ -29,7 +30,8 @@ fun NavGraphBuilder.mainNavGraph(
     taskAPI: TaskAPI,
     receiptsAPI: ReceiptAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
-    accountingSubCategoryAPI: AccountingSubCategoryAPI
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    appThemeViewModel: ThemeViewModel
 ) {
   homeGraph(navActions)
   treasuryGraph(
@@ -41,7 +43,7 @@ fun NavGraphBuilder.mainNavGraph(
       accountingSubCategoryAPI)
   eventGraph(navActions, eventAPI, taskAPI)
   chatGraph(navActions)
-  profileGraph(navActions, userAPI, associationAPI, accountingCategoriesAPI, eventAPI)
+  profileGraph(navActions, userAPI, associationAPI, accountingCategoriesAPI, eventAPI, appThemeViewModel)
   loginGraph(navActions, userAPI)
   selectAssociationGraph(navActions, userAPI, associationAPI)
   createAssociationGraph(navActions, userAPI, associationAPI)

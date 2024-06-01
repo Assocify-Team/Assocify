@@ -13,13 +13,15 @@ import com.github.se.assocify.ui.screens.profile.events.profileEventsGraph
 import com.github.se.assocify.ui.screens.profile.members.profileMembersGraph
 import com.github.se.assocify.ui.screens.profile.preferences.profilePreferencesGraph
 import com.github.se.assocify.ui.screens.profile.treasuryTags.profileTreasuryTagsGraph
+import com.github.se.assocify.ui.theme.ThemeViewModel
 
 fun NavGraphBuilder.profileGraph(
     navigationActions: NavigationActions,
     userAPI: UserAPI,
     associationAPI: AssociationAPI,
     accountingCategoryAPI: AccountingCategoryAPI,
-    eventAPI: EventAPI
+    eventAPI: EventAPI,
+    appThemeVM : ThemeViewModel
 ) {
   composable(
       route = Destination.Profile.route,
@@ -28,7 +30,7 @@ fun NavGraphBuilder.profileGraph(
     ProfileScreen(navigationActions, profileViewModel)
   }
 
-  profilePreferencesGraph(navigationActions)
+  profilePreferencesGraph(navigationActions, appThemeVM)
   profileMembersGraph(navigationActions, associationAPI)
   profileTreasuryTagsGraph(navigationActions, accountingCategoryAPI)
   profileEventsGraph(navigationActions, eventAPI)

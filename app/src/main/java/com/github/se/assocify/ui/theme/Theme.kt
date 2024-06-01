@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.github.se.assocify.model.entities.Theme
 
 private val LightColorScheme =
     lightColorScheme(
@@ -83,18 +84,27 @@ private val DarkColorScheme =
 
 @Composable
 fun AssocifyTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeVM: ThemeViewModel,
+    theme: Theme,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
+
   val colorScheme =
       when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
           val context = LocalContext.current
-          if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+          when(theme) {
+              Theme.LIGHT -> dynamicLightColorScheme(context)
+              Theme.DARK -> dynamicDarkColorScheme(context)
+              Theme.SYSTEM ->
+                  if (isSystemInDarkTheme()) dynamicDarkColorScheme(context)
+                  else dynamicLightColorScheme(context)
+          }
         }
-        darkTheme -> DarkColorScheme
+        theme == Theme.DARK -> DarkColorScheme
+        theme == Theme.SYSTEM -> if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme
         else -> LightColorScheme
       }
   val view = LocalView.current
@@ -102,7 +112,7 @@ fun AssocifyTheme(
     SideEffect {
       val window = (view.context as Activity).window
       window.statusBarColor = colorScheme.primary.toArgb()
-      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = theme == Theme.DARK
     }
   }
 

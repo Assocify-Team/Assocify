@@ -19,9 +19,10 @@ import com.github.se.assocify.model.localsave.LoginSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.navigation.mainNavGraph
+import com.github.se.assocify.ui.theme.ThemeViewModel
 
 @Composable
-fun AssocifyApp(loginSaver: LoginSave) {
+fun AssocifyApp(loginSaver: LoginSave, appThemeViewModel: ThemeViewModel) {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController, loginSaver)
 
@@ -62,6 +63,8 @@ fun AssocifyApp(loginSaver: LoginSave) {
         taskAPI = taskAPI,
         receiptsAPI = receiptsAPI,
         accountingCategoriesAPI = accountingCategoriesAPI,
-        accountingSubCategoryAPI = accountingSubCategoryAPI)
+        accountingSubCategoryAPI = accountingSubCategoryAPI,
+        appThemeViewModel = appThemeViewModel
+    )
   }
 }
