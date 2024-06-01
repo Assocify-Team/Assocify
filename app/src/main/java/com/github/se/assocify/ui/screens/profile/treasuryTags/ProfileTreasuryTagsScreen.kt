@@ -145,13 +145,16 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
             item {
               OutlinedTextField(
                   singleLine = true,
-                  isError = state.error,
+                  isError = state.nameError,
                   modifier = Modifier.padding(8.dp).testTag("nameField"),
                   value = nameString,
-                  onValueChange = { nameString = it },
+                  onValueChange = {
+                    nameString = it
+                    treasuryTagsViewModel.checkNameError(it)
+                  },
                   label = { Text("Name") },
                   supportingText = {
-                    Text(if (nameString.isEmpty()) "The string should not be empty!" else "")
+                    Text(if (nameString.isEmpty()) "The string is not correct!" else "")
                   })
             }
             item {
@@ -162,6 +165,7 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
                 TextButton(
                     content = { Text("Save") },
                     onClick = {
+                      treasuryTagsViewModel.checkNameError(nameString)
                       val newTag = AccountingCategory(tag.uid, nameString)
                       if (state.modify) treasuryTagsViewModel.modifyTag(newTag)
                       else treasuryTagsViewModel.addTag(newTag)
