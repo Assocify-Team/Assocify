@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,7 @@ import com.github.se.assocify.ui.util.SnackbarSystem
 import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * This ViewModel is used to manage the UI state of the profile screen. It is used to get the user's
