@@ -34,7 +34,7 @@ class ReceiptListViewModel(
           { updateReceipts() },
           { error ->
             _uiState.value = _uiState.value.copy(refresh = false)
-            Log.e("ReceiptListScreen", error)
+            snackbarSystem.showSnackbar(error)
           })
 
   init {
@@ -76,7 +76,7 @@ class ReceiptListViewModel(
         },
         onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching user receipts", it)
-          loadSystem.end("Error loading user receipts")
+          loadSystem.end("Error loading receipts")
         })
   }
 
