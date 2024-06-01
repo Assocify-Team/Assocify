@@ -49,15 +49,6 @@ class TreasuryViewModel(
       }
     }
   }
-
-  fun getCurrentUserRole() {
-    // TODO: change this to receiptListViewModel.uiState.value.currentUserRole when merge with main
-    _uiState.value =
-        _uiState.value.copy(
-            currentUserRole =
-                PermissionRole(
-                    CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER))
-  }
 }
 
 /**
@@ -67,9 +58,7 @@ class TreasuryViewModel(
  */
 data class TreasuryUIState(
     val searchQuery: String = "",
-    val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts,
-    val currentUserRole: PermissionRole =
-        PermissionRole(CurrentUser.userUid!!, CurrentUser.associationUid!!, RoleType.MEMBER)
+    val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts
 )
 
 /** Treasury tabs */

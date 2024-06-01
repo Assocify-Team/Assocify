@@ -52,6 +52,7 @@ fun TreasuryScreen(
 ) {
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
+    val receiptState by receiptListViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
   Scaffold(
@@ -95,9 +96,8 @@ fun TreasuryScreen(
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-          Log.d("TreasuryScreen", "Current user role: ${treasuryState.currentUserRole}")
-          if (treasuryState.currentUserRole.type != RoleType.TREASURY &&
-              treasuryState.currentUserRole.type != RoleType.PRESIDENCY) {
+          if (receiptState.userCurrentRole.type != RoleType.TREASURY &&
+              receiptState.userCurrentRole.type != RoleType.PRESIDENCY) {
             ReceiptListScreen(viewModel = receiptListViewModel)
           } else {
             InnerTabRow(
