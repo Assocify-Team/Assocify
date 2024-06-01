@@ -24,8 +24,6 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
-import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -102,23 +100,23 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               onSuccessCallback(listOf())
             }
       }
-  var receiptListViewModel: ReceiptListViewModel = ReceiptListViewModel(navActions, mockReceiptAPI)
-  lateinit var accountingViewModel: AccountingViewModel
+
+  // treasuryViewModel.otherViewmodel to acces accounting and receipt viewmodels :)
+  val treasuryViewModel =
+      TreasuryViewModel(
+          navActions,
+          mockReceiptAPI,
+          mockAccountingCategoriesAPI,
+          mockAccountingSubCategoryAPI,
+          mockBalanceAPI,
+          mockBudgetAPI,
+      )
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    accountingViewModel =
-        AccountingViewModel(
-            mockAccountingCategoriesAPI,
-            mockAccountingSubCategoryAPI,
-            mockBalanceAPI,
-            mockBudgetAPI)
-    val viewModel = TreasuryViewModel(navActions, receiptListViewModel, accountingViewModel)
-    composeTestRule.setContent {
-      TreasuryScreen(navActions, accountingViewModel, receiptListViewModel, viewModel)
-    }
+    composeTestRule.setContent { TreasuryScreen(navActions, treasuryViewModel) }
   }
 
   @Test
@@ -220,7 +218,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           secondArg<(Exception) -> Unit>().invoke(Exception("error"))
         }
     with(composeTestRule) {
-      receiptListViewModel.updateReceipts()
+      treasuryViewModel.receiptListViewModel.updateReceipts()
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipts")
     }
   }
