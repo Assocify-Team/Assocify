@@ -56,8 +56,8 @@ class AccountingViewModel(
 
   /** Initialize the view model */
   init {
-    loadAccounting()
     uiState = _uiState
+    loadAccounting()
   }
 
   /** Function to load categories and subcategories */
@@ -161,10 +161,10 @@ class AccountingViewModel(
 
   /** Set the amount of a subcategory */
   private fun setSubcategoriesAmount() {
-    val updatedAmountBalanceHT = _uiState.value.amountBalanceHT.toMutableMap()
-    val updatedAmountBalanceTTC = _uiState.value.amountBalanceTTC.toMutableMap()
-    val updatedAmountBudgetHT = _uiState.value.amountBudgetHT.toMutableMap()
-    val updatedAmountBudgetTTC = _uiState.value.amountBudgetTTC.toMutableMap()
+    val updatedAmountBalanceHT: MutableMap<String, Int> = mutableMapOf()
+    val updatedAmountBalanceTTC: MutableMap<String, Int> = mutableMapOf()
+    val updatedAmountBudgetHT: MutableMap<String, Int> = mutableMapOf()
+    val updatedAmountBudgetTTC: MutableMap<String, Int> = mutableMapOf()
 
     val balanceItemsBySubCategory = _uiState.value.balanceItemList.groupBy { it.subcategoryUID }
     val budgetItemsBySubCategory = _uiState.value.budgetItemsList.groupBy { it.subcategoryUID }
