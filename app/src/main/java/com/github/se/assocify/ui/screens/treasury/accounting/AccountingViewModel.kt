@@ -13,10 +13,10 @@ import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.ui.util.SnackbarSystem
 import com.github.se.assocify.ui.util.SyncSystem
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import java.time.Year
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * The view model for the budget screen

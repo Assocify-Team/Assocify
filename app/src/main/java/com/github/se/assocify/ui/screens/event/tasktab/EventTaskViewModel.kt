@@ -4,11 +4,12 @@ import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.database.TaskAPI
 import com.github.se.assocify.model.entities.Event
 import com.github.se.assocify.model.entities.Task
+import com.github.se.assocify.ui.util.SnackbarSystem
 import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : ViewModel() {
+class EventTaskViewModel(val db: TaskAPI, val snackbarSystem: SnackbarSystem) : ViewModel() {
   private val _uiState = MutableStateFlow(EventTaskState())
   val uiState: StateFlow<EventTaskState>
 
@@ -22,7 +23,7 @@ class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : 
           { updateTasks() },
           {
             _uiState.value = _uiState.value.copy(refresh = false)
-            showSnackbar(it)
+            snackbarSystem.showSnackbar(it)
           })
 
   init {
@@ -69,7 +70,7 @@ class EventTaskViewModel(val db: TaskAPI, val showSnackbar: (String) -> Unit) : 
                       })
           filterTasks()
         },
-        { showSnackbar("Couldn't update task state") })
+        { snackbarSystem.showSnackbar("Couldn't update task state") })
   }
 
   /**
