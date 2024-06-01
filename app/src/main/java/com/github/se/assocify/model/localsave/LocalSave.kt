@@ -2,7 +2,6 @@ package com.github.se.assocify.model.localsave
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.github.se.assocify.MainActivity
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Theme

@@ -26,8 +26,6 @@ fun AssocifyApp(localSaver: LocalSave, appThemeViewModel: ThemeViewModel) {
   val navController = rememberNavController()
   val navActions = NavigationActions(navController, localSaver)
 
-
-
   val userAPI =
       UserAPI(
           SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath().resolve("users"))

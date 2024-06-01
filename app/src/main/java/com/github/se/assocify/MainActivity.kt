@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
     val themeVM = ThemeViewModel()
     val localSave = LocalSave(this, themeVM)
 
-
     setContent {
       val theme by themeVM.theme.collectAsState()
       AssocifyTheme(themeVM = themeVM, theme = theme) {
