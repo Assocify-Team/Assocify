@@ -44,6 +44,21 @@ class ProfileViewModel(
 
   private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
 
+  private val loadSystem =
+      SyncSystem(
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
+          { error ->
+            _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = error)
+          })
+
+  private val refreshSystem =
+      SyncSystem(
+          { loadProfile() },
+          { error ->
+            _uiState.value = _uiState.value.copy(refresh = false)
+            snackbarSystem.showSnackbar(error)
+          })
+
   init {
     loadProfile()
   }
@@ -53,14 +68,7 @@ class ProfileViewModel(
    * and the current association. It also gets the user's role in the association.
    */
   fun loadProfile() {
-    val loadSystem =
-        SyncSystem(
-            {
-              _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null)
-            },
-            { error ->
-              _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = error)
-            })
+
     if (!loadSystem.start(4)) return
 
     _uiState.value = _uiState.value.copy(loading = true, error = null)
@@ -121,7 +129,7 @@ class ProfileViewModel(
         },
         { loadSystem.end("Error loading role") })
 
-    // This one is seperate from the main loading system because it's not critical,
+    // This one is separate from the main loading system because it's not critical,
     // therefore it doesn't need to block the screen in loading state
     userAPI.getProfilePicture(
         "${CurrentUser.userUid!!}.jpg",
@@ -130,13 +138,6 @@ class ProfileViewModel(
   }
 
   fun refreshProfile() {
-    val refreshSystem =
-        SyncSystem(
-            { loadProfile() },
-            { error ->
-              _uiState.value = _uiState.value.copy(refresh = false)
-              snackbarSystem.showSnackbar(error)
-            })
     if (!refreshSystem.start(2)) return
     _uiState.value = _uiState.value.copy(refresh = true)
 
@@ -256,11 +257,11 @@ class ProfileViewModel(
 }
 
 data class ProfileUIState(
-    // wether the screen in loading
+    // whether the screen in loading
     val loading: Boolean = false,
     // the error message, if any
     val error: String? = null,
-    // wether the profile is being refreshed
+    // whether the profile is being refreshed
     val refresh: Boolean = false,
     // the name of the user
     val myName: String = "",

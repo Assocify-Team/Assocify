@@ -1,7 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
@@ -78,7 +77,6 @@ class ReceiptViewModel {
           loadImage()
         },
         onFailure = {
-          Log.e("ReceiptViewModel", "Error loading receipt", it)
           _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
         })
   }

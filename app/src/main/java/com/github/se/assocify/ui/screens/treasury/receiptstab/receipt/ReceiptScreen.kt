@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -80,7 +79,6 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { paddingValues ->
         if (receiptState.loading) {
-          Log.e("ReceiptScreen", "receiptState.loading")
           CenteredCircularIndicator()
           return@Scaffold
         }

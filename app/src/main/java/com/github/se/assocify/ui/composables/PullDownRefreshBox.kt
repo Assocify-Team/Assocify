@@ -16,11 +16,18 @@ import androidx.compose.ui.unit.dp
 /**
  * A container to make a scrollable content pullable to refresh.
  *
+ * This box is meant to be used as a wrapper around a vertically scrolling element, such as a Column
+ * or LazyColumn. It will allow the user to pull down on the content to refresh it. The box will
+ * automatically show a loading indicator when the content is refreshing.
+ *
+ * The box will take up the entire size of its parent (typically a Scaffold), and will apply the
+ * padding values to the content inside the box.
+ *
  * NOTE: Pass the scaffold padding values to the box itself, NOT the content inside the box.
  *
  * @param refreshing Whether the content is currently refreshing.
  * @param onRefresh The callback to call when the user pulls down to refresh.
- * @param paddingValues The padding values to apply to the conatiner.
+ * @param paddingValues The padding values to apply to the container.
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
