@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -25,6 +26,7 @@ import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
+import com.github.se.assocify.ui.util.SnackbarSystem
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -151,7 +153,11 @@ class AccountingScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     CurrentUser.associationUid = "associationId"
     accountingViewModel =
         AccountingViewModel(
-            mockAccountingCategoryAPI, mockAccountingSubCategoryAPI, mockBalanceAPI, mockBudgetAPI)
+            mockAccountingCategoryAPI,
+            mockAccountingSubCategoryAPI,
+            mockBalanceAPI,
+            mockBudgetAPI,
+            SnackbarSystem(SnackbarHostState()))
     composeTestRule.setContent {
       AccountingScreen(AccountingPage.BUDGET, mockNavActions, accountingViewModel)
       AccountingFilterBar(accountingViewModel = accountingViewModel)
