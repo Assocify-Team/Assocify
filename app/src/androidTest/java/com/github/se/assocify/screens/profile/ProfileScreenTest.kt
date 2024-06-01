@@ -31,7 +31,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
-import kotlin.Exception
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -350,6 +349,54 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("default profile icon").assertHasClickAction()
       mViewmodel.setImage(uri)
       assert(mViewmodel.uiState.value.profileImageURI != null)
+    }
+  }
+
+  @Test
+  fun rolePermissionTest() {
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.MEMBER))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("MEMBER").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsNotDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.STAFF))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("STAFF").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsNotDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.TREASURY))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("TREASURY").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.COMMITTEE))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("COMMITTEE").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsDisplayed()
     }
   }
 }
