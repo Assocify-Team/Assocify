@@ -55,6 +55,7 @@ fun ProfilePreferencesScreen(
 ) {
   // temporary values for the theme, text size, language and currency, waiting for the viewmodel
   val themeOptions = listOf(Theme.LIGHT, Theme.DARK, Theme.SYSTEM)
+
   val currentTheme by appThemeViewModel.theme.collectAsState()
 
   var themeSelectedIndex by remember { mutableIntStateOf(themeOptions.indexOf(currentTheme)) }
