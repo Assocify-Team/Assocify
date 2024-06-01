@@ -138,10 +138,7 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
       eventCache =
           eventCache?.map {
             if (it.uid == uid) {
-              Event(
-                  uid = uid,
-                  name = name,
-                  description = description)
+              Event(uid = uid, name = name, description = description)
             } else {
               it
             }
@@ -174,10 +171,6 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
       val description: String,
       @SerialName("association_uid") val associationUID: String?
   ) {
-    fun toEvent() =
-        Event(
-            uid = uid,
-            name = name,
-            description = description)
+    fun toEvent() = Event(uid = uid, name = name, description = description)
   }
 }
