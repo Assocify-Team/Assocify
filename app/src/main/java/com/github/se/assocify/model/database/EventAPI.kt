@@ -4,7 +4,6 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Event
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
-import java.time.OffsetDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -54,10 +53,6 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
                   uid = event.uid,
                   name = event.name,
                   description = event.description,
-                  startDate = event.startDate.toString(),
-                  endDate = event.endDate.toString(),
-                  guestsOrArtists = event.guestsOrArtists,
-                  location = event.location,
                   associationUID = CurrentUser.associationUid))
 
       eventCache = eventCache?.plus(event)
@@ -112,10 +107,6 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
         uid = event.uid,
         name = event.name,
         description = event.description,
-        startDate = event.startDate,
-        endDate = event.endDate,
-        guestsOrArtists = event.guestsOrArtists,
-        location = event.location,
         onSuccess = onSuccess,
         onFailure = onFailure)
   }
@@ -126,10 +117,6 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
    * @param uid the id of the event to update
    * @param name the name of the event
    * @param description the description of the event
-   * @param startDate the start date of the event
-   * @param endDate the end date of the event
-   * @param guestsOrArtists the guests or artists of the event
-   * @param location the location of the event
    * @param onSuccess called on success (by default does nothing)
    * @param onFailure called on failure
    */
@@ -137,10 +124,6 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
       uid: String,
       name: String,
       description: String,
-      startDate: OffsetDateTime,
-      endDate: OffsetDateTime,
-      guestsOrArtists: String,
-      location: String,
       onSuccess: () -> Unit = {},
       onFailure: (Exception) -> Unit
   ) {
@@ -148,10 +131,6 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
       postgrest.from(collectionName).update({
         SupabaseEvent::name setTo name
         SupabaseEvent::description setTo description
-        SupabaseEvent::startDate setTo startDate.toString()
-        SupabaseEvent::endDate setTo endDate.toString()
-        SupabaseEvent::guestsOrArtists setTo guestsOrArtists
-        SupabaseEvent::location setTo location
       }) {
         filter { Event::uid eq uid }
       }
@@ -162,11 +141,7 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
               Event(
                   uid = uid,
                   name = name,
-                  description = description,
-                  startDate = startDate,
-                  endDate = endDate,
-                  guestsOrArtists = guestsOrArtists,
-                  location = location)
+                  description = description)
             } else {
               it
             }
@@ -197,20 +172,12 @@ class EventAPI(db: SupabaseClient) : SupabaseApi() {
       val uid: String,
       val name: String,
       val description: String,
-      @SerialName("start_date") val startDate: String,
-      @SerialName("end_date") val endDate: String,
-      @SerialName("guests_or_artists") val guestsOrArtists: String,
-      val location: String,
       @SerialName("association_uid") val associationUID: String?
   ) {
     fun toEvent() =
         Event(
             uid = uid,
             name = name,
-            description = description,
-            startDate = OffsetDateTime.parse(startDate),
-            endDate = OffsetDateTime.parse(endDate),
-            guestsOrArtists = guestsOrArtists,
-            location = location)
+            description = description)
   }
 }

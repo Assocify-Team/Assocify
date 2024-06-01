@@ -12,13 +12,13 @@ import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
-import java.time.OffsetDateTime
-import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @MockKExtension.ConfirmVerification
 class EventAPITest {
@@ -165,11 +165,7 @@ class EventAPITest {
         Event(
             uid = uuid1.toString(),
             name = "Test Event",
-            description = "Test Description",
-            startDate = currentTime,
-            endDate = currentTime,
-            guestsOrArtists = "Test Guest",
-            location = "Test Location"),
+            description = "Test Description"),
         onSuccess) {
           fail("should not fail")
         }
@@ -213,11 +209,7 @@ class EventAPITest {
         Event(
             uid = "$uuid1",
             name = "Test Event",
-            description = "Test Description",
-            startDate = currentTime,
-            endDate = currentTime,
-            guestsOrArtists = "Test Guest",
-            location = "Test Location"),
+            description = "Test Description"),
         onSuccess) {
           fail("Should not fail")
         }
