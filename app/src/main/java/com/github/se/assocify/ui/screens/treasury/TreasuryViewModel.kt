@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.treasury
 
+import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
@@ -8,24 +9,30 @@ import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
+import com.github.se.assocify.ui.util.SnackbarSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class TreasuryViewModel(
-  private val navActions: NavigationActions,
-  private val receiptsAPI: ReceiptAPI,
-  private val accountingCategoryAPI: AccountingCategoryAPI,
-  private val accountingSubCategoryAPI: AccountingSubCategoryAPI,
-  private val balanceAPI: BalanceAPI,
-  private val budgetAPI: BudgetAPI,
-  val receiptListViewModel: ReceiptListViewModel =
-      ReceiptListViewModel(navActions, receiptsAPI),
-  val accountingViewModel: AccountingViewModel =
-      AccountingViewModel(accountingCategoryAPI, accountingSubCategoryAPI, balanceAPI, budgetAPI)
+    private val navActions: NavigationActions,
+    private val receiptsAPI: ReceiptAPI,
+    private val accountingCategoryAPI: AccountingCategoryAPI,
+    private val accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    private val balanceAPI: BalanceAPI,
+    private val budgetAPI: BudgetAPI,
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<TreasuryUIState> = MutableStateFlow(TreasuryUIState())
   val uiState: StateFlow<TreasuryUIState>
+
+  private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
+
+  val receiptListViewModel: ReceiptListViewModel =
+      ReceiptListViewModel(navActions, receiptsAPI, snackbarSystem)
+
+  val accountingViewModel: AccountingViewModel =
+      AccountingViewModel(
+          accountingCategoryAPI, accountingSubCategoryAPI, balanceAPI, budgetAPI, snackbarSystem)
 
   init {
     _uiState.value = TreasuryUIState()
@@ -66,6 +73,7 @@ class TreasuryViewModel(
  * @param searchQuery the current search query
  */
 data class TreasuryUIState(
+    val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     val searchQuery: String = "",
     val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts
 )

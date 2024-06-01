@@ -13,6 +13,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,10 +44,7 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TreasuryScreen(
-    navActions: NavigationActions,
-    treasuryViewModel: TreasuryViewModel
-) {
+fun TreasuryScreen(navActions: NavigationActions, treasuryViewModel: TreasuryViewModel) {
 
   val accountingViewModel: AccountingViewModel = treasuryViewModel.accountingViewModel
   val receiptListViewModel: ReceiptListViewModel = treasuryViewModel.receiptListViewModel
@@ -92,6 +91,11 @@ fun TreasuryScreen(
             }) {
               Icon(Icons.Outlined.Add, "Create")
             }
+      },
+      snackbarHost = {
+        SnackbarHost(
+            hostState = treasuryState.snackbarHostState,
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
