@@ -154,7 +154,7 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
                   },
                   label = { Text("Name") },
                   supportingText = {
-                    Text(if (nameString.isEmpty()) "The string is not correct!" else "")
+                    Text(if (state.nameError) "The string is not correct!" else "")
                   })
             }
             item {
@@ -169,7 +169,6 @@ fun NamePopUp(treasuryTagsViewModel: ProfileTreasuryTagsViewModel) {
                       val newTag = AccountingCategory(tag.uid, nameString)
                       if (state.modify) treasuryTagsViewModel.modifyTag(newTag)
                       else treasuryTagsViewModel.addTag(newTag)
-                      treasuryTagsViewModel.cancelPopUp()
                     },
                     modifier = Modifier.testTag("saveButton"),
                 )

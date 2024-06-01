@@ -66,6 +66,7 @@ class ProfileTreasuryTagsViewModel(
         newTag,
         {
           _uiState.value = _uiState.value.copy(treasuryTags = _uiState.value.treasuryTags + newTag)
+          cancelPopUp()
         },
         {
           snackBarSystem.showSnackbar(
@@ -83,6 +84,7 @@ class ProfileTreasuryTagsViewModel(
           _uiState.value =
               _uiState.value.copy(
                   treasuryTags = _uiState.value.treasuryTags.filter { it.uid != tag.uid } + tag)
+          cancelPopUp()
         },
         {
           snackBarSystem.showSnackbar(
@@ -93,7 +95,12 @@ class ProfileTreasuryTagsViewModel(
 
   fun cancelPopUp() {
     _uiState.value =
-        _uiState.value.copy(modify = false, creating = false, editedTag = null, displayedName = "")
+        _uiState.value.copy(
+            modify = false,
+            creating = false,
+            editedTag = null,
+            displayedName = "",
+            nameError = false)
   }
 
   fun checkNameError(name: String) {
