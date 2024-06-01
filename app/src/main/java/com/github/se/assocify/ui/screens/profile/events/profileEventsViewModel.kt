@@ -19,10 +19,12 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
   private val _uiState = MutableStateFlow(ProfileEventsUIState())
   val uiState: StateFlow<ProfileEventsUIState> = _uiState
 
+  private val loadEventError: String = "Error loading events"
+
   init {
     eventAPI.getEvents(
         { eventList -> _uiState.value = _uiState.value.copy(events = eventList) },
-        { Log.e("events", "Error loading events") })
+        { Log.e("events", loadEventError) })
   }
 
   /**
@@ -85,7 +87,7 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
           _uiState.value = _uiState.value.copy(deleteDialog = false, deletingEvent = null)
           eventAPI.getEvents(
               { eventList -> _uiState.value = _uiState.value.copy(events = eventList) },
-              { Log.e("events", "Error loading events") })
+              { Log.e("events", loadEventError) })
         },
         { Log.e("events", "Error deleting event") })
   }
@@ -109,7 +111,7 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
                         newGuestsOrArtists = "",
                         newLocation = "")
               },
-              { Log.e("events", "Error loading events") })
+              { Log.e("events", loadEventError) })
         },
         { Log.e("events", "Error updating event") })
   }
@@ -140,7 +142,7 @@ class ProfileEventsViewModel(private val eventAPI: EventAPI) : ViewModel() {
                         newGuestsOrArtists = "",
                         newLocation = "")
               },
-              { Log.e("events", "Error loading events") })
+              { Log.e("events", loadEventError) })
         },
         { Log.e("events", "Error adding event") })
   }

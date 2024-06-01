@@ -112,7 +112,8 @@ fun ProfileEventsScreen(
               Dialog(onDismissRequest = { profileEventsViewModel.clearModifyingEvent() }) {
                 ElevatedCard {
                   Column(
-                      modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                      modifier =
+                          Modifier.padding(16.dp).fillMaxWidth().testTag("updateEventDialog"),
                       horizontalAlignment = Alignment.CenterHorizontally,
                       verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         // name of the event
@@ -153,7 +154,7 @@ fun ProfileEventsScreen(
               Dialog(onDismissRequest = { profileEventsViewModel.clearDeleteDialog() }) {
                 ElevatedCard {
                   Column(
-                      modifier = Modifier.padding(16.dp),
+                      modifier = Modifier.padding(16.dp).testTag("deleteEventDialog"),
                       horizontalAlignment = Alignment.CenterHorizontally,
                       verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Text(

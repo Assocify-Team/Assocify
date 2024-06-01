@@ -72,6 +72,41 @@ class ProfileEventsScreenTest :
   }
 
   @Test
+  fun addEvent() {
+    with(composeTestRule) {
+      onNodeWithTag("addEventButton").performClick()
+      onNodeWithTag("updateEventDialog").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun modifyEvent() {
+    with(composeTestRule) {
+      onAllNodesWithTag("editEventButton").apply {
+        fetchSemanticsNodes().forEachIndexed { i, _ ->
+          get(i).assertIsDisplayed().assertHasClickAction()
+            if (i == events.size-1) get(i).performClick()
+        }
+      }
+
+      onNodeWithTag("updateEventDialog").assertIsDisplayed()
+    }
+  }
+
+    @Test
+  fun deleteEvent() {
+    with(composeTestRule) {
+      onAllNodesWithTag("deleteEventButton").apply {
+        fetchSemanticsNodes().forEachIndexed { i, _ ->
+          get(i).assertIsDisplayed().assertHasClickAction()
+            if (i == events.size - 1) get(i).performClick()
+        }
+        onNodeWithTag("deleteEventDialog").assertIsDisplayed()
+      }
+    }
+  }
+
+  @Test
   fun goBack() {
     with(composeTestRule) {
       onNodeWithTag("backButton").performClick()
