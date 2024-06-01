@@ -143,13 +143,7 @@ class ProfileViewModel(
     userAPI.getCurrentUserRole(
         { role ->
           _uiState.value = _uiState.value.copy(currentRole = role)
-          when (role.type) {
-            RoleType.PRESIDENCY -> _uiState.value = _uiState.value.copy(isAdmin = true)
-            RoleType.TREASURY -> _uiState.value = _uiState.value.copy(isAdmin = false)
-            RoleType.COMMITTEE -> _uiState.value = _uiState.value.copy(isAdmin = false)
-            RoleType.STAFF -> _uiState.value = _uiState.value.copy(isAdmin = false)
-            RoleType.MEMBER -> _uiState.value = _uiState.value.copy(isAdmin = false)
-          }
+          setRoleCapacities()
           endLoading()
         },
         { endLoading("Error loading role") })
@@ -199,12 +193,27 @@ class ProfileViewModel(
         { role ->
           _uiState.value = _uiState.value.copy(selectedAssociation = association)
           _uiState.value = _uiState.value.copy(currentRole = role)
+          setRoleCapacities()
           endLoading()
         },
         {
           CurrentUser.associationUid = oldAssociationUid
           snackbarSystem.showSnackbar("Couldn't switch association")
         })
+  }
+
+  /**
+   * This function is used to set the role capacities of the user. It sets the user as an admin if
+   * they are a president, treasurer or committee of the association.
+   */
+  private fun setRoleCapacities() {
+    when (_uiState.value.currentRole.type) {
+      RoleType.PRESIDENCY -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.TREASURY -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.COMMITTEE -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.STAFF -> _uiState.value = _uiState.value.copy(isAdmin = false)
+      RoleType.MEMBER -> _uiState.value = _uiState.value.copy(isAdmin = false)
+    }
   }
 
   /**
