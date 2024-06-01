@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -165,7 +164,6 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
 
             // The amount field
             item {
-              Log.e("BalancePopUpScreen", "receiptUid: $receiptUid")
               OutlinedTextField(
                   singleLine = true,
                   isError = balanceModel.errorAmount != null,
@@ -315,7 +313,6 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                           nameString, receiptUid, amountString, assignee, descriptionString, date)
 
                       if (balanceModel.creating && amountString.toDoubleOrNull() != null) {
-                        Log.e("BalancePopUpScreen", "Creating balance item")
                         val newBalanceItem =
                             BalanceItem(
                                 balance.uid,
@@ -330,7 +327,6 @@ fun BalancePopUpScreen(balanceDetailedViewModel: BalanceDetailedViewModel) {
                                 mutableStatus)
                         balanceDetailedViewModel.saveCreation(newBalanceItem)
                       } else if (amountString.toDoubleOrNull() != null) {
-                        Log.e("BalancePopUpScreen", "Editing balance item")
                         val newBalanceItem =
                             BalanceItem(
                                 balance.uid,
