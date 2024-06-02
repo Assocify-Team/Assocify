@@ -11,7 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 
 @Composable
-fun ErrorMessage(errorMessage: String?, modifier: Modifier? = Modifier, onRetry: (() -> Unit)? = null) {
+fun ErrorMessage(
+    errorMessage: String?,
+    modifier: Modifier? = Modifier,
+    onRetry: (() -> Unit)? = null
+) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center,

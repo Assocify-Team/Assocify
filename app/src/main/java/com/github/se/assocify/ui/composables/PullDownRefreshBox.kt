@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PullDownRefreshBox(
+    modifier: Modifier = Modifier,
     refreshing: Boolean,
     onRefresh: () -> Unit,
     paddingValues: PaddingValues? = null,
-    modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
   val pullRefreshState = rememberPullRefreshState(refreshing, onRefresh)
