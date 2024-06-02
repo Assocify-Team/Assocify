@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.util
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +33,10 @@ class SnackbarSystem(private val snackbarHostState: SnackbarHostState) {
     CoroutineScope(Dispatchers.Main).launch {
       val result =
           snackbarHostState.showSnackbar(
-              message, actionLabel, dismiss || (persistent && actionLabel == null))
+              message,
+              actionLabel,
+              dismiss || (persistent && actionLabel == null),
+              if (persistent) SnackbarDuration.Indefinite else SnackbarDuration.Short)
       if (result == SnackbarResult.ActionPerformed) {
         actionHandler()
       }

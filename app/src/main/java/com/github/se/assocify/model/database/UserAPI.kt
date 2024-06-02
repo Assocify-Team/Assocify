@@ -155,7 +155,7 @@ class UserAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
   fun requestJoin(associationId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("applicant")
-          .insert(
+          .upsert(
               Json.decodeFromString<JsonElement>(
                   """{"association_id": "$associationId", "user_id": "${CurrentUser.userUid}"}"""))
       onSuccess()
