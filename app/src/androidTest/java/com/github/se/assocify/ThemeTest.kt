@@ -1,8 +1,11 @@
 package com.github.se.assocify
 
+import android.content.Context
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -49,7 +52,6 @@ class ThemeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   @Test
   fun lightTheme() {
-
     composeTestRule.setContent {
       AssocifyTheme(theme = Theme.LIGHT, dynamicColor = false) { TestScreen() }
     }
@@ -60,4 +62,18 @@ class ThemeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           .assertTextContains(md_theme_light_primary.toString())
     }
   }
+
+    @Test
+    fun systemTheme() {
+        composeTestRule.setContent {
+            AssocifyTheme(theme = Theme.SYSTEM, dynamicColor = false) { TestScreen() }
+        }
+        with(composeTestRule) {
+            onNodeWithText("Test")
+                .assertIsDisplayed()
+                .onSibling()
+                .assertTextContains(md_theme_light_primary.toString())
+        }
+    }
+
 }
