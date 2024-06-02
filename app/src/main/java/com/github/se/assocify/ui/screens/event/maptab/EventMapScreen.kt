@@ -1,10 +1,15 @@
 package com.github.se.assocify.ui.screens.event.maptab
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -13,23 +18,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.MapMarkerData
 import java.io.File
-import kotlin.random.Random
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
-import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
+private var myLocationOverlay: MyLocationNewOverlay? = null
+const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
 /** A screen that displays a map of the event: location with the associated tasks. */
 @Composable
@@ -80,6 +88,13 @@ fun rememberMapViewWithLifecycle(): MapView {
     }
   }
 
+  /*  // GPS location
+  val myLocationProvider = GpsMyLocationProvider(context)
+  myLocationProvider.startLocationProvider(null)
+  myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), mapView)
+  myLocationOverlay.enableMyLocation()
+  mapView.overlays.add(myLocationOverlay)*/
+
   // Make the mapview live as long as the composable
   val lifecycleObserver = rememberLifecycleObserver(mapView)
   val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -88,7 +103,31 @@ fun rememberMapViewWithLifecycle(): MapView {
     onDispose { lifecycle.removeObserver(lifecycleObserver) }
   }
 
+  // Request location permissions and initialize myLocationOverlay
+  LaunchedEffect(Unit) {
+    val permissionGranted = requestLocationPermission(context)
+    if (permissionGranted) {
+      val myLocationProvider = GpsMyLocationProvider(context)
+      myLocationProvider.startLocationProvider(null)
+      myLocationOverlay = MyLocationNewOverlay(myLocationProvider, mapView)
+      myLocationOverlay?.enableMyLocation()
+      mapView.overlays.add(myLocationOverlay)
+    }
+  }
+
   return mapView
+}
+
+fun requestLocationPermission(context: Context): Boolean {
+  if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+      PackageManager.PERMISSION_GRANTED) {
+    ActivityCompat.requestPermissions(
+        context as Activity,
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        LOCATION_PERMISSION_REQUEST_CODE)
+    return false
+  }
+  return true
 }
 
 /**
@@ -102,8 +141,14 @@ fun rememberLifecycleObserver(mapView: MapView): LifecycleObserver =
     remember(mapView) {
       LifecycleEventObserver { _, event ->
         when (event) {
-          Lifecycle.Event.ON_RESUME -> mapView.onResume()
-          Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+          Lifecycle.Event.ON_RESUME -> {
+            mapView.onResume()
+            myLocationOverlay?.enableMyLocation()
+          }
+          Lifecycle.Event.ON_PAUSE -> {
+            mapView.onPause()
+            myLocationOverlay?.disableMyLocation()
+          }
           else -> {}
         }
       }
@@ -146,10 +191,5 @@ fun EPFLMapView(
 
   // OSM maps are displayed as an Android view component
   AndroidView(
-    factory = { mapViewState },
-    modifier = modifier,
-    update = { view -> onLoad?.invoke(view) }
-  )
+      factory = { mapViewState }, modifier = modifier, update = { view -> onLoad?.invoke(view) })
 }
-
-
