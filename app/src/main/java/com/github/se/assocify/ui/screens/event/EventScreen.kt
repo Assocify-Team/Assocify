@@ -1,6 +1,9 @@
 package com.github.se.assocify.ui.screens.event
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,6 +25,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,11 +54,9 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreenViewModel) {
-
   val state by eventScreenViewModel.uiState.collectAsState()
 
   val swapState = remember { mutableStateOf(true) }
-
   val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
 
   when (pagerState.currentPage) {
@@ -103,6 +105,7 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
               Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
             })
       }) {
+
         if (state.loading) {
           CenteredCircularIndicator()
           return@Scaffold
@@ -124,7 +127,10 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
               pagerState = pagerState,
               switchTab = { tab -> eventScreenViewModel.switchTab(tab) })
 
-          HorizontalPager(state = pagerState, userScrollEnabled = swapState.value) { page ->
+          HorizontalPager(
+            state = pagerState,
+            userScrollEnabled = swapState.value
+          ) { page ->
             when (page) {
               EventPageIndex.Tasks.ordinal -> {
                 swapState.value = true
