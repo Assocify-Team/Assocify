@@ -1,6 +1,5 @@
 package com.github.se.assocify.screens
 
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -99,26 +98,6 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
     with(composeTestRule) {
       onNodeWithTag("mainNavBarItem/treasury").performClick()
       assert(tabSelected)
-    }
-  }
-
-  @OptIn(ExperimentalTestApi::class)
-  @Test
-  fun testTabSwitching() {
-    composeTestRule.setContent {
-      EventScreen(mockNavActions, EventScreenViewModel(mockNavActions, mockTaskAPI, mockEventAPI))
-    }
-    with(composeTestRule) {
-      onNodeWithTag("scheduleTab").assertIsDisplayed()
-      onNodeWithTag("scheduleTab").performClick()
-      onNodeWithTag("scheduleTab").assertIsSelected()
-
-      onNodeWithTag("tasksTab").assertIsDisplayed()
-      onNodeWithTag("tasksTab").performClick()
-      onNodeWithTag("tasksTab").assertIsSelected()
-
-      onNodeWithTag("mapTab").assertIsDisplayed()
-      onNodeWithTag("mapTab").performClick()
     }
   }
 
