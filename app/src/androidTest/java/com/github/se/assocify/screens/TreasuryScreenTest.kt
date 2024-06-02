@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
@@ -21,6 +22,7 @@ import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
+import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.PermissionRole
@@ -140,12 +142,14 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               onSuccessCallback(PermissionRole("roleUid", "testAssociation", RoleType.TREASURY))
             }
       }
-    val mockAssociationAPI: AssociationAPI = mockk<AssociationAPI>() {
-        every { getLogo(any(), any(), any()) } answers
-            {
-              secondArg<(String?) -> Unit>().invoke("uri")
-            }
-    }
+    private val mockAssocAPI =
+        mockk<AssociationAPI>() {
+            every { getLogo(any(), any(), any()) } answers
+                    {
+                        val onSuccessCallback = secondArg<(Uri) -> Unit>()
+                        onSuccessCallback(mockk())
+                    }
+        }
 
   @Before
   fun testSetup() {
@@ -160,7 +164,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             mockBalanceAPI,
             mockBudgetAPI,
             mockUserAPI,
-            mockAssociationAPI
+            mockAssocAPI
             )
     composeTestRule.setContent { TreasuryScreen(navActions, treasuryViewModel) }
   }

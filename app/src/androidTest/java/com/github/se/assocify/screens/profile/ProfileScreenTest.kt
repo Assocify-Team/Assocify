@@ -51,7 +51,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   private val asso1 = Association("asso", "test", "test", LocalDate.EPOCH)
   private val asso2 = Association("asso2", "test2", "test2", LocalDate.EPOCH)
   private val mockAssocAPI =
-      mockk<AssociationAPI>() {
+      mockk<AssociationAPI> {
         every { getAssociation("asso", any(), any()) } answers
             {
               val onSuccessCallback = secondArg<(Association) -> Unit>()
@@ -62,6 +62,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
               val onSuccessCallback = secondArg<(Association) -> Unit>()
               onSuccessCallback(asso2)
             }
+          every { getLogo(any(),any(),any()) } answers {}
       }
   private val mockUserAPI =
       mockk<UserAPI>() {

@@ -442,7 +442,7 @@ class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : Supabase
    * @param onSuccess called on success with the URI of the logo
    * @param onFailure called on failure
    */
-  fun getLogo(associationId: String, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
+  fun getLogo(associationId: String, onSuccess: (Uri?) -> Unit, onFailure: (Exception) -> Unit) {
     Log.d("image", "getLogo from association $associationId")
     if (associationId != currentAssociationCache) {
       currentAssociationCache = associationId
