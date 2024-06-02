@@ -117,7 +117,7 @@ private fun ReceiptItem(receipt: Receipt, viewModel: ReceiptListViewModel, mine:
       modifier =
           Modifier.clickable { viewModel.onReceiptClick(receipt) }
               .fillMaxWidth()
-              .testTag("$mine-${receipt.uid}"),
+              .testTag("receiptItem-$mine-${receipt.uid}"),
       headlineContent = {
         Text(modifier = Modifier.testTag("receiptNameText"), text = receipt.title)
       },

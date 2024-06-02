@@ -250,7 +250,7 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onAllNodesWithText("Receipt-1-name").apply {
         fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
       }
-      onNodeWithTag("true-r1").performClick()
+      onNodeWithTag("receiptItem-true-r1").performClick()
 
       // check that the receipt is correct and change its title
       onNodeWithTag("titleField").assertIsDisplayed().performClick().performTextInput("-changed")
@@ -258,9 +258,9 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("ReceiptList").assertIsDisplayed()
       onNodeWithText("Receipt-1-name-changed").assertIsDisplayed()
 
-      // (shouldn't have access to budget and balance but not implemented yet)
+      // (since i'm a member, i shouldn't have access to budget and balance : not implemented yet)
 
-      // add a receipt -- removed because I can't add a picture
+      // add a receipt -- removed this part of the test because adding a picture couldn't be mocked
       /*
       onNodeWithTag("createReceipt").assertIsDisplayed().performClick()
       onNodeWithTag("titleField").performClick().performTextInput("Receipt-2-name")
