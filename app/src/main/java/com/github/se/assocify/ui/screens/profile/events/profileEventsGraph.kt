@@ -9,7 +9,6 @@ import com.github.se.assocify.navigation.NavigationActions
 fun NavGraphBuilder.profileEventsGraph(navigationActions: NavigationActions, eventAPI: EventAPI) {
   composable(route = Destination.ProfileEvents.route) {
     ProfileEventsScreen(
-        navigationActions,
-        profileEventsViewModel = ProfileEventsViewModel(eventAPI, navigationActions))
+        navigationActions, profileEventsViewModel = ProfileEventsViewModel(eventAPI))
   }
 }

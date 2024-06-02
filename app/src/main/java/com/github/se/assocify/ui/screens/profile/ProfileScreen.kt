@@ -214,38 +214,40 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                         }
 
                     // The below part is association dependent, only available if you're an admin !
-                    Text(
-                        text = "Manage ${state.selectedAssociation.name}",
-                        style = MaterialTheme.typography.titleMedium)
+                    if (state.isAdmin) {
+                      Text(
+                          text = "Manage ${state.selectedAssociation.name}",
+                          style = MaterialTheme.typography.titleMedium)
 
-                    Column(
-                        modifier =
-                            Modifier.fillMaxWidth()
-                                .testTag("manageAssociationList")
-                                .clip(RoundedCornerShape(12.dp))) {
-                          AssociationSettings.entries.forEach { s ->
-                            ListItem(
-                                leadingContent = {
-                                  Icon(
-                                      imageVector = s.getIcon(),
-                                      contentDescription = "${s.name} icon")
-                                },
-                                headlineContent = { Text(text = s.toString()) },
-                                trailingContent = {
-                                  Icon(
-                                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                                      contentDescription = "Go to ${s.name} settings")
-                                },
-                                colors =
-                                    ListItemDefaults.colors(
-                                        containerColor =
-                                            MaterialTheme.colorScheme.primaryContainer),
-                                modifier =
-                                    Modifier.testTag(s.name).clickable {
-                                      navActions.navigateTo(s.getDestination())
-                                    })
+                      Column(
+                          modifier =
+                              Modifier.fillMaxWidth()
+                                  .testTag("manageAssociationList")
+                                  .clip(RoundedCornerShape(12.dp))) {
+                            AssociationSettings.entries.forEach { s ->
+                              ListItem(
+                                  leadingContent = {
+                                    Icon(
+                                        imageVector = s.getIcon(),
+                                        contentDescription = "${s.name} icon")
+                                  },
+                                  headlineContent = { Text(text = s.toString()) },
+                                  trailingContent = {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                        contentDescription = "Go to ${s.name} settings")
+                                  },
+                                  colors =
+                                      ListItemDefaults.colors(
+                                          containerColor =
+                                              MaterialTheme.colorScheme.primaryContainer),
+                                  modifier =
+                                      Modifier.testTag(s.name).clickable {
+                                        navActions.navigateTo(s.getDestination())
+                                      })
+                            }
                           }
-                        }
+                    }
 
                     // log out button (for everyone)
                     LogoutButton(viewmodel = viewmodel)

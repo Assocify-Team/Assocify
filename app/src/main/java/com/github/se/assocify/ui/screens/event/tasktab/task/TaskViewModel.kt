@@ -125,6 +125,11 @@ class TaskViewModel {
     }
   }
 
+  /** Set the location of the task */
+  fun setLocation(location: String) {
+    _uiState.value = _uiState.value.copy(location = location)
+  }
+
   fun setDescription(description: String) {
     _uiState.value = _uiState.value.copy(description = description)
   }
@@ -211,7 +216,7 @@ class TaskViewModel {
             duration = duration,
             peopleNeeded = _uiState.value.staffNumber.toInt(),
             category = _uiState.value.category,
-            location = "", // TODO: Add location
+            location = _uiState.value.location,
             eventUid = event.uid,
         )
 
@@ -268,6 +273,7 @@ data class TaskState(
     val time: String = "",
     val duration: String = "",
     val event: Event? = null,
+    val location: String = "",
     val eventList: List<Event> = emptyList(),
     val titleError: String? = null,
     val staffNumberError: String? = null,
