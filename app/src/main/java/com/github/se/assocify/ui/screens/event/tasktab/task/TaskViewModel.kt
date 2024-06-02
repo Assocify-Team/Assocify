@@ -125,6 +125,10 @@ class TaskViewModel {
     }
   }
 
+  fun setLocation(location: String) {
+    _uiState.value = _uiState.value.copy(location = location)
+  }
+
   fun setDescription(description: String) {
     _uiState.value = _uiState.value.copy(description = description)
   }

@@ -284,12 +284,8 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleObserver =
     remember(mapView) {
       LifecycleEventObserver { _, event ->
         when (event) {
-          // Lifecycle.Event.ON_CREATE -> mapView.onCreate(null)
-          // Lifecycle.Event.ON_START -> mapView.onStart()
           Lifecycle.Event.ON_RESUME -> mapView.onResume()
           Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-          // Lifecycle.Event.ON_STOP -> mapView.onStop()
-          // Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
           else -> {}
         }
       }
@@ -332,7 +328,8 @@ fun MapPickerView(
               var currentMarker: Marker? = null
 
               override fun draw(c: Canvas?, osmv: MapView?, shadow: Boolean) {
-                // Nothing to draw here, just intercepting touch events
+                // Override this method is required to catch the click event and avoid
+                // scrolling or single tap bugs
               }
 
               override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean {
@@ -351,6 +348,9 @@ fun MapPickerView(
 
                     mapView.overlays.add(marker)
                     currentMarker = marker
+
+                    // From GeoPoint
+                    viewModel.setLocation(marker.position.toDoubleString())
 
                     mapView.invalidate() // Refresh the map to show the new marker
                   }
