@@ -75,7 +75,7 @@ fun MainTopBar(
         navigationIcon = {
           IconButton(
               modifier = Modifier.testTag("accountIconButton"),
-              onClick = { /*TODO On assoc account click */}) {
+              onClick = { }) {
                 // profile picture
                 if (associationLogoUriValue != null) {
                   Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
