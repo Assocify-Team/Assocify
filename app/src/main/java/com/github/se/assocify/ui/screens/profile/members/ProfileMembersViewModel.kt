@@ -47,6 +47,7 @@ class ProfileMembersViewModel(
         _uiState.value.updatingMember!!.user.uid,
         CurrentUser.associationUid!!,
         {
+          Log.e("members", "User removed from association")
           _uiState.value =
               _uiState.value.copy(showDeleteMemberDialog = false, updatingMember = null)
         },
@@ -63,6 +64,7 @@ class ProfileMembersViewModel(
         CurrentUser.associationUid!!,
         _uiState.value.newRole!!,
         {
+          Log.e("members", "Role of user changed")
           _uiState.value = _uiState.value.copy(showEditMemberDialog = false, updatingMember = null)
         },
         { Log.e("members", "Error changing role of user : ${it.message}") })

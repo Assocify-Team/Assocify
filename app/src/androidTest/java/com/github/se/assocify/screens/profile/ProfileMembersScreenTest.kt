@@ -14,6 +14,7 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
@@ -78,6 +79,15 @@ class ProfileMembersScreenTest :
             }
       }
 
+  private val userAPI =
+      mockk<UserAPI> {
+        every { removeUserFromAssociation(any(), any(), any(), any()) } answers
+            {
+              val onSuccess = thirdArg<() -> Unit>()
+
+            }
+      }
+
   @Before
   fun testSetup() {
     CurrentUser.userUid = "1"
@@ -87,7 +97,7 @@ class ProfileMembersScreenTest :
 
     composeTestRule.setContent {
       ProfileMembersScreen(
-          navActions = navActions, ProfileMembersViewModel(navActions, associationAPI))
+          navActions = navActions, ProfileMembersViewModel(associationAPI, userAPI))
     }
   }
 
