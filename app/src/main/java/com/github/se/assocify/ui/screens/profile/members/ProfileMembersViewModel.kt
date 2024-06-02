@@ -1,12 +1,13 @@
 package com.github.se.assocify.ui.screens.profile.members
 
-import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.RoleType
+import com.github.se.assocify.ui.util.SnackbarSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -17,11 +18,27 @@ class ProfileMembersViewModel(
   private val _uiState = MutableStateFlow(ProfileMembersUIState())
   val uiState: StateFlow<ProfileMembersUIState> = _uiState
 
+  val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
+
   init {
+    loadMembers()
+  }
+
+  private fun loadMembers() {
     associationAPI.getMembers(
         CurrentUser.associationUid!!,
-        { members -> _uiState.value = _uiState.value.copy(currMembers = members) },
-        { Log.e("members", "Error loading members : ${it.message}") })
+        { members -> _uiState.value = _uiState.value.copy(currMembers = members, refresh = false) },
+        {
+            _uiState.value = _uiState.value.copy(refresh = false)
+            snackbarSystem.showSnackbar("Error loading members") })
+  }
+
+  fun refreshMembers() {
+    _uiState.value = _uiState.value.copy(refresh = true)
+    associationAPI.updateCache(
+        { loadMembers() }, {
+            _uiState.value = _uiState.value.copy(refresh = false)
+            snackbarSystem.showSnackbar("Error refreshing members") })
   }
 
   fun onEditMember(member: AssociationMember) {
@@ -47,11 +64,12 @@ class ProfileMembersViewModel(
         _uiState.value.updatingMember!!.user.uid,
         CurrentUser.associationUid!!,
         {
-          Log.e("members", "User removed from association")
+          associationAPI.updateCache(
+              { loadMembers() }, { snackbarSystem.showSnackbar("Error loading members") })
           _uiState.value =
               _uiState.value.copy(showDeleteMemberDialog = false, updatingMember = null)
         },
-        { Log.e("members", "Error removing user from association : ${it.message}") })
+        { snackbarSystem.showSnackbar("Could not remove member") })
   }
 
   fun updateRole(newRole: RoleType) {
@@ -64,14 +82,17 @@ class ProfileMembersViewModel(
         CurrentUser.associationUid!!,
         _uiState.value.newRole!!,
         {
-          Log.e("members", "Role of user changed")
+          associationAPI.updateCache(
+              { loadMembers() }, { snackbarSystem.showSnackbar("Error loading members") })
           _uiState.value = _uiState.value.copy(showEditMemberDialog = false, updatingMember = null)
         },
-        { Log.e("members", "Error changing role of user : ${it.message}") })
+        { snackbarSystem.showSnackbar("Could not change role") })
   }
 }
 
 data class ProfileMembersUIState(
+    val refresh: Boolean = false,
+    val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     val currMembers: List<AssociationMember> = emptyList(),
     val updatingMember: AssociationMember? = null,
     val newRole: RoleType? = null,

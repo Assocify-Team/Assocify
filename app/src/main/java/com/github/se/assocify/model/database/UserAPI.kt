@@ -388,9 +388,10 @@ class UserAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
       }) {
         filter {
           eq("user_id", userId)
-          eq("role_id", roleIDToChange.toString().drop(1).dropLast(1))
+          eq("role_id", roleIDToChange!!["uid"].toString().drop(1).dropLast(1))
         }
       }
+
       onSuccess()
     }
   }
