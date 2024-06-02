@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +36,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.BackButton
 
@@ -97,8 +99,41 @@ fun ProfileMembersScreen(
             ElevatedCard {
               Column(
                   modifier = Modifier.padding(16.dp).testTag("editMemberDialog"),
-                  horizontalAlignment = Alignment.CenterHorizontally,
-                  verticalArrangement = Arrangement.spacedBy(16.dp)) {}
+                  horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "Change ${state.updatingMember?.user?.name}'s role ?",
+                        style = MaterialTheme.typography.titleMedium)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    RoleType.entries.forEach { role ->
+                      ListItem(
+                          headlineContent = { Text(role.name.uppercase()) },
+                          trailingContent = {
+                            RadioButton(
+                                modifier = Modifier.testTag("role-${role.name}"),
+                                selected = state.newRole == role,
+                                onClick = { profileMembersViewModel.updateRole(role) })
+                          },
+                          modifier = Modifier.testTag("roleitem-${role.name}"))
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                      OutlinedButton(
+                          onClick = { profileMembersViewModel.onEditMemberDialogDismiss() },
+                          modifier = Modifier.wrapContentSize().testTag("cancelButton"),
+                      ) {
+                        Text(text = "Cancel", textAlign = TextAlign.Center)
+                      }
+                      OutlinedButton(
+                          onClick = { profileMembersViewModel.confirmEditMember() },
+                          modifier = Modifier.wrapContentSize().testTag("confirmButton")) {
+                            Text(text = "Confirm", textAlign = TextAlign.Center)
+                          }
+                    }
+                  }
             }
           }
         }

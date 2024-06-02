@@ -23,7 +23,9 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
   }
 
   fun onEditMember(member: AssociationMember) {
-    _uiState.value = _uiState.value.copy(updatingMember = member, showEditMemberDialog = true)
+    _uiState.value =
+        _uiState.value.copy(
+            updatingMember = member, showEditMemberDialog = true, newRole = member.role.type)
   }
 
   fun onDeleteMember(member: AssociationMember) {
@@ -39,6 +41,7 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
   }
 
   fun confirmDeleteMember() {
+    // TODO delete the member
     _uiState.value = _uiState.value.copy(showDeleteMemberDialog = false, updatingMember = null)
   }
 
@@ -47,7 +50,7 @@ class ProfileMembersViewModel(navActions: NavigationActions, associationAPI: Ass
   }
 
   fun confirmEditMember() {
-    // update the member role in DB
+    // TODO update the member role
     _uiState.value =
         _uiState.value.copy(showEditMemberDialog = false, updatingMember = null, newRole = null)
   }
