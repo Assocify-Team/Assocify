@@ -62,7 +62,7 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
               val onSuccessCallback = secondArg<(Association) -> Unit>()
               onSuccessCallback(asso2)
             }
-          every { getLogo(any(),any(),any()) } answers {}
+        every { getLogo(any(), any(), any()) } answers {}
       }
   private val mockUserAPI =
       mockk<UserAPI>() {
