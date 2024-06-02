@@ -77,7 +77,7 @@ class SelectAssociationViewModel(
               },
               {})
         },
-        {}) // TODO: handle joining assoc (non immediate approval)
+        {})
   }
 }
 

@@ -386,7 +386,6 @@ class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : Supabase
       }
       for (user in users) {
         inviteUserSus(user.user.uid, user.role)
-        // TODO: add the UI to accept invitations, remove this function
         acceptInvitationSus(user.user.uid, user.role.associationId)
       }
       onSuccess()

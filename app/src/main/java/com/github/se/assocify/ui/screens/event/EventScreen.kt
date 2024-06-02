@@ -84,7 +84,6 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
       floatingActionButton = {
         when (state.currentTab) {
           EventPageIndex.Map -> {
-            /*TODO: implement for map screen*/
           }
           else -> {
             FloatingActionButton(

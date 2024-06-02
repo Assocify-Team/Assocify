@@ -61,7 +61,7 @@ fun MainTopBar(
         navigationIcon = {
           IconButton(
               modifier = Modifier.testTag("accountIconButton"),
-              onClick = { /*TODO On assoc account click */}) {
+              onClick = { }) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
                     contentDescription = "Association Account")

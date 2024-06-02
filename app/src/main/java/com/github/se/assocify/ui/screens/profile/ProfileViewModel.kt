@@ -91,7 +91,6 @@ class ProfileViewModel(
                   myAssociations =
                       associations.map {
                         DropdownOption(it.name, it.uid)
-                        /* TODO fetch association logo, else by default :*/
                         {
                           Icon(
                               imageVector = Icons.Default.People,
@@ -111,7 +110,6 @@ class ProfileViewModel(
               _uiState.value.copy(
                   selectedAssociation =
                       DropdownOption(association.name, association.uid)
-                      /* TODO fetch association logo */
                       {
                         Icon(
                             imageVector = Icons.Default.People,
