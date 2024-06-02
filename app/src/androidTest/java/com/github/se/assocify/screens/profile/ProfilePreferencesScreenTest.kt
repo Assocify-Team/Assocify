@@ -33,14 +33,14 @@ class ProfilePreferencesScreenTest :
 
   private val navActions = mockk<NavigationActions>()
   private var goBack = false
-  private lateinit  var themeVM : ThemeViewModel
+  private lateinit var themeVM: ThemeViewModel
   private val localSave = mockk<LocalSave>()
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "1"
     CurrentUser.associationUid = "asso"
-    themeVM = mockk<ThemeViewModel>(relaxed=true)
+    themeVM = mockk<ThemeViewModel>(relaxed = true)
     every { themeVM.theme } returns MutableStateFlow(Theme.LIGHT)
 
     every { navActions.back() } answers { goBack = true }
