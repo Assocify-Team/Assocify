@@ -6,14 +6,14 @@ import org.junit.Test
 
 class ThemeViewModelTest {
 
-    @Test
-    fun testSetTheme() {
-        val themeVM = ThemeViewModel()
-        themeVM.setTheme(Theme.DARK)
-        assert(themeVM.theme.value == Theme.DARK)
-        themeVM.setTheme(Theme.LIGHT)
-        assert(themeVM.theme.value == Theme.LIGHT)
-        themeVM.setTheme(Theme.SYSTEM)
-        assert(themeVM.theme.value == Theme.SYSTEM)
-    }
+  @Test
+  fun testSetTheme() {
+    val themeVM = ThemeViewModel()
+    themeVM.setTheme(Theme.DARK)
+    assert(themeVM.theme.value == Theme.DARK)
+    themeVM.setTheme(Theme.LIGHT)
+    assert(themeVM.theme.value == Theme.LIGHT)
+    themeVM.setTheme(Theme.SYSTEM)
+    assert(themeVM.theme.value == Theme.SYSTEM)
+  }
 }
