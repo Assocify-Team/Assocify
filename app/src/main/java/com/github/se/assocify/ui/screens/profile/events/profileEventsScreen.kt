@@ -96,7 +96,7 @@ fun ProfileEventsScreen(
 
                       IconButton(
                           onClick = { profileEventsViewModel.openDeleteDialog(event) },
-                          modifier = Modifier.testTag("deleteEventButton")) {
+                          modifier = Modifier.testTag("deleteEventButton-$index")) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete")
                           }
                     }
