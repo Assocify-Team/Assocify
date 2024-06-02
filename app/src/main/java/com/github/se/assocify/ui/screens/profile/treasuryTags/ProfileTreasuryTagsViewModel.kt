@@ -32,7 +32,7 @@ class ProfileTreasuryTagsViewModel(
           _uiState.value = _uiState.value.copy(treasuryTags = categoryList)
           _uiState.value = _uiState.value.copy(loading = false, error = null)
         },
-        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipts") })
+        { _uiState.value = _uiState.value.copy(loading = false, error = "Error loading tags") })
   }
 
   fun modifying(modifying: Boolean, editedTag: AccountingCategory) {
