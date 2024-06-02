@@ -73,29 +73,27 @@ fun MainTopBar(
     CenterAlignedTopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
-          IconButton(
-              modifier = Modifier.testTag("accountIconButton"),
-              onClick = { }) {
-                // profile picture
-                if (associationLogoUriValue != null) {
-                  Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
-                  AsyncImage(
-                      modifier =
-                          Modifier.size(80.dp)
-                              .clip(CircleShape) // Clip the image to a circle shape
-                              .aspectRatio(1f)
-                              .testTag("profilePicture"),
-                      model = associationLogoUriValue,
-                      contentDescription = "profile picture",
-                      contentScale = ContentScale.Crop)
-                } else {
-                  Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
-                  Icon(
-                      modifier = Modifier.fillMaxSize(),
-                      imageVector = Icons.Outlined.AccountCircle,
-                      contentDescription = "default profile icon")
-                }
-              }
+          IconButton(modifier = Modifier.testTag("accountIconButton"), onClick = {}) {
+            // profile picture
+            if (associationLogoUriValue != null) {
+              Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
+              AsyncImage(
+                  modifier =
+                      Modifier.size(80.dp)
+                          .clip(CircleShape) // Clip the image to a circle shape
+                          .aspectRatio(1f)
+                          .testTag("profilePicture"),
+                  model = associationLogoUriValue,
+                  contentDescription = "profile picture",
+                  contentScale = ContentScale.Crop)
+            } else {
+              Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
+              Icon(
+                  modifier = Modifier.fillMaxSize(),
+                  imageVector = Icons.Outlined.AccountCircle,
+                  contentDescription = "default profile icon")
+            }
+          }
         },
         actions = {
           if (optInSearchBar) {
