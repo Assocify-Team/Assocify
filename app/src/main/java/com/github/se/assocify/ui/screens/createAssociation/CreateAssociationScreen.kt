@@ -1,15 +1,19 @@
 package com.github.se.assocify.ui.screens.createAssociation
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,6 +35,8 @@ import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,14 +44,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import com.github.se.assocify.R
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 import com.github.se.assocify.ui.composables.UserSearchState
 import com.github.se.assocify.ui.composables.UserSearchTextField
 
@@ -71,6 +80,13 @@ fun CreateAssociationScreen(
             },
             title = { Text(text = "Create your association") })
       },
+      snackbarHost = {
+        SnackbarHost(
+            hostState = state.snackbarHostState,
+            snackbar = { snackbarData ->
+              Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
+            })
+      },
       contentWindowInsets = WindowInsets(20.dp, 10.dp, 20.dp, 20.dp)) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -81,15 +97,29 @@ fun CreateAssociationScreen(
               horizontalArrangement = Arrangement.spacedBy(15.dp),
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.fillMaxWidth()) {
-                OutlinedIconButton(
-                    modifier = Modifier.testTag("logo"),
-                    onClick = {
-                      /* TODO : can add association logo // note : nowhere to put it yet because picture not handled in DB */
-                    }) {
-                      Icon(
-                          painter = painterResource(id = R.drawable.landscape),
-                          contentDescription = "Logo")
-                    }
+
+                // profile picture
+                if (state.imageUri != null) {
+                  AsyncImage(
+                      modifier =
+                          Modifier.size(48.dp)
+                              .clip(CircleShape) // Clip the image to a circle shape
+                              .aspectRatio(1f)
+                              .clickable { viewmodel.controlBottomSheet(true) }
+                              .testTag("logo"),
+                      model = state.imageUri,
+                      contentDescription = "profile picture",
+                      contentScale = ContentScale.Crop)
+                } else {
+                  OutlinedIconButton(
+                      modifier = Modifier.testTag("logo"),
+                      onClick = { viewmodel.controlBottomSheet(true) }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.landscape),
+                            contentDescription = "Logo")
+                      }
+                }
+
                 OutlinedTextField(
                     value = state.name,
                     singleLine = true,
@@ -207,5 +237,12 @@ fun CreateAssociationScreen(
             }
           }
         }
+
+        // open bottom sheet to select a (profile) picture
+        PhotoSelectionSheet(
+            visible = state.showBottomSheet,
+            hideSheet = { viewmodel.controlBottomSheet(false) },
+            setImageUri = { viewmodel.setLogo(it) },
+            signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
       }
 }
