@@ -1,8 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury
 
-import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.entities.PermissionRole
-import com.github.se.assocify.model.entities.RoleType
 import androidx.compose.material3.SnackbarHostState
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI

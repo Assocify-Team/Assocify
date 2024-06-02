@@ -1,6 +1,5 @@
 package com.github.se.assocify.ui.screens.treasury
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -52,7 +51,7 @@ fun TreasuryScreen(navActions: NavigationActions, treasuryViewModel: TreasuryVie
   val receiptListViewModel: ReceiptListViewModel = treasuryViewModel.receiptListViewModel
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
-    val receiptState by receiptListViewModel.uiState.collectAsState()
+  val receiptState by receiptListViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
   Scaffold(
