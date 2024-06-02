@@ -33,7 +33,7 @@ fun NavGraphBuilder.profileGraph(
   }
 
   profilePreferencesGraph(navigationActions, appThemeVM, localSave)
-  profileMembersGraph(navigationActions, associationAPI)
+  profileMembersGraph(navigationActions, associationAPI, userAPI)
   profileTreasuryTagsGraph(navigationActions, accountingCategoryAPI)
   profileEventsGraph(navigationActions, eventAPI)
 }
