@@ -1,5 +1,6 @@
 package com.github.se.assocify.ui.screens.profile.treasuryTags
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
@@ -52,11 +53,7 @@ class ProfileTreasuryTagsViewModel(
           _uiState.value =
               _uiState.value.copy(treasuryTags = _uiState.value.treasuryTags.filter { tag != it })
         },
-        {
-          snackBarSystem.showSnackbar(
-              "Could not delete the tag",
-          )
-        })
+        { snackBarSystem.showSnackbar("Could not delete the tag", "Retry", {}) })
   }
 
   fun addTag(newTag: AccountingCategory) {
@@ -69,9 +66,9 @@ class ProfileTreasuryTagsViewModel(
           cancelPopUp()
         },
         {
-          snackBarSystem.showSnackbar(
-              "Could not add the tag",
-          )
+          Log.e("TrasurySCreen", "does not work!!")
+          cancelPopUp()
+          snackBarSystem.showSnackbar("Could not add the tag", "Retry", {})
         })
   }
 
@@ -87,9 +84,9 @@ class ProfileTreasuryTagsViewModel(
           cancelPopUp()
         },
         {
-          snackBarSystem.showSnackbar(
-              "Could not modify the tag",
-          )
+          Log.e("TrasurySCreen", "does not work!!")
+          cancelPopUp()
+          snackBarSystem.showSnackbar("Could not modify the tag", "Retry", {})
         })
   }
 

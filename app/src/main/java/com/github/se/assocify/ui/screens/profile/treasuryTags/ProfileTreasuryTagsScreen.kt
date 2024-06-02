@@ -27,6 +27,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,7 +46,7 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.BackButton
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
-import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.composables.ErrorMessagePage
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +63,9 @@ fun ProfileTreasuryTagsScreen(
   }
 
   if (state.error != null) {
-    ErrorMessage(errorMessage = state.error) { treasuryTagsViewModel.fetchCategories() }
+    ErrorMessagePage(errorMessage = state.error, onBack = { navActions.back() }) {
+      treasuryTagsViewModel.fetchCategories()
+    }
     return
   }
 
@@ -69,6 +73,13 @@ fun ProfileTreasuryTagsScreen(
     NamePopUp(treasuryTagsViewModel = treasuryTagsViewModel)
   }
   Scaffold(
+      snackbarHost = {
+        SnackbarHost(
+            hostState = state.snackBarHostState,
+            snackbar = { snackbarData ->
+              Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
+            })
+      },
       modifier = Modifier.testTag("TreasuryTags Screen"),
       topBar = {
         CenterAlignedTopAppBar(
