@@ -1,8 +1,13 @@
 package com.github.se.assocify.ui.screens.treasury
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.collectAsState
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
@@ -21,8 +26,18 @@ class TreasuryViewModel(
     accountingSubCategoryAPI: AccountingSubCategoryAPI,
     balanceAPI: BalanceAPI,
     budgetAPI: BudgetAPI,
-    userAPI: UserAPI
+    userAPI: UserAPI,
+    associationAPI: AssociationAPI
 ) {
+    init {
+        Log.d("image", "getting logo in View model at init")
+        associationAPI.getLogo(CurrentUser.associationUid!!,
+            {uri ->
+                Log.d("image", "uri is $uri")
+                CurrentUser.setAssociationLogo(uri) },
+            {CurrentUser.setAssociationLogo(null)}
+        )
+    }
   // ViewModel states
   private val _uiState: MutableStateFlow<TreasuryUIState> = MutableStateFlow(TreasuryUIState())
   val uiState: StateFlow<TreasuryUIState> = _uiState
@@ -72,7 +87,7 @@ class TreasuryViewModel(
 data class TreasuryUIState(
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     val searchQuery: String = "",
-    val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts
+    val currentTab: TreasuryPageIndex = TreasuryPageIndex.Receipts,
 )
 
 /** Treasury tabs */

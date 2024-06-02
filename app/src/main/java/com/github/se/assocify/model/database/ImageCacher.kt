@@ -88,6 +88,7 @@ class ImageCacher(val timeout: Long, val cacheDir: Path, private val bucket: Buc
       if (!renamed) {
         Log.w("IMG", "Failed to rename temporary image cache file ($pathInBucket)")
       }
+
       onSuccess(imageFile)
     }
   }

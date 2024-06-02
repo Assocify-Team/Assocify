@@ -1,6 +1,8 @@
 package com.github.se.assocify.model.database
 
 import android.net.Uri
+import android.util.Log
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
@@ -25,9 +27,11 @@ import kotlinx.serialization.json.JsonObject
 class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
   private var associationCache = mapOf<String, Association>()
   private val imageCacher = ImageCacher(60 * 60_000, cachePath, db.storage["association"])
+    private var currentAssociationCache : String? = null
 
   init {
     updateCache({}, {}) // Try and fill the cache as quickly as possible
+      currentAssociationCache = CurrentUser.associationUid
   }
 
   /**
@@ -41,6 +45,7 @@ class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : Supabase
       val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
       associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
       memberCache = null
+        currentAssociationCache = CurrentUser.associationUid
       onSuccess(associationCache)
     }
   }
@@ -438,7 +443,11 @@ class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : Supabase
    * @param onFailure called on failure
    */
   fun getLogo(associationId: String, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
-    imageCacher.fetchImage(associationId, { onSuccess(Uri.fromFile(it.toFile())) }, onFailure)
+      Log.d("image", "getLogo from association $associationId")
+      if (associationId != currentAssociationCache) {
+          currentAssociationCache = associationId
+          imageCacher.fetchImage(associationId, {onSuccess(Uri.fromFile(it.toFile())) }, onFailure)
+      }
   }
 
   @Serializable

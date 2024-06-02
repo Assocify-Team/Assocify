@@ -36,7 +36,8 @@ fun NavGraphBuilder.mainNavGraph(
       receiptsAPI,
       accountingCategoriesAPI,
       accountingSubCategoryAPI,
-      userAPI)
+      userAPI,
+      associationAPI)
   eventGraph(navActions, eventAPI, taskAPI)
   profileGraph(navActions, userAPI, associationAPI, accountingCategoriesAPI, eventAPI)
   loginGraph(navActions, userAPI)

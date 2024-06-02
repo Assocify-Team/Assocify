@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
@@ -99,7 +100,9 @@ fun TreasuryScreen(navActions: NavigationActions, treasuryViewModel: TreasuryVie
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()) {
           if (receiptState.userCurrentRole.type != RoleType.TREASURY &&
               receiptState.userCurrentRole.type != RoleType.PRESIDENCY) {
             ReceiptListScreen(viewModel = receiptListViewModel)
