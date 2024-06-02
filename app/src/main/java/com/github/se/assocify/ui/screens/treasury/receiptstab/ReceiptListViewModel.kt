@@ -9,6 +9,8 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.SnackbarSystem
+import com.github.se.assocify.ui.util.SyncSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -20,48 +22,48 @@ import kotlinx.coroutines.flow.StateFlow
 class ReceiptListViewModel(
     private val navActions: NavigationActions,
     private val receiptsDatabase: ReceiptAPI,
+    private val snackbarSystem: SnackbarSystem,
     private val userAPI: UserAPI
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<ReceiptUIState> = MutableStateFlow(ReceiptUIState())
   val uiState: StateFlow<ReceiptUIState>
 
-  private var loadCounter = 0
+  private val loadSystem =
+      SyncSystem(
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = it) })
+
+  private val refreshSystem =
+      SyncSystem(
+          { updateReceipts() },
+          { error ->
+            _uiState.value = _uiState.value.copy(refresh = false)
+            snackbarSystem.showSnackbar(error)
+          })
 
   init {
-    updateReceipts()
     uiState = _uiState
+    updateReceipts()
   }
 
   fun updateReceipts() {
-    loadCounter = 3
+    if (!loadSystem.start(3)) return
     _uiState.value = _uiState.value.copy(loading = true)
     getCurrentUserRole()
     updateUserReceipts()
     updateAllReceipts()
   }
 
-  /** Get the current user's role */
-  private fun getCurrentUserRole() {
-    userAPI.getCurrentUserRole(
-        { role ->
-          _uiState.value = _uiState.value.copy(userCurrentRole = role)
-          endLoading()
-        },
-        {
-          Log.e("ReceiptListViewModel", "Error fetching user role", it)
-          loadingError()
-        })
-  }
+  fun refreshReceipts() {
+    if (!refreshSystem.start(3)) return
 
-  private fun endLoading() {
-    if (--loadCounter == 0) {
-      _uiState.value = _uiState.value.copy(loading = false, error = null)
-    }
-  }
+    _uiState.value = _uiState.value.copy(refresh = true)
 
-  private fun loadingError() {
-    _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipts")
+    // two callbacks !
+    receiptsDatabase.updateCaches(
+        onSuccess = { _, _ -> refreshSystem.end() },
+        onFailure = { _, _ -> refreshSystem.end("Error refreshing receipts") })
   }
 
   /** Update the user's receipts */
@@ -74,14 +76,25 @@ class ReceiptListViewModel(
                       receipts.filter {
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
-          endLoading()
+          loadSystem.end()
         },
         onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching user receipts", it)
-          loadingError()
+          loadSystem.end("Error loading receipts")
         })
   }
 
+  private fun getCurrentUserRole() {
+    userAPI.getCurrentUserRole(
+        { role ->
+          _uiState.value = _uiState.value.copy(userCurrentRole = role)
+          loadSystem.end()
+        },
+        {
+          Log.e("ReceiptListViewModel", "Error fetching user role", it)
+          loadSystem.end("Error loading current user role")
+        })
+  }
   /** Update all receipts */
   private fun updateAllReceipts() {
     receiptsDatabase.getAllReceipts(
@@ -92,11 +105,11 @@ class ReceiptListViewModel(
                       receipts.filter {
                         it.title.contains(_uiState.value.searchQuery, ignoreCase = true)
                       })
-          endLoading()
+          loadSystem.end()
         },
         onFailure = {
           Log.e("ReceiptListViewModel", "Error fetching all receipts", it)
-          loadingError()
+          loadSystem.end("Error loading receipts")
         })
   }
 
@@ -125,6 +138,7 @@ class ReceiptListViewModel(
 data class ReceiptUIState(
     val loading: Boolean = false,
     val error: String? = null,
+    val refresh: Boolean = false,
     val userReceipts: List<Receipt> = listOf(),
     val allReceipts: List<Receipt> = listOf(),
     val searchQuery: String = "",

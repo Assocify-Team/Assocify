@@ -20,7 +20,7 @@ data class BalanceItem(
     val uid: String,
     val nameItem: String,
     val subcategoryUID: String,
-    val receiptUID: String,
+    val receiptUID: String?,
     val amount: Int, // unsigned: can be positive or negative
     val tva: TVA,
     val description: String,
