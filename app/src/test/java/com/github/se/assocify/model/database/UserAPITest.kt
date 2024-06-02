@@ -331,4 +331,60 @@ class UserAPITest {
     userAPI.setProfilePicture(uuid1.toString(), mockk(), { fail("Should not succeed") }, onFailure)
     verify(timeout = 1000) { onFailure(any()) }
   }
+
+  @Test
+  fun testChangeRoleOfUser() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
+    response =
+        """
+            [{
+                "user_id": "${APITestUtils.USER.uid}",
+                "role_id": "${APITestUtils.PERMISSION_ROLE.uid}"
+            }]
+        
+      """
+            .trimIndent()
+
+    userAPI.changeRoleOfUser(
+        APITestUtils.USER.uid,
+        APITestUtils.ASSOCIATION.uid,
+        RoleType.PRESIDENCY,
+        onSuccess,
+        onFailure)
+    verify(timeout = 1000) { onSuccess() }
+    error = true
+    userAPI.changeRoleOfUser(
+        APITestUtils.USER.uid,
+        APITestUtils.ASSOCIATION.uid,
+        RoleType.PRESIDENCY,
+        onSuccess,
+        onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testRemoveUserFromAssociation() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
+    response =
+        """
+            [{
+                "user_id": "${APITestUtils.USER.uid}",
+                "role_id": "${APITestUtils.PERMISSION_ROLE.uid}"
+            }]
+        
+      """
+            .trimIndent()
+
+    userAPI.removeUserFromAssociation(
+        APITestUtils.USER.uid, APITestUtils.ASSOCIATION.uid, onSuccess, onFailure)
+    verify(timeout = 1000) { onSuccess() }
+    error = true
+    userAPI.removeUserFromAssociation(
+        APITestUtils.USER.uid, APITestUtils.ASSOCIATION.uid, onSuccess, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+  }
 }
