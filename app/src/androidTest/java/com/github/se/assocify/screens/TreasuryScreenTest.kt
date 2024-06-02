@@ -131,7 +131,6 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   // treasuryViewModel.otherViewmodel to access accounting and receipt viewmodels :)
   lateinit var treasuryViewModel: TreasuryViewModel
 
-
   val mockUserAPI: UserAPI =
       mockk<UserAPI>() {
         every { getCurrentUserRole(any(), any()) } answers
@@ -153,8 +152,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             mockAccountingSubCategoryAPI,
             mockBalanceAPI,
             mockBudgetAPI,
-            mockUserAPI
-        )
+            mockUserAPI)
     composeTestRule.setContent { TreasuryScreen(navActions, treasuryViewModel) }
   }
 
@@ -295,7 +293,9 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       onNodeWithTag("receiptsTab").performClick()
       onNodeWithText("My Receipts").assertIsDisplayed()
       onNodeWithText("All Receipts").assertIsDisplayed()
-      assert(treasuryViewModel.receiptListViewModel.uiState.value.userCurrentRole.type == RoleType.TREASURY)
+      assert(
+          treasuryViewModel.receiptListViewModel.uiState.value.userCurrentRole.type ==
+              RoleType.TREASURY)
     }
   }
 }

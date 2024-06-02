@@ -55,7 +55,7 @@ class ReceiptListViewModel(
     updateAllReceipts()
   }
 
-    fun refreshReceipts() {
+  fun refreshReceipts() {
     if (!refreshSystem.start(3)) return
 
     _uiState.value = _uiState.value.copy(refresh = true)
@@ -84,17 +84,17 @@ class ReceiptListViewModel(
         })
   }
 
-    private fun getCurrentUserRole() {
-        userAPI.getCurrentUserRole(
-            { role ->
-                _uiState.value = _uiState.value.copy(userCurrentRole = role)
-                loadSystem.end()
-            },
-            {
-                Log.e("ReceiptListViewModel", "Error fetching user role", it)
-                loadSystem.end("Error loading current user role")
-            })
-    }
+  private fun getCurrentUserRole() {
+    userAPI.getCurrentUserRole(
+        { role ->
+          _uiState.value = _uiState.value.copy(userCurrentRole = role)
+          loadSystem.end()
+        },
+        {
+          Log.e("ReceiptListViewModel", "Error fetching user role", it)
+          loadSystem.end("Error loading current user role")
+        })
+  }
   /** Update all receipts */
   private fun updateAllReceipts() {
     receiptsDatabase.getAllReceipts(

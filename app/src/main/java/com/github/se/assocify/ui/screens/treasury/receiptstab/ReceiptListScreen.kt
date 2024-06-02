@@ -84,7 +84,7 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
               // which is handled in the viewmodel whatsoever
               if (viewmodelState.allReceipts.isNotEmpty() &&
                   (viewmodelState.userCurrentRole.type == RoleType.TREASURY ||
-                          viewmodelState.userCurrentRole.type == RoleType.PRESIDENCY)) {
+                      viewmodelState.userCurrentRole.type == RoleType.PRESIDENCY)) {
                 // Header for the global receipts
                 item {
                   Text(
