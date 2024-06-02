@@ -9,9 +9,6 @@ import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.engine.mock.respondBadRequest
 import io.mockk.clearMocks
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
@@ -50,13 +47,13 @@ class UserAPITest {
         createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
           install(Postgrest)
           install(Storage)
-          httpEngine = MockEngine {
+          /*httpEngine = MockEngine {
             if (!error) {
               respond(response)
             } else {
               respondBadRequest()
             }
-          }
+          }*/
         }
 
     userAPI = UserAPI(client, cachePath)
@@ -329,6 +326,62 @@ class UserAPITest {
 
     // We can't test success :(
     userAPI.setProfilePicture(uuid1.toString(), mockk(), { fail("Should not succeed") }, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testChangeRoleOfUser() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
+    response =
+        """
+            [{
+                "user_id": "${APITestUtils.USER.uid}",
+                "role_id": "${APITestUtils.PERMISSION_ROLE.uid}"
+            }]
+        
+      """
+            .trimIndent()
+
+    userAPI.changeRoleOfUser(
+        APITestUtils.USER.uid,
+        APITestUtils.ASSOCIATION.uid,
+        RoleType.PRESIDENCY,
+        onSuccess,
+        onFailure)
+    verify(timeout = 1000) { onSuccess() }
+    error = true
+    userAPI.changeRoleOfUser(
+        APITestUtils.USER.uid,
+        APITestUtils.ASSOCIATION.uid,
+        RoleType.PRESIDENCY,
+        onSuccess,
+        onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+  }
+
+  @Test
+  fun testRemoveUserFromAssociation() {
+    val onSuccess: () -> Unit = mockk(relaxed = true)
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+    error = false
+    response =
+        """
+            [{
+                "user_id": "${APITestUtils.USER.uid}",
+                "role_id": "${APITestUtils.PERMISSION_ROLE.uid}"
+            }]
+        
+      """
+            .trimIndent()
+
+    userAPI.removeUserFromAssociation(
+        APITestUtils.USER.uid, APITestUtils.ASSOCIATION.uid, onSuccess, onFailure)
+    verify(timeout = 1000) { onSuccess() }
+    error = true
+    userAPI.removeUserFromAssociation(
+        APITestUtils.USER.uid, APITestUtils.ASSOCIATION.uid, onSuccess, onFailure)
     verify(timeout = 1000) { onFailure(any()) }
   }
 }
