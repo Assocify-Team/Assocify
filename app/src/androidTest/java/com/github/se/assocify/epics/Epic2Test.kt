@@ -65,7 +65,7 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val user = User("1", "user1")
 
-  private val prevReceipts =
+  private var myReceipts =
       listOf(
           Receipt(
               "r1",
@@ -74,11 +74,10 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               LocalDate.EPOCH,
               100,
               Status.Pending,
-              MaybeRemotePhoto.Remote("r1")))
+              MaybeRemotePhoto.Remote("r1"),
+              "1"))
 
-  private var myReceipts = prevReceipts.toMutableList()
-
-  private var allReceipts =
+  private var aReceipts =
       myReceipts +
           Receipt(
               "r2",
@@ -87,9 +86,22 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               LocalDate.EPOCH,
               10,
               Status.Pending,
-              MaybeRemotePhoto.Remote("r2"))
+              MaybeRemotePhoto.Remote("r2"),
+              "2")
 
-  private var testUri = Uri.parse("content://test")
+  private var bReceipts =
+      listOf(
+          Receipt(
+              "r3",
+              "Receipt-3-name",
+              "descR3",
+              LocalDate.EPOCH,
+              200,
+              Status.Pending,
+              MaybeRemotePhoto.Remote("r3"),
+              "3"))
+
+  private var allReceipts = aReceipts + bReceipts
 
   private val associationAPI =
       mockk<AssociationAPI> {
@@ -133,6 +145,8 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
                 }
               }
             }
+
+        every { getProfilePicture(any(), any(), any()) } answers {}
       }
 
   private val receiptAPI =
@@ -140,18 +154,26 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
         every { getAllReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback.invoke(allReceipts)
+              if (CurrentUser.associationUid == "a") {
+                onSuccessCallback.invoke(aReceipts)
+              } else {
+                onSuccessCallback.invoke(bReceipts)
+              }
             }
 
         every { getUserReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback.invoke(myReceipts)
+              if (CurrentUser.associationUid == "a") {
+                onSuccessCallback.invoke(myReceipts)
+              } else {
+                onSuccessCallback.invoke(emptyList())
+              }
             }
 
         every { getReceipt(any(), any(), any()) } answers
             {
-              val receipt = myReceipts.find { it.uid == firstArg() }!!
+              val receipt = allReceipts.find { it.uid == firstArg() }!!
               val onSuccessCallback = secondArg<(Receipt) -> Unit>()
               onSuccessCallback.invoke(receipt)
             }
@@ -159,14 +181,15 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
         every { getReceiptImage(any(), any(), any()) } answers
             {
               val onSuccessCallback = secondArg<(Uri) -> Unit>()
-              onSuccessCallback.invoke(Uri.parse(firstArg<Receipt>().uid))
+              onSuccessCallback.invoke(Uri.parse(firstArg<String>()))
             }
 
         every { uploadReceipt(any(), any(), any(), any()) } answers
             {
               val receipt = firstArg<Receipt>()
-              myReceipts.add(receipt)
-              navActions.back()
+              myReceipts = myReceipts + receipt
+              secondArg<(Boolean) -> Unit>().invoke(true)
+              thirdArg<() -> Unit>().invoke()
             }
       }
 
@@ -203,16 +226,13 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           receiptAPI,
           accountingCategoriesAPI,
           accountingSubCategoryAPI,
-          Destination.Home)
+          Destination.Treasury)
     }
   }
 
   @Test
   fun Epic2Test() {
     with(composeTestRule) {
-      // start at home
-      onNodeWithTag("homeScreen").assertIsDisplayed()
-
       // go to profile to check what association I'm in and my role
       onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
       val toProfile = navController.currentBackStackEntry?.destination?.route
@@ -238,10 +258,11 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("ReceiptList").assertIsDisplayed()
       onNodeWithText("Receipt-1-name-changed").assertIsDisplayed()
 
-      // (shouldn't have access to budget and balance but not implemented)
+      // (shouldn't have access to budget and balance but not implemented yet)
 
       // add a receipt -- removed because I can't add a picture
-      /*onNodeWithTag("createReceipt").assertIsDisplayed().performClick()
+      /*
+      onNodeWithTag("createReceipt").assertIsDisplayed().performClick()
       onNodeWithTag("titleField").performClick().performTextInput("Receipt-2-name")
       onNodeWithTag("amountField").performClick().performTextInput("10")
 
@@ -257,7 +278,8 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
       // check that receipt is here
       onNodeWithTag("ReceiptList").assertIsDisplayed()
-      onNodeWithText("Receipt-2-name").assertIsDisplayed()*/
+      onNodeWithText("Receipt-2-name").assertIsDisplayed()
+      */
 
       // change association
       onNodeWithTag("mainNavBarItem/profile").performClick()
