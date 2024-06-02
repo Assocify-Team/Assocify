@@ -77,13 +77,13 @@ fun ProfileMembersScreen(
               )
 
               Row(horizontalArrangement = Arrangement.End) {
-                IconButton(onClick = { }, modifier = Modifier.testTag("rejectButton")) {
+                IconButton(onClick = {}, modifier = Modifier.testTag("rejectButton")) {
                   Icon(
                       Icons.Default.Close,
                       contentDescription = "Reject",
                       tint = MaterialTheme.colorScheme.error)
                 }
-                IconButton(onClick = { }, modifier = Modifier.testTag("acceptButton")) {
+                IconButton(onClick = {}, modifier = Modifier.testTag("acceptButton")) {
                   Icon(Icons.Default.Check, contentDescription = "Accept", tint = Color.Green)
                 }
               }
@@ -105,7 +105,7 @@ fun ProfileMembersScreen(
               modifier = Modifier.testTag("memberItem-${member.user.uid}"),
               headlineContent = { Text(text = member.user.name) },
               trailingContent = {
-                IconButton(onClick = { }, modifier = Modifier.testTag("editButton")) {
+                IconButton(onClick = {}, modifier = Modifier.testTag("editButton")) {
                   Icon(Icons.Default.Edit, contentDescription = "Edit")
                 }
               },

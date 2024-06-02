@@ -59,13 +59,11 @@ fun MainTopBar(
     CenterAlignedTopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
-          IconButton(
-              modifier = Modifier.testTag("accountIconButton"),
-              onClick = { }) {
-                Icon(
-                    imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = "Association Account")
-              }
+          IconButton(modifier = Modifier.testTag("accountIconButton"), onClick = {}) {
+            Icon(
+                imageVector = Icons.Filled.AccountCircle,
+                contentDescription = "Association Account")
+          }
         },
         actions = {
           if (optInSearchBar) {

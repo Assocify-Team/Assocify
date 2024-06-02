@@ -90,8 +90,7 @@ class ProfileViewModel(
               _uiState.value.copy(
                   myAssociations =
                       associations.map {
-                        DropdownOption(it.name, it.uid)
-                        {
+                        DropdownOption(it.name, it.uid) {
                           Icon(
                               imageVector = Icons.Default.People,
                               contentDescription = "Association Logo")
@@ -109,8 +108,7 @@ class ProfileViewModel(
           _uiState.value =
               _uiState.value.copy(
                   selectedAssociation =
-                      DropdownOption(association.name, association.uid)
-                      {
+                      DropdownOption(association.name, association.uid) {
                         Icon(
                             imageVector = Icons.Default.People,
                             contentDescription = "Association Logo")
