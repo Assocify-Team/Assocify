@@ -51,6 +51,10 @@ class ProfileMembersViewModel(
   }
 
   fun onDeleteMember(member: AssociationMember) {
+    if (member.user.uid == CurrentUser.userUid) {
+      snackbarSystem.showSnackbar("You cannot remove yourself")
+      return
+    }
     _uiState.value = _uiState.value.copy(updatingMember = member, showDeleteMemberDialog = true)
   }
 
