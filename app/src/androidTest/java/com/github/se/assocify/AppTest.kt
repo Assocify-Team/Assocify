@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.UserAPI
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.login.loginGraph
@@ -36,7 +36,7 @@ import org.junit.runner.RunWith
 @Composable
 fun LoginApp() {
   val navController = rememberNavController()
-  val mockLoginSave: LoginSave = mockk(relaxed = true)
+  val mockLoginSave: LocalSave = mockk(relaxed = true)
   val navActions = NavigationActions(navController, mockLoginSave)
   val supabaseClient: SupabaseClient =
       createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {

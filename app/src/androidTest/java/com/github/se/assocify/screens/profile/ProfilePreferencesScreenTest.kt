@@ -10,13 +10,17 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.Theme
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.profile.preferences.ProfilePreferencesScreen
+import com.github.se.assocify.ui.theme.ThemeViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,15 +33,21 @@ class ProfilePreferencesScreenTest :
 
   private val navActions = mockk<NavigationActions>()
   private var goBack = false
+  private lateinit var themeVM: ThemeViewModel
+  private val localSave = mockk<LocalSave>()
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "1"
     CurrentUser.associationUid = "asso"
+    themeVM = mockk<ThemeViewModel>(relaxed = true)
+    every { themeVM.theme } returns MutableStateFlow(Theme.LIGHT)
 
     every { navActions.back() } answers { goBack = true }
 
-    composeTestRule.setContent { ProfilePreferencesScreen(navActions = navActions) }
+    composeTestRule.setContent {
+      ProfilePreferencesScreen(navActions = navActions, themeVM, localSave)
+    }
   }
 
   @Test
@@ -47,10 +57,10 @@ class ProfilePreferencesScreenTest :
 
       onNodeWithTag("themeTitle").assertIsDisplayed()
       onNodeWithTag("themeSegmentedButtonRow").assertIsDisplayed()
-      listOf("Light", "Dark", "System").forEach {
-        onNodeWithText(text = it).assertIsDisplayed().assertIsSelectable()
+      Theme.entries.forEach {
+        onNodeWithText(text = it.name).assertIsDisplayed().assertIsSelectable()
       }
-      onNodeWithText(text = "Light").assertIsSelected()
+      onNodeWithText(text = "LIGHT").assertIsSelected()
 
       onNodeWithTag("textSize").assertIsDisplayed()
       onNodeWithTag("textSizeSlider").assertIsDisplayed()

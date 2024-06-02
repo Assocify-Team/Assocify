@@ -1,7 +1,7 @@
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import com.github.se.assocify.model.CurrentUser
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import io.mockk.mockk
@@ -15,7 +15,7 @@ import org.junit.runners.JUnit4
 class NavigationActionsTest {
 
   private lateinit var navController: NavHostController
-  private lateinit var loginSave: LoginSave
+  private lateinit var loginSave: LocalSave
   private lateinit var navigationActions: NavigationActions
 
   @Before
