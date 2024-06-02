@@ -18,6 +18,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.MapMarkerData
+import java.io.File
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK
@@ -25,7 +26,6 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
-import java.io.File
 
 /** A screen that displays a map of the event: location with the associated tasks. */
 @Composable

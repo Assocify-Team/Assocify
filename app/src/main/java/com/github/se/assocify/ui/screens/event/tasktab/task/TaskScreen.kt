@@ -2,7 +2,6 @@ package com.github.se.assocify.ui.screens.event.tasktab.task
 
 import android.annotation.SuppressLint
 import android.graphics.Canvas
-import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -36,10 +35,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -80,164 +77,163 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
   val isMapInteracting = remember { mutableStateOf(false) }
 
   Scaffold(
-    modifier = Modifier.testTag("taskScreen"),
-    topBar = {
-      TopAppBar(
-        title = {
-          Text(modifier = Modifier.testTag("taskScreenTitle"), text = taskState.pageTitle)
-        },
-        navigationIcon = {
-          BackButton(
-            contentDescription = "Back",
-            onClick = { navActions.back() },
-            modifier = Modifier.testTag("backButton"))
-        })
-    },
-    contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
-    snackbarHost = {
-      SnackbarHost(
-        hostState = taskState.snackbarHostState,
-        snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
-    }) { paddingValues ->
-    if (taskState.loading) {
-      CenteredCircularIndicator()
-      return@Scaffold
-    }
-
-    if (taskState.error != null) {
-      ErrorMessage(errorMessage = taskState.error) { viewModel.loadTask() }
-      return@Scaffold
-    }
-
-    Column(
-      modifier =
-      Modifier.fillMaxSize()
-        .padding(paddingValues)
-        .verticalScroll(rememberScrollState(), enabled = !isMapInteracting.value),
-      verticalArrangement = Arrangement.spacedBy(5.dp),
-      horizontalAlignment = Alignment.CenterHorizontally) {
-      Box(
-        modifier =
-        Modifier.testTag("eventDropdownChip").padding(bottom = 5.dp).fillMaxWidth()) {
-        var eventExpanded by remember { mutableStateOf(false) }
-        FilterChip(
-          modifier = Modifier.testTag("eventChip"),
-          selected = false,
-          onClick = { eventExpanded = !eventExpanded },
-          label = { Text(taskState.event?.name ?: "Select Event") },
-          trailingIcon = {
-            Icon(
-              imageVector = Icons.Filled.ArrowDropDown,
-              contentDescription = "Expand")
-          })
-        DropdownMenu(
-          modifier = Modifier.testTag("eventDropdownMenu"),
-          expanded = eventExpanded,
-          onDismissRequest = { eventExpanded = false },
-          properties = PopupProperties(focusable = true)) {
-          taskState.eventList.forEach { event ->
-            DropdownMenuItem(
-              text = { Text(event.name) },
-              onClick = {
-                viewModel.setEvent(event)
-                eventExpanded = false
-              })
-          }
+      modifier = Modifier.testTag("taskScreen"),
+      topBar = {
+        TopAppBar(
+            title = {
+              Text(modifier = Modifier.testTag("taskScreenTitle"), text = taskState.pageTitle)
+            },
+            navigationIcon = {
+              BackButton(
+                  contentDescription = "Back",
+                  onClick = { navActions.back() },
+                  modifier = Modifier.testTag("backButton"))
+            })
+      },
+      contentWindowInsets = WindowInsets(40.dp, 20.dp, 40.dp, 0.dp),
+      snackbarHost = {
+        SnackbarHost(
+            hostState = taskState.snackbarHostState,
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+      }) { paddingValues ->
+        if (taskState.loading) {
+          CenteredCircularIndicator()
+          return@Scaffold
         }
-      }
-      OutlinedTextField(
-        modifier = Modifier.testTag("titleField").fillMaxWidth(),
-        value = taskState.title,
-        singleLine = true,
-        onValueChange = { viewModel.setTitle(it) },
-        label = { Text("Title") },
-        isError = taskState.titleError != null,
-        supportingText = { taskState.titleError?.let { Text(it) } })
-      OutlinedTextField(
-        modifier = Modifier.testTag("descriptionField").fillMaxWidth(),
-        value = taskState.description,
-        onValueChange = { viewModel.setDescription(it) },
-        label = { Text("Description") },
-        minLines = 3,
-        supportingText = {})
-      OutlinedTextField(
-        modifier = Modifier.testTag("categoryField").fillMaxWidth(),
-        value = taskState.category,
-        singleLine = true,
-        onValueChange = { viewModel.setCategory(it) },
-        label = { Text("Category") },
-        supportingText = {})
-      OutlinedTextField(
-        modifier = Modifier.testTag("staffNumberField").fillMaxWidth(),
-        value = taskState.staffNumber,
-        singleLine = true,
-        onValueChange = { viewModel.setStaffNumber(it) },
-        label = { Text("Number of Staff") },
-        keyboardOptions =
-        KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-        isError = taskState.staffNumberError != null,
-        supportingText = { taskState.staffNumberError?.let { Text(it) } })
-      DatePickerWithDialog(
-        modifier = Modifier.testTag("dateField").fillMaxWidth(),
-        value = taskState.date,
-        onDateSelect = { viewModel.setDate(it) },
-        label = { Text("Date") },
-        isError = taskState.dateError != null,
-        supportingText = { taskState.dateError?.let { Text(it) } })
-      TimePickerWithDialog(
-        modifier = Modifier.testTag("timeField").fillMaxWidth(),
-        value = taskState.time,
-        onTimeSelect = { viewModel.setTime(it) },
-        label = { Text("Time") },
-        isError = taskState.timeError != null,
-        errorText = { taskState.timeError?.let { Text(it) } })
-      TimePickerWithDialog(
-        modifier = Modifier.testTag("durationField").fillMaxWidth(),
-        value = taskState.duration,
-        onTimeSelect = { viewModel.setDuration(it) },
-        label = { Text("Duration") },
-        isError = taskState.durationError != null,
-        errorText = { taskState.durationError?.let { Text(it) } },
-        dialogTitle = "Select Duration",
-        switchModes = false)
 
-      // Problem is here
-      Box(modifier = Modifier.size(300.dp).padding(5.dp)) {
-        MapPickerView(
-          modifier = Modifier.fillMaxWidth(),
-          onLoad = { },
-          onMapInteraction = { isInteracting ->
-            isMapInteracting.value = isInteracting // Set the flag based on interaction
-          },
-          viewModel = viewModel
-          )
-      }
+        if (taskState.error != null) {
+          ErrorMessage(errorMessage = taskState.error) { viewModel.loadTask() }
+          return@Scaffold
+        }
 
-      Column {
-        Button(
-          modifier = Modifier.testTag("saveButton").fillMaxWidth(),
-          onClick = { viewModel.saveTask() },
-          content = { Text("Save") })
-        OutlinedButton(
-          modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
-          onClick = { viewModel.deleteTask() },
-          content = {
-            Text(
-              if (taskState.isNewTask) {
-                "Cancel"
-              } else {
-                "Delete"
-              })
-          },
-          colors =
-          ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.error),
-          border = BorderStroke(1.dp, MaterialTheme.colorScheme.error))
-      }
+        Column(
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState(), enabled = !isMapInteracting.value),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Box(
+                  modifier =
+                      Modifier.testTag("eventDropdownChip").padding(bottom = 5.dp).fillMaxWidth()) {
+                    var eventExpanded by remember { mutableStateOf(false) }
+                    FilterChip(
+                        modifier = Modifier.testTag("eventChip"),
+                        selected = false,
+                        onClick = { eventExpanded = !eventExpanded },
+                        label = { Text(taskState.event?.name ?: "Select Event") },
+                        trailingIcon = {
+                          Icon(
+                              imageVector = Icons.Filled.ArrowDropDown,
+                              contentDescription = "Expand")
+                        })
+                    DropdownMenu(
+                        modifier = Modifier.testTag("eventDropdownMenu"),
+                        expanded = eventExpanded,
+                        onDismissRequest = { eventExpanded = false },
+                        properties = PopupProperties(focusable = true)) {
+                          taskState.eventList.forEach { event ->
+                            DropdownMenuItem(
+                                text = { Text(event.name) },
+                                onClick = {
+                                  viewModel.setEvent(event)
+                                  eventExpanded = false
+                                })
+                          }
+                        }
+                  }
+              OutlinedTextField(
+                  modifier = Modifier.testTag("titleField").fillMaxWidth(),
+                  value = taskState.title,
+                  singleLine = true,
+                  onValueChange = { viewModel.setTitle(it) },
+                  label = { Text("Title") },
+                  isError = taskState.titleError != null,
+                  supportingText = { taskState.titleError?.let { Text(it) } })
+              OutlinedTextField(
+                  modifier = Modifier.testTag("descriptionField").fillMaxWidth(),
+                  value = taskState.description,
+                  onValueChange = { viewModel.setDescription(it) },
+                  label = { Text("Description") },
+                  minLines = 3,
+                  supportingText = {})
+              OutlinedTextField(
+                  modifier = Modifier.testTag("categoryField").fillMaxWidth(),
+                  value = taskState.category,
+                  singleLine = true,
+                  onValueChange = { viewModel.setCategory(it) },
+                  label = { Text("Category") },
+                  supportingText = {})
+              OutlinedTextField(
+                  modifier = Modifier.testTag("staffNumberField").fillMaxWidth(),
+                  value = taskState.staffNumber,
+                  singleLine = true,
+                  onValueChange = { viewModel.setStaffNumber(it) },
+                  label = { Text("Number of Staff") },
+                  keyboardOptions =
+                      KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+                  isError = taskState.staffNumberError != null,
+                  supportingText = { taskState.staffNumberError?.let { Text(it) } })
+              DatePickerWithDialog(
+                  modifier = Modifier.testTag("dateField").fillMaxWidth(),
+                  value = taskState.date,
+                  onDateSelect = { viewModel.setDate(it) },
+                  label = { Text("Date") },
+                  isError = taskState.dateError != null,
+                  supportingText = { taskState.dateError?.let { Text(it) } })
+              TimePickerWithDialog(
+                  modifier = Modifier.testTag("timeField").fillMaxWidth(),
+                  value = taskState.time,
+                  onTimeSelect = { viewModel.setTime(it) },
+                  label = { Text("Time") },
+                  isError = taskState.timeError != null,
+                  errorText = { taskState.timeError?.let { Text(it) } })
+              TimePickerWithDialog(
+                  modifier = Modifier.testTag("durationField").fillMaxWidth(),
+                  value = taskState.duration,
+                  onTimeSelect = { viewModel.setDuration(it) },
+                  label = { Text("Duration") },
+                  isError = taskState.durationError != null,
+                  errorText = { taskState.durationError?.let { Text(it) } },
+                  dialogTitle = "Select Duration",
+                  switchModes = false)
 
-      Spacer(modifier = Modifier.weight(1.0f))
-    }
-  }
+              // Problem is here
+              Box(modifier = Modifier.size(300.dp).padding(5.dp)) {
+                MapPickerView(
+                    modifier = Modifier.fillMaxWidth(),
+                    onLoad = {},
+                    onMapInteraction = { isInteracting ->
+                      isMapInteracting.value = isInteracting // Set the flag based on interaction
+                    },
+                    viewModel = viewModel)
+              }
+
+              Column {
+                Button(
+                    modifier = Modifier.testTag("saveButton").fillMaxWidth(),
+                    onClick = { viewModel.saveTask() },
+                    content = { Text("Save") })
+                OutlinedButton(
+                    modifier = Modifier.testTag("deleteButton").fillMaxWidth(),
+                    onClick = { viewModel.deleteTask() },
+                    content = {
+                      Text(
+                          if (taskState.isNewTask) {
+                            "Cancel"
+                          } else {
+                            "Delete"
+                          })
+                    },
+                    colors =
+                        ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error))
+              }
+
+              Spacer(modifier = Modifier.weight(1.0f))
+            }
+      }
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -282,89 +278,83 @@ fun rememberMapViewWithLifecycle(): MapView {
 
 @Composable
 fun rememberMapLifecycleObserver(mapView: MapView): LifecycleObserver =
-  remember(mapView) {
-    LifecycleEventObserver { _, event ->
-      when (event) {
-        // Lifecycle.Event.ON_CREATE -> mapView.onCreate(null)
-        // Lifecycle.Event.ON_START -> mapView.onStart()
-        Lifecycle.Event.ON_RESUME -> mapView.onResume()
-        Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-        // Lifecycle.Event.ON_STOP -> mapView.onStop()
-        // Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
-        else -> {}
+    remember(mapView) {
+      LifecycleEventObserver { _, event ->
+        when (event) {
+          // Lifecycle.Event.ON_CREATE -> mapView.onCreate(null)
+          // Lifecycle.Event.ON_START -> mapView.onStart()
+          Lifecycle.Event.ON_RESUME -> mapView.onResume()
+          Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+          // Lifecycle.Event.ON_STOP -> mapView.onStop()
+          // Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+          else -> {}
+        }
       }
     }
-  }
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun MapPickerView(
-  modifier: Modifier = Modifier,
-  onLoad: ((map: MapView) -> Unit)? = null,
-  onMapInteraction: (Boolean) -> Unit, // Callback to notify interaction
-  viewModel: TaskViewModel
+    modifier: Modifier = Modifier,
+    onLoad: ((map: MapView) -> Unit)? = null,
+    onMapInteraction: (Boolean) -> Unit, // Callback to notify interaction
+    viewModel: TaskViewModel
 ) {
   val mapView = rememberMapViewWithLifecycle()
   val currentMarker = remember { mutableStateOf<Marker?>(null) }
 
   AndroidView(
-    factory = { mapView },
-    modifier = modifier,
-    update = { view ->
-      onLoad?.invoke(view)
-      // Handle touch events for interaction detection
-      view.setOnTouchListener { _, event ->
-        when (event.action) {
-          MotionEvent.ACTION_DOWN,
-          MotionEvent.ACTION_MOVE -> {
-            onMapInteraction(true) // Notify interaction when touch starts or moves
+      factory = { mapView },
+      modifier = modifier,
+      update = { view ->
+        onLoad?.invoke(view)
+        // Handle touch events for interaction detection
+        view.setOnTouchListener { _, event ->
+          when (event.action) {
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_MOVE -> {
+              onMapInteraction(true) // Notify interaction when touch starts or moves
+            }
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL -> {
+              onMapInteraction(false) // Notify end of interaction when touch ends or is cancelled
+            }
           }
-          MotionEvent.ACTION_UP,
-          MotionEvent.ACTION_CANCEL -> {
-            onMapInteraction(false) // Notify end of interaction when touch ends or is cancelled
-          }
+          false // Return false to allow touch event to propagate
         }
-        false // Return false to allow touch event to propagate
-      }
 
-      // Handle map clicks to add marker
-      view.overlays.add(
-        object : org.osmdroid.views.overlay.Overlay() {
+        // Handle map clicks to add marker
+        view.overlays.add(
+            object : org.osmdroid.views.overlay.Overlay() {
 
-          override fun draw(c: Canvas?, osmv: MapView?, shadow: Boolean) {
-            // Overriding draw is required but we don't need to do anything here
-          }
-
-          override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean {
-            e?.let {
-              val geoPoint = mapView?.projection?.fromPixels(e.x.toInt(), e.y.toInt())
-              geoPoint?.let { point ->
-                // Remove the old marker if exists
-                currentMarker.value.let { mapView.overlays.remove(it) }
-
-                // Add new marker
-                val marker =
-                  Marker(mapView).apply {
-                    position = point as GeoPoint?
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                  }
-
-                mapView.overlays.add(marker)
-                currentMarker.value = marker
-
-                viewModel.setLocation(marker.position.toDoubleString())
-
-                mapView.invalidate() // Refresh the map to show the new marker
-
+              override fun draw(c: Canvas?, osmv: MapView?, shadow: Boolean) {
+                // Overriding draw is required but we don't need to do anything here
               }
 
-            }
-            return true
-          }
+              override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean {
+                e?.let {
+                  val geoPoint = mapView?.projection?.fromPixels(e.x.toInt(), e.y.toInt())
+                  geoPoint?.let { point ->
+                    // Remove the old marker if exists
+                    currentMarker.value.let { mapView.overlays.remove(it) }
 
-        }
-      )
-    })
+                    // Add new marker
+                    val marker =
+                        Marker(mapView).apply {
+                          position = point as GeoPoint?
+                          setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        }
 
+                    mapView.overlays.add(marker)
+                    currentMarker.value = marker
 
+                    viewModel.setLocation(marker.position.toDoubleString())
+
+                    mapView.invalidate() // Refresh the map to show the new marker
+                  }
+                }
+                return true
+              }
+            })
+      })
 }
