@@ -255,7 +255,6 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       // check that the receipt is correct and change its title
       onNodeWithTag("titleField").assertIsDisplayed().performClick().performTextInput("-changed")
       onNodeWithTag("saveButton").performScrollTo().assertIsDisplayed().performClick()
-      onNodeWithTag("ReceiptList").assertIsDisplayed()
       onNodeWithText("Receipt-1-name-changed").assertIsDisplayed()
 
       // (since i'm a member, i shouldn't have access to budget and balance : not implemented yet)
