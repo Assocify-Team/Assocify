@@ -1,4 +1,4 @@
-package com.github.se.assocify
+package com.github.se.assocify.epics
 
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertHasClickAction
@@ -183,7 +183,8 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           taskAPI,
           receiptAPI,
           accountingCategoryAPI,
-          accountingSubCategoryAPI)
+          accountingSubCategoryAPI,
+          Destination.SelectAsso)
     }
   }
 
