@@ -1,9 +1,6 @@
 package com.github.se.assocify.ui.screens.event
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -59,6 +56,10 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
   val swapState = remember { mutableStateOf(true) }
   val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
 
+  LaunchedEffect(pagerState.currentPage) {
+    swapState.value = pagerState.currentPage != EventPageIndex.Map.ordinal
+  }
+
   when (pagerState.currentPage) {
     EventPageIndex.Map.ordinal -> eventScreenViewModel.switchTab(EventPageIndex.Map)
     EventPageIndex.Tasks.ordinal -> eventScreenViewModel.switchTab(EventPageIndex.Tasks)
@@ -105,7 +106,6 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
               Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
             })
       }) {
-
         if (state.loading) {
           CenteredCircularIndicator()
           return@Scaffold
@@ -127,10 +127,7 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
               pagerState = pagerState,
               switchTab = { tab -> eventScreenViewModel.switchTab(tab) })
 
-          HorizontalPager(
-            state = pagerState,
-            userScrollEnabled = swapState.value
-          ) { page ->
+          HorizontalPager(state = pagerState, userScrollEnabled = swapState.value) { page ->
             when (page) {
               EventPageIndex.Tasks.ordinal -> {
                 swapState.value = true
