@@ -365,4 +365,52 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       assert(mViewmodel.uiState.value.profileImageURI != null)
     }
   }
+
+  @Test
+  fun rolePermissionTest() {
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.MEMBER))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("MEMBER").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsNotDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.STAFF))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("STAFF").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsNotDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.TREASURY))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("TREASURY").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.COMMITTEE))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("COMMITTEE").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsDisplayed()
+    }
+  }
 }
