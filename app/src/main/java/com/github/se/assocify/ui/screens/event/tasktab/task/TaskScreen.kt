@@ -70,6 +70,12 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
 
+/**
+ * The task screen that allows the user to create or edit a task.
+ *
+ * @param navActions Navigation actions to navigate to other screens.
+ * @param viewModel The view model for the task screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
@@ -236,6 +242,9 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
       }
 }
 
+/**
+ * Initialize the map view with the EPFL plan tiles and it's lifecycle in order to save its state
+ */
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
@@ -281,17 +290,21 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleObserver =
     remember(mapView) {
       LifecycleEventObserver { _, event ->
         when (event) {
-          // Lifecycle.Event.ON_CREATE -> mapView.onCreate(null)
-          // Lifecycle.Event.ON_START -> mapView.onStart()
           Lifecycle.Event.ON_RESUME -> mapView.onResume()
           Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-          // Lifecycle.Event.ON_STOP -> mapView.onStop()
-          // Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
           else -> {}
         }
       }
     }
 
+/**
+ * Custom view to pick a location on the map
+ *
+ * @param modifier the modifier for the view
+ * @param onLoad callback to notify when the map is loaded
+ * @param onMapInteraction callback to notify interaction (required for debouncing)
+ * @param viewModel the view model for the task screen
+ */
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun MapPickerView(

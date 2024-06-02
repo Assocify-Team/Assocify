@@ -125,6 +125,7 @@ class TaskViewModel {
     }
   }
 
+  /** Set the location of the task */
   fun setLocation(location: String) {
     _uiState.value = _uiState.value.copy(location = location)
   }
@@ -215,7 +216,7 @@ class TaskViewModel {
             duration = duration,
             peopleNeeded = _uiState.value.staffNumber.toInt(),
             category = _uiState.value.category,
-            location = _uiState.value.location, // TODO: Add location
+            location = _uiState.value.location,
             eventUid = event.uid,
         )
 
