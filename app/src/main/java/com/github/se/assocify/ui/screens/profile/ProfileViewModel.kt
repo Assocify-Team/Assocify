@@ -186,6 +186,10 @@ class ProfileViewModel(
     }
     val oldAssociationUid = CurrentUser.associationUid
     CurrentUser.associationUid = association.uid
+    assoAPI.getLogo(
+        CurrentUser.associationUid!!,
+        { uri -> CurrentUser.setAssociationLogo(uri) },
+        { CurrentUser.setAssociationLogo(null) })
     userAPI.getCurrentUserRole(
         { role ->
           _uiState.value = _uiState.value.copy(selectedAssociation = association)

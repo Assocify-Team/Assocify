@@ -1,5 +1,6 @@
 package com.github.se.assocify.screens
 
+import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
@@ -14,6 +15,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
+import com.github.se.assocify.model.database.AssociationAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
@@ -46,7 +48,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @get:Rule val composeTestRule = createComposeRule()
   @get:Rule val mockkRule = MockKRule(this)
   private val navActions =
-      mockk<NavigationActions>() {
+      mockk<NavigationActions> {
         every { navigateToMainTab(any()) } answers { tabSelected = true }
         every { navigateTo(any()) } answers {}
       }
@@ -139,6 +141,14 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               onSuccessCallback(PermissionRole("roleUid", "testAssociation", RoleType.TREASURY))
             }
       }
+  private val mockAssocAPI =
+      mockk<AssociationAPI>() {
+        every { getLogo(any(), any(), any()) } answers
+            {
+              val onSuccessCallback = secondArg<(Uri) -> Unit>()
+              onSuccessCallback(mockk())
+            }
+      }
 
   @Before
   fun testSetup() {
@@ -152,7 +162,8 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             mockAccountingSubCategoryAPI,
             mockBalanceAPI,
             mockBudgetAPI,
-            mockUserAPI)
+            mockUserAPI,
+            mockAssocAPI)
     composeTestRule.setContent { TreasuryScreen(navActions, treasuryViewModel) }
   }
 
