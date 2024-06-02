@@ -329,6 +329,15 @@ class UserAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
     }
   }
 
+  /**
+   * Changes the role of a user in an association
+   *
+   * @param userId the id of the user to change the role of
+   * @param associationId the id of the association to change the role in
+   * @param roleType the new role of the user
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
   fun changeRoleOfUser(
       userId: String,
       associationId: String,
