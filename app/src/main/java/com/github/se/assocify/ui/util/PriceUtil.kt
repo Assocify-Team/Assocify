@@ -79,7 +79,7 @@ object PriceUtil {
    */
   fun isTooPrecise(price: String): Boolean {
     val dot = price.indexOf('.')
-    return if (dot == -1) false else price.length - dot > 3
+    return  (dot == -1) && (price.length - dot > 3)
   }
 
   /**

@@ -1,12 +1,9 @@
 <resources>
     <string name="app_name">Assocify</string>
-  
-    <string name="home_tab_label">Home</string>
+
     <string name="treasury_tab_label">Treasury</string>
     <string name="event_tab_label">Event</string>
-    <string name="chat_tab_label">Chat</string>
     <string name="profile_tab_label">Profile</string>
-    <string name="login_page_label">Log In</string>
   
     <string name="web_client_id">112600063466-nm1jbh53pspi0dmmp25ino9e0bhh5ub5.apps.googleusercontent.com</string>
 </resources>
