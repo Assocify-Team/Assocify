@@ -105,6 +105,7 @@ class Epic4Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
             }
 
         every { associationNameValid(any()) } returns true
+        every { getLogo(any(), any(), any()) } answers {}
       }
 
   private val userAPI =

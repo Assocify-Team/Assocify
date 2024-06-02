@@ -117,6 +117,7 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = secondArg<(Association) -> Unit>()
               onSuccessCallback.invoke(associations.find { it.uid == assoID }!!)
             }
+        every { getLogo(any(), any(), any()) } answers {}
       }
 
   private val userAPI =
