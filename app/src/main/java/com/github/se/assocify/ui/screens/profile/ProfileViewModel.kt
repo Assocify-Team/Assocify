@@ -90,9 +90,7 @@ class ProfileViewModel(
               _uiState.value.copy(
                   myAssociations =
                       associations.map {
-                        DropdownOption(it.name, it.uid)
-                        /* TODO fetch association logo, else by default :*/
-                        {
+                        DropdownOption(it.name, it.uid) {
                           Icon(
                               imageVector = Icons.Default.People,
                               contentDescription = "Association Logo")
@@ -110,9 +108,7 @@ class ProfileViewModel(
           _uiState.value =
               _uiState.value.copy(
                   selectedAssociation =
-                      DropdownOption(association.name, association.uid)
-                      /* TODO fetch association logo */
-                      {
+                      DropdownOption(association.name, association.uid) {
                         Icon(
                             imageVector = Icons.Default.People,
                             contentDescription = "Association Logo")
@@ -129,6 +125,7 @@ class ProfileViewModel(
     userAPI.getCurrentUserRole(
         { role ->
           _uiState.value = _uiState.value.copy(currentRole = role)
+          setRoleCapacities()
           loadSystem.end()
         },
         { loadSystem.end("Error loading role") })
@@ -193,11 +190,26 @@ class ProfileViewModel(
         { role ->
           _uiState.value = _uiState.value.copy(selectedAssociation = association)
           _uiState.value = _uiState.value.copy(currentRole = role)
+          setRoleCapacities()
         },
         {
           CurrentUser.associationUid = oldAssociationUid
           snackbarSystem.showSnackbar("Couldn't switch association")
         })
+  }
+
+  /**
+   * This function is used to set the role capacities of the user. It sets the user as an admin if
+   * they are a president, treasurer or committee of the association.
+   */
+  private fun setRoleCapacities() {
+    when (_uiState.value.currentRole.type) {
+      RoleType.PRESIDENCY -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.TREASURY -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.COMMITTEE -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.STAFF -> _uiState.value = _uiState.value.copy(isAdmin = false)
+      RoleType.MEMBER -> _uiState.value = _uiState.value.copy(isAdmin = false)
+    }
   }
 
   /**
@@ -267,6 +279,8 @@ data class ProfileUIState(
     val error: String? = null,
     // whether the profile is being refreshed
     val refresh: Boolean = false,
+    // true if the user is an admin, false if not
+    val isAdmin: Boolean = false,
     // the name of the user
     val myName: String = "",
     // the name of the user as they're editing it

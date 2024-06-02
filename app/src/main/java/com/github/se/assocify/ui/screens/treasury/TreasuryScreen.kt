@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -50,7 +51,7 @@ fun TreasuryScreen(navActions: NavigationActions, treasuryViewModel: TreasuryVie
   val receiptListViewModel: ReceiptListViewModel = treasuryViewModel.receiptListViewModel
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
-  val accountingState by accountingViewModel.uiState.collectAsState()
+  val receiptState by receiptListViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
   Scaffold(
@@ -99,20 +100,25 @@ fun TreasuryScreen(navActions: NavigationActions, treasuryViewModel: TreasuryVie
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-          InnerTabRow(
-              tabList = TreasuryPageIndex.entries,
-              pagerState = pagerState,
-              switchTab = { tab -> treasuryViewModel.switchTab(tab) })
+          if (receiptState.userCurrentRole.type != RoleType.TREASURY &&
+              receiptState.userCurrentRole.type != RoleType.PRESIDENCY) {
+            ReceiptListScreen(viewModel = receiptListViewModel)
+          } else {
+            InnerTabRow(
+                tabList = TreasuryPageIndex.entries,
+                pagerState = pagerState,
+                switchTab = { tab -> treasuryViewModel.switchTab(tab) })
 
-          when (pagerState.currentPage) {
-            TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> {
-              AccountingFilterBar(accountingViewModel)
-              AddSubcategoryDialog(accountingViewModel)
-            }
-            TreasuryPageIndex.Balance.ordinal -> {
-              AccountingFilterBar(accountingViewModel)
-              AddSubcategoryDialog(accountingViewModel)
+            when (pagerState.currentPage) {
+              TreasuryPageIndex.Receipts.ordinal -> {}
+              TreasuryPageIndex.Budget.ordinal -> {
+                AccountingFilterBar(accountingViewModel)
+                AddSubcategoryDialog(accountingViewModel)
+              }
+              TreasuryPageIndex.Balance.ordinal -> {
+                AccountingFilterBar(accountingViewModel)
+                AddSubcategoryDialog(accountingViewModel)
+              }
             }
           }
 

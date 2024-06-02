@@ -1,4 +1,4 @@
-package com.github.se.assocify
+package com.github.se.assocify.epics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -173,8 +173,12 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           receiptAPI,
           accountingCategoriesAPI,
           accountingSubCategoryAPI,
+<<<<<<< HEAD:app/src/androidTest/java/com/github/se/assocify/Epic1Test.kt
           appThemeViewModel,
           loginSave)
+=======
+          Destination.SelectAsso)
+>>>>>>> 7473917be3520464fb108956224fbd3143b36083:app/src/androidTest/java/com/github/se/assocify/epics/Epic1Test.kt
     }
   }
 
@@ -241,12 +245,16 @@ fun TestAssocifyApp(
     receiptAPI: ReceiptAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
     accountingSubCategoryAPI: AccountingSubCategoryAPI,
+<<<<<<< HEAD:app/src/androidTest/java/com/github/se/assocify/Epic1Test.kt
     appThemeViewModel: ThemeViewModel,
     localSave: LocalSave
+=======
+    startDestination: Destination
+>>>>>>> 7473917be3520464fb108956224fbd3143b36083:app/src/androidTest/java/com/github/se/assocify/epics/Epic1Test.kt
 ) {
   CurrentUser.userUid = "1"
 
-  NavHost(navController = navController, startDestination = Destination.SelectAsso.route) {
+  NavHost(navController = navController, startDestination = startDestination.route) {
     mainNavGraph(
         navActions = navActions,
         userAPI = userAPI,
