@@ -16,17 +16,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilterChip
@@ -43,23 +41,18 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
-import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun ReceiptScreen(viewModel: ReceiptViewModel) {
 
@@ -100,52 +93,10 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
                 Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Box(
-                  modifier =
-                      Modifier.testTag("statusDropdownChip")
-                          .padding(bottom = 5.dp)
-                          .fillMaxWidth()) {
-                    var statusExpanded by remember { mutableStateOf(false) }
-                    FilterChip(
-                        modifier = Modifier.testTag("statusChip"),
-                        selected = false,
-                        onClick = { statusExpanded = !statusExpanded },
-                        label = { Text(receiptState.status.name) },
-                        leadingIcon = {
-                          Icon(
-                              modifier = Modifier.testTag("currentStatusIcon"),
-                              imageVector = receiptState.status.getIcon(),
-                              contentDescription = "status icon")
-                        },
-                        trailingIcon = {
-                          Icon(
-                              imageVector = Icons.Filled.ArrowDropDown,
-                              contentDescription = "Expand")
-                        })
-                    DropdownMenu(
-                        modifier = Modifier.testTag("statusDropdownMenu"),
-                        expanded = statusExpanded,
-                        onDismissRequest = { statusExpanded = false },
-                        properties = PopupProperties(focusable = true)) {
-                          Status.entries.forEach { status ->
-                            DropdownMenuItem(
-                                text = { Text(status.name) },
-                                onClick = {
-                                  viewModel.setStatus(status)
-                                  statusExpanded = false
-                                },
-                                leadingIcon = {
-                                  Icon(
-                                      modifier = Modifier.testTag("statusIcon"),
-                                      imageVector = status.getIcon(),
-                                      contentDescription = "Status icon")
-                                })
-                          }
-                        }
-                  }
               OutlinedTextField(
                   modifier = Modifier.testTag("titleField").fillMaxWidth(),
                   value = receiptState.title,
+                  singleLine = true,
                   onValueChange = { viewModel.setTitle(it) },
                   label = { Text("Title") },
                   isError = receiptState.titleError != null,
@@ -160,6 +111,7 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
               OutlinedTextField(
                   modifier = Modifier.testTag("amountField").fillMaxWidth(),
                   value = receiptState.amount,
+                  singleLine = true,
                   onValueChange = { viewModel.setAmount(it) },
                   label = { Text("Amount") },
                   keyboardOptions =
@@ -180,17 +132,28 @@ fun ReceiptScreen(viewModel: ReceiptViewModel) {
                           .aspectRatio(1f)
                           .padding(top = 15.dp, bottom = 5.dp)) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                      if (receiptState.receiptImageURI != null) {
-                        AsyncImage(
-                            model = receiptState.receiptImageURI,
-                            modifier = Modifier.align(Alignment.Center),
-                            contentDescription = "receipt image",
-                        )
-                      } else {
-                        Image(
-                            modifier = Modifier.align(Alignment.Center).size(100.dp),
-                            imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
-                            contentDescription = "receipt icon")
+                      when {
+                        receiptState.imageLoading -> {
+                          CenteredCircularIndicator()
+                        }
+                        receiptState.imageError != null -> {
+                          ErrorMessage(errorMessage = receiptState.imageError) {
+                            viewModel.loadImage()
+                          }
+                        }
+                        receiptState.receiptImageURI == null -> {
+                          Image(
+                              modifier = Modifier.align(Alignment.Center).size(100.dp),
+                              imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
+                              contentDescription = "receipt icon")
+                        }
+                        else -> {
+                          AsyncImage(
+                              model = receiptState.receiptImageURI,
+                              modifier = Modifier.align(Alignment.Center),
+                              contentDescription = "receipt image",
+                          )
+                        }
                       }
                       FilledIconButton(
                           modifier =

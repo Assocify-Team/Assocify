@@ -3,6 +3,7 @@ package com.github.se.assocify.screens.profile
 import android.net.Uri
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -30,7 +31,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
-import kotlin.Exception
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,11 +42,10 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
 
   private val navActions = mockk<NavigationActions>()
   private var tabSelected = false
-  private var goNotif = false
-  private var goSecu = false
   private var goPref = false
   private var goMembers = false
-  private var goRoles = false
+  private var goTreasTags = false
+  private var goEvents = false
 
   private val uid = "1"
   private val asso1 = Association("asso", "test", "test", LocalDate.EPOCH)
@@ -87,6 +86,15 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
               val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
               onSuccessCallback(PermissionRole("1", "asso", RoleType.PRESIDENCY))
             }
+
+        // Never return a profile picture, permanently "fetch" the profile picture
+        every { getProfilePicture(any(), any(), any()) } answers {}
+
+        every { setProfilePicture(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   private lateinit var mViewmodel: ProfileViewModel
@@ -100,11 +108,10 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
     mViewmodel = ProfileViewModel(mockAssocAPI, mockUserAPI, navActions)
 
     every { navActions.navigateToMainTab(any()) } answers { tabSelected = true }
-    every { navActions.navigateTo(Destination.ProfileNotifications) } answers { goNotif = true }
-    every { navActions.navigateTo(Destination.ProfileSecurityPrivacy) } answers { goSecu = true }
     every { navActions.navigateTo(Destination.ProfilePreferences) } answers { goPref = true }
     every { navActions.navigateTo(Destination.ProfileMembers) } answers { goMembers = true }
-    every { navActions.navigateTo(Destination.ProfileRoles) } answers { goRoles = true }
+    every { navActions.navigateTo(Destination.ProfileEvents) } answers { goEvents = true }
+    every { navActions.navigateTo(Destination.ProfileTreasuryTags) } answers { goTreasTags = true }
 
     composeTestRule.setContent { ProfileScreen(navActions = navActions, mViewmodel) }
   }
@@ -119,10 +126,9 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("editProfile").assertIsDisplayed()
       onNodeWithTag("associationDropdown").assertIsDisplayed()
       onNodeWithTag("Preferences").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("Privacy").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("Notifications").performScrollTo().assertIsDisplayed()
       onNodeWithTag("Members").performScrollTo().assertIsDisplayed()
-      onNodeWithTag("Roles").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("TreasuryTags").performScrollTo().assertIsDisplayed()
+      onNodeWithTag("Events").performScrollTo().assertIsDisplayed()
       onNodeWithTag("logoutButton").performScrollTo().assertIsDisplayed()
       onNodeWithTag("associationDropdown").performScrollTo().performClick()
       onNodeWithTag("DropdownItem-${asso1.uid}").assertIsDisplayed()
@@ -185,17 +191,14 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       onNodeWithTag("Preferences").performClick()
       assert(goPref)
 
-      onNodeWithTag("Privacy").performClick()
-      assert(goSecu)
-
-      onNodeWithTag("Notifications").performClick()
-      assert(goNotif)
-
       onNodeWithTag("Members").performScrollTo().performClick()
       assert(goMembers)
 
-      onNodeWithTag("Roles").performScrollTo().performClick()
-      assert(goRoles)
+      onNodeWithTag("TreasuryTags").performScrollTo().performClick()
+      assert(goTreasTags)
+
+      onNodeWithTag("Events").performScrollTo().performClick()
+      assert(goEvents)
     }
   }
 
@@ -299,6 +302,67 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       mViewmodel.loadProfile() // reload page in case already loaded by before
       waitUntil { mViewmodel.uiState.value.error != null }
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading role")
+    }
+  }
+
+  @Test
+  fun refreshProfile() {
+    every { mockAssocAPI.updateCache(any(), any()) } answers {}
+    every { mockUserAPI.updateUserCache(any(), any()) } answers
+        {
+          val onErrorCallback = secondArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.refreshProfile()
+      onNodeWithText("Could not refresh").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun openProfileSheet() {
+    with(composeTestRule) {
+      onNodeWithTag("default profile icon").performClick()
+      onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
+      mViewmodel.signalCameraPermissionDenied()
+      onNodeWithTag("snackbar").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun setUriFailure() {
+    every { mockUserAPI.getProfilePicture(any(), any(), any()) } answers
+        {
+          val onFailureCallback = thirdArg<(Exception) -> Unit>()
+          onFailureCallback(Exception("Testing error"))
+        }
+    mViewmodel.loadProfile()
+    with(composeTestRule) { onNodeWithTag("snackbar").assertIsDisplayed() }
+  }
+
+  @Test
+  fun setUriSuccess() {
+    every { mockUserAPI.getProfilePicture(any(), any(), any()) } answers
+        {
+          val onSuccessCallback = secondArg<(Uri) -> Unit>()
+          onSuccessCallback(mockk())
+        }
+    mViewmodel.loadProfile()
+    with(composeTestRule) { onNodeWithTag("snackbar").assertIsNotDisplayed() }
+  }
+
+  @Test
+  fun displayProfilePictureError() {
+    every { mockUserAPI.setProfilePicture(any(), any(), any(), any()) } answers
+        {
+          val onFailureCallback = arg<(Exception) -> Unit>(3)
+          onFailureCallback(Exception("Testing error"))
+        }
+    with(composeTestRule) {
+      onNodeWithTag("default profile icon").assertIsDisplayed()
+      onNodeWithTag("default profile icon").assertHasClickAction()
+      mViewmodel.setImage(uri)
+      assert(mViewmodel.uiState.value.profileImageURI != null)
     }
   }
 }

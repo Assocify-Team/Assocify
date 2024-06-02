@@ -13,6 +13,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,6 +29,7 @@ import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingFilterBar
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
+import com.github.se.assocify.ui.screens.treasury.accounting.accountingComposables.AddSubcategoryDialog
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetScreen
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListScreen
@@ -41,14 +44,13 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TreasuryScreen(
-    navActions: NavigationActions,
-    accountingViewModel: AccountingViewModel,
-    receiptListViewModel: ReceiptListViewModel,
-    treasuryViewModel: TreasuryViewModel
-) {
+fun TreasuryScreen(navActions: NavigationActions, treasuryViewModel: TreasuryViewModel) {
+
+  val accountingViewModel: AccountingViewModel = treasuryViewModel.accountingViewModel
+  val receiptListViewModel: ReceiptListViewModel = treasuryViewModel.receiptListViewModel
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
+  val accountingState by accountingViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
   Scaffold(
@@ -60,7 +62,14 @@ fun TreasuryScreen(
             query = treasuryState.searchQuery,
             onQueryChange = { treasuryViewModel.setSearchQuery(it) },
             onSearch = { treasuryViewModel.onSearch(pagerState.currentPage) },
-            page = pagerState.currentPage)
+            page = pagerState.currentPage,
+            searchTitle =
+                when (pagerState.currentPage) {
+                  TreasuryPageIndex.Receipts.ordinal -> "receipts"
+                  TreasuryPageIndex.Budget.ordinal -> "budget"
+                  TreasuryPageIndex.Balance.ordinal -> "balance"
+                  else -> ""
+                })
       },
       bottomBar = {
         MainNavigationBar(
@@ -76,14 +85,17 @@ fun TreasuryScreen(
             onClick = {
               when (pagerState.currentPage) {
                 TreasuryPageIndex.Receipts.ordinal -> navActions.navigateTo(Destination.NewReceipt)
-                TreasuryPageIndex.Budget.ordinal ->
-                    navActions.navigateTo(Destination.NewBalanceCategory)
-                TreasuryPageIndex.Balance.ordinal ->
-                    navActions.navigateTo(Destination.NewBalanceCategory)
+                TreasuryPageIndex.Budget.ordinal -> accountingViewModel.showNewSubcategoryDialog()
+                TreasuryPageIndex.Balance.ordinal -> accountingViewModel.showNewSubcategoryDialog()
               }
             }) {
               Icon(Icons.Outlined.Add, "Create")
             }
+      },
+      snackbarHost = {
+        SnackbarHost(
+            hostState = treasuryState.snackbarHostState,
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
@@ -94,8 +106,14 @@ fun TreasuryScreen(
 
           when (pagerState.currentPage) {
             TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> AccountingFilterBar(accountingViewModel)
-            TreasuryPageIndex.Balance.ordinal -> AccountingFilterBar(accountingViewModel)
+            TreasuryPageIndex.Budget.ordinal -> {
+              AccountingFilterBar(accountingViewModel)
+              AddSubcategoryDialog(accountingViewModel)
+            }
+            TreasuryPageIndex.Balance.ordinal -> {
+              AccountingFilterBar(accountingViewModel)
+              AddSubcategoryDialog(accountingViewModel)
+            }
           }
 
           // Pages content

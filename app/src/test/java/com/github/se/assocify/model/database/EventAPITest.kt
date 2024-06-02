@@ -74,7 +74,8 @@ class EventAPITest {
                 "start_date": "$responseTime",
                 "end_date": "$responseTime",
                 "guests_or_artists": "Test Guest",
-                "location": "Test Location"
+                "location": "Test Location",
+                "association_uid": "00000000-0000-0000-0000-000000000000"
             }]
         """
             .trimIndent()
@@ -107,7 +108,8 @@ class EventAPITest {
                 "start_date": "$responseTime",
                 "end_date": "$responseTime",
                 "guests_or_artists": "Test Guest",
-                "location": "Test Location"
+                "location": "Test Location",
+                "association_uid": "00000000-0000-0000-0000-000000000000"
             }, {
                 "uid": "$uuid1",
                 "name": "Test Event",
@@ -115,7 +117,8 @@ class EventAPITest {
                 "start_date": "$responseTime",
                 "end_date": "$responseTime",
                 "guests_or_artists": "Test Guest",
-                "location": "Test Location"
+                "location": "Test Location",
+                "association_uid": "00000000-0000-0000-0000-000000000000"
             }
                 
             ]
@@ -152,20 +155,14 @@ class EventAPITest {
                 "start_date": "$currentTime",
                 "end_date": "$currentTime",
                 "guests_or_artists": "Test Guest",
-                "location": "Test Location"
+                "location": "Test Location",
+                "association_uid": "00000000-0000-0000-0000-000000000000"
             }
         """
             .trimIndent()
 
     eventAPI.addEvent(
-        Event(
-            uid = uuid1.toString(),
-            name = "Test Event",
-            description = "Test Description",
-            startDate = currentTime,
-            endDate = currentTime,
-            guestsOrArtists = "Test Guest",
-            location = "Test Location"),
+        Event(uid = uuid1.toString(), name = "Test Event", description = "Test Description"),
         onSuccess) {
           fail("should not fail")
         }
@@ -196,7 +193,8 @@ class EventAPITest {
             "start_date": "2008-12-03T10:15:30+01:00",
             "end_date": "2008-12-03T10:15:30+01:00",
             "guests_or_artists": "Test Guest",
-            "location": "Test Location"
+            "location": "Test Location",
+            "association_uid": "00000000-0000-0000-0000-000000000000"
         }]
       """
             .trimIndent()
@@ -205,15 +203,7 @@ class EventAPITest {
     verify(timeout = 1000) { successMockCache(any()) }
 
     eventAPI.updateEvent(
-        Event(
-            uid = "$uuid1",
-            name = "Test Event",
-            description = "Test Description",
-            startDate = currentTime,
-            endDate = currentTime,
-            guestsOrArtists = "Test Guest",
-            location = "Test Location"),
-        onSuccess) {
+        Event(uid = "$uuid1", name = "Test Event", description = "Test Description"), onSuccess) {
           fail("Should not fail")
         }
 

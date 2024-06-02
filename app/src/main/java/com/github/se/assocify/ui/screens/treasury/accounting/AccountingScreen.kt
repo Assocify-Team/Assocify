@@ -18,9 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -29,8 +26,12 @@ import androidx.compose.ui.unit.dp
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DropdownFilterChip
+import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.composables.PullDownRefreshBox
 import com.github.se.assocify.ui.util.DateUtil
+import com.github.se.assocify.ui.util.PriceUtil
 
 /** Represents the page to display in the accounting screen */
 enum class AccountingPage {
@@ -51,31 +52,75 @@ fun AccountingScreen(
     navigationActions: NavigationActions,
     accountingViewModel: AccountingViewModel
 ) {
-  val model by accountingViewModel.uiState.collectAsState()
-  val subCategoryList = model.subCategoryList
+  val accountingState by accountingViewModel.uiState.collectAsState()
+  val subCategoryList = accountingState.subCategoryList
 
-  LazyColumn(
-      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center,
+  if (accountingState.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (accountingState.error != null) {
+    ErrorMessage(errorMessage = accountingState.error) { accountingViewModel.loadAccounting() }
+    return
+  }
+
+  PullDownRefreshBox(
+      refreshing = accountingState.refresh,
+      onRefresh = { accountingViewModel.refreshAccounting() },
   ) {
-    // display the subcategory if list is not empty
-    if (subCategoryList.isNotEmpty()) {
-      items(subCategoryList) {
-        DisplayLine(it, "displayLine${it.name}", page, navigationActions)
-        HorizontalDivider(Modifier.fillMaxWidth())
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+      // display the subcategory if list is not empty
+      if (subCategoryList.isNotEmpty()) {
+        items(subCategoryList) {
+          DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingState)
+          HorizontalDivider(Modifier.fillMaxWidth())
+        }
+        item {
+          val totalAmount =
+              when (page) {
+                AccountingPage.BUDGET -> {
+                  if (accountingState.tvaFilterActive)
+                      accountingState.amountBudgetTTC
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                  else
+                      accountingState.amountBudgetHT
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                }
+                AccountingPage.BALANCE -> {
+                  if (accountingState.tvaFilterActive)
+                      accountingState.amountBalanceTTC
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                  else
+                      accountingState.amountBalanceHT
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                }
+              }
+          TotalLine(totalAmount = totalAmount)
+        }
+      } else {
+        item {
+          Text(
+              text = "No data available with these tags",
+              style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+          )
+        }
       }
-      item { TotalLine(totalAmount = subCategoryList.sumOf { it.amount }) }
-    } else {
-      item {
-        Text(
-            text = "No data available with these tags",
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-        )
-      }
-    }
 
-    item { Spacer(modifier = Modifier.height(80.dp)) }
+      item { Spacer(modifier = Modifier.height(80.dp)) }
+    }
   }
 }
 
@@ -90,26 +135,23 @@ fun AccountingFilterBar(accountingViewModel: AccountingViewModel) {
 
   // filter bar lists
   val yearList = DateUtil.getYearList().reversed()
-  val tvaList: List<String> = listOf("TTC", "HT")
+  val tvaList: List<String> = listOf("HT", "TTC")
   val categoryList = listOf("Global") + model.categoryList.map { it.name }
-
-  // selected filters
-  var selectedYear by remember { mutableStateOf(yearList.first()) }
-  var selectedCategory by remember { mutableStateOf(categoryList.first()) }
-  var selectedTVA by remember { mutableStateOf(tvaList.first()) }
+  val category = if (model.selectedCategory != null) model.selectedCategory!!.name else "Global"
 
   // Row of dropdown filters
   Row(Modifier.testTag("filterRow").horizontalScroll(rememberScrollState())) {
-    DropdownFilterChip(yearList.first(), yearList, "yearFilterChip") {
-      selectedYear = it
-      accountingViewModel.onYearFilter(selectedYear.toInt())
+    DropdownFilterChip(model.yearFilter.toString(), yearList, "yearFilterChip") {
+      accountingViewModel.onYearFilter(it.toInt())
     }
-    DropdownFilterChip(categoryList.first(), categoryList, "categoryFilterChip") {
-      selectedCategory = it
-      accountingViewModel.onSelectedCategory(selectedCategory)
+
+    DropdownFilterChip(category, categoryList, "categoryFilterChip") {
+      accountingViewModel.onSelectedCategory(it)
     }
-    // TODO: change amount given TVA
-    DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") { selectedTVA = it }
+
+    DropdownFilterChip(tvaList.first(), tvaList, "tvaListTag") {
+      accountingViewModel.activeTVA(it == "TTC")
+    }
   }
 }
 
@@ -129,7 +171,7 @@ fun TotalLine(totalAmount: Int) {
       },
       trailingContent = {
         Text(
-            text = "$totalAmount",
+            text = PriceUtil.fromCents(totalAmount),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
       },
       colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer))
@@ -138,29 +180,45 @@ fun TotalLine(totalAmount: Int) {
 /**
  * A line displaying a budget category and its amount
  *
- * @param category: The budget category
+ * @param subCategory: The budget category
  * @param testTag: The test tag of the line
  * @param page: The page to which the line belongs
  * @param navigationActions: The navigation actions to navigate to the detailed screen
+ * @param accountingState: The state of the accounting screen
  */
 @Composable
 fun DisplayLine(
-    category: AccountingSubCategory,
+    subCategory: AccountingSubCategory,
     testTag: String,
     page: AccountingPage,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    accountingState: AccountingState
 ) {
+  val amount =
+      when (page) {
+        AccountingPage.BUDGET ->
+            if (accountingState.tvaFilterActive)
+                accountingState.amountBudgetTTC[subCategory.uid] ?: 0
+            else accountingState.amountBudgetHT[subCategory.uid] ?: 0
+        AccountingPage.BALANCE ->
+            if (accountingState.tvaFilterActive)
+                accountingState.amountBalanceTTC[subCategory.uid] ?: 0
+            else accountingState.amountBalanceHT[subCategory.uid] ?: 0
+      }
+
   ListItem(
-      headlineContent = { Text(category.name) },
-      trailingContent = { Text("${category.amount}", style = MaterialTheme.typography.bodyMedium) },
+      headlineContent = { Text(subCategory.name) },
+      trailingContent = {
+        Text(PriceUtil.fromCents(amount), style = MaterialTheme.typography.bodyMedium)
+      },
       modifier =
           Modifier.clickable {
-                if (page == AccountingPage.BUDGET) {
-                  navigationActions.navigateTo(Destination.BudgetDetailed(category.uid))
-                } else {
-                  navigationActions.navigateTo(Destination.BalanceDetailed(category.uid))
+                when (page) {
+                  AccountingPage.BUDGET ->
+                      navigationActions.navigateTo(Destination.BudgetDetailed(subCategory.uid))
+                  AccountingPage.BALANCE ->
+                      navigationActions.navigateTo(Destination.BalanceDetailed(subCategory.uid))
                 }
               }
-              .testTag(testTag),
-  )
+              .testTag(testTag))
 }

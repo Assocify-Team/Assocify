@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.TVA
 import io.github.jan.supabase.SupabaseClient
@@ -10,6 +11,38 @@ import kotlinx.serialization.Serializable
 class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
 
   private val collectionName = "budget_item"
+
+  private var budgetCache: List<BudgetItem>? = null
+  private var budgetCacheAssociationUID: String? = null
+
+  init {
+    CurrentUser.associationUid?.let { updateBudgetCache(it, {}, {}) }
+  }
+
+  /**
+   * Get the budget of an association, but force an update of the cache
+   *
+   * @param associationUID the unique identifier of the association
+   * @param onSuccess the callback to be called when the budget items are retrieved
+   * @param onFailure the callback to be called when the budget items could not be retrieved
+   */
+  fun updateBudgetCache(
+      associationUID: String,
+      onSuccess: (List<BudgetItem>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    tryAsync(onFailure) {
+      val response =
+          db.from(collectionName)
+              .select { filter { SupabaseBudgetItem::associationUID eq associationUID } }
+              .decodeList<SupabaseBudgetItem>()
+              .map { it.toBudgetItem() }
+      budgetCache = response
+      budgetCacheAssociationUID = associationUID
+      onSuccess(response)
+    }
+  }
+
   /**
    * Get the budget of an association
    *
@@ -22,13 +55,12 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<BudgetItem>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
-      val response =
-          db.from(collectionName)
-              .select { filter { SupabaseBudgetItem::associationUID eq associationUID } }
-              .decodeList<SupabaseBudgetItem>()
-      onSuccess(response.map { it.toBudgetItem() })
+    if (budgetCacheAssociationUID == associationUID && budgetCache != null) {
+      onSuccess(budgetCache!!)
+      return
     }
+
+    updateBudgetCache(associationUID, onSuccess, onFailure)
   }
 
   /**
@@ -44,6 +76,12 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
   ) {
     tryAsync(onFailure) {
       db.from(collectionName).insert(SupabaseBudgetItem.fromBudgetItem(budgetItem, associationUID))
+
+      // Update cache
+      if (budgetCacheAssociationUID == associationUID) {
+        budgetCache = budgetCache.orEmpty() + budgetItem
+      }
+
       onSuccess()
     }
   }
@@ -72,9 +110,15 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       }) {
         filter {
           BudgetAPI.SupabaseBudgetItem::associationUID eq associationUID
-          SupabaseBudgetItem::itemUID eq budgetItem.uid
+          SupabaseBudgetItem::uid eq budgetItem.uid
         }
       }
+
+      // Update cache
+      if (budgetCacheAssociationUID == associationUID) {
+        budgetCache = budgetCache.orEmpty().map { if (it.uid == budgetItem.uid) budgetItem else it }
+      }
+
       onSuccess()
     }
   }
@@ -91,14 +135,18 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
       onFailure: (Exception) -> Unit
   ) {
     tryAsync(onFailure) {
-      db.from(collectionName).delete { filter { SupabaseBudgetItem::itemUID eq budgetItemUID } }
+      db.from(collectionName).delete { filter { SupabaseBudgetItem::uid eq budgetItemUID } }
+
+      // Update cache
+      budgetCache = budgetCache.orEmpty().filter { it.uid != budgetItemUID }
+
       onSuccess()
     }
   }
 
   @Serializable
   data class SupabaseBudgetItem(
-      @SerialName("uid") val itemUID: String,
+      @SerialName("uid") val uid: String,
       @SerialName("association_uid") val associationUID: String,
       @SerialName("name") val name: String,
       @SerialName("description") val description: String,
@@ -109,7 +157,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
   ) {
     fun toBudgetItem(): BudgetItem {
       return BudgetItem(
-          uid = itemUID,
+          uid = uid,
           nameItem = name,
           amount = amount,
           description = description,
@@ -121,7 +169,7 @@ class BudgetAPI(val db: SupabaseClient) : SupabaseApi() {
     companion object {
       fun fromBudgetItem(budgetItem: BudgetItem, associationUID: String) =
           SupabaseBudgetItem(
-              itemUID = budgetItem.uid,
+              uid = budgetItem.uid,
               associationUID = associationUID,
               name = budgetItem.nameItem,
               description = budgetItem.description,

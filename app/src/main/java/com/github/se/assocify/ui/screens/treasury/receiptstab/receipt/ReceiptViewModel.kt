@@ -1,9 +1,8 @@
 package com.github.se.assocify.ui.screens.treasury.receiptstab.receipt
 
 import android.net.Uri
-import android.util.Log
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.ReceiptAPI
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
@@ -11,14 +10,12 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
+import com.github.se.assocify.ui.util.SnackbarSystem
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.math.absoluteValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class ReceiptViewModel {
 
@@ -28,6 +25,9 @@ class ReceiptViewModel {
   private val receiptApi: ReceiptAPI
   private val navActions: NavigationActions
   private val receiptUid: String
+  private var receiptCreatorUid: String
+
+  private val snackbarSystem: SnackbarSystem
 
   private val _uiState: MutableStateFlow<ReceiptState>
   val uiState: StateFlow<ReceiptState>
@@ -36,19 +36,28 @@ class ReceiptViewModel {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = UUID.randomUUID().toString()
+    this.receiptCreatorUid = CurrentUser.userUid!!
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = true, pageTitle = NEW_RECEIPT_TITLE))
     uiState = _uiState
+    snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
   }
 
   constructor(receiptUid: String, navActions: NavigationActions, receiptApi: ReceiptAPI) {
     this.navActions = navActions
     this.receiptApi = receiptApi
     this.receiptUid = receiptUid
+    // Temporary. Gets overridden once the receipt is fetched
+    this.receiptCreatorUid = CurrentUser.userUid!!
     _uiState = MutableStateFlow(ReceiptState(isNewReceipt = false, pageTitle = EDIT_RECEIPT_TITLE))
     uiState = _uiState
+    snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
     loadReceipt()
   }
 
+  /**
+   * Load receipt from database If successful, update the UI state with the receipt data If failed,
+   * update the UI state with an error message
+   */
   fun loadReceipt() {
     _uiState.value = _uiState.value.copy(loading = true, error = null)
     this.receiptApi.getReceipt(
@@ -61,17 +70,32 @@ class ReceiptViewModel {
                   description = receipt.description,
                   amount = PriceUtil.fromCents(receipt.cents.absoluteValue),
                   date = DateUtil.formatDate(receipt.date),
-                  incoming = receipt.cents >= 0,
-                  loading = false,
-                  error = null)
+                  incoming = receipt.cents >= 0)
 
-          receiptApi.getReceiptImage(
-              receipt,
-              { _uiState.value = _uiState.value.copy(receiptImageURI = it) },
-              { Log.e("ReceiptViewModel", "Failed to load receipt image", it) })
+          _uiState.value = _uiState.value.copy(loading = false, error = null)
+          this.receiptCreatorUid = receipt.userId
+          loadImage()
         },
         onFailure = {
           _uiState.value = _uiState.value.copy(loading = false, error = "Error loading receipt")
+        })
+  }
+
+  /**
+   * Load receipt image from database If successful, update the UI state with the image URI If
+   * failed, update the UI state with an error message
+   */
+  fun loadImage() {
+    _uiState.value = _uiState.value.copy(imageLoading = true, imageError = null)
+    receiptApi.getReceiptImage(
+        receiptUid,
+        {
+          _uiState.value = _uiState.value.copy(receiptImageURI = it)
+          _uiState.value = _uiState.value.copy(imageLoading = false, imageError = null)
+        },
+        {
+          _uiState.value =
+              _uiState.value.copy(imageLoading = false, imageError = "Error loading image")
         })
   }
 
@@ -143,10 +167,7 @@ class ReceiptViewModel {
   }
 
   fun signalCameraPermissionDenied() {
-    CoroutineScope(Dispatchers.Main).launch {
-      _uiState.value.snackbarHostState.showSnackbar(
-          message = "Camera permission denied", duration = SnackbarDuration.Short)
-    }
+    snackbarSystem.showSnackbar("Camera permission denied")
   }
 
   fun saveReceipt() {
@@ -161,10 +182,7 @@ class ReceiptViewModel {
     }
 
     if (_uiState.value.receiptImageURI == null) {
-      CoroutineScope(Dispatchers.Main).launch {
-        _uiState.value.snackbarHostState.showSnackbar(
-            message = "Receipt image is required", duration = SnackbarDuration.Short)
-      }
+      snackbarSystem.showSnackbar("Receipt image is required")
       return
     }
 
@@ -179,26 +197,17 @@ class ReceiptViewModel {
                 PriceUtil.toCents(_uiState.value.amount) * (if (_uiState.value.incoming) 1 else -1),
             date = date,
             status = _uiState.value.status,
-            photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!))
+            photo = MaybeRemotePhoto.LocalFile(_uiState.value.receiptImageURI!!),
+            userId = receiptCreatorUid)
     receiptApi.uploadReceipt(
         receipt,
         onPhotoUploadSuccess = {},
         onReceiptUploadSuccess = { navActions.back() },
         onFailure = { receiptFail, _ ->
           if (receiptFail) {
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Failed to save receipt",
-                  actionLabel = "Retry",
-              )
-            }
+            snackbarSystem.showSnackbar("Failed to save receipt", "Retry", { saveReceipt() })
           } else {
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Failed to save image",
-                  actionLabel = "Retry",
-              )
-            }
+            snackbarSystem.showSnackbar("Failed to save image", "Retry", { saveReceipt() })
           }
         })
   }
@@ -211,12 +220,7 @@ class ReceiptViewModel {
           id = receiptUid,
           onSuccess = { navActions.back() },
           onFailure = { _ ->
-            CoroutineScope(Dispatchers.Main).launch {
-              _uiState.value.snackbarHostState.showSnackbar(
-                  message = "Failed to delete receipt",
-                  actionLabel = "Retry",
-              )
-            }
+            snackbarSystem.showSnackbar("Failed to delete receipt", "Retry", { deleteReceipt() })
           })
     }
   }
@@ -229,6 +233,8 @@ class ReceiptViewModel {
 data class ReceiptState(
     val loading: Boolean = false,
     val error: String? = null,
+    val imageLoading: Boolean = false,
+    val imageError: String? = null,
     val isNewReceipt: Boolean,
     val status: Status = Status.Pending,
     val pageTitle: String,

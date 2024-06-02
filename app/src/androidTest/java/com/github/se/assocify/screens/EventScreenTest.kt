@@ -45,15 +45,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   fun testSetup() {
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
-          val e1 =
-              Event(
-                  "eventUID",
-                  "testEvent1",
-                  "a",
-                  OffsetDateTime.now(),
-                  OffsetDateTime.now(),
-                  "me",
-                  "home")
+          val e1 = Event("eventUID", "testEvent1", "a")
           val onSuccessCallback = arg<(List<Event>) -> Unit>(0)
           onSuccessCallback(listOf(e1))
         }
@@ -70,7 +62,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   60,
                   0,
                   "Committee",
-                  "Here",
+                  "46.518726,6.566615",
                   "eventUID0")
           val t2 =
               Task(
@@ -82,7 +74,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
                   60,
                   0,
                   "Committee",
-                  "Here",
+                  "46.518726,6.566610",
                   "eventUID")
           val onSuccessCallback = arg<(List<Task>) -> Unit>(0)
           onSuccessCallback(listOf(t1, t2))
@@ -134,16 +126,7 @@ class EventScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompos
   fun testFilterChipShowAssoc() {
     every { mockEventAPI.getEvents(any(), any()) } answers
         {
-          val events =
-              listOf(
-                  Event(
-                      "1",
-                      "filterChipTestEvent1",
-                      "a",
-                      OffsetDateTime.now(),
-                      OffsetDateTime.now(),
-                      "me",
-                      "home"))
+          val events = listOf(Event("1", "filterChipTestEvent1", "a"))
           val onSuccessCallback = firstArg<(List<Event>) -> Unit>()
           onSuccessCallback(events)
         }

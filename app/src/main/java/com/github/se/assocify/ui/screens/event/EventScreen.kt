@@ -46,7 +46,6 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
  *
  * @param navActions Navigation actions to navigate to other screens.
  * @param eventScreenViewModel The view model for the event screen.
- * @param taskListViewModel The view model for the task list.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -73,7 +72,8 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
             query = state.searchQuery,
             onQueryChange = { eventScreenViewModel.setSearchQuery(it) },
             onSearch = { eventScreenViewModel.searchTaskLists() },
-            page = pagerState.currentPage)
+            page = pagerState.currentPage,
+            searchTitle = "tasks")
       },
       bottomBar = {
         MainNavigationBar(
@@ -133,7 +133,7 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
               }
               EventPageIndex.Map.ordinal -> {
                 swapState.value = false
-                EventMapScreen()
+                EventMapScreen(eventScreenViewModel.mapViewModel)
               }
               EventPageIndex.Schedule.ordinal -> {
                 swapState.value = true

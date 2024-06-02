@@ -40,24 +40,8 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
 
   private val eventList =
       listOf<Event>(
-          Event(
-              "testEvent",
-              "testEvent1",
-              "Test Event",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "5",
-              "2022-01-01",
-          ),
-          Event(
-              "testEvent2",
-              "testEvent2",
-              "Test Event 2",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "10",
-              "2022-01-01",
-          ))
+          Event("testEvent", "testEvent1", "Test Event"),
+          Event("testEvent2", "testEvent2", "Test Event 2"))
 
   private val navActions = mockk<NavigationActions>(relaxUnitFun = true)
   private val eventAPI =
@@ -242,24 +226,8 @@ class EditTaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
 
   private val eventList =
       listOf<Event>(
-          Event(
-              "testEvent1",
-              "testEvent1",
-              "Test Event",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "5",
-              "2022-01-01",
-          ),
-          Event(
-              "testEvent2",
-              "testEvent2",
-              "Test Event 2",
-              OffsetDateTime.now(),
-              OffsetDateTime.now(),
-              "10",
-              "2022-01-01",
-          ))
+          Event("testEvent1", "testEvent1", "Test Event"),
+          Event("testEvent2", "testEvent2", "Test Event 2"))
 
   private val task =
       Task(

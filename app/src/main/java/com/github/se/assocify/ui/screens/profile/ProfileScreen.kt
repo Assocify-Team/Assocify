@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -58,6 +58,7 @@ import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.MainNavigationBar
 import com.github.se.assocify.ui.composables.MainTopBar
 import com.github.se.assocify.ui.composables.PhotoSelectionSheet
+import com.github.se.assocify.ui.composables.PullDownRefreshBox
 
 /**
  * Profile screen that displays the user's information, a way to change your current association and
@@ -67,7 +68,7 @@ import com.github.se.assocify.ui.composables.PhotoSelectionSheet
  * @param navActions: NavigationActions object that contains the navigation actions.
  * @param viewmodel: ProfileViewModel object that contains the logic of the profile screen.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
   val state by viewmodel.uiState.collectAsState()
@@ -89,158 +90,165 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
               Snackbar(snackbarData = snackbarData, modifier = Modifier.testTag("snackbar"))
             })
       }) { innerPadding ->
-        if (state.loading) {
+        if (state.loading && !state.refresh) {
           CenteredCircularIndicator()
           return@Scaffold
         }
 
         if (state.error != null) {
-          ErrorMessage(errorMessage = state.error) { viewmodel.loadProfile() }
+          Column(
+              modifier = Modifier.padding(innerPadding).fillMaxSize(),
+              verticalArrangement = Arrangement.Center,
+              horizontalAlignment = Alignment.CenterHorizontally) {
+                ErrorMessage(errorMessage = state.error, Modifier.padding(8.dp)) {
+                  viewmodel.loadProfile()
+                }
+                LogoutButton(viewmodel = viewmodel)
+              }
           return@Scaffold
         }
 
-        Column(
-            modifier =
-                Modifier.padding(innerPadding).verticalScroll(rememberScrollState()).fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)) {
-              Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)) {
+        PullDownRefreshBox(
+            refreshing = state.refresh,
+            onRefresh = { viewmodel.refreshProfile() },
+            paddingValues = innerPadding) {
+              Column(
+                  modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxWidth(),
+                  verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)) {
 
-                    // profile picture
-                    if (state.profileImageURI != null) {
-                      AsyncImage(
-                          modifier =
-                              Modifier.size(80.dp)
-                                  .clip(CircleShape) // Clip the image to a circle shape
-                                  .aspectRatio(1f)
-                                  .clickable { viewmodel.controlBottomSheet(true) }
-                                  .testTag("profilePicture"),
-                          model = state.profileImageURI,
-                          contentDescription = "profile picture",
-                          contentScale = ContentScale.Crop)
-                    } else {
-                      IconButton(
-                          modifier = Modifier.testTag("default profile icon").size(80.dp),
-                          onClick = { viewmodel.controlBottomSheet(true) }) {
-                            Icon(
-                                modifier = Modifier.fillMaxSize(),
-                                imageVector = Icons.Outlined.AccountCircle,
-                                contentDescription = "default profile icon")
+                          // profile picture
+                          if (state.profileImageURI != null) {
+                            AsyncImage(
+                                modifier =
+                                    Modifier.size(80.dp)
+                                        .clip(CircleShape) // Clip the image to a circle shape
+                                        .aspectRatio(1f)
+                                        .clickable { viewmodel.controlBottomSheet(true) }
+                                        .testTag("profilePicture"),
+                                model = state.profileImageURI,
+                                contentDescription = "profile picture",
+                                contentScale = ContentScale.Crop)
+                          } else {
+                            IconButton(
+                                modifier = Modifier.testTag("default profile icon").size(80.dp),
+                                onClick = { viewmodel.controlBottomSheet(true) }) {
+                                  Icon(
+                                      modifier = Modifier.fillMaxSize(),
+                                      imageVector = Icons.Outlined.AccountCircle,
+                                      contentDescription = "default profile icon")
+                                }
                           }
-                    }
 
-                    // personal information : name and role (depends on current association)
-                    Column(modifier = Modifier.testTag("profileInfos").weight(1f)) {
-                      Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            state.myName,
-                            modifier = Modifier.testTag("profileName").weight(1f),
-                            style = MaterialTheme.typography.headlineSmall)
+                          // personal information : name and role (depends on current association)
+                          Column(modifier = Modifier.testTag("profileInfos").weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                              Text(
+                                  state.myName,
+                                  modifier = Modifier.testTag("profileName").weight(1f),
+                                  style = MaterialTheme.typography.headlineSmall)
 
-                        // edit name button
-                        IconButton(
-                            onClick = { viewmodel.controlNameEdit(true) },
-                            modifier = Modifier.testTag("editProfile")) {
-                              Icon(
-                                  imageVector = Icons.Filled.Edit,
-                                  contentDescription = "Edit Profile Icon")
+                              // edit name button
+                              IconButton(
+                                  onClick = { viewmodel.controlNameEdit(true) },
+                                  modifier = Modifier.testTag("editProfile")) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Edit Profile Icon")
+                                  }
                             }
-                      }
 
-                      Text(state.currentRole.type.name, modifier = Modifier.testTag("profileRole"))
-                    }
-                  }
+                            Text(
+                                state.currentRole.type.name,
+                                modifier = Modifier.testTag("profileRole"))
+                          }
+                        }
 
-              // Change_association dropdown
-              DropdownWithSetOptions(
-                  options = state.myAssociations,
-                  selectedOption =
-                      DropdownOption(
-                          state.selectedAssociation.name,
-                          state.selectedAssociation.uid,
-                          state.selectedAssociation.leadIcon),
-                  opened = state.openAssociationDropdown,
-                  onOpenedChange = { viewmodel.controlAssociationDropdown(it) },
-                  onSelectOption = { viewmodel.setAssociation(it) },
-                  modifier =
-                      Modifier.testTag("associationDropdown").align(Alignment.CenterHorizontally))
+                    // Change_association dropdown
+                    DropdownWithSetOptions(
+                        options = state.myAssociations,
+                        selectedOption =
+                            DropdownOption(
+                                state.selectedAssociation.name,
+                                state.selectedAssociation.uid,
+                                state.selectedAssociation.leadIcon),
+                        opened = state.openAssociationDropdown,
+                        onOpenedChange = { viewmodel.controlAssociationDropdown(it) },
+                        onSelectOption = { viewmodel.setAssociation(it) },
+                        modifier =
+                            Modifier.testTag("associationDropdown")
+                                .align(Alignment.CenterHorizontally))
 
-              Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "Settings", style = MaterialTheme.typography.titleMedium)
 
-              Column(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .testTag("settingsList")
-                          .clip(RoundedCornerShape(12.dp))) {
-                    MySettings.entries.forEach { setting ->
-                      ListItem(
-                          leadingContent = {
-                            Icon(
-                                imageVector = setting.getIcon(),
-                                contentDescription = "${setting.name} icon")
-                          },
-                          headlineContent = { Text(text = setting.name) },
-                          trailingContent = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                                contentDescription = "Go to ${setting.name} settings")
-                          },
-                          colors =
-                              ListItemDefaults.colors(
-                                  containerColor = MaterialTheme.colorScheme.primaryContainer),
-                          modifier =
-                              Modifier.testTag(setting.name).clickable {
-                                navActions.navigateTo(setting.getDestination())
-                              })
-                    }
-                  }
+                    Column(
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .testTag("settingsList")
+                                .clip(RoundedCornerShape(12.dp))) {
+                          MySettings.entries.forEach { setting ->
+                            ListItem(
+                                leadingContent = {
+                                  Icon(
+                                      imageVector = setting.getIcon(),
+                                      contentDescription = "${setting.name} icon")
+                                },
+                                headlineContent = { Text(text = setting.name) },
+                                trailingContent = {
+                                  Icon(
+                                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                      contentDescription = "Go to ${setting.name} settings")
+                                },
+                                colors =
+                                    ListItemDefaults.colors(
+                                        containerColor =
+                                            MaterialTheme.colorScheme.primaryContainer),
+                                modifier =
+                                    Modifier.testTag(setting.name).clickable {
+                                      navActions.navigateTo(setting.getDestination())
+                                    })
+                          }
+                        }
 
-              // The below part is association dependent, only available if you're an admin !
-              Text(
-                  text = "Manage ${state.selectedAssociation.name}",
-                  style = MaterialTheme.typography.titleMedium)
+                    // The below part is association dependent, only available if you're an admin !
+                    Text(
+                        text = "Manage ${state.selectedAssociation.name}",
+                        style = MaterialTheme.typography.titleMedium)
 
-              Column(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .testTag("manageAssociationList")
-                          .clip(RoundedCornerShape(12.dp))) {
-                    AssociationSettings.entries.forEach { s ->
-                      ListItem(
-                          leadingContent = {
-                            Icon(imageVector = s.getIcon(), contentDescription = "${s.name} icon")
-                          },
-                          headlineContent = { Text(text = s.name) },
-                          trailingContent = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                                contentDescription = "Go to ${s.name} settings")
-                          },
-                          colors =
-                              ListItemDefaults.colors(
-                                  containerColor = MaterialTheme.colorScheme.primaryContainer),
-                          modifier =
-                              Modifier.testTag(s.name).clickable {
-                                navActions.navigateTo(s.getDestination())
-                              })
-                    }
-                  }
+                    Column(
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .testTag("manageAssociationList")
+                                .clip(RoundedCornerShape(12.dp))) {
+                          AssociationSettings.entries.forEach { s ->
+                            ListItem(
+                                leadingContent = {
+                                  Icon(
+                                      imageVector = s.getIcon(),
+                                      contentDescription = "${s.name} icon")
+                                },
+                                headlineContent = { Text(text = s.toString()) },
+                                trailingContent = {
+                                  Icon(
+                                      imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                      contentDescription = "Go to ${s.name} settings")
+                                },
+                                colors =
+                                    ListItemDefaults.colors(
+                                        containerColor =
+                                            MaterialTheme.colorScheme.primaryContainer),
+                                modifier =
+                                    Modifier.testTag(s.name).clickable {
+                                      navActions.navigateTo(s.getDestination())
+                                    })
+                          }
+                        }
 
-              // log out button (for everyone)
-              TextButton(
-                  onClick = { viewmodel.logout() },
-                  modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-                  contentPadding = ButtonDefaults.TextButtonContentPadding,
-                  colors =
-                      ButtonDefaults.textButtonColors(
-                          contentColor = MaterialTheme.colorScheme.error)) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Log out Icon")
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    Text(text = "Log out", textAlign = TextAlign.Center)
+                    // log out button (for everyone)
+                    LogoutButton(viewmodel = viewmodel)
                   }
             }
 
@@ -253,6 +261,7 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     OutlinedTextField(
                         value = state.modifyingName,
+                        singleLine = true,
                         onValueChange = { viewmodel.modifyName(it) },
                         label = { Text("Edit your name") },
                         modifier = Modifier.fillMaxWidth().testTag("editName"))
@@ -279,5 +288,19 @@ fun ProfileScreen(navActions: NavigationActions, viewmodel: ProfileViewModel) {
             hideSheet = { viewmodel.controlBottomSheet(false) },
             setImageUri = { viewmodel.setImage(it) },
             signalCameraPermissionDenied = { viewmodel.signalCameraPermissionDenied() })
+      }
+}
+
+@Composable
+fun LogoutButton(viewmodel: ProfileViewModel) {
+  // log out button (for everyone)
+  TextButton(
+      onClick = { viewmodel.logout() },
+      modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
+      contentPadding = ButtonDefaults.TextButtonContentPadding,
+      colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+        Icon(imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = "Log out Icon")
+        Spacer(modifier = Modifier.padding(4.dp))
+        Text(text = "Log out", textAlign = TextAlign.Center)
       }
 }

@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import android.net.Uri
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.AssociationMember
 import com.github.se.assocify.model.entities.PermissionRole
@@ -8,6 +9,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.storage.storage
+import java.nio.file.Path
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -19,19 +22,27 @@ import kotlinx.serialization.json.JsonObject
  *
  * @property db the Supabase client
  */
-class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
+class AssociationAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
   private var associationCache = mapOf<String, Association>()
-
-  private fun fillCache(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure, tag = "fillCache") {
-      val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
-      associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
-      onSuccess()
-    }
-  }
+  private val imageCacher = ImageCacher(60 * 60_000, cachePath, db.storage["association"])
 
   init {
-    fillCache({}, {}) // Try and fill the cache as quickly as possible
+    updateCache({}, {}) // Try and fill the cache as quickly as possible
+  }
+
+  /**
+   * Updates the cache of associations from the database. Also invalidates the member cache.
+   *
+   * @param onSuccess called on success with the map of associations (id, association)
+   * @param onFailure called on failure
+   */
+  fun updateCache(onSuccess: (Map<String, Association>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure, tag = "updateCache") {
+      val assoc = db.from("association").select().decodeList<SupabaseAssociation>()
+      associationCache = assoc.associateBy { it.uid!! }.mapValues { it.value.toAssociation() }
+      memberCache = null
+      onSuccess(associationCache)
+    }
   }
 
   /**
@@ -55,7 +66,7 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     if (associationCache.isNotEmpty()) {
       getFromCache()
     } else {
-      fillCache(getFromCache, onFailure)
+      updateCache({ getFromCache() }, onFailure)
     }
   }
 
@@ -70,8 +81,22 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
     if (associationCache.isNotEmpty()) {
       onSuccess(associationCache.values.toList())
     } else {
-      fillCache({ onSuccess(associationCache.values.toList()) }, onFailure)
+      updateCache({ onSuccess(associationCache.values.toList()) }, onFailure)
     }
+  }
+
+  /**
+   * Checks if the association name is valid. This means that the name is not empty and is not
+   * already taken. This function does not send any requests to the database, because it might be
+   * called multiple times in quick succession. As such, call `updateCache` before calling this if
+   * you want to ensure the cache is up to date.
+   *
+   * @param name the name to check
+   * @return true if the name is valid, false otherwise
+   */
+  fun associationNameValid(name: String): Boolean {
+    val trimmed = name.trim()
+    return name.isNotBlank() && associationCache.values.none { it.name == trimmed }
   }
 
   /**
@@ -94,6 +119,8 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
                   association.name,
                   association.description,
                   association.creationDate.toString()))
+
+      associationCache = associationCache + (association.uid to association)
       onSuccess()
     }
   }
@@ -121,6 +148,13 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
       }) {
         filter { SupabaseAssociation::uid eq uid }
       }
+
+      val associationCacheValue = associationCache[uid]
+      if (associationCacheValue != null) {
+        associationCache =
+            associationCache +
+                (uid to associationCacheValue.copy(name = name, description = description))
+      }
       onSuccess()
     }
   }
@@ -135,6 +169,8 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun deleteAssociation(id: String, onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure, tag = "deleteAssociation") {
       db.from("association").delete { filter { SupabaseAssociation::uid eq id } }
+
+      associationCache = associationCache - id
       onSuccess()
     }
   }
@@ -226,6 +262,50 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
               .select { filter { PermissionRole::associationId eq associationId } }
               .decodeList<PermissionRole>()
       onSuccess(roles)
+    }
+  }
+
+  @Serializable
+  private data class MemberOf(
+      @SerialName("users") val user: User,
+      @SerialName("role") val role: PermissionRole,
+  )
+
+  private var memberCache: Pair<String, List<AssociationMember>>? = null
+
+  /**
+   * Gets the members of an association. Lightly cached. If `associationId` isn't in the association
+   * cache, the cache is refreshed. If it still isn't, the failure callback is called.
+   *
+   * @param associationId the association to get the members for
+   * @param onSuccess called on success with the list of members
+   * @param onFailure called on failure
+   */
+  fun getMembers(
+      associationId: String,
+      onSuccess: (List<AssociationMember>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    if (memberCache?.first == associationId) {
+      onSuccess(memberCache!!.second)
+      return
+    }
+
+    val association = associationCache[associationId]
+    if (association != null) {
+      tryAsync(onFailure, tag = "getMembers") {
+        val members =
+            db.from("member_of")
+                .select(Columns.list("users(*)", "role!inner(*)")) {
+                  filter { eq("role.association_id", associationId) }
+                }
+                .decodeList<MemberOf>()
+                .map { AssociationMember(it.user, association, it.role) }
+        memberCache = associationId to members
+        onSuccess(members)
+      }
+    } else {
+      onFailure(Exception("Association not found"))
     }
   }
 
@@ -331,6 +411,34 @@ class AssociationAPI(private val db: SupabaseClient) : SupabaseApi() {
         .insert(
             Json.decodeFromString<JsonElement>(
                 """{"user_id": "$userId","role_id": ${invitation["role_id"]}}"""))
+  }
+
+  /**
+   * Sets the logo of an association.
+   *
+   * @param associationId the association to set the logo for
+   * @param uri the URI of the logo
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun setLogo(
+      associationId: String,
+      uri: Uri,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    imageCacher.uploadImage(associationId, uri, onSuccess, onFailure)
+  }
+
+  /**
+   * Gets the logo of an association.
+   *
+   * @param associationId the association to get the logo for
+   * @param onSuccess called on success with the URI of the logo
+   * @param onFailure called on failure
+   */
+  fun getLogo(associationId: String, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
+    imageCacher.fetchImage(associationId, { onSuccess(Uri.fromFile(it.toFile())) }, onFailure)
   }
 
   @Serializable

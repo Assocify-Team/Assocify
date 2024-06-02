@@ -20,6 +20,7 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.composables.PullDownRefreshBox
 import com.github.se.assocify.ui.screens.event.EventScreenViewModel
 import com.github.se.assocify.ui.util.DateTimeUtil
 
@@ -53,42 +54,48 @@ fun EventTaskScreen(
         mainState.selectedEvents.any { ev -> ev.uid == t.eventUid }
       }
 
-  if (mainState.selectedEvents.isEmpty()) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()) {
-          Text("No events selected")
-        }
-  } else if (visibleTasks.isEmpty()) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()) {
-          Text("No tasks found for selected events")
-        }
-  } else {
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-      visibleTasks.forEach {
-        item {
-          ListItem(
-              modifier =
-                  Modifier.testTag("TaskItem").clickable {
-                    navActions.navigateTo(Destination.EditTask(it.uid))
-                  },
-              headlineContent = { Text(it.title) },
-              supportingContent = { Text(it.category) },
-              trailingContent = {
-                Checkbox(
-                    modifier = Modifier.testTag("TaskCheckbox"),
-                    checked = it.isCompleted,
-                    onCheckedChange = { checked -> eventTaskViewModel.checkTask(it, checked) },
-                )
-              },
-              overlineContent = { Text(DateTimeUtil.formatDateTime(it.startTime)) })
-          HorizontalDivider()
+  PullDownRefreshBox(
+      refreshing = state.refresh, onRefresh = { eventTaskViewModel.refreshTasks() }) {
+        if (mainState.selectedEvents.isEmpty()) {
+          Column(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center,
+              modifier = Modifier.fillMaxSize()) {
+                Text("No events selected")
+              }
+        } else if (visibleTasks.isEmpty()) {
+          Column(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center,
+              modifier = Modifier.fillMaxSize()) {
+                Text("No tasks found for selected events")
+              }
+        } else {
+
+          LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            visibleTasks.forEach {
+              item {
+                ListItem(
+                    modifier =
+                        Modifier.testTag("TaskItem").clickable {
+                          navActions.navigateTo(Destination.EditTask(it.uid))
+                        },
+                    headlineContent = { Text(it.title) },
+                    supportingContent = { Text(it.category) },
+                    trailingContent = {
+                      Checkbox(
+                          modifier = Modifier.testTag("TaskCheckbox"),
+                          checked = it.isCompleted,
+                          onCheckedChange = { checked ->
+                            eventTaskViewModel.checkTask(it, checked)
+                          },
+                      )
+                    },
+                    overlineContent = { Text(DateTimeUtil.formatDateTime(it.startTime)) })
+                HorizontalDivider()
+              }
+            }
+          }
         }
       }
-    }
-  }
 }

@@ -6,24 +6,20 @@ import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.MaybeRemotePhoto
 import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.Status
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.resumable.MemoryResumableCache
-import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import java.io.File
 import java.time.LocalDate
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail
 import org.junit.Before
@@ -43,6 +39,7 @@ class ReceiptsAPITest {
   private val remoteReceipt =
       Receipt(
           uid = "00000000-ABCD-0000-0000-000000000000",
+          userId = "ABCD0001-ABCD-0000-0000-000000000001",
           date = LocalDate.EPOCH,
           cents = -100,
           status = Status.Pending,
@@ -52,7 +49,8 @@ class ReceiptsAPITest {
 
   private val localReceipt =
       Receipt(
-          uid = "00000000-ABCD-0000-0000-000000000001",
+          uid = "00000001-ABCD-0000-0000-000000000001",
+          userId = "ABCD0001-ABCD-0000-0000-000000000001",
           date = LocalDate.EPOCH,
           cents = -100,
           status = Status.Approved,
@@ -71,7 +69,7 @@ class ReceiptsAPITest {
         },
         "title": "title",
         "description": "notes",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "user_id": "ABCD0001-ABCD-0000-0000-000000000001",
         "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
       }
     """
@@ -88,7 +86,7 @@ class ReceiptsAPITest {
         },
         "title": "title",
         "description": "notes",
-        "user_id": "2c256037-ad67-4185-991a-1a2b9bb1f9b3",
+        "user_id": "ABCD0001-ABCD-0000-0000-000000000001",
         "association_id": "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
       }
     """
@@ -99,20 +97,15 @@ class ReceiptsAPITest {
 
   private val receivedListJson = "[$remoteJson, $localJson]"
 
-  @OptIn(SupabaseInternal::class, ExperimentalCoroutinesApi::class)
   @Before
   fun setUp() {
     APITestUtils.setup()
     mockkStatic(Uri::class)
     every { Uri.parse(any()) }.returns(mockk())
 
-    // Workaround for supabase internals that create a class unsupported on Linux.
-    mockkStatic(::createDefaultResumableCache)
-    every { createDefaultResumableCache() } returns MemoryResumableCache()
-
     CurrentUser.userUid = "2c256037-ad67-4185-991a-1a2b9bb1f9b3"
     CurrentUser.associationUid = "2c256037-4185-ad67-991a-1a2b9bb1f9b3"
-    val cachePath = File("cache").toPath()
+    val cachePath = APITestUtils.setupImageCacher { error }
     api =
         ReceiptAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
@@ -188,12 +181,14 @@ class ReceiptsAPITest {
     api.getReceipt(remoteReceipt.uid, successMock, { fail("Should not fail, failed with $it") })
 
     verify(timeout = 1000) { successMock(remoteReceipt) }
+    clearMocks(successMock)
 
     error = true
 
     // Test the cache; this shouldn't ping remote
     api.getReceipt(remoteReceipt.uid, successMock, { fail("Should not fail, failed with $it") })
     verify(timeout = 1000) { successMock(remoteReceipt) }
+    clearMocks(successMock)
 
     val failureMock1 = mockk<(Exception) -> Unit>(relaxed = true)
     api.getReceipt(localReceipt.uid, { fail("Should not succeed") }, failureMock1)
@@ -214,7 +209,7 @@ class ReceiptsAPITest {
 
     val failureMock = mockk<(Exception) -> Unit>(relaxed = true)
     error = true
-    api.getReceiptImage(remoteReceipt, { fail("Should not succeed") }, failureMock)
+    api.getReceiptImage(remoteReceipt.uid, { fail("Should not succeed") }, failureMock)
     verify(timeout = 1000) { failureMock.invoke(any()) }
   }
 

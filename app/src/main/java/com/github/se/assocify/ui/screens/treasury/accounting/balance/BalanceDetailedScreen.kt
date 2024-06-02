@@ -1,7 +1,11 @@
 package com.github.se.assocify.ui.screens.treasury.accounting.balance
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.composables.CenteredCircularIndicator
+import com.github.se.assocify.ui.composables.ErrorMessagePage
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingDetailedScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingPage
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
@@ -19,9 +23,31 @@ fun BalanceDetailedScreen(
     budgetDetailedViewModel: BudgetDetailedViewModel,
     balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
+  val balanceState by balanceDetailedViewModel.uiState.collectAsState()
+
+  if (balanceState.loading) {
+    CenteredCircularIndicator()
+    return
+  }
+
+  if (balanceState.error != null) {
+    ErrorMessagePage(
+        errorMessage = balanceState.error,
+        onBack = { navigationActions.back() },
+        title =
+            if (balanceState.subCategory != null) balanceState.subCategory!!.name else "Error") {
+          balanceDetailedViewModel.loadBalanceDetails()
+        }
+    return
+  }
+
+  val subCategory = balanceState.subCategory
+  val snackbarState = balanceState.snackbarState
   AccountingDetailedScreen(
       page = AccountingPage.BALANCE,
       navigationActions = navigationActions,
+      subCategory = subCategory,
+      snackbarState = snackbarState,
       budgetDetailedViewModel = budgetDetailedViewModel,
       balanceDetailedViewModel = balanceDetailedViewModel)
 }

@@ -7,7 +7,7 @@ import java.time.LocalDate
  *
  * @param uid unique identifier of the item
  * @param nameItem name of the item (for example: sweater)
- * @param categoryUID unique identifier of the category of the item
+ * @param subcategoryUID unique identifier of the category of the item
  * @param receiptUID unique identifier of the receipt of the item
  * @param amount amount of the item
  * @param tva TVA of the item
@@ -20,14 +20,19 @@ data class BalanceItem(
     val uid: String,
     val nameItem: String,
     val subcategoryUID: String,
-    val receiptUID: String,
+    val receiptUID: String?,
     val amount: Int, // unsigned: can be positive or negative
     val tva: TVA,
     val description: String,
     val date: LocalDate,
     val assignee: String,
     val status: Status,
-)
+) {
+  fun getAmount(tvaActive: Boolean): Int {
+    return if (tvaActive) this.amount + (this.amount * this.tva.rate / 100f).toInt()
+    else this.amount
+  }
+}
 
 /**
  * Represents the TVA of a budget or balance item, these types are also represented in the database

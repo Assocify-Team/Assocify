@@ -13,6 +13,26 @@ import kotlinx.serialization.Serializable
  * @property db the Supabase client
  */
 class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
+  private var taskCache: List<Task>? = null
+
+  init {
+    updateTaskCache({}, {})
+  }
+
+  /**
+   * Updates the task cache with the tasks from the database.
+   *
+   * @param onSuccess called on success with the list of tasks
+   * @param onFailure called on failure
+   */
+  fun updateTaskCache(onSuccess: (List<Task>) -> Unit, onFailure: (Exception) -> Unit) {
+    tryAsync(onFailure) {
+      val tasks = db.from("task").select().decodeList<SupabaseTask>().map { it.toTask() }
+      taskCache = tasks
+      onSuccess(tasks)
+    }
+  }
+
   /**
    * Gets a task from the database.
    *
@@ -21,16 +41,15 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getTask(id: String, onSuccess: (Task) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      val task =
-          db.from("task")
-              .select {
-                filter { SupabaseTask::uid eq id }
-                limit(1)
-                single()
-              }
-              .decodeAs<SupabaseTask>()
-      onSuccess(task.toTask())
+    val getFromList = { list: List<Task> ->
+      val task = list.find { it.uid == id }
+      task?.let { onSuccess(it) } ?: onFailure(Exception("Task with id $id not found"))
+    }
+
+    if (taskCache != null) {
+      getFromList(taskCache!!)
+    } else {
+      updateTaskCache(getFromList, onFailure)
     }
   }
   /**
@@ -40,9 +59,10 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
    * @param onFailure called on failure
    */
   fun getTasks(onSuccess: (List<Task>) -> Unit, onFailure: (Exception) -> Unit) {
-    tryAsync(onFailure) {
-      val tasks = db.from("task").select().decodeList<SupabaseTask>()
-      onSuccess(tasks.map { it.toTask() })
+    if (taskCache != null) {
+      onSuccess(taskCache!!)
+    } else {
+      updateTaskCache(onSuccess, onFailure)
     }
   }
 
@@ -69,6 +89,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
                   location = task.location,
                   eventId = task.eventUid))
 
+      taskCache = taskCache?.plus(task)
       onSuccess()
     }
   }
@@ -113,6 +134,23 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       }) {
         filter { SupabaseTask::uid eq uid }
       }
+
+      taskCache =
+          taskCache?.map {
+            if (it.uid == uid) {
+              it.copy(
+                  title = title,
+                  description = description,
+                  isCompleted = isCompleted,
+                  startTime = startTime,
+                  duration = duration,
+                  peopleNeeded = peopleNeeded,
+                  category = category,
+                  location = location)
+            } else {
+              it
+            }
+          }
       onSuccess()
     }
   }
@@ -149,6 +187,7 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
   fun deleteTask(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     tryAsync(onFailure) {
       db.from("task").delete { filter { SupabaseTask::uid eq id } }
+      taskCache = taskCache?.filter { it.uid != id }
       onSuccess()
     }
   }
@@ -165,12 +204,10 @@ class TaskAPI(private val db: SupabaseClient) : SupabaseApi() {
       onSuccess: (List<Task>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    tryAsync(onFailure) {
-      val tasks =
-          db.from("task")
-              .select { filter { SupabaseTask::eventId eq eventId } }
-              .decodeList<SupabaseTask>()
-      onSuccess(tasks.map { it.toTask() })
+    if (taskCache != null) {
+      onSuccess(taskCache!!.filter { it.eventUid == eventId })
+    } else {
+      updateTaskCache({ onSuccess(it.filter { task -> task.eventUid == eventId }) }, onFailure)
     }
   }
 
