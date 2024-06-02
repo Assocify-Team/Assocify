@@ -1,9 +1,7 @@
 package com.github.se.assocify.ui.screens.treasury
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.collectAsState
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
 import com.github.se.assocify.model.database.AccountingSubCategoryAPI
@@ -29,15 +27,16 @@ class TreasuryViewModel(
     userAPI: UserAPI,
     associationAPI: AssociationAPI
 ) {
-    init {
-        Log.d("image", "getting logo in View model at init")
-        associationAPI.getLogo(CurrentUser.associationUid!!,
-            {uri ->
-                Log.d("image", "uri is $uri")
-                CurrentUser.setAssociationLogo(uri) },
-            {CurrentUser.setAssociationLogo(null)}
-        )
-    }
+  init {
+    Log.d("image", "getting logo in View model at init")
+    associationAPI.getLogo(
+        CurrentUser.associationUid!!,
+        { uri ->
+          Log.d("image", "uri is $uri")
+          CurrentUser.setAssociationLogo(uri)
+        },
+        { CurrentUser.setAssociationLogo(null) })
+  }
   // ViewModel states
   private val _uiState: MutableStateFlow<TreasuryUIState> = MutableStateFlow(TreasuryUIState())
   val uiState: StateFlow<TreasuryUIState> = _uiState

@@ -60,8 +60,8 @@ fun MainTopBar(
   // Page state
   var currentPage by remember { mutableIntStateOf(page) }
 
-    val associationLogoUri = CurrentUser.associationLogo.collectAsState()
-    val associationLogoUriValue = associationLogoUri.value
+  val associationLogoUri = CurrentUser.associationLogo.collectAsState()
+  val associationLogoUriValue = associationLogoUri.value
 
   if (currentPage != page) {
     currentPage = page
@@ -78,7 +78,7 @@ fun MainTopBar(
               onClick = { /*TODO On assoc account click */}) {
                 // profile picture
                 if (associationLogoUriValue != null) {
-                    Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
+                  Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
                   AsyncImage(
                       modifier =
                           Modifier.size(80.dp)
@@ -89,7 +89,7 @@ fun MainTopBar(
                       contentDescription = "profile picture",
                       contentScale = ContentScale.Crop)
                 } else {
-                    Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
+                  Log.d("image", "CurrentUser.associationLogo: ${associationLogoUriValue}")
                   Icon(
                       modifier = Modifier.fillMaxSize(),
                       imageVector = Icons.Outlined.AccountCircle,

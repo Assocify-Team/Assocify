@@ -39,8 +39,7 @@ fun NavGraphBuilder.treasuryGraph(
           balanceAPI,
           budgetAPI,
           userAPI,
-          associationAPI
-          )
+          associationAPI)
     }
     TreasuryScreen(navigationActions, treasuryViewModel)
   }
