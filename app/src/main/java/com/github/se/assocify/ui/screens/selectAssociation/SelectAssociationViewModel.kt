@@ -1,5 +1,7 @@
 package com.github.se.assocify.ui.screens.selectAssociation
 
+import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AssociationAPI
@@ -8,6 +10,7 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.util.SnackbarSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -24,10 +27,11 @@ class SelectAssociationViewModel(
 ) : ViewModel() {
   private val _uiState: MutableStateFlow<SelectAssociationState> =
       MutableStateFlow(SelectAssociationState())
-  val uiState: StateFlow<SelectAssociationState>
+  val uiState: StateFlow<SelectAssociationState> = _uiState
+
+  private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
 
   init {
-    uiState = _uiState
     updateDatabaseValues()
   }
 
@@ -50,6 +54,12 @@ class SelectAssociationViewModel(
   /** Confirms selection of an association and moves to the home screen. */
   fun selectAssoc(uid: String) {
     CurrentUser.associationUid = uid
+    val selectError = { e: Exception ->
+      Log.e("SelectAssociationViewModel", "Error selecting association: $e")
+      val association = uiState.value.associations.find { it.uid == uid }?.name ?: "Unknown"
+      snackbarSystem.showSnackbar(
+          "Error joining association \"$association\"", "Retry", { selectAssoc(uid) })
+    }
     userAPI.requestJoin(
         uid,
         {
@@ -62,22 +72,21 @@ class SelectAssociationViewModel(
                       CurrentUser.userUid!!,
                       role,
                       {
-                        userAPI.updateCurrentUserAssociationCache(
-                            {
-                              if (navActions.backFromSelectAsso()) {
-                                navActions.back()
-                              } else {
-                                navActions.onLogin(true)
-                              }
-                            },
-                            {})
+                        val exit = {
+                          if (navActions.backFromSelectAsso()) {
+                            navActions.back()
+                          } else {
+                            navActions.onLogin(true)
+                          }
+                        }
+                        userAPI.updateCurrentUserAssociationCache({ exit() }, { exit() })
                       },
-                      {})
+                      selectError)
                 }
               },
-              {})
+              selectError)
         },
-        {})
+        selectError)
   }
 }
 
@@ -93,5 +102,6 @@ data class SelectAssociationState(
     val associations: List<Association> = emptyList(),
     val searchQuery: String = "",
     val user: User = User(),
-    val searchState: Boolean = false
+    val searchState: Boolean = false,
+    val snackbarHostState: SnackbarHostState = SnackbarHostState()
 )

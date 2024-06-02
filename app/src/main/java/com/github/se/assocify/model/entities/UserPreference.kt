@@ -25,7 +25,17 @@ data class UserPreference(
 enum class Theme {
   LIGHT,
   DARK,
-  SYSTEM
+  SYSTEM;
+
+  companion object {
+    fun fromString(value: String?): Theme {
+      return when (value) {
+        "LIGHT" -> LIGHT
+        "DARK" -> DARK
+        else -> SYSTEM
+      }
+    }
+  }
 }
 
 /** All the languages supported by the application */
