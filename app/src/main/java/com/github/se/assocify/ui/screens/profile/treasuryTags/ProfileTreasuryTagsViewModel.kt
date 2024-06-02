@@ -53,7 +53,7 @@ class ProfileTreasuryTagsViewModel(
           _uiState.value =
               _uiState.value.copy(treasuryTags = _uiState.value.treasuryTags.filter { tag != it })
         },
-        { snackBarSystem.showSnackbar("Could not delete the tag", "Retry", {}) })
+        { snackBarSystem.showSnackbar("Could not delete the tag") })
   }
 
   fun addTag(newTag: AccountingCategory) {
@@ -68,7 +68,7 @@ class ProfileTreasuryTagsViewModel(
         {
           Log.e("TrasurySCreen", "does not work!!")
           cancelPopUp()
-          snackBarSystem.showSnackbar("Could not add the tag", "Retry", {})
+          snackBarSystem.showSnackbar("Could not add the tag")
         })
   }
 
@@ -86,7 +86,7 @@ class ProfileTreasuryTagsViewModel(
         {
           Log.e("TrasurySCreen", "does not work!!")
           cancelPopUp()
-          snackBarSystem.showSnackbar("Could not modify the tag", "Retry", {})
+          snackBarSystem.showSnackbar("Could not modify the tag")
         })
   }
 
