@@ -30,7 +30,7 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.model.entities.User
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.kaspersky.components.composesupport.config.withComposeSupport
@@ -197,7 +197,7 @@ class Epic2Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   private val taskAPI = mockk<TaskAPI>(relaxUnitFun = true)
   private val budgetAPI = mockk<BudgetAPI>(relaxUnitFun = true)
   private val balanceAPI = mockk<BalanceAPI>(relaxUnitFun = true)
-  private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
+  private val loginSave = mockk<LocalSave>(relaxUnitFun = true)
   private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
   private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
 
