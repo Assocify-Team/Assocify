@@ -26,13 +26,9 @@ import androidx.lifecycle.LifecycleObserver
 import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.model.entities.MapMarkerData
 import java.io.File
-import kotlin.random.Random
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
-import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -132,8 +128,12 @@ fun rememberLifecycleObserver(mapView: MapView): LifecycleObserver =
     remember(mapView) {
       LifecycleEventObserver { _, event ->
         when (event) {
-          Lifecycle.Event.ON_RESUME -> mapView.onResume()
-          Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+          Lifecycle.Event.ON_RESUME -> {
+            mapView.onResume()
+          }
+          Lifecycle.Event.ON_PAUSE -> {
+            mapView.onPause()
+          }
           else -> {}
         }
       }
