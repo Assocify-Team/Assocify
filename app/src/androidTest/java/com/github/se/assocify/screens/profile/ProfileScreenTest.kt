@@ -306,6 +306,20 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
   }
 
   @Test
+  fun refreshProfile() {
+    every { mockAssocAPI.updateCache(any(), any()) } answers {}
+    every { mockUserAPI.updateUserCache(any(), any()) } answers
+        {
+          val onErrorCallback = secondArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.refreshProfile()
+      onNodeWithText("Could not refresh").assertIsDisplayed()
+    }
+  }
+
+  @Test
   fun openProfileSheet() {
     with(composeTestRule) {
       onNodeWithTag("default profile icon").performClick()

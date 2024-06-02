@@ -13,12 +13,15 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.MAIN_TABS_LIST
 import com.github.se.assocify.navigation.NavigationActions
@@ -42,15 +45,13 @@ import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewMod
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TreasuryScreen(
-    navActions: NavigationActions,
-    accountingViewModel: AccountingViewModel,
-    receiptListViewModel: ReceiptListViewModel,
-    treasuryViewModel: TreasuryViewModel
-) {
+fun TreasuryScreen(navActions: NavigationActions, treasuryViewModel: TreasuryViewModel) {
+
+  val accountingViewModel: AccountingViewModel = treasuryViewModel.accountingViewModel
+  val receiptListViewModel: ReceiptListViewModel = treasuryViewModel.receiptListViewModel
 
   val treasuryState by treasuryViewModel.uiState.collectAsState()
-  val accountingState by accountingViewModel.uiState.collectAsState()
+  val receiptState by receiptListViewModel.uiState.collectAsState()
   val pagerState = rememberPagerState(pageCount = { TreasuryPageIndex.entries.size })
 
   Scaffold(
@@ -92,22 +93,32 @@ fun TreasuryScreen(
               Icon(Icons.Outlined.Add, "Create")
             }
       },
+      snackbarHost = {
+        SnackbarHost(
+            hostState = treasuryState.snackbarHostState,
+            snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
+      },
       contentWindowInsets = WindowInsets(20.dp, 0.dp, 20.dp, 0.dp)) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-          InnerTabRow(
-              tabList = TreasuryPageIndex.entries,
-              pagerState = pagerState,
-              switchTab = { tab -> treasuryViewModel.switchTab(tab) })
+          if (receiptState.userCurrentRole.type != RoleType.TREASURY &&
+              receiptState.userCurrentRole.type != RoleType.PRESIDENCY) {
+            ReceiptListScreen(viewModel = receiptListViewModel)
+          } else {
+            InnerTabRow(
+                tabList = TreasuryPageIndex.entries,
+                pagerState = pagerState,
+                switchTab = { tab -> treasuryViewModel.switchTab(tab) })
 
-          when (pagerState.currentPage) {
-            TreasuryPageIndex.Receipts.ordinal -> {}
-            TreasuryPageIndex.Budget.ordinal -> {
-              AccountingFilterBar(accountingViewModel)
-              AddSubcategoryDialog(accountingViewModel)
-            }
-            TreasuryPageIndex.Balance.ordinal -> {
-              AccountingFilterBar(accountingViewModel)
-              AddSubcategoryDialog(accountingViewModel)
+            when (pagerState.currentPage) {
+              TreasuryPageIndex.Receipts.ordinal -> {}
+              TreasuryPageIndex.Budget.ordinal -> {
+                AccountingFilterBar(accountingViewModel)
+                AddSubcategoryDialog(accountingViewModel)
+              }
+              TreasuryPageIndex.Balance.ordinal -> {
+                AccountingFilterBar(accountingViewModel)
+                AddSubcategoryDialog(accountingViewModel)
+              }
             }
           }
 

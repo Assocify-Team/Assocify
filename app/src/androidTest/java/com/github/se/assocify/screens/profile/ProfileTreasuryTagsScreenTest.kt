@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.database.AccountingCategoryAPI
@@ -42,6 +43,16 @@ class ProfileTreasuryTagsScreenTest :
               val onSuccess = secondArg<(List<AccountingCategory>) -> Unit>()
               onSuccess(accCats)
             }
+        every { addCategory(any(), any(), any(), any()) } answers
+            {
+              val onSuccess = thirdArg<() -> Unit>()
+              onSuccess()
+            }
+        every { updateCategory(any(), any(), any(), any()) } answers
+            {
+              val onSuccess = thirdArg<() -> Unit>()
+              onSuccess()
+            }
       }
 
   @Before
@@ -64,7 +75,7 @@ class ProfileTreasuryTagsScreenTest :
       onNodeWithTag("TreasuryTags Screen").assertIsDisplayed()
       onNodeWithTag("addTagButton").assertIsDisplayed().assertHasClickAction()
       accCats.forEach { onNodeWithText(it.name).assertIsDisplayed() }
-      onAllNodesWithTag("editTagButton").assertCountEquals(accCats.size)
+      accCats.forEach { onNodeWithTag(it.uid).assertIsDisplayed() }
       onAllNodesWithTag("deleteTagButton").assertCountEquals(accCats.size)
     }
   }
@@ -74,6 +85,27 @@ class ProfileTreasuryTagsScreenTest :
     with(composeTestRule) {
       onNodeWithTag("backButton").performClick()
       assert(goBack)
+    }
+  }
+
+  @Test
+  fun createTag() {
+    with(composeTestRule) {
+      onNodeWithTag("addTagButton").performClick()
+      onNodeWithTag("nameField").performClick()
+      onNodeWithTag("nameField").performTextInput("testTag")
+      onNodeWithTag("saveButton").performClick()
+      onNodeWithText("testTag").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun editTag() {
+    with(composeTestRule) {
+      onNodeWithTag("1").performClick()
+      onNodeWithTag("nameField").performTextInput("cat2")
+      onNodeWithTag("saveButton").performClick()
+      onNodeWithText("cat2cat1").assertIsDisplayed()
     }
   }
 }

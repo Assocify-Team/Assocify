@@ -404,7 +404,9 @@ class BalanceDetailedScreenTest :
         }
     with(composeTestRule) {
       balanceDetailedViewModel.loadBalanceDetails()
-      onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading category")
+      onNodeWithTag("errorMessage")
+          .assertIsDisplayed()
+          .assertTextContains("Error loading balance category")
     }
   }
 

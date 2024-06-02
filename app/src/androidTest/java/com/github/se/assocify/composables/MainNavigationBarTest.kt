@@ -33,7 +33,7 @@ class MainNavigationBarTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       MainNavigationBar(
           onTabSelect = { tabPressed = it },
           tabList = MAIN_TABS_LIST,
-          selectedTab = Destination.Home)
+          selectedTab = Destination.Treasury)
     }
   }
 
@@ -41,7 +41,7 @@ class MainNavigationBarTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
   fun tabsDisplayed() {
     with(composeTestRule) {
       onNodeWithTag("mainNavBar").assertIsDisplayed()
-      onNodeWithTag("mainNavBar").onChild().onChildren().assertCountEquals(5)
+      onNodeWithTag("mainNavBar").onChild().onChildren().assertCountEquals(3)
     }
   }
 
@@ -50,9 +50,7 @@ class MainNavigationBarTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     with(composeTestRule) {
       onNodeWithTag("mainNavBarItem/event").assertTextContains("Event")
       onNodeWithTag("mainNavBarItem/profile").assertTextContains("Profile")
-      onNodeWithTag("mainNavBarItem/chat").assertTextContains("Chat")
       onNodeWithTag("mainNavBarItem/treasury").assertTextContains("Treasury")
-      onNodeWithTag("mainNavBarItem/home").assertTextContains("Home")
     }
   }
 
@@ -61,9 +59,7 @@ class MainNavigationBarTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
     with(composeTestRule) {
       onNodeWithTag("eventIcon", useUnmergedTree = true).assertIsDisplayed()
       onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
-      onNodeWithTag("chatIcon", useUnmergedTree = true).assertIsDisplayed()
       onNodeWithTag("treasuryIcon", useUnmergedTree = true).assertIsDisplayed()
-      onNodeWithTag("homeIcon", useUnmergedTree = true).assertIsDisplayed()
     }
   }
 
@@ -74,12 +70,8 @@ class MainNavigationBarTest : TestCase(kaspressoBuilder = Kaspresso.Builder.with
       assert(tabPressed == Destination.Event)
       onNodeWithTag("mainNavBarItem/profile").performClick()
       assert(tabPressed == Destination.Profile)
-      onNodeWithTag("mainNavBarItem/chat").performClick()
-      assert(tabPressed == Destination.Chat)
       onNodeWithTag("mainNavBarItem/treasury").performClick()
       assert(tabPressed == Destination.Treasury)
-      onNodeWithTag("mainNavBarItem/home").performClick()
-      assert(tabPressed == Destination.Home)
     }
   }
 }
