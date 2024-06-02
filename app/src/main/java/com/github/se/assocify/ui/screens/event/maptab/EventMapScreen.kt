@@ -1,10 +1,15 @@
 package com.github.se.assocify.ui.screens.event.maptab
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -13,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
@@ -26,6 +33,13 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
+// The location overlay to display the user's location
+private var myLocationOverlay: MyLocationNewOverlay? = null
+// Permission code for accessing GPS location
+const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 
 /** A screen that displays a map of the event: location with the associated tasks. */
 @Composable
@@ -82,6 +96,18 @@ fun rememberMapViewWithLifecycle(): MapView {
   DisposableEffect(lifecycle) {
     lifecycle.addObserver(lifecycleObserver)
     onDispose { lifecycle.removeObserver(lifecycleObserver) }
+  }
+
+  // Request location permissions and initialize myLocationOverlay
+  LaunchedEffect(Unit) {
+    val permissionGranted = requestLocationPermission(context)
+    if (permissionGranted) {
+      val myLocationProvider = GpsMyLocationProvider(context)
+      myLocationProvider.startLocationProvider(null)
+      myLocationOverlay = MyLocationNewOverlay(myLocationProvider, mapView)
+      myLocationOverlay?.enableMyLocation()
+      mapView.overlays.add(myLocationOverlay)
+    }
   }
 
   return mapView
@@ -147,4 +173,21 @@ fun EPFLMapView(
   // OSM maps are displayed as an Android view component
   AndroidView(
       factory = { mapViewState }, modifier = modifier, update = { view -> onLoad?.invoke(view) })
+}
+
+/**
+ * Displays a permission dialog to request location permission
+ *
+ * @param context the context to display the dialog
+ */
+fun requestLocationPermission(context: Context): Boolean {
+  if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+      PackageManager.PERMISSION_GRANTED) {
+    ActivityCompat.requestPermissions(
+        context as Activity,
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        LOCATION_PERMISSION_REQUEST_CODE)
+    return false
+  }
+  return true
 }

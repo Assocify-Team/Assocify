@@ -42,7 +42,6 @@ class ReceiptAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi(
     updateCaches({ _, _ -> }, { _, _ -> })
   }
 
-  // TODO: caches should use mutable lists to be more efficient
   private fun updateReceiptInList(receipt: Receipt, receipts: List<Receipt>): List<Receipt> {
     val index = receipts.indexOfFirst { r -> r.uid == receipt.uid }
     return if (index != -1) {
@@ -113,7 +112,7 @@ class ReceiptAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi(
 
   /**
    * Fetches the image of a receipt. If the image is not cached, it will be downloaded from the
-   * network, and stored in disk cache. TODO: limit the size of the cache
+   * network, and stored in disk cache.
    *
    * @param receiptUid the uid of the receipt to fetch the image of
    * @param onSuccess called when the image is fetched successfully with the URI of the image

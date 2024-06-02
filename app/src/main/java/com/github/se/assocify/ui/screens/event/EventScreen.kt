@@ -22,6 +22,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,12 +51,14 @@ import com.github.se.assocify.ui.screens.event.tasktab.EventTaskScreen
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreenViewModel) {
-
   val state by eventScreenViewModel.uiState.collectAsState()
 
   val swapState = remember { mutableStateOf(true) }
-
   val pagerState = rememberPagerState(pageCount = { EventPageIndex.entries.size })
+
+  LaunchedEffect(pagerState.currentPage) {
+    swapState.value = pagerState.currentPage != EventPageIndex.Map.ordinal
+  }
 
   when (pagerState.currentPage) {
     EventPageIndex.Map.ordinal -> eventScreenViewModel.switchTab(EventPageIndex.Map)
@@ -83,9 +86,7 @@ fun EventScreen(navActions: NavigationActions, eventScreenViewModel: EventScreen
       },
       floatingActionButton = {
         when (state.currentTab) {
-          EventPageIndex.Map -> {
-            /*TODO: implement for map screen*/
-          }
+          EventPageIndex.Map -> {}
           else -> {
             FloatingActionButton(
                 modifier = Modifier.testTag("floatingButtonEvent"),
