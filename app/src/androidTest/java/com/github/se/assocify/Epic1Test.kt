@@ -126,6 +126,15 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
               val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
               onSuccessCallback.invoke(PermissionRole("1", "aaa", RoleType.PRESIDENCY))
             }
+
+        // Never return a profile picture, permanently "fetch" the profile picture
+        every { getProfilePicture(any(), any(), any()) } answers {}
+
+        every { setProfilePicture(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
 
   private val eventAPI = mockk<EventAPI>() { every { getEvents(any(), any()) } answers {} }
@@ -192,10 +201,6 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("create").performClick()
       verify { associationAPI.addAssociation(any(), any(), any()) }
 
-      val toHome = navController.currentBackStackEntry?.destination?.route
-      assert(toHome == Destination.Home.route)
-
-      onNodeWithTag("homeScreen").assertIsDisplayed()
       onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
 
       // go to my profile

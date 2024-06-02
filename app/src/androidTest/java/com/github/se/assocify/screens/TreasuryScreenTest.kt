@@ -29,8 +29,6 @@ import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
-import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -130,7 +128,11 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             }
       }
 
-  val userAPI: UserAPI =
+  // treasuryViewModel.otherViewmodel to access accounting and receipt viewmodels :)
+  lateinit var treasuryViewModel: TreasuryViewModel
+
+
+  val mockUserAPI: UserAPI =
       mockk<UserAPI>() {
         every { getCurrentUserRole(any(), any()) } answers
             {
@@ -138,24 +140,22 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
               onSuccessCallback(PermissionRole("roleUid", "testAssociation", RoleType.TREASURY))
             }
       }
-  lateinit var receiptListViewModel: ReceiptListViewModel
-  lateinit var accountingViewModel: AccountingViewModel
 
   @Before
   fun testSetup() {
     CurrentUser.userUid = "testUser"
     CurrentUser.associationUid = "testAssociation"
-    receiptListViewModel = ReceiptListViewModel(navActions, mockReceiptAPI, userAPI)
-    accountingViewModel =
-        AccountingViewModel(
+    treasuryViewModel =
+        TreasuryViewModel(
+            navActions,
+            mockReceiptAPI,
             mockAccountingCategoriesAPI,
             mockAccountingSubCategoryAPI,
             mockBalanceAPI,
-            mockBudgetAPI)
-    val viewModel = TreasuryViewModel(navActions, receiptListViewModel, accountingViewModel)
-    composeTestRule.setContent {
-      TreasuryScreen(navActions, accountingViewModel, receiptListViewModel, viewModel)
-    }
+            mockBudgetAPI,
+            mockUserAPI
+        )
+    composeTestRule.setContent { TreasuryScreen(navActions, treasuryViewModel) }
   }
 
   @Test
@@ -166,7 +166,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun navigate() {
     with(composeTestRule) {
-      onNodeWithTag("mainNavBarItem/home").performClick()
+      onNodeWithTag("mainNavBarItem/profile").performClick()
       assert(tabSelected)
     }
   }
@@ -257,8 +257,35 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           secondArg<(Exception) -> Unit>().invoke(Exception("error"))
         }
     with(composeTestRule) {
-      receiptListViewModel.updateReceipts()
+      treasuryViewModel.receiptListViewModel.updateReceipts()
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading receipts")
+    }
+  }
+
+  @Test
+  fun receiptRefresh() {
+    every { mockReceiptAPI.updateCaches(any(), any()) } answers
+        {
+          secondArg<(Boolean, Exception) -> Unit>().invoke(true, Exception("error"))
+        }
+    with(composeTestRule) {
+      treasuryViewModel.receiptListViewModel.refreshReceipts()
+      onNodeWithText("Error refreshing receipts").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun refreshAccounting() {
+    every { mockBudgetAPI.updateBudgetCache(any(), any(), any()) } answers {}
+    every { mockBalanceAPI.updateBalanceCache(any(), any(), any()) } answers {}
+    every { mockAccountingCategoriesAPI.updateCategoryCache(any(), any(), any()) } answers {}
+    every { mockAccountingSubCategoryAPI.updateSubCategoryCache(any(), any(), any()) } answers
+        {
+          thirdArg<(Exception) -> Unit>().invoke(Exception("error"))
+        }
+    with(composeTestRule) {
+      treasuryViewModel.accountingViewModel.refreshAccounting()
+      onNodeWithText("Error refreshing accounting").assertIsDisplayed()
     }
   }
 
@@ -268,7 +295,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
       onNodeWithTag("receiptsTab").performClick()
       onNodeWithText("My Receipts").assertIsDisplayed()
       onNodeWithText("All Receipts").assertIsDisplayed()
-      assert(receiptListViewModel.uiState.value.userCurrentRole.type == RoleType.TREASURY)
+      assert(treasuryViewModel.receiptListViewModel.uiState.value.userCurrentRole.type == RoleType.TREASURY)
     }
   }
 }

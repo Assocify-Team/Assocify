@@ -27,6 +27,7 @@ import com.github.se.assocify.model.entities.Receipt
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.composables.PullDownRefreshBox
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 
@@ -46,60 +47,63 @@ fun ReceiptListScreen(viewModel: ReceiptListViewModel) {
     return
   }
 
-  LazyColumn(
-      modifier = Modifier.testTag("ReceiptList").fillMaxSize(),
-      verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        // Header for the user receipts
-        item {
-          Text(
-              text = "My Receipts",
-              style = MaterialTheme.typography.titleMedium,
-              modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
-          HorizontalDivider()
-        }
+  PullDownRefreshBox(
+      refreshing = viewmodelState.refresh, onRefresh = { viewModel.refreshReceipts() }) {
+        LazyColumn(
+            modifier = Modifier.testTag("ReceiptList").fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              // Header for the user receipts
+              item {
+                Text(
+                    text = "My Receipts",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+                HorizontalDivider()
+              }
 
-        if (viewmodelState.userReceipts.isNotEmpty()) {
-          // First list of receipts
-          viewmodelState.userReceipts.forEach { receipt ->
-            item {
-              ReceiptItem(receipt, viewModel)
-              HorizontalDivider()
+              if (viewmodelState.userReceipts.isNotEmpty()) {
+                // First list of receipts
+                viewmodelState.userReceipts.forEach { receipt ->
+                  item {
+                    ReceiptItem(receipt, viewModel)
+                    HorizontalDivider()
+                  }
+                }
+              } else {
+                // Placeholder for empty list
+                item {
+                  Text(
+                      text = "No receipts found. You can create one!",
+                      style = MaterialTheme.typography.bodyMedium,
+                      modifier = Modifier.padding(20.dp))
+                }
+              }
+
+              // Global receipts only appear if the user has the permission,
+              // which is handled in the viewmodel whatsoever
+              if (viewmodelState.allReceipts.isNotEmpty() &&
+                  (viewmodelState.userCurrentRole.type == RoleType.TREASURY ||
+                          viewmodelState.userCurrentRole.type == RoleType.PRESIDENCY)) {
+                // Header for the global receipts
+                item {
+                  Text(
+                      text = "All Receipts",
+                      style = MaterialTheme.typography.titleMedium,
+                      modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+                  HorizontalDivider()
+                }
+                // Second list of receipts
+                viewmodelState.allReceipts.forEach { receipt ->
+                  item {
+                    ReceiptItem(receipt, viewModel)
+                    HorizontalDivider()
+                  }
+                }
+              }
+
+              item { Spacer(modifier = Modifier.height(80.dp)) }
             }
-          }
-        } else {
-          // Placeholder for empty list
-          item {
-            Text(
-                text = "No receipts found. You can create one!",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(20.dp))
-          }
-        }
-
-        // Global receipts only appear if the user has the permission,
-        // which is handled in the viewmodel whatsoever
-        if (viewmodelState.allReceipts.isNotEmpty() &&
-            (viewmodelState.userCurrentRole.type == RoleType.TREASURY ||
-                viewmodelState.userCurrentRole.type == RoleType.PRESIDENCY)) {
-          // Header for the global receipts
-          item {
-            Text(
-                text = "All Receipts",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
-            HorizontalDivider()
-          }
-          // Second list of receipts
-          viewmodelState.allReceipts.forEach { receipt ->
-            item {
-              ReceiptItem(receipt, viewModel)
-              HorizontalDivider()
-            }
-          }
-        }
-
-        item { Spacer(modifier = Modifier.height(80.dp)) }
       }
 }
 

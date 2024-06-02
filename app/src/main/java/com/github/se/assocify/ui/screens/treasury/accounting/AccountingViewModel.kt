@@ -11,6 +11,8 @@ import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.ui.util.SnackbarSystem
+import com.github.se.assocify.ui.util.SyncSystem
 import java.time.Year
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,42 +30,64 @@ class AccountingViewModel(
     private var accountingCategoryAPI: AccountingCategoryAPI,
     private var accountingSubCategoryAPI: AccountingSubCategoryAPI,
     private var balanceAPI: BalanceAPI,
-    private var budgetAPI: BudgetAPI
+    private var budgetAPI: BudgetAPI,
+    private val snackbarSystem: SnackbarSystem
 ) : ViewModel() {
 
   private val _uiState: MutableStateFlow<AccountingState> = MutableStateFlow(AccountingState())
   val uiState: StateFlow<AccountingState>
 
+  private val loadSystem =
+      SyncSystem(
+          {
+            filterSubCategories()
+            setSubcategoriesAmount()
+            _uiState.value = _uiState.value.copy(refresh = false, loading = false, error = null)
+          },
+          { _uiState.value = _uiState.value.copy(refresh = false, loading = false, error = it) })
+
+  private val refreshSystem =
+      SyncSystem(
+          { loadAccounting() },
+          {
+            _uiState.value = _uiState.value.copy(refresh = false)
+            snackbarSystem.showSnackbar(it)
+          })
+
   /** Initialize the view model */
   init {
-    loadAccounting()
     uiState = _uiState
-  }
-
-  private var loadCounter = 0
-
-  private fun startLoad(count: Int) {
-    loadCounter = count
-    _uiState.value = _uiState.value.copy(loading = true, error = null)
-  }
-
-  private fun endLoad(error: String? = null) {
-    loadCounter--
-    if (error != null) {
-      _uiState.value = _uiState.value.copy(loading = false, error = error)
-    } else if (loadCounter == 0) {
-      filterSubCategories()
-      setSubcategoriesAmount()
-      _uiState.value = _uiState.value.copy(loading = false, error = null)
-    }
+    loadAccounting()
   }
 
   /** Function to load categories and subcategories */
   fun loadAccounting() {
-    startLoad(4)
+    if (!loadSystem.start(4)) return
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
     getCategories()
     getSubCategories()
     getAccountingList()
+  }
+
+  fun refreshAccounting() {
+    if (!refreshSystem.start(4)) return
+    _uiState.value = _uiState.value.copy(refresh = true)
+    accountingSubCategoryAPI.updateSubCategoryCache(
+        CurrentUser.associationUid!!,
+        { refreshSystem.end() },
+        { refreshSystem.end("Error refreshing accounting") })
+    accountingCategoryAPI.updateCategoryCache(
+        CurrentUser.associationUid!!,
+        { refreshSystem.end() },
+        { refreshSystem.end("Error refreshing tags") })
+    budgetAPI.updateBudgetCache(
+        CurrentUser.associationUid!!,
+        { refreshSystem.end() },
+        { refreshSystem.end("Error refreshing budget") })
+    balanceAPI.updateBalanceCache(
+        CurrentUser.associationUid!!,
+        { refreshSystem.end() },
+        { refreshSystem.end("Error refreshing balance") })
   }
 
   /** Function to get the categories from the database */
@@ -73,9 +97,9 @@ class AccountingViewModel(
         CurrentUser.associationUid!!,
         { categoryList ->
           _uiState.value = _uiState.value.copy(categoryList = categoryList)
-          endLoad()
+          loadSystem.end()
         },
-        { endLoad("Error loading tags") })
+        { loadSystem.end("Error loading tags") })
   }
 
   /** Function to get the subcategories from the database */
@@ -85,9 +109,9 @@ class AccountingViewModel(
         CurrentUser.associationUid!!,
         { subCategoryList ->
           _uiState.value = _uiState.value.copy(allSubCategoryList = subCategoryList)
-          endLoad()
+          loadSystem.end()
         },
-        { endLoad("Error loading categories") })
+        { loadSystem.end("Error loading categories") })
   }
 
   /** Function to filter the subCategoryList */
@@ -121,26 +145,26 @@ class AccountingViewModel(
         CurrentUser.associationUid!!,
         { budgetList ->
           _uiState.value = _uiState.value.copy(budgetItemsList = budgetList)
-          endLoad()
+          loadSystem.end()
         },
-        { endLoad("Error loading budget") })
+        { loadSystem.end("Error loading budget") })
 
     // get the balanceItem List
     balanceAPI.getBalance(
         CurrentUser.associationUid!!,
         { balanceList ->
           _uiState.value = _uiState.value.copy(balanceItemList = balanceList)
-          endLoad()
+          loadSystem.end()
         },
-        { endLoad("Error loading balance") })
+        { loadSystem.end("Error loading balance") })
   }
 
   /** Set the amount of a subcategory */
   private fun setSubcategoriesAmount() {
-    val updatedAmountBalanceHT = _uiState.value.amountBalanceHT.toMutableMap()
-    val updatedAmountBalanceTTC = _uiState.value.amountBalanceTTC.toMutableMap()
-    val updatedAmountBudgetHT = _uiState.value.amountBudgetHT.toMutableMap()
-    val updatedAmountBudgetTTC = _uiState.value.amountBudgetTTC.toMutableMap()
+    val updatedAmountBalanceHT: MutableMap<String, Int> = mutableMapOf()
+    val updatedAmountBalanceTTC: MutableMap<String, Int> = mutableMapOf()
+    val updatedAmountBudgetHT: MutableMap<String, Int> = mutableMapOf()
+    val updatedAmountBudgetTTC: MutableMap<String, Int> = mutableMapOf()
 
     val balanceItemsBySubCategory = _uiState.value.balanceItemList.groupBy { it.subcategoryUID }
     val budgetItemsBySubCategory = _uiState.value.budgetItemsList.groupBy { it.subcategoryUID }
@@ -324,6 +348,7 @@ class AccountingViewModel(
 data class AccountingState(
     val loading: Boolean = false,
     val error: String? = null,
+    val refresh: Boolean = false,
     val categoryList: List<AccountingCategory> = emptyList(),
     val selectedCategory: AccountingCategory? = null,
     val subCategoryList: List<AccountingSubCategory> = emptyList(),
