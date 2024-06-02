@@ -205,10 +205,6 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
       onNodeWithTag("create").performClick()
       verify { associationAPI.addAssociation(any(), any(), any()) }
 
-      val toHome = navController.currentBackStackEntry?.destination?.route
-      assert(toHome == Destination.Home.route)
-
-      onNodeWithTag("homeScreen").assertIsDisplayed()
       onNodeWithTag("mainNavBarItem/profile").assertIsDisplayed().performClick()
 
       // go to my profile

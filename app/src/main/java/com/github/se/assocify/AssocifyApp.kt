@@ -45,7 +45,7 @@ fun AssocifyApp(localSaver: LocalSave, appThemeViewModel: ThemeViewModel) {
 
   val firstDest =
       if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
-        Destination.Home.route
+        Destination.Treasury.route
       } else {
         Destination.Login.route
       }

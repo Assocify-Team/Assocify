@@ -29,7 +29,7 @@ class NavigationActions(
   fun onLogin(userHasMembership: Boolean) {
     if (userHasMembership) {
       loginSaver.saveUserInfo()
-      navController.navigate(Destination.Home.route) {
+      navController.navigate(Destination.Treasury.route) {
         popUpTo(navController.graph.id) { inclusive = true }
       }
     } else {

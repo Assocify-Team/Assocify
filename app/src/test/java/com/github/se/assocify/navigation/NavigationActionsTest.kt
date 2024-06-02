@@ -43,7 +43,9 @@ class NavigationActionsTest {
   fun `onLogin navigates to Home when user exists`() {
     navigationActions.onLogin(true)
 
-    verify { navController.navigate(Destination.Home.route, any<(NavOptionsBuilder) -> Unit>()) }
+    verify {
+      navController.navigate(Destination.Treasury.route, any<(NavOptionsBuilder) -> Unit>())
+    }
   }
 
   @Test
