@@ -29,16 +29,19 @@ class ProfileMembersViewModel(
         CurrentUser.associationUid!!,
         { members -> _uiState.value = _uiState.value.copy(currMembers = members, refresh = false) },
         {
-            _uiState.value = _uiState.value.copy(refresh = false)
-            snackbarSystem.showSnackbar("Error loading members") })
+          _uiState.value = _uiState.value.copy(refresh = false)
+          snackbarSystem.showSnackbar("Error loading members")
+        })
   }
 
   fun refreshMembers() {
     _uiState.value = _uiState.value.copy(refresh = true)
     associationAPI.updateCache(
-        { loadMembers() }, {
-            _uiState.value = _uiState.value.copy(refresh = false)
-            snackbarSystem.showSnackbar("Error refreshing members") })
+        { loadMembers() },
+        {
+          _uiState.value = _uiState.value.copy(refresh = false)
+          snackbarSystem.showSnackbar("Error refreshing members")
+        })
   }
 
   fun onEditMember(member: AssociationMember) {
