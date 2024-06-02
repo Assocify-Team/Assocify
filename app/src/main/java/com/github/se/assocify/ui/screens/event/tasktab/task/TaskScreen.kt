@@ -1,5 +1,8 @@
 package com.github.se.assocify.ui.screens.event.tasktab.task
 
+import android.annotation.SuppressLint
+import android.graphics.Canvas
+import android.view.MotionEvent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +12,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -30,6 +34,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,21 +42,45 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.PopupProperties
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import com.github.se.assocify.BuildConfig
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.BackButton
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DatePickerWithDialog
 import com.github.se.assocify.ui.composables.ErrorMessage
 import com.github.se.assocify.ui.composables.TimePickerWithDialog
+import com.github.se.assocify.ui.screens.event.maptab.CampusTileSource
+import com.github.se.assocify.ui.screens.event.maptab.INITIAL_POSITION
+import com.github.se.assocify.ui.screens.event.maptab.INITIAL_ZOOM
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.MapTileProviderBasic
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.TilesOverlay
 
+/**
+ * The task screen that allows the user to create or edit a task.
+ *
+ * @param navActions Navigation actions to navigate to other screens.
+ * @param viewModel The view model for the task screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
   val taskState by viewModel.uiState.collectAsState()
+  val isMapInteracting = remember { mutableStateOf(false) }
 
   Scaffold(
       modifier = Modifier.testTag("taskScreen"),
@@ -85,7 +114,9 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
 
         Column(
             modifier =
-                Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState()),
+                Modifier.fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState(), enabled = !isMapInteracting.value),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
               Box(
@@ -172,6 +203,18 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                   errorText = { taskState.durationError?.let { Text(it) } },
                   dialogTitle = "Select Duration",
                   switchModes = false)
+
+              // Map location picker
+              Box(modifier = Modifier.size(300.dp).padding(5.dp).testTag("mapPickerBox")) {
+                MapPickerView(
+                    modifier = Modifier.fillMaxWidth(),
+                    onLoad = {},
+                    onMapInteraction = { isInteracting ->
+                      isMapInteracting.value = isInteracting // Set the flag based on interaction
+                    },
+                    viewModel = viewModel)
+              }
+
               Column {
                 Button(
                     modifier = Modifier.testTag("saveButton").fillMaxWidth(),
@@ -197,4 +240,134 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
               Spacer(modifier = Modifier.weight(1.0f))
             }
       }
+}
+
+/**
+ * Initialize the map view with the EPFL plan tiles and it's lifecycle in order to save its state
+ */
+@SuppressLint("StateFlowValueCalledInComposition")
+@Composable
+fun rememberMapViewWithLifecycle(): MapView {
+  val context = LocalContext.current
+
+  // Update OSM configuration, for some reason
+  Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+  Configuration.getInstance().tileFileSystemCacheMaxBytes = 50L * 1024 * 1024
+
+  // No need for cache here
+
+  // Initialise the map view
+  val mapView = remember {
+    MapView(context).apply {
+      setTileSource(TileSourceFactory.MAPNIK)
+      // Enable pinch to zoom
+      setMultiTouchControls(true)
+      // Initial settings
+      controller.setZoom(INITIAL_ZOOM)
+      controller.setCenter(INITIAL_POSITION)
+      // Sets the tile source ot the EPFL plan tiles
+      val campusTileSource = CampusTileSource(0)
+      val tileProvider = MapTileProviderBasic(context, campusTileSource)
+      val tilesOverlay = TilesOverlay(tileProvider, context)
+      overlays.add(tilesOverlay)
+      clipToOutline = true
+    }
+  }
+
+  // Make the mapview live as long as the composable
+  val lifecycleObserver = rememberMapLifecycleObserver(mapView)
+  val lifecycle = LocalLifecycleOwner.current.lifecycle
+  DisposableEffect(lifecycle) {
+    lifecycle.addObserver(lifecycleObserver)
+    onDispose { lifecycle.removeObserver(lifecycleObserver) }
+  }
+
+  return mapView
+}
+
+@Composable
+fun rememberMapLifecycleObserver(mapView: MapView): LifecycleObserver =
+    remember(mapView) {
+      LifecycleEventObserver { _, event ->
+        when (event) {
+          Lifecycle.Event.ON_RESUME -> mapView.onResume()
+          Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+          else -> {}
+        }
+      }
+    }
+
+/**
+ * Custom view to pick a location on the map
+ *
+ * @param modifier the modifier for the view
+ * @param onLoad callback to notify when the map is loaded
+ * @param onMapInteraction callback to notify interaction (required for debouncing)
+ * @param viewModel the view model for the task screen
+ */
+@SuppressLint("ClickableViewAccessibility")
+@Composable
+fun MapPickerView(
+    modifier: Modifier = Modifier,
+    onLoad: ((map: MapView) -> Unit)? = null,
+    onMapInteraction: (Boolean) -> Unit, // Callback to notify interaction
+    viewModel: TaskViewModel
+) {
+  val mapView = rememberMapViewWithLifecycle()
+  val currentMarker = remember { mutableStateOf<Marker?>(null) }
+
+  AndroidView(
+      factory = { mapView },
+      modifier = modifier,
+      update = { view ->
+        onLoad?.invoke(view)
+        // Handle touch events for interaction detection
+        view.setOnTouchListener { _, event ->
+          when (event.action) {
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_MOVE -> {
+              onMapInteraction(true) // Notify interaction when touch starts or moves
+            }
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL -> {
+              onMapInteraction(false) // Notify end of interaction when touch ends or is cancelled
+            }
+          }
+          false // Return false to allow touch event to propagate
+        }
+
+        // Handle map clicks to add marker
+        view.overlays.add(
+            object : org.osmdroid.views.overlay.Overlay() {
+
+              override fun draw(c: Canvas?, osmv: MapView?, shadow: Boolean) {
+                // Overriding draw is required but we don't need to do anything here
+              }
+
+              override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean {
+                e?.let {
+                  val geoPoint = mapView?.projection?.fromPixels(e.x.toInt(), e.y.toInt())
+                  geoPoint?.let { point ->
+                    // Remove the old marker if exists
+                    currentMarker.value.let { mapView.overlays.remove(it) }
+
+                    // Add new marker
+                    val marker =
+                        Marker(mapView).apply {
+                          position = point as GeoPoint?
+                          setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        }
+
+                    mapView.overlays.add(marker)
+                    currentMarker.value = marker
+
+                    viewModel.setLocation(marker.position.toDoubleString())
+
+                    mapView.invalidate() // Refresh the map to show the new marker
+                  }
+                }
+                return true
+              }
+            })
+      })
 }
