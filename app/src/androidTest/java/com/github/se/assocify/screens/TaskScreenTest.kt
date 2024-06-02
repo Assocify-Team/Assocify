@@ -124,6 +124,12 @@ class TaskScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCompose
     }
   }
 
+  // Sadly MapView isn't really testable
+  @Test
+  fun location() {
+    with(composeTestRule) { onNodeWithTag("mapPickerBox").assertIsDisplayed() }
+  }
+
   @Test
   fun description() {
     with(composeTestRule) {

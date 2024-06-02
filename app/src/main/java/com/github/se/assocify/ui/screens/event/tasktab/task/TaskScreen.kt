@@ -198,8 +198,8 @@ fun TaskScreen(navActions: NavigationActions, viewModel: TaskViewModel) {
                   dialogTitle = "Select Duration",
                   switchModes = false)
 
-              // Problem is here
-              Box(modifier = Modifier.size(300.dp).padding(5.dp)) {
+              // Map location picker
+              Box(modifier = Modifier.size(300.dp).padding(5.dp).testTag("mapPickerBox")) {
                 MapPickerView(
                     modifier = Modifier.fillMaxWidth(),
                     onLoad = {},
