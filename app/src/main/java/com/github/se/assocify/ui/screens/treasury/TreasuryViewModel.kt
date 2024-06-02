@@ -6,6 +6,7 @@ import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.AccountingViewModel
 import com.github.se.assocify.ui.screens.treasury.receiptstab.ReceiptListViewModel
@@ -20,6 +21,7 @@ class TreasuryViewModel(
     accountingSubCategoryAPI: AccountingSubCategoryAPI,
     balanceAPI: BalanceAPI,
     budgetAPI: BudgetAPI,
+    userAPI: UserAPI
 ) {
   // ViewModel states
   private val _uiState: MutableStateFlow<TreasuryUIState> = MutableStateFlow(TreasuryUIState())
@@ -28,7 +30,7 @@ class TreasuryViewModel(
   private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
 
   val receiptListViewModel: ReceiptListViewModel =
-      ReceiptListViewModel(navActions, receiptsAPI, snackbarSystem)
+      ReceiptListViewModel(navActions, receiptsAPI, snackbarSystem, userAPI)
 
   val accountingViewModel: AccountingViewModel =
       AccountingViewModel(

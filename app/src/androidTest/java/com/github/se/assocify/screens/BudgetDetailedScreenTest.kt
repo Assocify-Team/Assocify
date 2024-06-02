@@ -408,6 +408,21 @@ class BudgetDetailedScreenTest :
   }
 
   @Test
+  fun testNegativeAmount() {
+    with(composeTestRule) {
+      onNodeWithTag("createNewItem").performClick()
+      onNodeWithTag("editDialogBox").assertIsDisplayed()
+      onNodeWithTag("editNameBox").performTextClearance()
+      onNodeWithTag("editNameBox").performTextInput("fees")
+      onNodeWithTag("editAmountBox").performTextClearance()
+      onNodeWithTag("editAmountBox").performTextInput("-5")
+      onNodeWithTag("editConfirmButton").performClick()
+      assert(!budgetDetailedViewModel.uiState.value.amountError)
+      onNodeWithTag("editDialogBox").assertIsNotDisplayed()
+    }
+  }
+
+  @Test
   fun deleteTest() {
     with(composeTestRule) {
       onNodeWithText("pair of scissors").assertIsDisplayed()
