@@ -8,6 +8,7 @@ import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.balanceDetailedGraph
@@ -20,7 +21,8 @@ fun NavGraphBuilder.treasuryGraph(
     balanceAPI: BalanceAPI,
     receiptsAPI: ReceiptAPI,
     accountingCategoryAPI: AccountingCategoryAPI,
-    accountingSubCategoryAPI: AccountingSubCategoryAPI
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    userAPI: UserAPI
 ) {
 
   composable(
@@ -33,7 +35,8 @@ fun NavGraphBuilder.treasuryGraph(
           accountingCategoryAPI,
           accountingSubCategoryAPI,
           balanceAPI,
-          budgetAPI)
+          budgetAPI,
+          userAPI)
     }
     TreasuryScreen(navigationActions, treasuryViewModel)
   }
