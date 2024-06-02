@@ -116,7 +116,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                 item {
                   OutlinedTextField(
                       singleLine = true,
-                      modifier = Modifier.padding(8.dp),
+                      modifier = Modifier.padding(8.dp).testTag("editAmountBox"),
                       value = amountString,
                       isError = budgetModel.amountError,
                       onValueChange = {
