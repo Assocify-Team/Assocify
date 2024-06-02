@@ -19,6 +19,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,9 +31,12 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.entities.Theme
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.composables.DropdownWithSetOptions
+import com.github.se.assocify.ui.theme.ThemeViewModel
 
 /**
  * The screen for the user to change the theme, text size, language and currency Accessed from the
@@ -44,10 +48,16 @@ import com.github.se.assocify.ui.composables.DropdownWithSetOptions
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfilePreferencesScreen(navActions: NavigationActions) {
+fun ProfilePreferencesScreen(
+    navActions: NavigationActions,
+    appThemeViewModel: ThemeViewModel,
+    localSave: LocalSave
+) {
   // temporary values for the theme, text size, language and currency, waiting for the viewmodel
-  val themeOptions = listOf("Light", "Dark", "System")
-  var themeSelectedIndex by remember { mutableIntStateOf(0) }
+  val themeOptions = listOf(Theme.LIGHT, Theme.DARK, Theme.SYSTEM)
+  val currentTheme by appThemeViewModel.theme.collectAsState()
+
+  var themeSelectedIndex by remember { mutableIntStateOf(themeOptions.indexOf(currentTheme)) }
 
   var sliderPosition by remember { mutableFloatStateOf(15f) }
 
@@ -84,11 +94,16 @@ fun ProfilePreferencesScreen(navActions: NavigationActions) {
                       shape =
                           SegmentedButtonDefaults.itemShape(
                               index = index, count = themeOptions.size),
-                      onClick = { themeSelectedIndex = index },
-                      selected = index == themeSelectedIndex,
-                  ) {
-                    Text(label)
-                  }
+                      onClick = {
+                        if (index != themeSelectedIndex) {
+                          themeSelectedIndex = index
+                          appThemeViewModel.setTheme(label)
+                          localSave.saveTheme()
+                        }
+                      },
+                      selected = index == themeSelectedIndex) {
+                        Text(label.name)
+                      }
                 }
               }
 

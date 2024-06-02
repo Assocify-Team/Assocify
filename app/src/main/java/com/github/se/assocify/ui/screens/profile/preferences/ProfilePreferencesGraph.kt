@@ -2,11 +2,18 @@ package com.github.se.assocify.ui.screens.profile.preferences
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
+import com.github.se.assocify.ui.theme.ThemeViewModel
 
-fun NavGraphBuilder.profilePreferencesGraph(navigationActions: NavigationActions) {
+fun NavGraphBuilder.profilePreferencesGraph(
+    navigationActions: NavigationActions,
+    appThemeVM: ThemeViewModel,
+    localSave: LocalSave
+) {
   composable(route = Destination.ProfilePreferences.route) {
-    ProfilePreferencesScreen(navActions = navigationActions)
+    ProfilePreferencesScreen(
+        navActions = navigationActions, appThemeViewModel = appThemeVM, localSave = localSave)
   }
 }

@@ -29,10 +29,11 @@ import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.navigation.mainNavGraph
+import com.github.se.assocify.ui.theme.ThemeViewModel
 import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -98,6 +99,8 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
             }
 
         every { associationNameValid(any()) } returns true
+
+        every { getLogo(any(), any(), any()) } answers {}
       }
 
   private val userAPI =
@@ -147,10 +150,11 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   private val receiptAPI = mockk<ReceiptAPI>(relaxUnitFun = true)
 
-  private val loginSave = mockk<LoginSave>(relaxUnitFun = true)
+  private val loginSave = mockk<LocalSave>(relaxUnitFun = true)
 
   private val accountingCategoriesAPI = mockk<AccountingCategoryAPI>(relaxUnitFun = true)
   private val accountingSubCategoryAPI = mockk<AccountingSubCategoryAPI>(relaxUnitFun = true)
+  private val appThemeViewModel = mockk<ThemeViewModel>(relaxUnitFun = true)
 
   @Before
   fun testSetup() {
@@ -253,6 +257,8 @@ fun TestAssocifyApp(
         taskAPI = taskAPI,
         receiptsAPI = receiptAPI,
         accountingCategoriesAPI = accountingCategoriesAPI,
-        accountingSubCategoryAPI = accountingSubCategoryAPI)
+        accountingSubCategoryAPI = accountingSubCategoryAPI,
+        appThemeViewModel = mockk(),
+        localSave = mockk())
   }
 }

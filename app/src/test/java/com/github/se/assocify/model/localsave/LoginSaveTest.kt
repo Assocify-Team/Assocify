@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.github.se.assocify.MainActivity
 import com.github.se.assocify.model.CurrentUser
+import com.github.se.assocify.model.entities.Theme
+import com.github.se.assocify.ui.theme.ThemeViewModel
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.junit5.MockKExtension
@@ -16,6 +18,11 @@ import org.junit.Test
 class LoginSaveTest {
   @get:Rule val mockkRule = MockKRule(this)
 
+  var appThemeVm =
+      mockk<ThemeViewModel>(relaxed = true) {
+        every { theme.value } returns Theme.DARK
+        every { theme.value.name } returns "DARK"
+      }
   var user: String? = null
   var assoc: String? = null
 
@@ -32,6 +39,11 @@ class LoginSaveTest {
               assoc = secondArg()
               this@mockk
             }
+        every { putString("theme", any()) } answers
+            {
+              appThemeVm = mockk { every { theme.value.name } returns secondArg() }
+              this@mockk
+            }
 
         every { remove("user_uid") } answers
             {
@@ -44,6 +56,11 @@ class LoginSaveTest {
               assoc = null
               this@mockk
             }
+        every { remove("theme") } answers
+            {
+              appThemeVm = mockk { every { theme.value } returns Theme.SYSTEM }
+              this@mockk
+            }
 
         every { apply() } answers {}
       }
@@ -54,6 +71,8 @@ class LoginSaveTest {
         every { getString("user_uid", null) } answers { user }
 
         every { getString("association_uid", null) } answers { assoc }
+
+        every { getString("theme", null) } answers { "DARK" }
       }
 
   val activity: MainActivity =
@@ -63,7 +82,7 @@ class LoginSaveTest {
         } answers { prefs }
       }
 
-  val loginSaver = LoginSave(activity)
+  val loginSaver = LocalSave(activity, themeVM = appThemeVm)
 
   @Before
   fun setup() {
@@ -76,6 +95,7 @@ class LoginSaveTest {
     loginSaver.saveUserInfo()
     assert(user == "testUser")
     assert(assoc == "testAssociation")
+    assert(appThemeVm.theme.value.name == Theme.DARK.name)
   }
 
   @Test
@@ -110,5 +130,25 @@ class LoginSaveTest {
     loginSaver.clearSavedAssociation()
     assert(user == "newUser")
     assert(assoc == null)
+  }
+
+  @Test
+  fun testSaveTheme() {
+    loginSaver.saveTheme()
+    assert(appThemeVm.theme.value.name == Theme.DARK.name)
+  }
+
+  @Test
+  fun testLoadTheme() {
+    appThemeVm = mockk { every { theme.value } returns Theme.LIGHT }
+    loginSaver.loadTheme()
+    assert(appThemeVm.theme.value == Theme.LIGHT)
+  }
+
+  @Test
+  fun testClearSavedTheme() {
+    appThemeVm = mockk { every { theme.value } returns Theme.LIGHT }
+    loginSaver.clearSavedTheme()
+    assert(appThemeVm.theme.value == Theme.SYSTEM)
   }
 }

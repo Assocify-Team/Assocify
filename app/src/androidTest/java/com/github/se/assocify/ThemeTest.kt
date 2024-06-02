@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onSibling
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.assocify.model.entities.Theme
 import com.github.se.assocify.ui.theme.AssocifyTheme
 import com.github.se.assocify.ui.theme.md_theme_dark_primary
 import com.github.se.assocify.ui.theme.md_theme_light_primary
@@ -34,8 +35,9 @@ class ThemeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
 
   @Test
   fun darkTheme() {
+
     composeTestRule.setContent {
-      AssocifyTheme(darkTheme = true, dynamicColor = false) { TestScreen() }
+      AssocifyTheme(theme = Theme.DARK, dynamicColor = false) { TestScreen() }
     }
     with(composeTestRule) {
       onNodeWithText("Test")
@@ -48,7 +50,20 @@ class ThemeTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
   @Test
   fun lightTheme() {
     composeTestRule.setContent {
-      AssocifyTheme(darkTheme = false, dynamicColor = false) { TestScreen() }
+      AssocifyTheme(theme = Theme.LIGHT, dynamicColor = false) { TestScreen() }
+    }
+    with(composeTestRule) {
+      onNodeWithText("Test")
+          .assertIsDisplayed()
+          .onSibling()
+          .assertTextContains(md_theme_light_primary.toString())
+    }
+  }
+
+  @Test
+  fun systemTheme() {
+    composeTestRule.setContent {
+      AssocifyTheme(theme = Theme.SYSTEM, dynamicColor = false) { TestScreen() }
     }
     with(composeTestRule) {
       onNodeWithText("Test")

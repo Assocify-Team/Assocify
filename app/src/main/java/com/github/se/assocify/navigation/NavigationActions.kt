@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.github.se.assocify.model.localsave.LoginSave
+import com.github.se.assocify.model.localsave.LocalSave
 
 class NavigationActions(
     private val navController: NavHostController,
-    private val loginSaver: LoginSave
+    private val loginSaver: LocalSave
 ) {
   fun navigateToMainTab(destination: Destination) {
     if (destination in MAIN_TABS_LIST) {
