@@ -17,11 +17,15 @@ import com.github.se.assocify.model.database.AccountingSubCategoryAPI
 import com.github.se.assocify.model.database.BalanceAPI
 import com.github.se.assocify.model.database.BudgetAPI
 import com.github.se.assocify.model.database.ReceiptAPI
+import com.github.se.assocify.model.database.UserAPI
 import com.github.se.assocify.model.entities.AccountingCategory
 import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
+import com.github.se.assocify.model.entities.PermissionRole
 import com.github.se.assocify.model.entities.Receipt
+import com.github.se.assocify.model.entities.RoleType
+import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.screens.treasury.TreasuryScreen
 import com.github.se.assocify.ui.screens.treasury.TreasuryViewModel
@@ -31,6 +35,7 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,6 +57,27 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
           AccountingSubCategory("2", "1", "OGJ", 2000, 1000),
           AccountingSubCategory("3", "1", "Subsonic", 100, 50),
       )
+  val receiptList =
+      listOf(
+          Receipt(
+              "1",
+              "receipt1",
+              "desc",
+              LocalDate.of(2021, 1, 1),
+              1000,
+              Status.Pending,
+              null,
+              "testUser"),
+          Receipt(
+              "2",
+              "receipt2",
+              "desc",
+              LocalDate.of(2021, 1, 1),
+              1000,
+              Status.Pending,
+              null,
+              "testUser2"))
+
   val mockAccountingCategoriesAPI: AccountingCategoryAPI =
       mockk<AccountingCategoryAPI>() {
         every { getCategories(any(), any(), any()) } answers
@@ -93,17 +119,26 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
         every { getAllReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback(listOf())
+              onSuccessCallback(receiptList)
             }
         every { getUserReceipts(any(), any()) } answers
             {
               val onSuccessCallback = firstArg<(List<Receipt>) -> Unit>()
-              onSuccessCallback(listOf())
+              onSuccessCallback(receiptList.filter { it.userId == "testUser" })
             }
       }
 
   // treasuryViewModel.otherViewmodel to access accounting and receipt viewmodels :)
   lateinit var treasuryViewModel: TreasuryViewModel
+
+  val mockUserAPI: UserAPI =
+      mockk<UserAPI>() {
+        every { getCurrentUserRole(any(), any()) } answers
+            {
+              val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+              onSuccessCallback(PermissionRole("roleUid", "testAssociation", RoleType.TREASURY))
+            }
+      }
 
   @Before
   fun testSetup() {
@@ -117,7 +152,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
             mockAccountingSubCategoryAPI,
             mockBalanceAPI,
             mockBudgetAPI,
-        )
+            mockUserAPI)
     composeTestRule.setContent { TreasuryScreen(navActions, treasuryViewModel) }
   }
 
@@ -129,7 +164,7 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
   @Test
   fun navigate() {
     with(composeTestRule) {
-      onNodeWithTag("mainNavBarItem/home").performClick()
+      onNodeWithTag("mainNavBarItem/profile").performClick()
       assert(tabSelected)
     }
   }
@@ -249,6 +284,18 @@ class TreasuryScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withCom
     with(composeTestRule) {
       treasuryViewModel.accountingViewModel.refreshAccounting()
       onNodeWithText("Error refreshing accounting").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun testReceiptPermissions() {
+    with(composeTestRule) {
+      onNodeWithTag("receiptsTab").performClick()
+      onNodeWithText("My Receipts").assertIsDisplayed()
+      onNodeWithText("All Receipts").assertIsDisplayed()
+      assert(
+          treasuryViewModel.receiptListViewModel.uiState.value.userCurrentRole.type ==
+              RoleType.TREASURY)
     }
   }
 }

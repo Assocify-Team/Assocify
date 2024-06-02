@@ -20,7 +20,6 @@ import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
-import java.time.OffsetDateTime
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -34,10 +33,7 @@ class ProfileEventsScreenTest :
   private val navActions = mockk<NavigationActions>()
   private var goBack = false
 
-  private val events =
-      listOf(
-          Event("1", "event1", "desc1", OffsetDateTime.MIN, OffsetDateTime.MAX, "", ""),
-          Event("2", "event2", "desc2", OffsetDateTime.MIN, OffsetDateTime.MAX, "", ""))
+  private val events = listOf(Event("1", "event1", "desc1"), Event("2", "event2", "desc2"))
 
   private val mockEventAPI =
       mockk<EventAPI> {

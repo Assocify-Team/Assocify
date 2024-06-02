@@ -99,10 +99,6 @@ class ReceiptViewModel {
         })
   }
 
-  fun setStatus(status: Status) {
-    _uiState.value = _uiState.value.copy(status = status)
-  }
-
   fun setTitle(title: String) {
     _uiState.value = _uiState.value.copy(title = title)
     if (title.isEmpty()) {
