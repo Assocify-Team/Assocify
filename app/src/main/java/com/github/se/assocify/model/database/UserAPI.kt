@@ -328,4 +328,97 @@ class UserAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
       return PermissionRole(roleId, associationId, type)
     }
   }
+
+  fun changeRoleOfUser(
+      userId: String,
+      associationId: String,
+      roleType: RoleType,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    // Determine which roleId of the user to change
+    var roleIDs: List<JsonObject>
+    tryAsync(onFailure) {
+      db.from("member_of")
+          .select { filter { eq("user_id", userId) } }
+          .decodeList<JsonObject>()
+          .let { roleIDs = it }
+
+      var roleIDToChange: JsonObject? = null
+      roleIDs
+          .map { it["role_id"].toString().drop(1).dropLast(1) }
+          .forEach {
+            val result =
+                db.from("role")
+                    .select {
+                      filter {
+                        eq("uid", it)
+                        eq("association_id", associationId)
+                      }
+                    }
+                    .decodeSingleOrNull<JsonObject>()
+            if (result != null) {
+              roleIDToChange = result
+            }
+          }
+
+      // Find the role to change to
+      val roleToChangeTo =
+          db.from("role")
+              .select {
+                filter {
+                  eq("type", roleType.name.lowercase())
+                  eq("association_id", associationId)
+                }
+              }
+              .decodeSingle<JsonObject>()
+
+      // Update the role of the user
+      db.from("member_of").update({
+        Membership::roleId setTo roleToChangeTo["uid"].toString().drop(1).dropLast(1)
+      }) {
+        filter {
+          eq("user_id", userId)
+          eq("role_id", roleIDToChange.toString().drop(1).dropLast(1))
+        }
+      }
+      onSuccess()
+    }
+  }
+
+  /**
+   * Removes a user from an association
+   *
+   * @param userId the id of the user to remove
+   * @param associationId the id of the association to remove the user from
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun removeUserFromAssociation(
+      userId: String,
+      associationId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    var roleIDs: List<JsonObject>
+    tryAsync(onFailure) {
+      // Get all the role ids the user have
+      roleIDs =
+          db.from("member_of").select { filter { eq("user_id", userId) } }.decodeList<JsonObject>()
+
+      // Delete the role id from the user which corresponds to the association
+      roleIDs
+          .map { it["role_id"].toString().drop(1).dropLast(1) }
+          .forEach {
+            println("Role ID: $it")
+            db.from("role").delete {
+              filter {
+                eq("uid", it)
+                eq("association_id", associationId)
+              }
+            }
+          }
+      onSuccess()
+    }
+  }
 }
