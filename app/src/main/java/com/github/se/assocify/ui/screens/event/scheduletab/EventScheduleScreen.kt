@@ -184,7 +184,6 @@ fun ScheduleTask(task: Task, lines: Int) {
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
               style = MaterialTheme.typography.bodySmall)
-          // TODO: Add more task details ?
         }
       }
 }

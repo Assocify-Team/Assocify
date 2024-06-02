@@ -86,7 +86,7 @@ class SelectAssociationViewModel(
               },
               selectError)
         },
-        selectError) // TODO: handle joining assoc (non immediate approval) (post-V1)
+        selectError)
   }
 }
 
