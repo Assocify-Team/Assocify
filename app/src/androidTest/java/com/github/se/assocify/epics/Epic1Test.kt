@@ -1,4 +1,4 @@
-package com.github.se.assocify
+package com.github.se.assocify.epics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -170,7 +170,8 @@ class Epic1Test : TestCase(kaspressoBuilder = Kaspresso.Builder.withComposeSuppo
           taskAPI,
           receiptAPI,
           accountingCategoriesAPI,
-          accountingSubCategoryAPI)
+          accountingSubCategoryAPI,
+          Destination.SelectAsso)
     }
   }
 
@@ -236,11 +237,12 @@ fun TestAssocifyApp(
     taskAPI: TaskAPI,
     receiptAPI: ReceiptAPI,
     accountingCategoriesAPI: AccountingCategoryAPI,
-    accountingSubCategoryAPI: AccountingSubCategoryAPI
+    accountingSubCategoryAPI: AccountingSubCategoryAPI,
+    startDestination: Destination
 ) {
   CurrentUser.userUid = "1"
 
-  NavHost(navController = navController, startDestination = Destination.SelectAsso.route) {
+  NavHost(navController = navController, startDestination = startDestination.route) {
     mainNavGraph(
         navActions = navActions,
         userAPI = userAPI,
