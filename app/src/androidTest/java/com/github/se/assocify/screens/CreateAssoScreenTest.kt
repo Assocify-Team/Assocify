@@ -66,6 +66,12 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
               val name = firstArg<String>()
               name != "nonValidName"
             }
+
+        every { setLogo(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
+            }
       }
   private val mockUserAPI =
       mockk<UserAPI> {
@@ -157,6 +163,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
 
   @Test
   fun testCantCreateAsso() {
+    bigView.setLogo(mockk())
     with(composeTestRule) {
       onNodeWithTag("create").assertIsNotEnabled()
       onNodeWithTag("name").performTextInput("nonValidName")
@@ -181,7 +188,7 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
     with(composeTestRule) {
       onNodeWithTag("create").performClick()
       verify { bigView.saveAsso() }
-      verify { mockNavActions.navigateToMainTab(Destination.Home) }
+      verify { mockNavActions.navigateToMainTab(Destination.Treasury) }
     }
   }
 
@@ -191,5 +198,21 @@ class CreateAssoScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withC
       onNodeWithTag("Back").performClick()
       verify { mockNavActions.back() }
     }
+  }
+
+  @Test
+  fun openProfileSheet() {
+    with(composeTestRule) {
+      onNodeWithTag("logo").performClick()
+      onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
+      bigView.signalCameraPermissionDenied()
+      onNodeWithTag("snackbar").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun setUri() {
+    bigView.setLogo(mockk())
+    with(composeTestRule) { onNodeWithTag("logo").assertIsDisplayed() }
   }
 }

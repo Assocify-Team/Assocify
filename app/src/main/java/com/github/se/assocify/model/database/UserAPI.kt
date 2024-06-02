@@ -1,5 +1,6 @@
 package com.github.se.assocify.model.database
 
+import android.net.Uri
 import com.github.se.assocify.model.CurrentUser
 import com.github.se.assocify.model.entities.Association
 import com.github.se.assocify.model.entities.PermissionRole
@@ -8,6 +9,8 @@ import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.storage
+import java.nio.file.Path
 import java.time.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,9 +23,10 @@ import kotlinx.serialization.json.JsonObject
  *
  * @property db the Supabase client
  */
-class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
+class UserAPI(private val db: SupabaseClient, cachePath: Path) : SupabaseApi() {
 
   private var userCache = mutableMapOf<String, User>()
+  private val imageCacher = ImageCacher(60 * 60_000, cachePath, db.storage["profile-picture"])
 
   init {
     updateUserCache({}, {})
@@ -111,6 +115,34 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
       }
       onSuccess()
     }
+  }
+
+  /**
+   * Sets the profile picture of a user.
+   *
+   * @param userId the id of the user to set the profile picture of
+   * @param newProfilePicture the URI of the new profile picture
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun setProfilePicture(
+      userId: String,
+      newProfilePicture: Uri,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    imageCacher.uploadImage(userId, newProfilePicture, onSuccess, onFailure)
+  }
+
+  /**
+   * Gets the profile picture of a user.
+   *
+   * @param userId the id of the user to get the profile picture of
+   * @param onSuccess called on success with the URI of the profile picture
+   * @param onFailure called on failure
+   */
+  fun getProfilePicture(userId: String, onSuccess: (Uri) -> Unit, onFailure: (Exception) -> Unit) {
+    imageCacher.fetchImage(userId, { onSuccess(Uri.fromFile(it.toFile())) }, onFailure)
   }
 
   /**
@@ -294,6 +326,108 @@ class UserAPI(private val db: SupabaseClient) : SupabaseApi() {
 
     fun getRole(): PermissionRole {
       return PermissionRole(roleId, associationId, type)
+    }
+  }
+
+  /**
+   * Changes the role of a user in an association
+   *
+   * @param userId the id of the user to change the role of
+   * @param associationId the id of the association to change the role in
+   * @param roleType the new role of the user
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun changeRoleOfUser(
+      userId: String,
+      associationId: String,
+      roleType: RoleType,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    // Determine which roleId of the user to change
+    var roleIDs: List<JsonObject>
+    tryAsync(onFailure) {
+      db.from("member_of")
+          .select { filter { eq("user_id", userId) } }
+          .decodeList<JsonObject>()
+          .let { roleIDs = it }
+
+      var roleIDToChange: JsonObject? = null
+      roleIDs
+          .map { it["role_id"].toString().drop(1).dropLast(1) }
+          .forEach {
+            val result =
+                db.from("role")
+                    .select {
+                      filter {
+                        eq("uid", it)
+                        eq("association_id", associationId)
+                      }
+                    }
+                    .decodeSingleOrNull<JsonObject>()
+            if (result != null) {
+              roleIDToChange = result
+            }
+          }
+
+      // Find the role to change to
+      val roleToChangeTo =
+          db.from("role")
+              .select {
+                filter {
+                  eq("type", roleType.name.lowercase())
+                  eq("association_id", associationId)
+                }
+              }
+              .decodeSingle<JsonObject>()
+
+      // Update the role of the user
+      db.from("member_of").update({
+        Membership::roleId setTo roleToChangeTo["uid"].toString().drop(1).dropLast(1)
+      }) {
+        filter {
+          eq("user_id", userId)
+          eq("role_id", roleIDToChange.toString().drop(1).dropLast(1))
+        }
+      }
+      onSuccess()
+    }
+  }
+
+  /**
+   * Removes a user from an association
+   *
+   * @param userId the id of the user to remove
+   * @param associationId the id of the association to remove the user from
+   * @param onSuccess called on success
+   * @param onFailure called on failure
+   */
+  fun removeUserFromAssociation(
+      userId: String,
+      associationId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    var roleIDs: List<JsonObject>
+    tryAsync(onFailure) {
+      // Get all the role ids the user have
+      roleIDs =
+          db.from("member_of").select { filter { eq("user_id", userId) } }.decodeList<JsonObject>()
+
+      // Delete the role id from the user which corresponds to the association
+      roleIDs
+          .map { it["role_id"].toString().drop(1).dropLast(1) }
+          .forEach {
+            println("Role ID: $it")
+            db.from("role").delete {
+              filter {
+                eq("uid", it)
+                eq("association_id", associationId)
+              }
+            }
+          }
+      onSuccess()
     }
   }
 }

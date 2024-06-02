@@ -39,26 +39,6 @@ import java.time.Year
 import java.util.UUID
 
 /**
- * Displays the popup to edit a budget
- *
- * @param budgetViewModel the viewModel of the budget details
- */
-@Composable
-fun DisplayEditBudget(budgetViewModel: BudgetDetailedViewModel) {
-  BudgetPopUpScreen(budgetViewModel)
-}
-
-/**
- * Displays the popup to create a budget
- *
- * @param budgetViewModel the viewModel of the budget details
- */
-@Composable
-fun DisplayCreateBudget(budgetViewModel: BudgetDetailedViewModel) {
-  BudgetPopUpScreen(budgetViewModel)
-}
-
-/**
  * Displays the popup to edit a specific budget element
  *
  * @param budgetViewModel the viewModel of the budget details
@@ -136,7 +116,7 @@ fun BudgetPopUpScreen(budgetViewModel: BudgetDetailedViewModel) {
                 item {
                   OutlinedTextField(
                       singleLine = true,
-                      modifier = Modifier.padding(8.dp),
+                      modifier = Modifier.padding(8.dp).testTag("editAmountBox"),
                       value = amountString,
                       isError = budgetModel.amountError,
                       onValueChange = {

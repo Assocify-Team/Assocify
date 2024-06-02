@@ -29,6 +29,7 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.CenteredCircularIndicator
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.composables.ErrorMessage
+import com.github.se.assocify.ui.composables.PullDownRefreshBox
 import com.github.se.assocify.ui.util.DateUtil
 import com.github.se.assocify.ui.util.PriceUtil
 
@@ -64,57 +65,62 @@ fun AccountingScreen(
     return
   }
 
-  LazyColumn(
-      modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center,
+  PullDownRefreshBox(
+      refreshing = accountingState.refresh,
+      onRefresh = { accountingViewModel.refreshAccounting() },
   ) {
-    // display the subcategory if list is not empty
-    if (subCategoryList.isNotEmpty()) {
-      items(subCategoryList) {
-        DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingState)
-        HorizontalDivider(Modifier.fillMaxWidth())
-      }
-      item {
-        val totalAmount =
-            when (page) {
-              AccountingPage.BUDGET -> {
-                if (accountingState.tvaFilterActive)
-                    accountingState.amountBudgetTTC
-                        .filter { it.key in subCategoryList.map { it.uid } }
-                        .values
-                        .sum()
-                else
-                    accountingState.amountBudgetHT
-                        .filter { it.key in subCategoryList.map { it.uid } }
-                        .values
-                        .sum()
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().testTag("AccountingScreen"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+      // display the subcategory if list is not empty
+      if (subCategoryList.isNotEmpty()) {
+        items(subCategoryList) {
+          DisplayLine(it, "displayLine${it.name}", page, navigationActions, accountingState)
+          HorizontalDivider(Modifier.fillMaxWidth())
+        }
+        item {
+          val totalAmount =
+              when (page) {
+                AccountingPage.BUDGET -> {
+                  if (accountingState.tvaFilterActive)
+                      accountingState.amountBudgetTTC
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                  else
+                      accountingState.amountBudgetHT
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                }
+                AccountingPage.BALANCE -> {
+                  if (accountingState.tvaFilterActive)
+                      accountingState.amountBalanceTTC
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                  else
+                      accountingState.amountBalanceHT
+                          .filter { it.key in subCategoryList.map { it.uid } }
+                          .values
+                          .sum()
+                }
               }
-              AccountingPage.BALANCE -> {
-                if (accountingState.tvaFilterActive)
-                    accountingState.amountBalanceTTC
-                        .filter { it.key in subCategoryList.map { it.uid } }
-                        .values
-                        .sum()
-                else
-                    accountingState.amountBalanceHT
-                        .filter { it.key in subCategoryList.map { it.uid } }
-                        .values
-                        .sum()
-              }
-            }
-        TotalLine(totalAmount = totalAmount)
+          TotalLine(totalAmount = totalAmount)
+        }
+      } else {
+        item {
+          Text(
+              text = "No data available with these tags",
+              style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+          )
+        }
       }
-    } else {
-      item {
-        Text(
-            text = "No data available with these tags",
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-        )
-      }
-    }
 
-    item { Spacer(modifier = Modifier.height(80.dp)) }
+      item { Spacer(modifier = Modifier.height(80.dp)) }
+    }
   }
 }
 

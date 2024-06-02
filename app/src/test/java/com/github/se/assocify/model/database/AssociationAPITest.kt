@@ -8,6 +8,7 @@ import com.github.se.assocify.model.entities.RoleType
 import com.github.se.assocify.model.entities.User
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
@@ -41,10 +42,12 @@ class AssociationAPITest {
   fun setup() {
     APITestUtils.setup()
     error = true
+    val cachePath = APITestUtils.setupImageCacher { error }
     assoAPI =
         AssociationAPI(
             createSupabaseClient(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_ANON_KEY) {
               install(Postgrest)
+              install(Storage)
               httpEngine = MockEngine {
                 if (!error) {
                   respond(response, headers = responseHeaders)
@@ -52,7 +55,8 @@ class AssociationAPITest {
                   respondBadRequest()
                 }
               }
-            })
+            },
+            cachePath)
     error = false
   }
 
@@ -457,5 +461,19 @@ class AssociationAPITest {
     verify(timeout = 1000) { failureMock(any()) }
     verify(exactly = 0) { successMock(any()) }
     clearMocks(successMock, failureMock)
+  }
+
+  @Test
+  fun testSetGetLogo() {
+    error = true
+    val onFailure: (Exception) -> Unit = mockk(relaxed = true)
+
+    assoAPI.getLogo(uuid1.toString(), { fail("Should not succeed") }, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
+    clearMocks(onFailure)
+
+    // We can't test success :(
+    assoAPI.setLogo(uuid1.toString(), mockk(), { fail("Should not succeed") }, onFailure)
+    verify(timeout = 1000) { onFailure(any()) }
   }
 }

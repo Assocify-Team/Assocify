@@ -2,12 +2,14 @@ package com.github.se.assocify.ui.screens.profile
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
@@ -20,8 +22,12 @@ import com.github.se.assocify.navigation.Destination
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownOption
 import com.github.se.assocify.ui.util.SnackbarSystem
+import com.github.se.assocify.ui.util.SyncSystem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * This ViewModel is used to manage the UI state of the profile screen. It is used to get the user's
@@ -42,33 +48,23 @@ class ProfileViewModel(
 
   private val snackbarSystem = SnackbarSystem(_uiState.value.snackbarHostState)
 
-  private var loadCounter = 0 // number of things loading
+  private val loadSystem =
+      SyncSystem(
+          { _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = null) },
+          { error ->
+            _uiState.value = _uiState.value.copy(loading = false, refresh = false, error = error)
+          })
+
+  private val refreshSystem =
+      SyncSystem(
+          { loadProfile() },
+          { error ->
+            _uiState.value = _uiState.value.copy(refresh = false)
+            snackbarSystem.showSnackbar(error)
+          })
 
   init {
     loadProfile()
-  }
-
-  /** This function is used to start loading. It increments the load counter. */
-  private fun startLoading() {
-    _uiState.value = _uiState.value.copy(loading = true, error = null)
-    loadCounter += 4
-  }
-
-  /**
-   * This function is used to end loading. It decrements the load counter.
-   *
-   * @param error the error message, if any
-   */
-  private fun endLoading(error: String? = null) {
-    if (error != null) {
-      if (_uiState.value.error == null) {
-        _uiState.value = _uiState.value.copy(loading = false, error = error)
-      }
-      loadCounter = 0
-    } else if (--loadCounter == 0) {
-      _uiState.value = _uiState.value.copy(loading = false, error = null)
-      loadCounter = 0
-    }
   }
 
   /**
@@ -76,14 +72,18 @@ class ProfileViewModel(
    * and the current association. It also gets the user's role in the association.
    */
   fun loadProfile() {
-    startLoading()
+
+    if (!loadSystem.start(4)) return
+
+    _uiState.value = _uiState.value.copy(loading = true, error = null)
+
     userAPI.getUser(
         CurrentUser.userUid!!,
         { user ->
           _uiState.value = _uiState.value.copy(myName = user.name, modifyingName = user.name)
-          endLoading()
+          loadSystem.end()
         },
-        { endLoading("Error loading profile") })
+        { loadSystem.end("Error loading profile") })
     userAPI.getCurrentUserAssociations(
         { associations ->
           _uiState.value =
@@ -98,11 +98,11 @@ class ProfileViewModel(
                               contentDescription = "Association Logo")
                         }
                       } + _uiState.value.defaultJoinAsso)
-          endLoading()
+          loadSystem.end()
         },
         {
           _uiState.value = _uiState.value.copy(myAssociations = emptyList())
-          endLoading("Error loading your associations")
+          loadSystem.end("Error loading your associations")
         })
     assoAPI.getAssociation(
         CurrentUser.associationUid!!,
@@ -117,21 +117,37 @@ class ProfileViewModel(
                             imageVector = Icons.Default.People,
                             contentDescription = "Association Logo")
                       })
-          endLoading()
+          loadSystem.end()
         },
         {
           if (_uiState.value.myAssociations.isNotEmpty()) {
             _uiState.value =
                 _uiState.value.copy(selectedAssociation = _uiState.value.myAssociations[0])
           }
-          endLoading("Error loading current association")
+          loadSystem.end("Error loading current association")
         })
     userAPI.getCurrentUserRole(
         { role ->
           _uiState.value = _uiState.value.copy(currentRole = role)
-          endLoading()
+          setRoleCapacities()
+          loadSystem.end()
         },
-        { endLoading("Error loading role") })
+        { loadSystem.end("Error loading role") })
+
+    // This one is separate from the main loading system because it's not critical,
+    // therefore it doesn't need to block the screen in loading state
+    userAPI.getProfilePicture(
+        "${CurrentUser.userUid!!}.jpg",
+        { uri -> _uiState.value = _uiState.value.copy(profileImageURI = uri) },
+        { snackbarSystem.showSnackbar("Error loading profile picture") })
+  }
+
+  fun refreshProfile() {
+    if (!refreshSystem.start(2)) return
+    _uiState.value = _uiState.value.copy(refresh = true)
+
+    assoAPI.updateCache({ refreshSystem.end() }, { refreshSystem.end("Could not refresh") })
+    userAPI.updateUserCache({ refreshSystem.end() }, { refreshSystem.end("Could not refresh") })
   }
 
   /**
@@ -178,12 +194,26 @@ class ProfileViewModel(
         { role ->
           _uiState.value = _uiState.value.copy(selectedAssociation = association)
           _uiState.value = _uiState.value.copy(currentRole = role)
-          endLoading()
+          setRoleCapacities()
         },
         {
           CurrentUser.associationUid = oldAssociationUid
           snackbarSystem.showSnackbar("Couldn't switch association")
         })
+  }
+
+  /**
+   * This function is used to set the role capacities of the user. It sets the user as an admin if
+   * they are a president, treasurer or committee of the association.
+   */
+  private fun setRoleCapacities() {
+    when (_uiState.value.currentRole.type) {
+      RoleType.PRESIDENCY -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.TREASURY -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.COMMITTEE -> _uiState.value = _uiState.value.copy(isAdmin = true)
+      RoleType.STAFF -> _uiState.value = _uiState.value.copy(isAdmin = false)
+      RoleType.MEMBER -> _uiState.value = _uiState.value.copy(isAdmin = false)
+    }
   }
 
   /**
@@ -222,6 +252,17 @@ class ProfileViewModel(
    */
   fun setImage(uri: Uri?) {
     if (uri == null) return
+
+    userAPI.setProfilePicture(
+        "${CurrentUser.userUid!!}.jpg",
+        uri,
+        {},
+        {
+          CoroutineScope(Dispatchers.Main).launch {
+            _uiState.value.snackbarHostState.showSnackbar(
+                message = "Couldn't change profile picture", duration = SnackbarDuration.Short)
+          }
+        })
     _uiState.value = _uiState.value.copy(profileImageURI = uri)
   }
 
@@ -236,10 +277,14 @@ class ProfileViewModel(
 }
 
 data class ProfileUIState(
-    // wether the screen in loading
+    // whether the screen in loading
     val loading: Boolean = false,
     // the error message, if any
     val error: String? = null,
+    // whether the profile is being refreshed
+    val refresh: Boolean = false,
+    // true if the user is an admin, false if not
+    val isAdmin: Boolean = false,
     // the name of the user
     val myName: String = "",
     // the name of the user as they're editing it
@@ -301,9 +346,9 @@ enum class AssociationSettings {
 
   fun getIcon(): ImageVector {
     return when (this) {
-      Members -> Icons.Default.People
-      TreasuryTags -> Icons.Default.Savings
-      Events -> Icons.Default.Event
+      Members -> Icons.Outlined.People
+      TreasuryTags -> Icons.Outlined.Savings
+      Events -> Icons.Outlined.Event
     }
   }
 

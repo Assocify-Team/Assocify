@@ -2,6 +2,7 @@ package com.github.se.assocify.ui.screens.treasury.accounting
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -27,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,17 +39,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.se.assocify.model.entities.AccountingSubCategory
 import com.github.se.assocify.model.entities.BalanceItem
 import com.github.se.assocify.model.entities.BudgetItem
 import com.github.se.assocify.model.entities.Status
 import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.composables.DropdownFilterChip
 import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalanceDetailedViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayCreateBalance
-import com.github.se.assocify.ui.screens.treasury.accounting.balance.DisplayEditBalance
+import com.github.se.assocify.ui.screens.treasury.accounting.balance.BalancePopUpScreen
 import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetDetailedViewModel
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.DisplayCreateBudget
-import com.github.se.assocify.ui.screens.treasury.accounting.budget.DisplayEditBudget
+import com.github.se.assocify.ui.screens.treasury.accounting.budget.BudgetPopUpScreen
 import com.github.se.assocify.ui.util.PriceUtil
 
 /**
@@ -62,6 +64,8 @@ import com.github.se.assocify.ui.util.PriceUtil
 fun AccountingDetailedScreen(
     page: AccountingPage,
     navigationActions: NavigationActions,
+    subCategory: AccountingSubCategory?,
+    snackbarState: SnackbarHostState,
     budgetDetailedViewModel: BudgetDetailedViewModel,
     balanceDetailedViewModel: BalanceDetailedViewModel
 ) {
@@ -71,33 +75,11 @@ fun AccountingDetailedScreen(
   val statusList: List<String> = listOf("All Status") + Status.entries.map { it.name }
   val tvaList: List<String> = listOf("HT", "TTC")
 
-  val totalAmount =
-      when (page) {
-        AccountingPage.BUDGET ->
-            if (!budgetState.filterActive) budgetState.budgetList.sumOf { it.amount }
-            else
-                budgetState.budgetList.sumOf {
-                  it.amount + (it.amount * it.tva.rate / 100f).toInt()
-                }
-        AccountingPage.BALANCE ->
-            if (!balanceState.filterActive) balanceState.balanceList.sumOf { it.amount }
-            else
-                balanceState.balanceList.sumOf {
-                  it.amount + (it.amount * it.tva.rate / 100f).toInt()
-                }
-      }
-
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
             title = {
-              Text(
-                  text =
-                      when (page) {
-                        AccountingPage.BALANCE -> balanceState.subCategory!!.name
-                        AccountingPage.BUDGET -> budgetState.subCategory!!.name
-                      },
-                  style = MaterialTheme.typography.titleLarge)
+              Text(text = subCategory!!.name, style = MaterialTheme.typography.titleLarge)
             },
             navigationIcon = {
               IconButton(
@@ -110,15 +92,10 @@ fun AccountingDetailedScreen(
               IconButton(
                   onClick = {
                     // Sets the editing state to true
-                    when (page) {
-                      AccountingPage.BALANCE ->
-                          if (balanceState.subCategory != null) {
-                            balanceDetailedViewModel.startSubCategoryEditingInBalance()
-                          }
-                      AccountingPage.BUDGET ->
-                          if (budgetState.subCategory != null) {
-                            budgetDetailedViewModel.startSubCategoryEditingInBudget()
-                          }
+                    if (page == AccountingPage.BALANCE && subCategory != null) {
+                      balanceDetailedViewModel.startSubCategoryEditingInBalance()
+                    } else if (page == AccountingPage.BUDGET && subCategory != null) {
+                      budgetDetailedViewModel.startSubCategoryEditingInBudget()
                     }
                   },
                   modifier = Modifier.testTag("editSubCat")) {
@@ -144,16 +121,13 @@ fun AccountingDetailedScreen(
       },
       snackbarHost = {
         SnackbarHost(
-            hostState =
-                when (page) {
-                  AccountingPage.BALANCE -> balanceState.snackbarState
-                  AccountingPage.BUDGET -> budgetState.snackbarState
-                },
+            hostState = snackbarState,
             snackbar = { snackbarData -> Snackbar(snackbarData = snackbarData) })
       }) { innerPadding ->
+
         // Call the various editing popups
-        if (budgetState.editing && page == AccountingPage.BUDGET) {
-          DisplayEditBudget(budgetDetailedViewModel)
+        if ((budgetState.editing || budgetState.creating) && page == AccountingPage.BUDGET) {
+          BudgetPopUpScreen(budgetViewModel = budgetDetailedViewModel)
         } else if ((budgetState.subCatEditing && page == AccountingPage.BUDGET) ||
             (balanceState.subCatEditing && page == AccountingPage.BALANCE)) {
           DisplayEditSubCategory(
@@ -163,12 +137,9 @@ fun AccountingDetailedScreen(
               navigationActions,
               balanceState,
               budgetState)
-        } else if (balanceState.editing && page == AccountingPage.BALANCE) {
-          DisplayEditBalance(balanceDetailedViewModel)
-        } else if (budgetState.creating && page == AccountingPage.BUDGET) {
-          DisplayCreateBudget(budgetViewModel = budgetDetailedViewModel)
-        } else if (balanceState.creating && page == AccountingPage.BALANCE) {
-          DisplayCreateBalance(balanceDetailedViewModel)
+        } else if ((balanceState.editing || balanceState.creating) &&
+            page == AccountingPage.BALANCE) {
+          BalancePopUpScreen(balanceDetailedViewModel = balanceDetailedViewModel)
         }
 
         LazyColumn(
@@ -180,11 +151,7 @@ fun AccountingDetailedScreen(
               if (page == AccountingPage.BALANCE) {
                 DropdownFilterChip(statusList.first(), statusList, "statusListTag") {
                   balanceDetailedViewModel.onStatusFilter(
-                      if (it == "All Status") {
-                        null
-                      } else {
-                        Status.valueOf(it)
-                      })
+                      it.takeIf { it != "All Status" }?.let { Status.valueOf(it) })
                 }
               }
 
@@ -195,7 +162,6 @@ fun AccountingDetailedScreen(
               }
             }
           }
-
           // Display the items
           when (page) {
             AccountingPage.BALANCE -> {
@@ -206,7 +172,10 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (balanceState.balanceList.isNotEmpty()) {
-                item { TotalItems(totalAmount) }
+                item {
+                  TotalItems(
+                      balanceState.balanceList.sumOf { it.getAmount(budgetState.filterActive) })
+                }
               } else {
                 item {
                   Text(
@@ -222,7 +191,10 @@ fun AccountingDetailedScreen(
 
               // display total amount
               if (budgetState.budgetList.isNotEmpty()) {
-                item { TotalItems(totalAmount) }
+                item {
+                  TotalItems(
+                      budgetState.budgetList.sumOf { it.getAmount(budgetState.filterActive) })
+                }
               } else {
                 item {
                   Text(
@@ -277,15 +249,10 @@ fun DisplayBudgetItem(
       headlineContent = { Text(budgetItem.nameItem) },
       trailingContent = {
         Text(
-            if (budgetState.filterActive)
-                PriceUtil.fromCents(
-                    budgetItem.amount + (budgetItem.amount * budgetItem.tva.rate / 100f).toInt())
-            else PriceUtil.fromCents(budgetItem.amount),
+            PriceUtil.fromCents(budgetItem.getAmount(budgetState.filterActive)),
             style = MaterialTheme.typography.bodyMedium)
       },
-      supportingContent = {
-        if (budgetItem.description.isEmpty()) Text("-") else Text(budgetItem.description)
-      },
+      supportingContent = { Text(budgetItem.getFormattedDescription()) },
       modifier =
           Modifier.clickable { budgetDetailedViewModel.startEditing(budgetItem) }.testTag(testTag))
 }
@@ -304,19 +271,20 @@ fun DisplayBalanceItem(
     testTag: String
 ) {
   val balanceState by balanceDetailedViewModel.uiState.collectAsState()
+  val receipt = balanceState.receiptList.find { it.uid == balanceItem.receiptUID }
   ListItem(
       headlineContent = { Text(balanceItem.nameItem) },
       trailingContent = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(horizontalAlignment = Alignment.End) {
           Text(
-              text =
-                  if (balanceState.filterActive)
-                      PriceUtil.fromCents(
-                          balanceItem.amount +
-                              (balanceItem.amount * balanceItem.tva.rate / 100f).toInt())
-                  else PriceUtil.fromCents(balanceItem.amount),
+              text = PriceUtil.fromCents(balanceItem.getAmount(balanceState.filterActive)),
               modifier = Modifier.padding(end = 4.dp),
               style = MaterialTheme.typography.bodyMedium)
+
+          Icon(
+              receipt?.status?.getIcon() ?: Icons.Filled.CheckCircle,
+              contentDescription = "Status",
+          )
         }
       },
       supportingContent = { Text(balanceItem.assignee) },

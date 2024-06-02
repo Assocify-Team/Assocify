@@ -27,12 +27,18 @@ fun AssocifyApp(loginSaver: LoginSave) {
 
   loginSaver.loadUserInfo()
 
-  val userAPI = UserAPI(SupabaseClient.supabaseClient)
-  val associationAPI = AssociationAPI(SupabaseClient.supabaseClient)
+  val userAPI =
+      UserAPI(
+          SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath().resolve("users"))
+  val associationAPI =
+      AssociationAPI(
+          SupabaseClient.supabaseClient,
+          LocalContext.current.cacheDir.toPath().resolve("associations"))
   val eventAPI = EventAPI(SupabaseClient.supabaseClient)
   val taskAPI = TaskAPI(SupabaseClient.supabaseClient)
   val receiptsAPI =
-      ReceiptAPI(SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath())
+      ReceiptAPI(
+          SupabaseClient.supabaseClient, LocalContext.current.cacheDir.toPath().resolve("receipts"))
   val budgetAPI = BudgetAPI(SupabaseClient.supabaseClient)
   val accountingCategoriesAPI = AccountingCategoryAPI(SupabaseClient.supabaseClient)
   val accountingSubCategoryAPI = AccountingSubCategoryAPI(SupabaseClient.supabaseClient)
@@ -40,7 +46,7 @@ fun AssocifyApp(loginSaver: LoginSave) {
 
   val firstDest =
       if (CurrentUser.userUid != null && CurrentUser.associationUid != null) {
-        Destination.Home.route
+        Destination.Treasury.route
       } else {
         Destination.Login.route
       }

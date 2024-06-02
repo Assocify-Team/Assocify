@@ -3,6 +3,7 @@ package com.github.se.assocify.screens.profile
 import android.net.Uri
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -30,7 +31,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
-import kotlin.Exception
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -85,6 +85,15 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
             {
               val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
               onSuccessCallback(PermissionRole("1", "asso", RoleType.PRESIDENCY))
+            }
+
+        // Never return a profile picture, permanently "fetch" the profile picture
+        every { getProfilePicture(any(), any(), any()) } answers {}
+
+        every { setProfilePicture(any(), any(), any(), any()) } answers
+            {
+              val onSuccessCallback = thirdArg<() -> Unit>()
+              onSuccessCallback()
             }
       }
 
@@ -293,6 +302,115 @@ class ProfileScreenTest : TestCase(kaspressoBuilder = Kaspresso.Builder.withComp
       mViewmodel.loadProfile() // reload page in case already loaded by before
       waitUntil { mViewmodel.uiState.value.error != null }
       onNodeWithTag("errorMessage").assertIsDisplayed().assertTextContains("Error loading role")
+    }
+  }
+
+  @Test
+  fun refreshProfile() {
+    every { mockAssocAPI.updateCache(any(), any()) } answers {}
+    every { mockUserAPI.updateUserCache(any(), any()) } answers
+        {
+          val onErrorCallback = secondArg<(Exception) -> Unit>()
+          onErrorCallback(Exception("error"))
+        }
+    with(composeTestRule) {
+      mViewmodel.refreshProfile()
+      onNodeWithText("Could not refresh").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun openProfileSheet() {
+    with(composeTestRule) {
+      onNodeWithTag("default profile icon").performClick()
+      onNodeWithTag("photoSelectionSheet").assertIsDisplayed()
+      mViewmodel.signalCameraPermissionDenied()
+      onNodeWithTag("snackbar").assertIsDisplayed()
+    }
+  }
+
+  @Test
+  fun setUriFailure() {
+    every { mockUserAPI.getProfilePicture(any(), any(), any()) } answers
+        {
+          val onFailureCallback = thirdArg<(Exception) -> Unit>()
+          onFailureCallback(Exception("Testing error"))
+        }
+    mViewmodel.loadProfile()
+    with(composeTestRule) { onNodeWithTag("snackbar").assertIsDisplayed() }
+  }
+
+  @Test
+  fun setUriSuccess() {
+    every { mockUserAPI.getProfilePicture(any(), any(), any()) } answers
+        {
+          val onSuccessCallback = secondArg<(Uri) -> Unit>()
+          onSuccessCallback(mockk())
+        }
+    mViewmodel.loadProfile()
+    with(composeTestRule) { onNodeWithTag("snackbar").assertIsNotDisplayed() }
+  }
+
+  @Test
+  fun displayProfilePictureError() {
+    every { mockUserAPI.setProfilePicture(any(), any(), any(), any()) } answers
+        {
+          val onFailureCallback = arg<(Exception) -> Unit>(3)
+          onFailureCallback(Exception("Testing error"))
+        }
+    with(composeTestRule) {
+      onNodeWithTag("default profile icon").assertIsDisplayed()
+      onNodeWithTag("default profile icon").assertHasClickAction()
+      mViewmodel.setImage(uri)
+      assert(mViewmodel.uiState.value.profileImageURI != null)
+    }
+  }
+
+  @Test
+  fun rolePermissionTest() {
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.MEMBER))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("MEMBER").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsNotDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.STAFF))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("STAFF").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsNotDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.TREASURY))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("TREASURY").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsDisplayed()
+    }
+    every { mockUserAPI.getCurrentUserRole(any(), any()) } answers
+        {
+          val onSuccessCallback = firstArg<(PermissionRole) -> Unit>()
+          onSuccessCallback(PermissionRole("1", "asso", RoleType.COMMITTEE))
+        }
+    with(composeTestRule) {
+      mViewmodel.loadProfile()
+      onNodeWithTag("profileRole").assertIsDisplayed()
+      onNodeWithText("COMMITTEE").assertIsDisplayed()
+      onNodeWithText("Manage", true).assertIsDisplayed()
     }
   }
 }

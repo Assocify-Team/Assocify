@@ -1,6 +1,8 @@
 package com.github.se.assocify.ui.screens.createAssociation
 
+import android.net.Uri
 import android.util.Log
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import com.github.se.assocify.model.CurrentUser
@@ -15,8 +17,11 @@ import com.github.se.assocify.navigation.NavigationActions
 import com.github.se.assocify.ui.util.SnackbarSystem
 import java.time.LocalDate
 import java.util.UUID
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class CreateAssociationViewmodel(
     private val assoAPI: AssociationAPI,
@@ -197,12 +202,38 @@ class CreateAssociationViewmodel(
                     { navActions.goFromCreateAsso() }, { navActions.goFromCreateAsso() })
               },
               {}) // Exception not dealt with, to do in v1.1 (use server funcs, it's atomic)
+          if (_uiState.value.imageUri != null) {
+            assoAPI.setLogo(
+                association.uid,
+                _uiState.value.imageUri!!,
+                {},
+                { exception ->
+                  // We might already have navigated away, there's no way to show a snackbar...
+                  Log.e("CreateAssoViewModel", "Failed to set logo: ${exception.message}")
+                })
+          }
         },
         onFailure = { exception ->
           currentlySaving = false
           Log.e("CreateAssoViewModel", "Failed to add asso: ${exception.message}")
           snackbarSystem.showSnackbar("Failed to create association.", "Retry", this::saveAsso)
         })
+  }
+
+  fun controlBottomSheet(show: Boolean) {
+    _uiState.value = _uiState.value.copy(showBottomSheet = show)
+  }
+
+  fun setLogo(image: Uri?) {
+    if (image == null) return
+    _uiState.value = _uiState.value.copy(imageUri = image)
+  }
+
+  fun signalCameraPermissionDenied() {
+    CoroutineScope(Dispatchers.Main).launch {
+      _uiState.value.snackbarHostState.showSnackbar(
+          message = "Camera permission denied", duration = SnackbarDuration.Short)
+    }
   }
 }
 
@@ -217,7 +248,9 @@ data class CreateAssoUIState(
     val savable: Boolean =
         (members.any { member -> member.user.uid == CurrentUser.userUid }) &&
             name.isNotBlank(), // whether the association can be saved
-    val nameError: String? = null, // error message when the name is invalid
+    // the snackbar host state
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
-    // there should be a logo val but not implemented yet
+    val nameError: String? = null, // error message when the name is invalid
+    val showBottomSheet: Boolean = false, // whether the bottom sheet is shown
+    val imageUri: Uri? = null // the image URI of the logo
 )
